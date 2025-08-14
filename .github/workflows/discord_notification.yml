@@ -8,7 +8,7 @@ on:
     types: [opened, closed]
   push: # push - master 브랜치에 push 이벤트 발생 시 discord 알림
     branches:
-      - main
+      [main]
 
 jobs:
   discordNotification:
