@@ -5,27 +5,37 @@ using VContainer;
 
 public class PoolPresenter : MonoBehaviour
 {
-    private Pool pool;
-
-    private Stack<GameObject> pooledStack = new Stack<GameObject>();
+    private PoolManager poolManager;
 
     [Inject]
-    public void Construct(Pool pool)
+    public void Construct(PoolManager manager)
     {
-        this.pool = pool;
+        poolManager = manager;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            pooledStack.Push(pool.GetItem());
+            poolManager.ActiveAll();
+
 
         }
         else if (Input.GetKeyDown(KeyCode.F2))
         {
-            pool.ReleaseItem(pooledStack.Pop());
-
+            poolManager.PunchPool.RealeaseItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            poolManager.StickPool.RealeaseItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.F4))
+        {
+            poolManager.CainPool.RealeaseItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.F5))
+        {
+            poolManager.BowPool.RealeaseItem();
         }
     }
 }
