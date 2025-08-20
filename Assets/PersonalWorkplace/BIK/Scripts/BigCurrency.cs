@@ -195,7 +195,7 @@ public sealed class BigCurrency : IComparable<BigCurrency>, IEquatable<BigCurren
     }
 
     // 팩토리: A단위 원시값(예: 1500000A)에서 생성
-    public static BigCurrency FromBaseAmount(double baseAmount)
+    public static BigCurrency FromBaseAmount(double baseAmount) // 예: 1500000A -> 1.5B
     {
         if (baseAmount <= 0) return new BigCurrency(0, 0);
         int tier = 0;
