@@ -13,6 +13,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-common:22.0.0' // Assets/Imports/Firebase/Editor/AppDependencies.xml:13
     implementation 'com.google.firebase:firebase-database:22.0.0' // Assets/Imports/Firebase/Editor/DatabaseDependencies.xml:13
     implementation 'com.google.firebase:firebase-database-unity:13.1.0' // Assets/Imports/Firebase/Editor/DatabaseDependencies.xml:22
+    implementation 'com.google.games:gpgs-plugin-support:2.1.0' // Assets/Imports/GooglePlayGames/com.google.play.games/Editor/GooglePlayGamesPluginDependencies.xml:11
 // Android Resolver Dependencies End
 **DEPS**}
 
@@ -20,7 +21,6 @@ dependencies {
 android {
   packaging {
       exclude ('/lib/armeabi/*' + '*')
-      exclude ('/lib/armeabi-v7a/*' + '*')
       exclude ('/lib/mips/*' + '*')
       exclude ('/lib/mips64/*' + '*')
       exclude ('/lib/x86/*' + '*')
