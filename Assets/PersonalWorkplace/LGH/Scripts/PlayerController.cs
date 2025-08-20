@@ -1,16 +1,29 @@
+using Unity.Behavior;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private NavMeshAgent NMagent;
+    private BehaviorGraphAgent BGagent;
+
+    public bool isSkillReady = true;
+
+    private void Start()
     {
-        
+        NMagent = GetComponent<NavMeshAgent>();
+        BGagent = GetComponent<BehaviorGraphAgent>();
+
+        NMagent.updateRotation = false;
+        NMagent.updateUpAxis = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        // Behavior Graph용 스킬 사용 가능 온오프 테스트코드
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            isSkillReady = !isSkillReady;
+        }
     }
 }
