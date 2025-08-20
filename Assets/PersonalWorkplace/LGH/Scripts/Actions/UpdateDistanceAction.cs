@@ -15,7 +15,11 @@ public partial class UpdateDistanceAction : Action
     protected override Status OnUpdate()
     {
         Target.Value = GetTarget();
-        CurrentDistance.Value = Vector2.Distance(Self.Value.transform.position, Target.Value.transform.position);
+        if (Target.Value != null)
+        {
+            CurrentDistance.Value = Vector2.Distance(Self.Value.transform.position, Target.Value.transform.position);
+        }
+        
         return Status.Success;
     }
 
