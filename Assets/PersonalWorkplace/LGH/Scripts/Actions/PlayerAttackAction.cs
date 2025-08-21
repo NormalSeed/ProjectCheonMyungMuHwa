@@ -11,8 +11,11 @@ public partial class PlayerAttackAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
 
+    private BehaviorGraphAgent BGagent;
+
     protected override Status OnStart()
     {
+        BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
         Target.Value = GetTarget();
         // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
 
@@ -55,6 +58,14 @@ public partial class PlayerAttackAction : Action
     protected override void OnEnd()
     {
         // 공격 딜레이 초기화
+
+        // 타겟 재탐지
+        Target.Value = GetTarget();
+        // 타겟이 없으면(전부 사망했다면)
+        if (Target.Value == null)
+        {
+            BGagent.SetVariableValue<bool>("isTargetDetected", false);
+        }
     }
 }
 

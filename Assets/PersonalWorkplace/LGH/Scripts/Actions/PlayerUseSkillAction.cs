@@ -12,10 +12,12 @@ public partial class PlayerUseSkillAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Target;
 
     private PlayerController controller;
+    private BehaviorGraphAgent BGagent;
 
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
+        BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
 
         Target.Value = GetTarget();
 
@@ -59,6 +61,14 @@ public partial class PlayerUseSkillAction : Action
 
     protected override void OnEnd()
     {
+        // 스킬 쿨타임 초기화
+
+        // 타겟 재탐지
+        Target.Value = GetTarget();
+        if (Target.Value == null)
+        {
+            BGagent.SetVariableValue<bool>("isTargetDetected", false);
+        }
     }
 }
 

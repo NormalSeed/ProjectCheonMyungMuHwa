@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a08a13190ab641459cbfb4ebf78e407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isSkillReady: 1
 --- !u!50 &218060082
 Rigidbody2D:
   serializedVersion: 5
@@ -519,7 +520,7 @@ GameObject:
   - component: {fileID: 431725265}
   m_Layer: 0
   m_Name: PointNo.3
-  m_TagString: Untagged
+  m_TagString: AlignPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1596,6 +1597,7 @@ Transform:
   - {fileID: 1987866172}
   - {fileID: 431725265}
   - {fileID: 1611216481}
+  - {fileID: 2136964688}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &969215475
@@ -2853,7 +2855,7 @@ GameObject:
   - component: {fileID: 1611216481}
   m_Layer: 0
   m_Name: PointNo.4
-  m_TagString: Untagged
+  m_TagString: AlignPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2971,7 +2973,7 @@ GameObject:
   - component: {fileID: 1966219868}
   m_Layer: 0
   m_Name: PointNo.1
-  m_TagString: Untagged
+  m_TagString: AlignPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3002,7 +3004,7 @@ GameObject:
   - component: {fileID: 1987866172}
   m_Layer: 0
   m_Name: PointNo.2
-  m_TagString: Untagged
+  m_TagString: AlignPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3017,6 +3019,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.44, y: -1.21, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 945349245}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2136964687
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2136964688}
+  m_Layer: 0
+  m_Name: PointNo.5
+  m_TagString: AlignPoint
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2136964688
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136964687}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.99, y: -1.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
