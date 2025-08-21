@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 431725265}
   m_Layer: 0
   m_Name: PointNo.3
-  m_TagString: AlignPoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1573,9 +1573,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 945349245}
+  - component: {fileID: 945349246}
   m_Layer: 0
   m_Name: PlayerAlignPoints
-  m_TagString: Untagged
+  m_TagString: AlignPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1600,6 +1601,24 @@ Transform:
   - {fileID: 2136964688}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &945349246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945349244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2480a6c64b9d074caf312ddf4b93961, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alignPoints:
+  - {fileID: 1966219867}
+  - {fileID: 1987866171}
+  - {fileID: 431725264}
+  - {fileID: 1611216480}
+  - {fileID: 2136964687}
 --- !u!1 &969215475
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,7 +2874,7 @@ GameObject:
   - component: {fileID: 1611216481}
   m_Layer: 0
   m_Name: PointNo.4
-  m_TagString: AlignPoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2973,7 +2992,7 @@ GameObject:
   - component: {fileID: 1966219868}
   m_Layer: 0
   m_Name: PointNo.1
-  m_TagString: AlignPoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3004,7 +3023,7 @@ GameObject:
   - component: {fileID: 1987866172}
   m_Layer: 0
   m_Name: PointNo.2
-  m_TagString: AlignPoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3035,7 +3054,7 @@ GameObject:
   - component: {fileID: 2136964688}
   m_Layer: 0
   m_Name: PointNo.5
-  m_TagString: AlignPoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
