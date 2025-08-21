@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,57 +34,46 @@ public class MainBottomUI : UIBase
     #region Button OnClick
     private void OnClickHero()
     {
-        if (activeUI != null)
-            activeUI.SetActive(false);
-        if (activeUI == heroUI)
-            return;
-        activeUI = heroUI;
-        activeUI.SetActive(true);
+        ShowUI(heroUI);
     }
     private void OnClickDungeon()
     {
-        if (activeUI != null)
-            activeUI.SetActive(false);
-        if (activeUI == dungeonUI)
-            return;
-        activeUI = dungeonUI;
-        activeUI.SetActive(true);
+        ShowUI(dungeonUI);
     }
     private void OnClickUpgrade()
     {
-        if (activeUI != null)
-            activeUI.SetActive(false);
-        if (activeUI == upgradeUI)
-            return;
-        activeUI = upgradeUI;
-        activeUI.SetActive(true);
+        ShowUI(upgradeUI);
     }
     private void OnClickInventory()
     {
-        if (activeUI != null)
-            activeUI.SetActive(false);
-        if (activeUI == inventoryUI)
-            return;
-        activeUI = inventoryUI;
-        activeUI.SetActive(true);
+        ShowUI(inventoryUI);
     }
     private void OnClickSummon()
     {
-        if (activeUI != null)
-            activeUI.SetActive(false);
-        if (activeUI == summonUI)
-            return;
-        activeUI = summonUI;
-        activeUI.SetActive(true);
+        ShowUI(summonUI);
     }
     private void OnClickShop()
     {
+        ShowUI(shopUI);
+    }
+    #endregion
+
+    #region private
+    private void ShowUI(GameObject targetUI)
+    {
+        if (activeUI == targetUI && activeUI.activeSelf)
+        {
+            activeUI.SetActive(false);
+            activeUI = null;
+            return;
+        }
+
         if (activeUI != null)
             activeUI.SetActive(false);
-        if (activeUI == shopUI)
-            return;
-        activeUI = shopUI;
+
+        activeUI = targetUI;
         activeUI.SetActive(true);
     }
+
     #endregion
 }
