@@ -6,5 +6,6 @@ public class TestPlayerModel : PlayerModel
     {
         MoveSpeed = 0.5f;
         AtkRange = 1f;
+        AtkSpeed = 1f;
     }
 }

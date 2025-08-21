@@ -12,10 +12,16 @@ public partial class PlayerUseSkillAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Target;
 
     private PlayerController controller;
+    private BehaviorGraphAgent BGagent;
+
+    private float skillCooldown;
 
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
+        BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
+
+        skillCooldown = controller.skillCooldown;
 
         Target.Value = GetTarget();
 
@@ -49,9 +55,28 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Target.Value != null)
+        if (skillCooldown > 0f)
+        {
+            skillCooldown -= Time.deltaTime;
+            return Status.Success;
+        }
+
+        if (Target.Value != null && controller.isSkillReady == true)
         {
             Debug.Log("스킬 공격 실행");
+            IDamagable target = Target.Value.GetComponent<IDamagable>();
+            if (target != null)
+            {
+                // 스킬 데미지 주기
+                target.TakeDamage(10.0f);
+                // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
+                skillCooldown = controller.skillCooldown;
+                controller.isSkillReady = false;
+            }
+            else
+            {
+                Debug.Log("데미지를 입힐 수 없는 상대입니다.");
+            }
         }
 
         return Status.Success;
@@ -59,6 +84,14 @@ public partial class PlayerUseSkillAction : Action
 
     protected override void OnEnd()
     {
+        
+
+        // 타겟 재탐지
+        Target.Value = GetTarget();
+        if (Target.Value == null)
+        {
+            BGagent.SetVariableValue<bool>("isTargetDetected", false);
+        }
     }
 }
 
