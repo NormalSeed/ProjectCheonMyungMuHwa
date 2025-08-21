@@ -34,7 +34,7 @@ public partial class PlayerMoveAction : Action
     private Transform GetMovePoint(List<GameObject> points)
     {
         // 배치 번호에 따라 이동 포인트로 이동하는 로직 구현 필요
-        Transform point = points[0].transform;
+        Transform point = points[1].transform;
 
         Debug.Log($"이동 포인트 : {point.gameObject.name}");
         return point;
