@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     public bool isSkillReady = true;
     public float skillCooldown = 3f;
+    public float curCool = 0f;
 
     private void Start()
     {
@@ -31,6 +32,16 @@ public class PlayerController : MonoBehaviour, IDamagable
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             isSkillReady = !isSkillReady;
+        }
+
+        if (curCool > 0)
+        {
+            isSkillReady = false;
+            curCool -= Time.deltaTime;
+        }
+        else
+        {
+            isSkillReady = true;
         }
     }
 

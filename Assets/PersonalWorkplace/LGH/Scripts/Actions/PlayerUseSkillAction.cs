@@ -5,23 +5,20 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
+[NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
 public partial class PlayerUseSkillAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<bool> IsSkillReady;
 
     private PlayerController controller;
     private BehaviorGraphAgent BGagent;
-
-    private float skillCooldown;
 
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
-
-        skillCooldown = controller.skillCooldown;
 
         Target.Value = GetTarget();
 
@@ -55,23 +52,21 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
-        if (skillCooldown > 0f)
+        if (IsSkillReady.Value == false)
         {
-            skillCooldown -= Time.deltaTime;
             return Status.Success;
         }
 
-        if (Target.Value != null && controller.isSkillReady == true)
+        if (Target.Value != null && IsSkillReady.Value == true)
         {
             Debug.Log("스킬 공격 실행");
             IDamagable target = Target.Value.GetComponent<IDamagable>();
             if (target != null)
             {
                 // 스킬 데미지 주기
-                target.TakeDamage(10.0f);
+                target.TakeDamage(20.0f);
                 // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
-                skillCooldown = controller.skillCooldown;
-                controller.isSkillReady = false;
+                controller.curCool = controller.skillCooldown;
             }
             else
             {
