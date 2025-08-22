@@ -1,22 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartyManager : Singleton<PartyManager>
+public class PartyManager : MonoBehaviour
 {
     public List<GameObject> partyMembers = new List<GameObject>();
-    private readonly int MaxPartySize = 5;  // 최대 파티 편성가능 인원수
-    
+    private readonly int MaxPartySize = 5;
 
-    #region Unity LifeCycle
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-    #endregion
 
     #region Public 
     public void AddMember(GameObject member)
@@ -33,6 +22,13 @@ public class PartyManager : Singleton<PartyManager>
         {
             partyMembers.Remove(member);
         }
+    }
+    #endregion
+
+    #region Private
+    private void CheakSynergy()
+    {
+
     }
     #endregion
 }

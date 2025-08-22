@@ -25,19 +25,12 @@ public class HeroPartySetting : UIBase
     #region OnClick
     private void SaveHeroSetting()
     {
-
+        /*  선택된 멤버를 추가하는 기능  */
         SetHide();
     }
     private void AutoSet()
     {
-
-    }
-    #endregion
-
-    #region private
-    public void AddMember(GameObject member)
-    {
-
+        /*  멤버를 자동으로 선택하여 추가하는 기능ㄴ  */
     }
     #endregion
 }
