@@ -5,7 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "DetactTargetPlayerAction", story: "[Self] detact nearby [Target] and set bool [IsTargetDetected]", category: "Action", id: "6ca15d30e1052d68a137bbfc3f902935")]
+[NodeDescription(name: "DetectTargetPlayerAction", story: "[Self] detect nearby [Target] and set bool [IsTargetDetected]", category: "Action", id: "6ca15d30e1052d68a137bbfc3f902935")]
 public partial class DetectTargetPlayerAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
@@ -18,8 +18,12 @@ public partial class DetectTargetPlayerAction : Action
     private float detectDelay = 0.5f;
     private float timer = 0f;
 
+    private SPUM_Prefabs spum;
+
     protected override Status OnStart()
     {
+        if (spum == null) spum = Self.Value.GetComponent<SPUM_Prefabs>();
+        spum.PlayAnimation(PlayerState.IDLE, 0);
         return Status.Running;
     }
 

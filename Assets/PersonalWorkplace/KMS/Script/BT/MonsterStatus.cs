@@ -4,7 +4,8 @@ using Unity.Behavior;
 [BlackboardEnum]
 public enum MonsterStatus
 {
-    Idle,
+	Idle,
 	Chase,
-	Attack
+	Attack,
+	Death
 }
