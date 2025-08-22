@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     private BehaviorGraphAgent BGagent;
 
     public bool isSkillReady = true;
+    // 스킬셋에 들어가야 할 쿨다운
     public float skillCooldown = 3f;
     public float curCool = 0f;
 
