@@ -297,12 +297,12 @@ GameObject:
   - component: {fileID: 130229944}
   - component: {fileID: 130229943}
   m_Layer: 5
-  m_Name: FadeOut
+  m_Name: IsHeroSetting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &130229942
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7803,7 +7803,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageUpgrade: {fileID: 215059065}
   heroSet: {fileID: 2010826801}
+  autoSet: {fileID: 48063152}
   heroSetSave: {fileID: 1292068461}
+  IsHeroSetting: {fileID: 130229942}
+  IsHeroSetNow: 0
 --- !u!1001 &5448603326800067200
 PrefabInstance:
   m_ObjectHideFlags: 0
