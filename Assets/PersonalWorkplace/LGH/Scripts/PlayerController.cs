@@ -2,15 +2,22 @@ using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamagable
 {
+    private PlayerModel model;
+    private PlayerView view;
+
     private NavMeshAgent NMagent;
     private BehaviorGraphAgent BGagent;
 
     public bool isSkillReady = true;
+    public float skillCooldown = 3f;
 
     private void Start()
     {
+        model = GetComponent<PlayerModel>();
+        view = GetComponent<PlayerView>();
+
         NMagent = GetComponent<NavMeshAgent>();
         BGagent = GetComponent<BehaviorGraphAgent>();
 
@@ -25,5 +32,11 @@ public class PlayerController : MonoBehaviour
         {
             isSkillReady = !isSkillReady;
         }
+    }
+
+    public void TakeDamage(double amount)
+    {
+        model.CurHealth.Value -= amount;
+        Debug.Log($"현재 체력 : {model.CurHealth.Value}");
     }
 }
