@@ -74,6 +74,5 @@ public class MainBottomUI : UIBase
         activeUI = targetUI;
         activeUI.SetActive(true);
     }
-
     #endregion
 }
