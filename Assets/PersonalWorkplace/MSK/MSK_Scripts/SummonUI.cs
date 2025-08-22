@@ -42,9 +42,7 @@ public class SummonUI : UIBase
     #region private
     private void SummonHeros(int times)
     {
-        /*
-        
-         */
+
     }
     #endregion
 }
