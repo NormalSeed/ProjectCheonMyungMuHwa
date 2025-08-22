@@ -32,11 +32,13 @@ public readonly struct CurrencyId : IEquatable<CurrencyId>
 
 public static class CurrencyIds
 {
-    public static readonly CurrencyId Jewel = "Jewel";                 // 용옥(다이아)
-    public static readonly CurrencyId Gold = "Gold";                   // 금화
-    public static readonly CurrencyId Soul = "Soul";                   // 혼백(경험치)
-    public static readonly CurrencyId SpiritStone = "SpiritStone";     // 영석(보물 강화)
-    public static readonly CurrencyId SummonTicket = "SummonTicket";   // 등용패(뽑기권)
+    public static readonly CurrencyId Jewel = "Jewel";                         // 용옥(다이아)
+    public static readonly CurrencyId Gold = "Gold";                           // 금화
+    public static readonly CurrencyId Soul = "Soul";                           // 혼백(경험치)
+    public static readonly CurrencyId SpiritStone = "SpiritStone";             // 영석(보물 강화)
+    public static readonly CurrencyId SummonTicket = "SummonTicket";           // 등용패(뽑기권)
+    public static readonly CurrencyId InvitationTicket = "InvitationTicket";   // 초대장(입장권)
+    public static readonly CurrencyId ChallengeTicket = "ChallengeTicket";     // 도전장(입장권)
 
     public static IEnumerable<CurrencyId> All {
         get {
@@ -45,6 +47,8 @@ public static class CurrencyIds
             yield return Soul;
             yield return SpiritStone;
             yield return SummonTicket;
+            yield return InvitationTicket;
+            yield return ChallengeTicket;
         }
     }
 }

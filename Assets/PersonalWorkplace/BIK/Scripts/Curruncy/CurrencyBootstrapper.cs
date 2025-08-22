@@ -52,5 +52,7 @@ public class CurrencyBootstrapper : IStartable
         _model.Set(CurrencyIds.Soul, new BigCurrency(0, 0));
         _model.Set(CurrencyIds.SpiritStone, new BigCurrency(0, 0));
         _model.Set(CurrencyIds.SummonTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyIds.InvitationTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyIds.ChallengeTicket, new BigCurrency(0, 0));
     }
 }
