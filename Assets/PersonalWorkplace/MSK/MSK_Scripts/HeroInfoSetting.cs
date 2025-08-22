@@ -18,15 +18,22 @@ public class HeroInfoSetting : MonoBehaviour
     [SerializeField] private Transform characterRoot;
     [SerializeField] private Transform stageRoot;
     [SerializeField] private Transform badgeRoot;
+    [SerializeField] private Transform selectRoot;
 
     [Header("UI")]
     [SerializeField] private Button CardButton;
-    [SerializeField] private GameObject HeroInfoUI;
+    [SerializeField] private TextMeshProUGUI PartyNum;
+    // [SerializeField] private GameObject HeroInfoUI;
 
 
-    private void Awake()
+    private void OnEnable()
     {
         Init();
+    }
+
+    private void OnDisable()
+    {
+        CardButton.onClick.RemoveListener(OnClickCard);
     }
 
     private void Init()
@@ -40,6 +47,8 @@ public class HeroInfoSetting : MonoBehaviour
         SetCharacter();
         SetStage();
         SetBadge();
+
+        CardButton.onClick.AddListener(OnClickCard);
     }
 
     #region Init
@@ -96,4 +105,27 @@ public class HeroInfoSetting : MonoBehaviour
         }
     }
     #endregion
+
+
+    #region OnClick
+    private void OnClickCard()
+    {
+        // 파티 편성중일 경우 HeroSetting()
+        // 선택 효과 + 편성 번호 표시
+
+        // 일반적 상황에서   HeroUIActive()
+        /* 영웅 개별 UI 활성화 */
+    }
+    #endregion
+
+    private void HeroSetting()
+    {
+        selectRoot.gameObject.SetActive(true);
+
+    }
+
+    private void HeroUIActive()
+    {
+
+    }
 }

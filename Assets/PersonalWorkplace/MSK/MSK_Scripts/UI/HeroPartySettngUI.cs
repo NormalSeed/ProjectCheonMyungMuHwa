@@ -8,6 +8,9 @@ public class HeroPartySettingUI : UIBase
     [SerializeField] private Button saveSettingButton;
     [SerializeField] private Button autoSetButton;
 
+
+    public bool IsPartySettingNow = false;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
