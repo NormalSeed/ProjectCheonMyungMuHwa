@@ -8,24 +8,17 @@ public class HeroUI : UIBase
     [SerializeField] private Button heroSet;
     [SerializeField] private Button heroSetSave;
 
-    [Header("For Test")]
-    [SerializeField] private Button addCharCard;
-    [SerializeField] private GameObject CardPrefab; 
-    [SerializeField] private Transform cardContent;
-
     #region Unity LifeCycle
     private void OnEnable()
     {
         // 승급 가능한 영웅이 있을 경우에만 활성화
         // stageUpgrade.onClick.AddListener(onClickStageUpgrade);
         heroSet.onClick.AddListener(OnClickHeroSet);
-        addCharCard.onClick.AddListener(CardAddTest);
     }
 
     private void OnDisable()
     {
         heroSet.onClick.RemoveListener(OnClickHeroSet);
-        addCharCard.onClick.RemoveListener(CardAddTest);
     }
     #endregion
 
@@ -46,16 +39,6 @@ public class HeroUI : UIBase
         //  변경 후 버튼 비활성화
         heroSetSave.gameObject.SetActive(false);
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
-    }
-    #endregion
-
-
-    #region Test Code
-
-    private void CardAddTest()
-    {
-        GameObject newCard = Instantiate(CardPrefab, cardContent);
-        newCard.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
     }
     #endregion
 }
