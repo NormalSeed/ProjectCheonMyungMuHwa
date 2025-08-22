@@ -7,7 +7,10 @@ public class PlayerModel : MonoBehaviour
     // Observable Properties
     public ObservableProperty<double> CurHealth { get; private set; } = new();
 
-    private void Start()
+    /// <summary>
+    /// Status의 계산값을 적용시키는 메서드
+    /// </summary>
+    public void SetPoints()
     {
         modelSO.HealthPoint = modelSO.Vital * modelSO.HealthRatio;
         modelSO.ExtAtkPoint = modelSO.ExtPow * modelSO.AttackRatio;
