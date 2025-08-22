@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HeroPartySetting : UIBase
+public class HeroPartySettingUI : UIBase
 {
     [Header("Button")]
     [SerializeField] private Button saveSettingButton;
