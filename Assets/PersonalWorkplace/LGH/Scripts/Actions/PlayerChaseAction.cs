@@ -6,16 +6,18 @@ using Unity.Properties;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "PlayerChase", story: "[Self] Chases [Target]", category: "Action", id: "ee0e126e269beb9725b29f54f7c198ef")]
+[NodeDescription(name: "PlayerChase", story: "[Self] Chases [Target] if [isTargetDetected] and [isInAttackRange]", category: "Action", id: "ee0e126e269beb9725b29f54f7c198ef")]
 public partial class PlayerChaseAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<bool> IsTargetDetected;
+    [SerializeReference] public BlackboardVariable<bool> IsInAttackRange;
 
     private NavMeshAgent agent;
     private PlayerModel model;
     private float distance;
-    
+
     protected override Status OnStart()
     {
         agent = Self.Value.GetComponent<NavMeshAgent>();
@@ -23,7 +25,7 @@ public partial class PlayerChaseAction : Action
         // 타겟 지정(가장 가까운 상대)
         Target.Value = GetTarget();
 
-        agent.speed = model.MoveSpeed;
+        agent.speed = model.modelSO.MoveSpeed;
         
         return Status.Running;
     }
@@ -54,22 +56,26 @@ public partial class PlayerChaseAction : Action
 
     protected override Status OnUpdate()
     {
+        if (Target.Value == null)
+        {
+            IsTargetDetected.Value = false;
+            IsInAttackRange.Value = false;
+            agent.ResetPath();
+            return Status.Failure;
+        }
+
         distance = Vector2.Distance(Self.Value.transform.position, Target.Value.transform.position);
 
         // 사정거리 안으로 들어오면 성공 반환
-        if (distance <= model.AtkRange)
+        if (distance <= model.modelSO.AtkRange)
         {
             agent.ResetPath();
             return Status.Success;
         }
-            
 
         // 사정거리 밖이면 계속 NavMesh를 이용해 경로 설정
-        if (Target.Value != null)
-        {
-            agent.SetDestination(Target.Value.transform.position);
-        }
-
+        agent.SetDestination(Target.Value.transform.position);
+        
         return Status.Running;
     }
 }

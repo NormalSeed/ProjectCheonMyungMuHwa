@@ -67,7 +67,7 @@ public partial class PlayerAttackAction : Action
             {
                 // 데미지 주기
                 target.TakeDamage(10.0f);
-                attackDelay = 1f / model.AtkSpeed;
+                attackDelay = 1f / model.modelSO.AtkSpeed;
             }
             else
             {
@@ -80,8 +80,6 @@ public partial class PlayerAttackAction : Action
 
     protected override void OnEnd()
     {
-        // 공격 딜레이 초기화
-
         // 타겟 재탐지
         Target.Value = GetTarget();
         // 타겟이 없으면(전부 사망했다면)

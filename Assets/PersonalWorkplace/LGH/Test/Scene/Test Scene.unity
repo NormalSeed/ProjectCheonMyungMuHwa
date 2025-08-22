@@ -268,13 +268,13 @@ GameObject:
   - component: {fileID: 218060075}
   - component: {fileID: 218060077}
   - component: {fileID: 218060080}
-  - component: {fileID: 218060084}
   - component: {fileID: 218060078}
+  - component: {fileID: 218060086}
   - component: {fileID: 218060082}
   - component: {fileID: 218060083}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -402,6 +402,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isSkillReady: 1
+  skillCooldown: 3
+  curCool: 0
 --- !u!50 &218060082
 Rigidbody2D:
   serializedVersion: 5
@@ -451,7 +453,7 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &218060084
+--- !u!114 &218060086
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -460,9 +462,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 218060074}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6878f6c3fe0e4fd4581de673d43e8547, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f0a1e818274cbc43886d0e6dfcff656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  modelSO: {fileID: 11400000, guid: 6f109a1e9398f0c41969b9b397a5fe24, type: 2}
 --- !u!1 &223654753
 GameObject:
   m_ObjectHideFlags: 0
