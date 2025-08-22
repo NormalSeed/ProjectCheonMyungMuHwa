@@ -1,14 +1,14 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class HeroCardSet : MonoBehaviour
+public class HeroInfoSetting : MonoBehaviour
 {
     [Header("SO")]
     [SerializeField] private CardInfo chardata;
 
     public string HeroID { get; private set; }
     public int HeroStage { get; private set; }
-
     private HeroRarity rarity;
     private HeroRelationship relationship;
 
@@ -19,6 +19,10 @@ public class HeroCardSet : MonoBehaviour
     [SerializeField] private Transform stageRoot;
     [SerializeField] private Transform badgeRoot;
 
+    [Header("UI")]
+    [SerializeField] private Button CardButton;
+    [SerializeField] private GameObject HeroInfoUI;
+
 
     private void Awake()
     {
@@ -27,13 +31,6 @@ public class HeroCardSet : MonoBehaviour
 
     private void Init()
     {
-        Debug.Log($"chardata: {chardata.name}");
-        Debug.Log($"HeroID 값: {chardata.HeroID}");
-        Debug.Log($"HeroStage 값: {chardata.HeroStage}");
-        Debug.Log($"Rarity 값: {chardata.rarity}");
-        Debug.Log($"Relationship 값: {chardata.relationship}");
-
-
         HeroID = chardata.HeroID;
         HeroStage = chardata.HeroStage;
         rarity = chardata.rarity;
