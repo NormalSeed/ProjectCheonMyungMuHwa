@@ -25,6 +25,9 @@ public readonly struct CurrencyId : IEquatable<CurrencyId>
         StringComparer.Ordinal.GetHashCode(Key);
 
     public static implicit operator CurrencyId(string key) => new CurrencyId(key);
+
+    public static bool operator ==(CurrencyId left, CurrencyId right) => left.Equals(right);
+    public static bool operator !=(CurrencyId left, CurrencyId right) => !left.Equals(right);
 }
 
 public static class CurrencyIds
