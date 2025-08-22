@@ -268,9 +268,9 @@ GameObject:
   - component: {fileID: 218060075}
   - component: {fileID: 218060077}
   - component: {fileID: 218060080}
-  - component: {fileID: 218060084}
   - component: {fileID: 218060078}
   - component: {fileID: 218060085}
+  - component: {fileID: 218060086}
   - component: {fileID: 218060082}
   - component: {fileID: 218060083}
   m_Layer: 0
@@ -454,42 +454,6 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &218060084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 218060074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6878f6c3fe0e4fd4581de673d43e8547, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <CharID>k__BackingField: 
-  <CharName>k__BackingField: 
-  <Rarity>k__BackingField: 0
-  <Faction>k__BackingField: 
-  <Position>k__BackingField: 0
-  <Role>k__BackingField: 
-  <Level>k__BackingField: 0
-  <Grade>k__BackingField: 0
-  <Vital>k__BackingField: 0
-  <ExtPow>k__BackingField: 0
-  <InnPow>k__BackingField: 0
-  <CritRate>k__BackingField: 0
-  <CritDamage>k__BackingField: 0
-  <HealthRatio>k__BackingField: 0
-  <AttackRatio>k__BackingField: 0
-  <DefRatio>k__BackingField: 0
-  <HealthPoint>k__BackingField: 0
-  <ExtAtkPoint>k__BackingField: 0
-  <InnAtkPoint>k__BackingField: 0
-  <DefPoint>k__BackingField: 0
-  <AtkSpeed>k__BackingField: 0
-  <MoveSpeed>k__BackingField: 0
-  <AtkRange>k__BackingField: 0
-  <SkillSetID>k__BackingField: 
 --- !u!114 &218060085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,6 +474,19 @@ MonoBehaviour:
   InnSkillDmg: 0
   CoolTime: 0
   SkillRange: 0
+--- !u!114 &218060086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218060074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f0a1e818274cbc43886d0e6dfcff656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelSO: {fileID: 11400000, guid: 6f109a1e9398f0c41969b9b397a5fe24, type: 2}
 --- !u!1 &223654753
 GameObject:
   m_ObjectHideFlags: 0

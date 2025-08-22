@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour, IDamagable
 {
-    private PlayerModel model;
+    //private PlayerModel model;
     private PlayerView view;
 
     private NavMeshAgent NMagent;
@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void Start()
     {
-        model = GetComponent<PlayerModel>();
+        //model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
 
         NMagent = GetComponent<NavMeshAgent>();
@@ -25,6 +25,19 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
+    }
+
+    private void LoadPlayerData()
+    {
+        // 테스트를 위한 TestPlayerData.csv 파일 받아오기, TestPlayerData는 Addressable로 체크되어있어야 함
+        Utils.LoadCSV("TestPlayerData", csvText =>
+        {
+            if (csvText != null)
+            {
+                // ID 기준으로 플레이어 데이터 받아오기
+            }
+        });
+
     }
 
     private void Update()
@@ -48,7 +61,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     public void TakeDamage(double amount)
     {
-        model.CurHealth.Value -= amount;
-        Debug.Log($"현재 체력 : {model.CurHealth.Value}");
+        //model.CurHealth.Value -= amount;
+        //Debug.Log($"현재 체력 : {model.CurHealth.Value}");
     }
 }

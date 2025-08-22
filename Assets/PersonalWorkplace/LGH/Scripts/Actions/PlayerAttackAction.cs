@@ -67,7 +67,7 @@ public partial class PlayerAttackAction : Action
             {
                 // 데미지 주기
                 target.TakeDamage(10.0f);
-                attackDelay = 1f / model.AtkSpeed;
+                attackDelay = 1f / model.modelSO.AtkSpeed;
             }
             else
             {

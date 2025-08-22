@@ -25,7 +25,7 @@ public partial class PlayerChaseAction : Action
         // 타겟 지정(가장 가까운 상대)
         Target.Value = GetTarget();
 
-        agent.speed = model.MoveSpeed;
+        agent.speed = model.modelSO.MoveSpeed;
         
         return Status.Running;
     }
@@ -67,7 +67,7 @@ public partial class PlayerChaseAction : Action
         distance = Vector2.Distance(Self.Value.transform.position, Target.Value.transform.position);
 
         // 사정거리 안으로 들어오면 성공 반환
-        if (distance <= model.AtkRange)
+        if (distance <= model.modelSO.AtkRange)
         {
             agent.ResetPath();
             return Status.Success;

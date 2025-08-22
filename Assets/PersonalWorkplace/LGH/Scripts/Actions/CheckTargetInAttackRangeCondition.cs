@@ -15,7 +15,7 @@ public partial class CheckTargetInAttackRangeCondition : Condition
     public override void OnStart()
     {
         model = Self.Value.GetComponent<PlayerModel>();
-        AttackRange.Value = model.AtkRange;
+        AttackRange.Value = model.modelSO.AtkRange;
     }
 
     public override bool IsTrue()
