@@ -1,7 +1,7 @@
 using Firebase;
 using Firebase.Auth;
-using Firebase.Extensions;
 using Firebase.Database;
+using Firebase.Extensions;
 using UnityEngine;
 
 public class BackendManager : MonoBehaviour
@@ -42,8 +42,12 @@ public class BackendManager : MonoBehaviour
             {
                 FirebaseApp = FirebaseApp.DefaultInstance;
                 Auth = FirebaseAuth.DefaultInstance;
+                Database = FirebaseDatabase.DefaultInstance;
 
                 Debug.Log("Firebase 초기화 완료!");
+
+                //Firebase 준비가 끝나면 익명 로그인 시도
+                SignInAnonymously();
             }
             else
             {
@@ -52,52 +56,28 @@ public class BackendManager : MonoBehaviour
         });
     }
 
-    //이메일 회원가입
-    public void SignUpWithEmail(string email, string password)
+    //익명 로그인
+    public void SignInAnonymously()
     {
-        Auth.CreateUserWithEmailAndPasswordAsync(email, password)
-            .ContinueWithOnMainThread(task =>
+        Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled || task.IsFaulted)
             {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("회원가입 실패: " + task.Exception);
-                    return;
-                }
+                Debug.LogError("익명 로그인 실패: " + task.Exception);
+                return;
+            }
 
-                FirebaseUser newUser = task.Result.User;
-                Database = FirebaseDatabase.DefaultInstance;
-                userRef = Database.RootReference.Child("users").Child(newUser.UserId);
+            FirebaseUser newUser = task.Result.User;
+            userRef = Database.RootReference.Child("users").Child(newUser.UserId);
 
-                Debug.Log($"회원가입 성공! UID: {newUser.UserId}");
-            });
+            Debug.Log($"익명 로그인 성공 UID: {newUser.UserId}");
+
+            TestLoadQuests();
+        });
     }
 
-    //이메일 로그인
-    public void SignInWithEmail(string email, string password)
-    {
-        Auth.SignInWithEmailAndPasswordAsync(email, password)
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("이메일 로그인 실패: " + task.Exception);
-                    return;
-                }
-
-                FirebaseUser newUser = task.Result.User;
-                Database = FirebaseDatabase.DefaultInstance;
-                userRef = Database.RootReference.Child("users").Child(newUser.UserId);
-
-                Debug.Log($"이메일 로그인 성공! UID: {newUser.UserId}");
-
-                // 로그인 성공 후 테스트 실행
-                TestSaveData();
-                TestLoadData();
-            });
-    }
-
-    //테스트 데이터 저장
-    public void TestSaveData()
+    //퀘스트 저장
+    public void SaveQuest(Quest quest)
     {
         if (userRef == null)
         {
@@ -105,18 +85,19 @@ public class BackendManager : MonoBehaviour
             return;
         }
 
-        userRef.Child("testValue").SetValueAsync("Hello Firebase (Email)!")
+        string json = JsonUtility.ToJson(quest);
+        userRef.Child("quests").Child(quest.questID).SetRawJsonValueAsync(json)
             .ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted)
-                    Debug.Log("테스트 데이터 저장 성공!");
+                    Debug.Log($"퀘스트 저장 완료: {quest.questName}");
                 else
-                    Debug.LogError("테스트 데이터 저장 실패: " + task.Exception);
+                    Debug.LogError("퀘스트 저장 실패: " + task.Exception);
             });
     }
 
-    //테스트 데이터 불러오기
-    public void TestLoadData()
+    //퀘스트 불러오기
+    public void LoadQuests()
     {
         if (userRef == null)
         {
@@ -124,17 +105,51 @@ public class BackendManager : MonoBehaviour
             return;
         }
 
-        userRef.Child("testValue").GetValueAsync()
+        userRef.Child("quests").GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted || task.IsCanceled)
+            {
+                Debug.LogError("퀘스트 불러오기 실패: " + task.Exception);
+                return;
+            }
+
+            DataSnapshot snapshot = task.Result;
+            foreach (var child in snapshot.Children)
+            {
+                Quest quest = JsonUtility.FromJson<Quest>(child.GetRawJsonValue());
+                Debug.Log($"불러온 퀘스트: {quest.questID}, 진행도 {quest.valueProgress}/{quest.valueGoal}");
+            }
+        });
+    }
+    public void TestSaveQuest(Quest quest)
+    {
+        if (userRef == null || Auth.CurrentUser == null)
+        {
+            Debug.LogError("Database 참조 없음! 로그인 먼저 하세요.");
+            return;
+        }
+
+        string json = JsonUtility.ToJson(quest);
+
+        // 여기서 dbRef 대신 userRef 사용
+        userRef.Child("testQuest")
+            .SetRawJsonValueAsync(json)
             .ContinueWithOnMainThread(task =>
             {
-                if (task.IsFaulted || task.IsCanceled)
+                if (task.IsCompleted)
                 {
-                    Debug.LogError("데이터 불러오기 실패: " + task.Exception);
-                    return;
+                    Debug.Log($"[DB 저장 완료] {quest.questName} ({quest.valueProgress}/{quest.valueGoal}) 완료={quest.isComplete}, 보상={quest.isClaimed}");
                 }
-
-                DataSnapshot snapshot = task.Result;
-                Debug.Log("불러온 값: " + snapshot.Value);
+                else
+                {
+                    Debug.LogError("퀘스트 저장 실패: " + task.Exception);
+                }
             });
+    }
+
+    //테스트용 퀘스트 불러오기
+    private void TestLoadQuests()
+    {
+        LoadQuests();
     }
 }

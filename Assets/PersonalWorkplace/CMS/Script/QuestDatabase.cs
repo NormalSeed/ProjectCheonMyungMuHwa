@@ -3,17 +3,25 @@ using UnityEngine;
 
 public class QuestDatabase : MonoBehaviour
 {
-    public static List <Quest> AllQuests = new List<Quest>();
+    public static List<Quest> AllQuests = new List<Quest>();
 
-    public void LoadFromCSV(string csvText)
+    public void LoadFromCSV(string fileName)
     {
-        string[] lines = csvText.Split('\n');
+        AllQuests.Clear();
 
-        for(int i = 1; i < lines.Length; i++) //첫줄 스킵
+        TextAsset csvFile = Resources.Load<TextAsset>(fileName);
+        if (csvFile == null)
         {
-            if(string.IsNullOrWhiteSpace(lines[i]))
-                continue;
+            Debug.LogError("CSV 파일을 찾을 수 없습니다: " + fileName);
+            return;
+        }
 
+        string[] lines = csvFile.text.Split('\n');
+
+        for (int i = 1; i < lines.Length; i++) // 첫 줄은 헤더
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+                continue;
 
             string[] values = lines[i].Split(',');
 
@@ -24,19 +32,21 @@ public class QuestDatabase : MonoBehaviour
 
                 questType = (QuestCategory)int.Parse(values[2].Trim()),
                 questTarget = (QuestTargetType)int.Parse(values[3].Trim()),
-                valueProgress = 0, //초기 진행 수치는 0
+                valueProgress = 0,
                 valueGoal = int.Parse(values[4].Trim()),
 
-                isComplete = false, //초기 완료 여부는 false
-                isClaimed = false, //초기 보상 수령 여부는 false
+                isComplete = false,
+                isClaimed = false,
 
                 rewardID = values[5].Trim(),
                 rewardType = (RewardType)int.Parse(values[6].Trim()),
                 rewardCount = int.Parse(values[7].Trim())
             };
+
             AllQuests.Add(quest);
         }
-        Debug.Log("퀘스트 데이터베이스 로드 완료: " + AllQuests.Count + "개의 퀘스트가 로드되었습니다.");
+
+        Debug.Log("퀘스트 데이터베이스 로드 완료: " + AllQuests.Count + "개의 퀘스트 로드됨");
     }
 }
 
