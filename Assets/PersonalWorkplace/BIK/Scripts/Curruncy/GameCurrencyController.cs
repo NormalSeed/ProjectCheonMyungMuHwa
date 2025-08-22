@@ -1,11 +1,10 @@
 using System;
 
-
-public class GameCurrencyController
+public sealed class GameCurrencyController : IGameCurrencyController
 {
-    private readonly CurrencyModel _model;
+    private readonly ICurrencyModel _model;
 
-    public GameCurrencyController(CurrencyModel model)
+    public GameCurrencyController(ICurrencyModel model)
     {
         _model = model ?? throw new ArgumentNullException(nameof(model));
     }
@@ -35,10 +34,7 @@ public class GameCurrencyController
 
     public BigCurrency Get(CurrencyId id) => _model.Get(id);
 
-    public void Set(CurrencyId id, BigCurrency amount)
-    {
-        _model.Set(id, amount);
-    }
+    public void Set(CurrencyId id, BigCurrency amount) => _model.Set(id, amount);
 
     public void Add(CurrencyId id, BigCurrency delta)
     {
@@ -92,4 +88,3 @@ public class GameCurrencyController
 
     public void ResetAll() => _model.Clear();
 }
-
