@@ -27,7 +27,7 @@ public class SummonResultUI : UIBase
 
     private void OnClickResult()
     {
-        SetHide();
+        this.gameObject.SetActive(false);
     }
 
 
