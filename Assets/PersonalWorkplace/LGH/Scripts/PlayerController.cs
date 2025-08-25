@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         NMagent.updateUpAxis = false;
 
         charID.Subscribe(LoadPlayerData);
+        charID.Value = "A01";
     }
 
     private void LoadPlayerData(string charID)
