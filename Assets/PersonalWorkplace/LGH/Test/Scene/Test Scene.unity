@@ -401,6 +401,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a08a13190ab641459cbfb4ebf78e407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  model: {fileID: 0}
+  view: {fileID: 0}
+  skillSet: {fileID: 1292851195521690489, guid: 8c3154d7ae3a9514e902feb50223c763, type: 3}
   isSkillReady: 1
   skillCooldown: 3
   curCool: 0
@@ -2908,6 +2911,8 @@ GameObject:
   - component: {fileID: 1622843971}
   - component: {fileID: 1622843970}
   - component: {fileID: 1622843972}
+  - component: {fileID: 1622843973}
+  - component: {fileID: 1622843974}
   m_Layer: 0
   m_Name: Mosnter
   m_TagString: Monster
@@ -2997,6 +3002,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c93e77954e2f149a4a84acc4422fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!50 &1622843973
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622843969}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!70 &1622843974
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622843969}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 1, y: 2}
+  m_Direction: 0
 --- !u!1 &1966219867
 GameObject:
   m_ObjectHideFlags: 0

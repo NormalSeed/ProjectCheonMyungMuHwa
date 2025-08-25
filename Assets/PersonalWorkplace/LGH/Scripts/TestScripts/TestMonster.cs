@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TestMonster : MonoBehaviour, IDamagable
 {
-    private double health = 100f;
+    private double health = 1000f;
 
     public void TakeDamage(double amount)
     {

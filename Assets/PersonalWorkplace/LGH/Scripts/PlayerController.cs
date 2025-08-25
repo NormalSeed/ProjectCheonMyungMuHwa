@@ -6,9 +6,9 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class PlayerController : MonoBehaviour, IDamagable
 {
-    private PlayerModel model;
-    private PlayerView view;
-    private SkillSet skillSet;
+    public PlayerModel model;
+    public PlayerView view;
+    public GameObject skillSet;
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
@@ -16,9 +16,11 @@ public class PlayerController : MonoBehaviour, IDamagable
     private BehaviorGraphAgent BGagent;
 
     public bool isSkillReady = true;
-    // 스킬셋에 들어가야 할 쿨다운
-    public float skillCooldown = 3f;
+    public bool isSkill1Ready = true;
+    public bool isSkill2Ready = false;
+    
     public float curCool = 0f;
+    public int skill2Count = 5;
 
     private void Start()
     {
@@ -37,13 +39,15 @@ public class PlayerController : MonoBehaviour, IDamagable
     private void LoadPlayerData(string charID)
     {
         // csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
-        Addressables.LoadAssetAsync<PlayerModelSO>(charID)
+        Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
             .Completed += handle =>
             {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     model.modelSO = handle.Result;
                     model.SetPoints();
+
+                    LoadPlayerSkillData(model.modelSO.SkillSetID);
                 }
                 else
                 {
@@ -52,8 +56,25 @@ public class PlayerController : MonoBehaviour, IDamagable
             };
     }
 
-    private void LoadPlayerSkillData()
+    private void LoadPlayerSkillData(string skillSetID)
     {
+        Addressables.LoadAssetAsync<GameObject>(skillSetID)
+        .Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject skillSetInstance = Instantiate(handle.Result, transform);
+                skillSet = skillSetInstance;
+
+                // 컴포넌트 초기화도 여기서
+                var skillSetComponent = skillSet.GetComponent<SkillSet>();
+                skillSetComponent.Init(this); // 예시: PlayerController를 넘겨주는 방식
+            }
+            else
+            {
+                Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
+            }
+        };
 
     }
 
@@ -73,11 +94,23 @@ public class PlayerController : MonoBehaviour, IDamagable
         if (curCool > 0)
         {
             isSkillReady = false;
+            isSkill1Ready = false;
             curCool -= Time.deltaTime;
         }
         else
         {
             isSkillReady = true;
+            isSkill1Ready = true;
+        }
+
+        if (skill2Count > 0)
+        {
+            isSkill2Ready = false;
+        }
+        else
+        {
+            isSkillReady = true;
+            isSkill2Ready = true;
         }
     }
 

@@ -57,7 +57,7 @@ public class PlayerModelGenerator
 
             var guid = AssetDatabase.AssetPathToGUID(fullPath);
             var entry = settings.CreateOrMoveEntry(guid, group);
-            entry.address = model.CharID; // Address 이름을 CharID로 설정
+            entry.address = model.CharID + "_model"; // Address 이름을 CharID_model로 설정
         }
 
         AssetDatabase.SaveAssets();
