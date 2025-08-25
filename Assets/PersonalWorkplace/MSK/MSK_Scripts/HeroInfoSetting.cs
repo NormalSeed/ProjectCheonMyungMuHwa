@@ -25,7 +25,6 @@ public class HeroInfoSetting : MonoBehaviour
     [SerializeField] private TextMeshProUGUI PartyNum;
     [SerializeField] private GameObject HeroInfoUI;
 
-
     private void OnEnable()
     {
         Init();
@@ -113,7 +112,7 @@ public class HeroInfoSetting : MonoBehaviour
         //  TODO : 파티 편성 구현하기
         // 파티 편성중일 경우 HeroSetting()
         // 선택 효과 + 편성 번호 표시
-
+        HeroUIActive();
         // 일반적 상황에서   HeroUIActive()
         /* 영웅 개별 UI 활성화 */
     }
@@ -127,6 +126,6 @@ public class HeroInfoSetting : MonoBehaviour
 
     private void HeroUIActive()
     {
-
+        HeroInfoUI.SetActive(true);
     }
 }

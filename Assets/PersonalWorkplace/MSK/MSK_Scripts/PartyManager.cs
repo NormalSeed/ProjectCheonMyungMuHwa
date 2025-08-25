@@ -29,7 +29,7 @@ public class PartyManager : MonoBehaviour
             partyMembers.Remove(member);
         }
     }
-    public void PartyInit()
+        public void PartyInit()
     {
         foreach (var partyMembers in partyMembers)
         {
