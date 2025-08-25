@@ -15,6 +15,15 @@ public class SummonUI : UIBase
     [SerializeField] private TextMeshProUGUI button10;
     [SerializeField] private TextMeshProUGUI button50;
 
+    [Header("Hero Image")]
+    [SerializeField] private Transform Hero1;
+    [SerializeField] private Transform Hero2;
+    [SerializeField] private Transform Hero3;
+    [SerializeField] private Transform Hero4;
+
+    [Header("Panel")]
+    [SerializeField] private GameObject SummonResult;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -54,7 +63,7 @@ public class SummonUI : UIBase
     #region private
     private void SummonHeros(int times)
     {
-
+        SummonResult.gameObject.SetActive(true);
     }
 
     private void ChangeButtonText(TextMeshProUGUI text)
