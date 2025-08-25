@@ -110,6 +110,7 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
+        //  TODO : 파티 편성 구현하기
         // 파티 편성중일 경우 HeroSetting()
         // 선택 효과 + 편성 번호 표시
 
