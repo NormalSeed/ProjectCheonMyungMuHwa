@@ -18,24 +18,10 @@ public class PoolPresenter : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             poolManager.ActiveAll();
-
-
         }
-        else if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKeyDown(KeyCode.F2))
         {
-            poolManager.PunchPool.RealeaseItem();
-        }
-        else if (Input.GetKeyDown(KeyCode.F3))
-        {
-            poolManager.StickPool.RealeaseItem();
-        }
-        else if (Input.GetKeyDown(KeyCode.F4))
-        {
-            poolManager.CainPool.RealeaseItem();
-        }
-        else if (Input.GetKeyDown(KeyCode.F5))
-        {
-            poolManager.BowPool.RealeaseItem();
+            poolManager.ActiveBoss();
         }
     }
 }

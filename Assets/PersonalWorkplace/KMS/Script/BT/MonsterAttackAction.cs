@@ -5,7 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "MonsterAttackAction", story: "[Self] attack [Target] by [AttackDelay] / set [IsTargetDetected] and [CurrentDistance]", category: "Action", id: "e6a0e8fea4cd29a0747bfe8d27303af6")]
+[NodeDescription(name: "MonsterAttackAction", story: "[Self] attack [Target] by [AttackDelay] / set [IsTargetDetected] and [CurrentDistance] & [Controller]", category: "Action", id: "e6a0e8fea4cd29a0747bfe8d27303af6")]
 public partial class MonsterAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
@@ -13,14 +13,15 @@ public partial class MonsterAttackAction : Action
     [SerializeReference] public BlackboardVariable<float> AttackDelay;
     [SerializeReference] public BlackboardVariable<bool> IsTargetDetected;
     [SerializeReference] public BlackboardVariable<float> CurrentDistance;
-    private SPUM_Prefabs spum;
+    [SerializeReference] public BlackboardVariable<MonsterController> Controller;
 
+    private IDamagable damageable;
     private float timer;
 
     protected override Status OnStart()
     {
-        if (spum == null) spum = Self.Value.GetComponent<SPUM_Prefabs>();
-        spum.PlayAnimation(PlayerState.IDLE, 0);
+        damageable = Target.Value.GetComponent<IDamagable>();
+        Controller.Value.OnIdle();
         return Status.Running;
     }
 
@@ -45,7 +46,7 @@ public partial class MonsterAttackAction : Action
 
     private void Attack()
     {
-        spum.PlayAnimation(PlayerState.ATTACK, 0);
+        Controller.Value.OnAttack(Self.Value, damageable);
     }
 }
 
