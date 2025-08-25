@@ -23,7 +23,7 @@ public class HeroInfoSetting : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Button CardButton;
     [SerializeField] private TextMeshProUGUI PartyNum;
-    // [SerializeField] private GameObject HeroInfoUI;
+    [SerializeField] private GameObject HeroInfoUI;
 
 
     private void OnEnable()

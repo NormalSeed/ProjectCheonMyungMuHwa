@@ -13,13 +13,15 @@ public class HeroInfoUI : UIBase
     [SerializeField] private Button upgradeButton;
     [SerializeField] private Button stageUPButton;
 
-    [Header("UI Object")]
+    [Header("UI Text")]
     [SerializeField] private TextMeshProUGUI name;      // 이름
     [SerializeField] private TextMeshProUGUI power;     // 전투력
     [SerializeField] private TextMeshProUGUI outPow;    // 외공
     [SerializeField] private TextMeshProUGUI inPow;     // 내공
     [SerializeField] private TextMeshProUGUI health;    // 체력
-
+    [SerializeField] private TextMeshProUGUI heroPiece; // 영웅조각
+    [SerializeField] private TextMeshProUGUI exp;       // 성장재화
+                                                        
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 레어도
     [SerializeField] private Transform characterRoot;      // 이미지

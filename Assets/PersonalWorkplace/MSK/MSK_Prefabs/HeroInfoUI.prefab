@@ -790,7 +790,7 @@ GameObject:
   - component: {fileID: 1593139702623833693}
   - component: {fileID: 6286973791957837999}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Power (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1137,7 +1137,7 @@ GameObject:
   - component: {fileID: 5915771018396463246}
   - component: {fileID: 8866099789582559604}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: NameText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1350,6 +1350,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1614ed4ea986204d833015b468dcd3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chardata: {fileID: 0}
+  exitButton: {fileID: 2012567644583685906}
+  upgradeButton: {fileID: 5133183938746054589}
+  stageUPButton: {fileID: 5446193516887576249}
+  name: {fileID: 8866099789582559604}
+  power: {fileID: 2655080376940387103}
+  outPow: {fileID: 8044650864576902771}
+  inPow: {fileID: 430863971412854073}
+  health: {fileID: 8002546967575854535}
+  heroPiece: {fileID: 6750410968649073718}
+  exp: {fileID: 7919346245222648299}
+  cardBackgroundRoot: {fileID: 194302778570647660}
+  characterRoot: {fileID: 7035955180257041731}
+  stageRoot: {fileID: 2050682452954716934}
+  badgeRoot: {fileID: 9119864944568463926}
+  SkillRoot: {fileID: 7912803950725234567}
+  heroInfoPanel: {fileID: 2860311811551664544}
 --- !u!1 &2867131089154981627
 GameObject:
   m_ObjectHideFlags: 0
@@ -1440,7 +1457,7 @@ GameObject:
   - component: {fileID: 8916786456105723277}
   - component: {fileID: 5586246886165693312}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1577,7 +1594,7 @@ GameObject:
   - component: {fileID: 8068007125684622620}
   - component: {fileID: 5133183938746054589}
   m_Layer: 5
-  m_Name: Button
+  m_Name: UpgradeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1811,7 +1828,7 @@ GameObject:
   - component: {fileID: 8481155799349338387}
   - component: {fileID: 6750410968649073718}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: HeroPiece (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2330,9 +2347,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8411088168480151146}
   - {fileID: 83754963548868650}
   - {fileID: 3969942278983120790}
-  - {fileID: 8411088168480151146}
   m_Father: {fileID: 6439348316865416880}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2918,7 +2935,7 @@ GameObject:
   - component: {fileID: 1860870744319762703}
   - component: {fileID: 6488296737681185596}
   m_Layer: 5
-  m_Name: Image
+  m_Name: FlowrImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2991,7 +3008,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2414462081697608695}
   m_Layer: 5
-  m_Name: Power
+  m_Name: PowerNum
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3029,7 +3046,7 @@ GameObject:
   - component: {fileID: 2521539918540946286}
   - component: {fileID: 8002546967575854535}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: Health_NumText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3464,7 +3481,7 @@ GameObject:
   - component: {fileID: 1820309406659572683}
   - component: {fileID: 583615937645186556}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3736,7 +3753,7 @@ GameObject:
   - component: {fileID: 6331735882426397436}
   - component: {fileID: 7687322593613706305}
   m_Layer: 5
-  m_Name: Image
+  m_Name: NameBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3980,8 +3997,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2450279025690529794}
   - {fileID: 1789369003388655865}
+  - {fileID: 2450279025690529794}
   - {fileID: 2697152263672421260}
   m_Father: {fileID: 6439348316865416880}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4182,7 +4199,7 @@ GameObject:
   - component: {fileID: 8154446339445213660}
   - component: {fileID: 430863971412854073}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: In_NumText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4393,7 +4410,7 @@ GameObject:
   - component: {fileID: 7318414231710209783}
   - component: {fileID: 8044650864576902771}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Out_NumText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4606,7 +4623,7 @@ GameObject:
   - component: {fileID: 2318261533551995976}
   - component: {fileID: 5446193516887576249}
   m_Layer: 5
-  m_Name: Button
+  m_Name: StageButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5092,7 +5109,7 @@ GameObject:
   - component: {fileID: 8508772164608418917}
   - component: {fileID: 7919346245222648299}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Exp (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5228,7 +5245,7 @@ GameObject:
   - component: {fileID: 7975978878450486273}
   - component: {fileID: 2655080376940387103}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PowerText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
