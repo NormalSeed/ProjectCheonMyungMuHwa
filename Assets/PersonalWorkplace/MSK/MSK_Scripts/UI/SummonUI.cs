@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,12 +9,25 @@ public class SummonUI : UIBase
     [SerializeField] private Button summon10thButton;
     [SerializeField] private Button summon50thTimesButton;
 
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI summonLevel;
+    [SerializeField] private TextMeshProUGUI button1;
+    [SerializeField] private TextMeshProUGUI button10;
+    [SerializeField] private TextMeshProUGUI button50;
+
+    [Header("Hero Image")]
+    [SerializeField] private Transform Hero1;
+    [SerializeField] private Transform Hero2;
+    [SerializeField] private Transform Hero3;
+    [SerializeField] private Transform Hero4;
+
+    [Header("Panel")]
+    [SerializeField] private GameObject SummonResult;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
-        summonButton.onClick.AddListener(onClickSummon);
-        summon10thButton.onClick.AddListener(onClickSummon10th);
-        summon50thTimesButton.onClick.AddListener(onClickSummon50th);
+        Init();
     }
 
     private void OnDisable()
@@ -21,6 +35,13 @@ public class SummonUI : UIBase
         summonButton.onClick.RemoveListener(onClickSummon);
         summon10thButton.onClick.RemoveListener(onClickSummon10th);
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
+    }
+
+    private void Init()
+    {
+        summonButton.onClick.AddListener(onClickSummon);
+        summon10thButton.onClick.AddListener(onClickSummon10th);
+        summon50thTimesButton.onClick.AddListener(onClickSummon50th);
     }
     #endregion
 
@@ -42,7 +63,12 @@ public class SummonUI : UIBase
     #region private
     private void SummonHeros(int times)
     {
+        SummonResult.gameObject.SetActive(true);
+    }
 
+    private void ChangeButtonText(TextMeshProUGUI text)
+    {
+        /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
     }
     #endregion
 }

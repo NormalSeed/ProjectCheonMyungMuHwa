@@ -2,10 +2,10 @@ using UnityEngine;
 
 public enum HeroRarity
 {
-    Normal, // 노먈(흰색)
-    Rare,   // 레어(하늘색)
-    Epic,   // 에픽(보라색)
-    Unique  // 유니크(노란색)
+    Normal = 0,  // 노먈(흰색)
+    Rare = 1,   // 레어(하늘색)
+    Epic = 2,   // 에픽(보라색)
+    Unique = 3,  // 유니크(노란색)
 }
 
 public enum HeroRelationship

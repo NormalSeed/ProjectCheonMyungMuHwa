@@ -60,7 +60,6 @@ public class HeroUI : UIBase
     private void OnClickAutoSet()
     {
         // 규칙에 따라서 영웅을 자동으로 배치
-        // 
     }
 
     //  영웅 배치 저장
