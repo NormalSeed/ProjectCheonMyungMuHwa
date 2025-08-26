@@ -1,3 +1,6 @@
+using System;
+using Unity.VisualScripting;
+
 [System.Serializable]
 public class Quest
 {
@@ -17,6 +20,59 @@ public class Quest
     public string rewardID; //보상 ID
     public RewardType rewardType; //보상 유형 (장비/재화 등)
     public int rewardCount; //보상 수량
+
+    //리셋 관리
+    public DateTime lastUpdated; //마지막 갱신
+    public int lastWeek; //마지막 갱신 주차 
+
+    public Quest() { }
+
+    public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal, string rewardId, RewardType rewardType, int rewardCount)
+{
+    questID = id;
+    questName = name;
+    questType = type;
+    questTarget = target;
+    valueProgress = 0;
+    valueGoal = goal;
+    isComplete = false;
+    isClaimed = false;
+    rewardID = rewardId;
+    this.rewardType = rewardType;
+    this.rewardCount = rewardCount;
+    
+    this.lastUpdated = DateTime.UtcNow;
+    this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
+}
+
+//진행도 추가
+public void AddProgress(int amount)
+{
+    if (isComplete) return;
+
+    valueProgress += amount;
+    if (valueProgress >= valueGoal)
+    {
+        valueProgress = valueGoal;
+        isComplete = true;
+    }
+    lastUpdated = DateTime.UtcNow;
+}
+
+//퀘스트 리셋
+public void ResetProgress()
+{
+    valueProgress = 0;
+    isComplete = false;
+    isClaimed = false;
+    lastUpdated = DateTime.UtcNow;
+}
+// 주차 계산 (주간 퀘스트 체크용)
+private int GetCurrentWeek(DateTime time)
+{
+    var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
+    return cal.GetWeekOfYear(time, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+}
 }
 public enum QuestCategory
 {
