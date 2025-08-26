@@ -1,6 +1,9 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using System;
 
 public class HeroInfoSetting : MonoBehaviour
 {
@@ -12,10 +15,12 @@ public class HeroInfoSetting : MonoBehaviour
     private HeroRarity rarity;
     private HeroRelationship relationship;
 
+    // 개인 폴더 경로로 되어 있어서 추후 수정 필요
+    private string path = "Assets/PersonalWorkplace/MSK/MSK_Sprite/SampleChar";
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
-    [SerializeField] private Transform characterRoot;      // 캐릭터 이미지
+    [SerializeField] private Sprite characterRoot;          // 캐릭터 이미지
     [SerializeField] private Transform stageRoot;          // 돌파상태
     [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
     [SerializeField] private Transform selectRoot;         // 배치 선택여부 
@@ -69,12 +74,14 @@ public class HeroInfoSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        foreach (Transform child in characterRoot)
-            child.gameObject.SetActive(false);
+        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                characterRoot = handle.Result;
+            }
+        };
 
-        Transform target = characterRoot.Find(HeroID.ToString());
-        if (target != null)
-            target.gameObject.SetActive(true);
     }
     private void SetBadge()
     {
@@ -116,8 +123,9 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
+        Debug.Log(chardata);
         partyManager.AddMember(chardata);
-        //    HeroUIActive();
+        //    HeroUIActive(); 
         //  TODO : 파티 편성 구현하기
         // 파티 편성중일 경우 HeroSetting()
         // 선택 효과 + 편성 번호 표시

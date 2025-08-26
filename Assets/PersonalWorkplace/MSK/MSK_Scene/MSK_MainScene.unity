@@ -407,7 +407,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 58356358}
-  - component: {fileID: 58356357}
+  - component: {fileID: 58356359}
   m_Layer: 0
   m_Name: PartyManager
   m_TagString: Untagged
@@ -415,19 +415,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &58356357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58356356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 668c25d2c50ae584bb2f7100c10de01d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  partyMembers: []
 --- !u!4 &58356358
 Transform:
   m_ObjectHideFlags: 0
@@ -443,6 +430,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &58356359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58356356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 668c25d2c50ae584bb2f7100c10de01d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  partyMembers: []
+  PartySixe: 1
 --- !u!1 &72323591
 GameObject:
   m_ObjectHideFlags: 0
@@ -11202,6 +11203,7 @@ MonoBehaviour:
   autoSet: {fileID: 48063152}
   heroSetSave: {fileID: 1292068461}
   IsHeroSetting: {fileID: 130229942}
+  PartyMembersCount: {fileID: 0}
 --- !u!1001 &5137664050064499359
 PrefabInstance:
   m_ObjectHideFlags: 0
