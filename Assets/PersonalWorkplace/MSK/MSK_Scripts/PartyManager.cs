@@ -19,6 +19,12 @@ public class PartyManager : MonoBehaviour
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+            var controller = member.GetComponent<PlayerController>();
+            if (controller != null)
+            {
+                controller.partyNum = partyMembers.Count - 1;
+                Debug.Log($"추가된 멤버 {controller.name}의 partyNum 설정됨: {controller.partyNum}");
+            }
         }
     }
 
@@ -29,11 +35,21 @@ public class PartyManager : MonoBehaviour
             partyMembers.Remove(member);
         }
     }
-        public void PartyInit()
+    public void PartyInit()
     {
-        foreach (var partyMembers in partyMembers)
+        // 파티 멤버 초기화
+        for (int i = 0; i < partyMembers.Count; i++)
         {
-            // 파티 멤버 초기화
+            var controller = partyMembers[i].GetComponent<PlayerController>();
+            if (controller != null)
+            {
+                controller.partyNum = i;
+                Debug.Log($"파티 멤버 {controller.name}의 partyNum 설정됨: {i}");
+            }
+            else
+            {
+                Debug.LogWarning($"파티 멤버 {partyMembers[i].name}에 PlayerController가 없습니다.");
+            }
         }
     }
     #endregion
