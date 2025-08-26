@@ -24,7 +24,7 @@ public class BowOrcController : MonsterController
         if (target != null)
         {
             MonsterProjectile proj = PoolManager.Instance.ArrowPool.GetItem(transform.position);
-            proj.TargetPos = (target as TestPlayer).transform.position;
+            proj.TargetPos = (target as PlayerController).transform.position;
             proj.Damage = Model.BaseModel.finalAttackPower;
             proj.Shot();
         }

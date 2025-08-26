@@ -24,7 +24,7 @@ public class PunchOrcController : MonsterController
         if (target != null)
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem((target as TestPlayer).transform.position);
+            DamageText text = PoolManager.Instance.DamagePool.GetItem((target as PlayerController).transform.position);
             text.SetText(Model.BaseModel.finalAttackPower);
         }
 
