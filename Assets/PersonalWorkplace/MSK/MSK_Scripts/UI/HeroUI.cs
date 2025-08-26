@@ -13,6 +13,7 @@ public class HeroUI : UIBase
     [SerializeField] private Transform IsHeroSetting;
 
     public bool IsHeroSetNow = false;
+    
 
     #region Unity LifeCycle
     private void OnEnable()

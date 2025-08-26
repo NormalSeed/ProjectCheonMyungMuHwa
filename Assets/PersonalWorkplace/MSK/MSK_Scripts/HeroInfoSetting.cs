@@ -14,16 +14,20 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     [Header("Root References")]
-    [SerializeField] private Transform cardBackgroundRoot;
-    [SerializeField] private Transform characterRoot;
-    [SerializeField] private Transform stageRoot;
-    [SerializeField] private Transform badgeRoot;
-    [SerializeField] private Transform selectRoot;
+    [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
+    [SerializeField] private Transform characterRoot;      // 캐릭터 이미지
+    [SerializeField] private Transform stageRoot;          // 돌파상태
+    [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
+    [SerializeField] private Transform selectRoot;         // 배치 선택여부 
 
     [Header("UI")]
-    [SerializeField] private Button CardButton;
-    [SerializeField] private TextMeshProUGUI PartyNum;
-    [SerializeField] private GameObject HeroInfoUI;
+    [SerializeField] private Button CardButton;             // 캐릭터 카드
+    [SerializeField] private TextMeshProUGUI PartyNum;      // 배치 순서
+
+
+
+    // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
+    private GameObject HeroInfoUI;         // 캐릭터 정보 판넬
 
     private void OnEnable()
     {
@@ -126,6 +130,7 @@ public class HeroInfoSetting : MonoBehaviour
 
     private void HeroUIActive()
     {
+        // 캐릭터 정보 SO도 함께 전달해주어야 한다.
         HeroInfoUI.SetActive(true);
     }
 }
