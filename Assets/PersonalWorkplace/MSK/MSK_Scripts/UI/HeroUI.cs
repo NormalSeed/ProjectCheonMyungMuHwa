@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer.Unity;
@@ -13,6 +14,8 @@ public class HeroUI : UIBase, IStartable
     [Header("Root References")]
     [SerializeField] private Transform IsHeroSetting;
 
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
     private bool isHeroSetNow = false;
     public bool IsHeroSetNow { get { return isHeroSetNow; } }

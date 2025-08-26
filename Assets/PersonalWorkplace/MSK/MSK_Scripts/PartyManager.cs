@@ -13,6 +13,8 @@ public class PartyManager : MonoBehaviour, IStartable
 
     private readonly int MaxPartySize = 5;
 
+    public int PartySixe = 1;
+
     public event Action<Dictionary<string, CardInfo>> partySet;
 
 
