@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using TMPro;
 using UnityEngine;
 
 public class Projectile : PooledObject
@@ -11,6 +12,7 @@ public class Projectile : PooledObject
 
     private Transform target;
     private Vector2 startPosition;
+    private Vector2 fireDirection;
     private bool isFired;
 
     private void Start()
@@ -27,13 +29,18 @@ public class Projectile : PooledObject
     {
         if (!isFired || target == null) return;
 
-        Vector2 direction = (target.position - transform.position).normalized;
-        transform.Translate(direction * speed * Time.deltaTime);
-
         if (Vector2.Distance(startPosition, transform.position) > range)
         {
+            fireDirection = Vector2.zero;
             ReturnPool();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!isFired || target == null) return;
+
+        transform.Translate(fireDirection * speed * Time.deltaTime, Space.World);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -48,7 +55,7 @@ public class Projectile : PooledObject
                 damagable.TakeDamage(
                 controller.model.modelSO.ExtAtkPoint * skillData.ExtSkillDmg +
                 controller.model.modelSO.InnAtkPoint * skillData.InnSkillDmg);
-                ReturnPool();
+                //ReturnPool();
             }
             else
             {
@@ -57,14 +64,17 @@ public class Projectile : PooledObject
         }
     }
 
-    public void Configure(Transform targetTransform, float skillSpeed, float skillRange, PlayerSkillSO skillSO)
+    public void Configure(Vector2 fireOrigin, Transform targetTransform, float skillSpeed, float skillRange, PlayerSkillSO skillSO)
     {
         target = targetTransform;
-        startPosition = transform.position;
+        startPosition = fireOrigin;
+        transform.position = startPosition;
+        fireDirection = ((Vector2)targetTransform.position - fireOrigin).normalized;
         speed = skillSpeed;
         range = skillRange;
         skillData = skillSO;
 
         isFired = true;
+        Debug.Log($"FireOrigin: {fireOrigin}, Target: {targetTransform.position}, Direction: {fireDirection}");
     }
 }

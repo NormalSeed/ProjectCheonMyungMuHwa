@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public PlayerModel model;
     public PlayerView view;
     public GameObject skillSet;
+    public GameObject SPUMAsset;
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour, IDamagable
                     model.modelSO = handle.Result;
                     model.SetPoints();
 
+                    LoadPlayerSPUMAsset(charID);
                     LoadPlayerSkillData(model.modelSO.SkillSetID);
                 }
                 else
@@ -76,7 +78,25 @@ public class PlayerController : MonoBehaviour, IDamagable
                 Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
             }
         };
+    }
 
+    private void LoadPlayerSPUMAsset(string charID)
+    {
+        Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
+        .Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject SPUMInstance = Instantiate(handle.Result, transform);
+                SPUMInstance.transform.localPosition = Vector3.zero;
+                SPUMInstance.transform.localScale = Vector3.one;
+                SPUMAsset = SPUMInstance;
+            }
+            else
+            {
+                Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
+            }
+        };
     }
 
     private void Update()

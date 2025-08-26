@@ -42,7 +42,7 @@ public class AS01_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(target, skill1Speed, skill1Range, skills[0]);
+            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[0]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else
@@ -73,7 +73,7 @@ public class AS01_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(target, skill1Speed, skill1Range, skills[1]);
+            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[1]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else
