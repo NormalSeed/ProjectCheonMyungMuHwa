@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestDatabase : MonoBehaviour
+public static class QuestDatabase
 {
-    public static List<Quest> AllQuests = new List<Quest>();
+    public static readonly List<Quest> AllQuests = new List<Quest>();
 
-    public void LoadFromCSV(string fileName)
+    public static void LoadFromCSV(string fileName)
     {
         AllQuests.Clear();
 
@@ -24,29 +25,37 @@ public class QuestDatabase : MonoBehaviour
                 continue;
 
             string[] values = lines[i].Split(',');
+            if (values.Length < 8) continue; // 안전장치
 
-            Quest quest = new Quest
+            var quest = new Quest
             {
                 questID = values[0].Trim(),
                 questName = values[1].Trim(),
-
                 questType = (QuestCategory)int.Parse(values[2].Trim()),
                 questTarget = (QuestTargetType)int.Parse(values[3].Trim()),
                 valueProgress = 0,
                 valueGoal = int.Parse(values[4].Trim()),
-
                 isComplete = false,
                 isClaimed = false,
-
                 rewardID = values[5].Trim(),
                 rewardType = (RewardType)int.Parse(values[6].Trim()),
-                rewardCount = int.Parse(values[7].Trim())
+                rewardCount = int.Parse(values[7].Trim()),
+
+                // 리셋 기준 초기화(초기 저장 시 당일/당주로 인식되도록)
+                lastUpdated = DateTime.UtcNow,
+                lastWeek = GetWeekOfYearUTC(DateTime.UtcNow)
             };
 
             AllQuests.Add(quest);
         }
 
-        Debug.Log("퀘스트 데이터베이스 로드 완료: " + AllQuests.Count + "개의 퀘스트 로드됨");
+        Debug.Log($"퀘스트 DB 로드 완료: {AllQuests.Count}개");
+    }
+
+    private static int GetWeekOfYearUTC(DateTime utc)
+    {
+        var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
+        return cal.GetWeekOfYear(utc, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
     }
 }
 
