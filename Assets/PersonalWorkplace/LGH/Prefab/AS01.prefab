@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1292851195521690489
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9139044905023093599}
+  - component: {fileID: 2312571421541380899}
+  - component: {fileID: 5042791233469074996}
+  m_Layer: 0
+  m_Name: AS01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9139044905023093599
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292851195521690489}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2312571421541380899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292851195521690489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c680b6a8cbedae4495bf888020390ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SkillSetID: 
+  skills:
+  - {fileID: 11400000, guid: d31be5c1432cb774197c922e7bb4ee97, type: 2}
+  - {fileID: 11400000, guid: 07a7e162f25576146a6b2564f840ff25, type: 2}
+  skill1Cooldown: 0
+  skill2Count: 0
+  skill1Speed: 0
+  skill2Speed: 0
+  skill1Range: 0
+  skill2Range: 0
+--- !u!114 &5042791233469074996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292851195521690489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eabfb83ea0da89643bdb794cc8c7927c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefabs:
+  - {fileID: 3782648216814250108, guid: 7417d61188dae234aa5b53f11e5538f0, type: 3}
+  - {fileID: 4296308275232444539, guid: 46808d00e974b214481941bbd2108176, type: 3}

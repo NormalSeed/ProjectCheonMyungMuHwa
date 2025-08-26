@@ -16,12 +16,17 @@ public partial class PlayerChaseAction : Action
 
     private NavMeshAgent agent;
     private PlayerModel model;
+    private PlayerController controller;
+    private SkillSet skillSet;
     private float distance;
 
     protected override Status OnStart()
     {
         agent = Self.Value.GetComponent<NavMeshAgent>();
         model = Self.Value.GetComponent<PlayerModel>();
+        controller = Self.Value.GetComponent<PlayerController>();
+        skillSet = controller.skillSet.GetComponent<SkillSet>();
+
         // 타겟 지정(가장 가까운 상대)
         Target.Value = GetTarget();
 

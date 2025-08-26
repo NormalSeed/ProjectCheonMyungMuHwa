@@ -3,22 +3,25 @@ using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
+using Unity.VisualScripting;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
+[NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady] and [isInSkillRange]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
 public partial class PlayerUseSkillAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<bool> IsSkillReady;
-
+    [SerializeReference] public BlackboardVariable<bool> IsInSkillRange;
     private PlayerController controller;
     private BehaviorGraphAgent BGagent;
+    private SkillSet skillSet;
 
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
+        skillSet = controller.skillSet.GetComponent<SkillSet>();
 
         Target.Value = GetTarget();
 
@@ -52,9 +55,9 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
-        if (IsSkillReady.Value == false)
+        if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
         {
-            return Status.Success;
+            return Status.Failure;
         }
 
         if (Target.Value != null && IsSkillReady.Value == true)
@@ -63,10 +66,26 @@ public partial class PlayerUseSkillAction : Action
             IDamagable target = Target.Value.GetComponent<IDamagable>();
             if (target != null)
             {
-                // 스킬 데미지 주기
-                target.TakeDamage(20.0f);
-                // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
-                controller.curCool = controller.skillCooldown;
+                if (skillSet == null)
+                {
+                    Debug.Log("스킬셋 로드 안됨");
+                    return Status.Success;
+                }
+
+                // 스킬 실행(데미지는 스킬 내부에서 가함)
+                if (controller.isSkill1Ready)
+                {
+                    skillSet.Skill1(Target.Value.transform);
+                    // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
+                    controller.curCool = skillSet.skills[0].CoolTime;
+                }
+                else if (controller.isSkill2Ready)
+                {
+                    skillSet.Skill2(Target.Value.transform);
+                    // 스킬 카운트 초기화
+                    controller.skill2Count = 5;
+                }
+                    
             }
             else
             {

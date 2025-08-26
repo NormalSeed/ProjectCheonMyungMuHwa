@@ -1,17 +1,19 @@
 using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
-using System.Collections;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "PlayerAttack", story: "[Self] Attack to [Target]", category: "Action", id: "6af060fcca8cec03ba035db04ac86992")]
+[NodeDescription(name: "PlayerAttack", story: "[Self] Attack to [Target] if not [isSkillReady] and [isInAttackRange]", category: "Action", id: "6af060fcca8cec03ba035db04ac86992")]
 public partial class PlayerAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<bool> IsSkillReady;
+    [SerializeReference] public BlackboardVariable<bool> IsInAttackRange;
 
+    private PlayerController controller;
     private PlayerModel model;
     private BehaviorGraphAgent BGagent;
 
@@ -19,6 +21,7 @@ public partial class PlayerAttackAction : Action
 
     protected override Status OnStart()
     {
+        controller = Self.Value.GetComponent<PlayerController>();
         model = Self.Value.GetComponent<PlayerModel>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
         Target.Value = GetTarget();
@@ -53,21 +56,27 @@ public partial class PlayerAttackAction : Action
 
     protected override Status OnUpdate()
     {
+        if (IsInAttackRange.Value == false)
+        {
+            return Status.Failure;
+        }
+
         if (attackDelay > 0f)
         {
             attackDelay -= Time.deltaTime;
             return Status.Success;
         }
 
-        if (Target.Value != null && attackDelay <= 0f) // TODO: 공격속도에 따른 공격 딜레이 걸어야 함
+        if (Target.Value != null && attackDelay <= 0f)
         {
             Debug.Log("기본 공격 실행");
             IDamagable target = Target.Value.GetComponent<IDamagable>();
             if (target != null && attackDelay <= 0f)
             {
-                // 데미지 주기
+                // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
                 target.TakeDamage(10.0f);
                 attackDelay = 1f / model.modelSO.AtkSpeed;
+                controller.skill2Count--;
             }
             else
             {
