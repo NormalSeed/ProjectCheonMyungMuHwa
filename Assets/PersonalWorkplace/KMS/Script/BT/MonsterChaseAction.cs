@@ -29,7 +29,7 @@ public partial class MonsterChaseAction : Action
             Target.Value = null;
             IsTargetDetected.Value = false;
             CurrentDistance.Value = float.MaxValue;
-            return Status.Running;
+            return Status.Failure;
         }
         Vector3 dir = Target.Value.transform.position - Self.Value.transform.position;
         CurrentDistance.Value = Vector3.Magnitude(dir);

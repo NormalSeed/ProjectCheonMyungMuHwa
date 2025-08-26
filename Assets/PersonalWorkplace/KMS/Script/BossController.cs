@@ -31,6 +31,7 @@ public class BossController : MonsterController
 
     public override void OnDeath()
     {
+        InGameManager.Instance.SetNextStage();
         OnLifeEnded?.Invoke(this);
     }
 
