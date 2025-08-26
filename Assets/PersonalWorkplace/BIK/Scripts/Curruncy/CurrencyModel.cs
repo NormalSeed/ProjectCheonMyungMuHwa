@@ -1,25 +1,29 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class CurrencyModel : ICurrencyModel
 {
-    private readonly Dictionary<CurrencyId, BigCurrency> _balances = new();
+    private readonly Dictionary<CurrencyType, BigCurrency> _balances = new();
 
-    public event Action<CurrencyId, BigCurrency> OnChanged;
+    public event Action<CurrencyType, BigCurrency> OnChanged;
 
-    public bool Has(CurrencyId id) => _balances.ContainsKey(id);
+    public bool Has(CurrencyType id)
+    {
+        return _balances.ContainsKey(id);
+    }
 
-    public BigCurrency Get(CurrencyId id) =>
-        _balances.TryGetValue(id, out var value) ? value : new BigCurrency(0, 0);
+    public BigCurrency Get(CurrencyType id)
+    {
+        return _balances.TryGetValue(id, out var value) ? value : new BigCurrency(0, 0);
+    }
 
-    public void Set(CurrencyId id, BigCurrency value)
+    public void Set(CurrencyType id, BigCurrency value)
     {
         _balances[id] = value;
         OnChanged?.Invoke(id, value);
     }
 
-    public void Add(CurrencyId id, BigCurrency delta)
+    public void Add(CurrencyType id, BigCurrency delta)
     {
         var current = Get(id);
         var updated = current + delta;
@@ -27,7 +31,7 @@ public class CurrencyModel : ICurrencyModel
         OnChanged?.Invoke(id, updated);
     }
 
-    public bool TrySpend(CurrencyId id, BigCurrency cost)
+    public bool TrySpend(CurrencyType id, BigCurrency cost)
     {
         if (!Has(id)) return false;
 
@@ -50,7 +54,7 @@ public class CurrencyModel : ICurrencyModel
         var list = new List<CurrencySaveEntry>(_balances.Count);
         foreach (var kv in _balances) {
             list.Add(new CurrencySaveEntry {
-                id = kv.Key.Key,
+                id = kv.Key.ToString(),
                 value = kv.Value.Value,
                 tier = kv.Value.Tier
             });
@@ -65,10 +69,12 @@ public class CurrencyModel : ICurrencyModel
         if (data.entries == null) return;
 
         foreach (var entry in data.entries) {
-            var id = new CurrencyId(entry.id);
+            if (!Enum.TryParse(entry.id, out CurrencyType id)) {
+                UnityEngine.Debug.LogWarning($"[CurrencyModel] Unknown CurrencyId: {entry.id}");
+                continue;
+            }
             var value = new BigCurrency(entry.value, entry.tier);
             Set(id, value);
         }
     }
-
 }
