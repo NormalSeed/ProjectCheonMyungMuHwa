@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer.Unity;
 
-public class HeroUI : UIBase, IStartable
+
+public class HeroUI : UIBase
 {
     [Header("Buttons")]
     [SerializeField] private Button stageUpgrade;       // 자동 일괄승급

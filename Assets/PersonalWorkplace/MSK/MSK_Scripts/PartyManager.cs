@@ -4,7 +4,6 @@ using UnityEngine;
 using VContainer.Unity;
 using static UnityEngine.Rendering.DebugUI;
 
-
 public class PartyManager : MonoBehaviour, IStartable
 {
     public List<GameObject> partyMembers = new List<GameObject>();

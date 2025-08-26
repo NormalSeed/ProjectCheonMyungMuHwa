@@ -1,10 +1,10 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using System;
-using System.Threading.Tasks;
+using UnityEngine.UI;
+using VContainer;
+using VContainer.Unity;
 
 public class HeroInfoSetting : MonoBehaviour
 {
@@ -30,11 +30,19 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
-    private HeroInfoUI HeroInfoUI;         // 캐릭터 정보 판넬
+    [SerializeField ]private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
     private HeroUI heroUI;
     private PartyManager partyManager;
+    
 
     #region Unity LifeCycle
+
+    public void PostStart() 
+    {
+        Debug.Log("PostStart 실행됨");
+        
+
+    }
     private void OnEnable()
     {
         Init();
@@ -122,22 +130,22 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnClickCard()
     {
         Debug.Log(chardata);
-        // partyManager.AddMember(chardata);
-        //    HeroUIActive(); 
-        //  TODO : 파티 편성 구현하기
-        // 파티 편성중일 경우 HeroSetting()
-        // 선택 효과 + 편성 번호 표시
+        // partyManager.AddMember(gameObject);
     }
     #endregion
 
 
     #region Private
+    /// <summary>
+    /// 회색으로 표시하여 배치되었음을 표시하는 스크립트
+    /// </summary>
     private void HeroSetting()
     {
         selectRoot.gameObject.SetActive(true);
-
     }
-
+    /// <summary>
+    /// 캐릭터 정보 UI로 연결하는 스크립트
+    /// </summary>
     private void HeroUIActive()
     {
         // 캐릭터 정보 SO도 함께 전달해주어야 한다.
