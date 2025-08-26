@@ -1,21 +1,34 @@
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer.Unity;
 
-public class HeroUI : UIBase
+public class HeroUI : UIBase, IStartable
 {
     [Header("Buttons")]
-    [SerializeField] private Button stageUpgrade;
-    [SerializeField] private Button heroSet;
-    [SerializeField] private Button autoSet;
-    [SerializeField] private Button heroSetSave;
+    [SerializeField] private Button stageUpgrade;       // 자동 일괄승급
+    [SerializeField] private Button heroSet;            // 파티편성 시작
+    [SerializeField] private Button autoSet;            // 파티 자동편성
+    [SerializeField] private Button heroSetSave;        // 편성파티 저장
 
     [Header("Root References")]
     [SerializeField] private Transform IsHeroSetting;
 
-    public bool IsHeroSetNow = false;
-    
+
+    private bool isHeroSetNow = false;
+    public bool IsHeroSetNow { get { return isHeroSetNow; } }
+    private PartyManager partyManager;
+
+    public HeroUI(PartyManager _partyManager)
+    {
+        partyManager = _partyManager;
+    }
 
     #region Unity LifeCycle
+    public void Start()
+    {
+        
+    }
+
     private void OnEnable()
     {
         // 승급 가능한 영웅이 있을 경우에만 활성화
@@ -48,6 +61,8 @@ public class HeroUI : UIBase
         //  버튼 비활성화
         heroSet.gameObject.SetActive(false);
 
+        //  편성변수 True
+        isHeroSetNow = true;
         //  영웅 편성화면 활성화
         IsHeroSetting.gameObject.SetActive(true);
         heroSetSave.gameObject.SetActive(true);
@@ -70,11 +85,13 @@ public class HeroUI : UIBase
         IsHeroSetting.gameObject.SetActive(false);
         heroSetSave.gameObject.SetActive(false);
         autoSet.gameObject.SetActive(false);
+        isHeroSetNow = false;
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
-        // 배치라기 버튼 활성화
+        // partyManager.PartyInit();
+        // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
     }
     #endregion

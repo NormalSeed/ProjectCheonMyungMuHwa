@@ -27,8 +27,11 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
-    private GameObject HeroInfoUI;         // 캐릭터 정보 판넬
+    private HeroInfoUI HeroInfoUI;         // 캐릭터 정보 판넬
+    private HeroUI heroUI;
+    private PartyManager partyManager;
 
+    #region Unity LifeCycle
     private void OnEnable()
     {
         Init();
@@ -38,7 +41,9 @@ public class HeroInfoSetting : MonoBehaviour
     {
         CardButton.onClick.RemoveListener(OnClickCard);
     }
+    #endregion
 
+    #region Init    
     private void Init()
     {
         HeroID = chardata.HeroID;
@@ -53,8 +58,6 @@ public class HeroInfoSetting : MonoBehaviour
 
         CardButton.onClick.AddListener(OnClickCard);
     }
-
-    #region Init
     private void SetBackground()
     {
         foreach (Transform child in cardBackgroundRoot)
@@ -113,15 +116,16 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
+        partyManager.AddMember(chardata);
+        //    HeroUIActive();
         //  TODO : 파티 편성 구현하기
         // 파티 편성중일 경우 HeroSetting()
         // 선택 효과 + 편성 번호 표시
-        HeroUIActive();
-        // 일반적 상황에서   HeroUIActive()
-        /* 영웅 개별 UI 활성화 */
     }
     #endregion
 
+
+    #region Private
     private void HeroSetting()
     {
         selectRoot.gameObject.SetActive(true);
@@ -131,6 +135,7 @@ public class HeroInfoSetting : MonoBehaviour
     private void HeroUIActive()
     {
         // 캐릭터 정보 SO도 함께 전달해주어야 한다.
-        HeroInfoUI.SetActive(true);
+        // HeroInfoUI.SetActive(true);
     }
+    #endregion
 }

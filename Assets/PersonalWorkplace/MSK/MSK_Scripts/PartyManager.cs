@@ -5,9 +5,10 @@ using VContainer.Unity;
 using static UnityEngine.Rendering.DebugUI;
 
 
-public class PartyManager : IStartable
+public class PartyManager : MonoBehaviour, IStartable
 {
-    public List<GameObject> partyMembers = new List<GameObject>();
+    public List<CardInfo> partyMembers = new List<CardInfo>();
+
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
     private readonly int MaxPartySize = 5;
@@ -22,24 +23,26 @@ public class PartyManager : IStartable
     #endregion
 
     #region Public 
-    public void AddMember(GameObject member)
+    public void AddMember(CardInfo member)
     {
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+            partyInfo.Add(member.HeroID, member);
         }
     }
 
-    public void RemoveMember(GameObject member)
+    public void RemoveMember(CardInfo member)
     {
         if (partyMembers.Contains(member))
         {
             partyMembers.Remove(member);
+            partyInfo.Remove(member.HeroID);
         }
     }
     public void PartyInit()
     {
-        partySet?.Invoke(partyInfo);
+       // partySet?.Invoke(partyInfo);
     }
     #endregion
 
