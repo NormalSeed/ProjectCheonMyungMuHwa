@@ -5,7 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "MonsterChaseAction", story: "check [Target] / set [IsTargetDetected] / set [CurrentDistance] based on [AttackDistance] and [Self]", category: "Action", id: "bcc7bc30e5e62c353ed1834ee12847c1")]
+[NodeDescription(name: "MonsterChaseAction", story: "check [Target] / set [IsTargetDetected] / set [CurrentDistance] based on [AttackDistance] and [Self] & [Controller]", category: "Action", id: "bcc7bc30e5e62c353ed1834ee12847c1")]
 public partial class MonsterChaseAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Target;
@@ -14,12 +14,11 @@ public partial class MonsterChaseAction : Action
     [SerializeReference] public BlackboardVariable<float> AttackDistance;
 
     [SerializeReference] public BlackboardVariable<GameObject> Self;
-    private SPUM_Prefabs spum;
+    [SerializeReference] public BlackboardVariable<MonsterController> Controller;
 
     protected override Status OnStart()
     {
-        if (spum == null) spum = Self.Value.GetComponent<SPUM_Prefabs>();
-        spum.PlayAnimation(PlayerState.MOVE, 0);
+        Controller.Value.OnMove();
         return Status.Running;
     }
 
@@ -37,11 +36,11 @@ public partial class MonsterChaseAction : Action
         float dot = Vector3.Dot(Vector3.right, dir);
         if (dot >= 0)
         {
-            Self.Value.transform.localScale = new Vector3(-1, 1, 1);
+            Self.Value.transform.localScale = new Vector3(-0.7f, 0.7f, 0.7f);
         }
         else
         {
-            Self.Value.transform.localScale = new Vector3(1,1,1);
+            Self.Value.transform.localScale = new Vector3(0.7f,0.7f,0.7f);
         }
 
 

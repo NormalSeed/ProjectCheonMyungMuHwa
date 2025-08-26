@@ -1,20 +1,51 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.AnimatedValues;
 using UnityEngine;
 
 public class MonsterModel : MonoBehaviour
 {
-    [SerializeField] double healthPoint;
-    public double HealthPoint { get => healthPoint; }
-    public ObservableProperty<double> CurHealth;
+  public ObservableProperty<double> CurHealth;
 
-  void Awake()
+  [SerializeField] MonsterTextures tex;
+  [SerializeField] SpriteRenderer[] renderers;
+
+  public MonsterModelBaseSO BaseModel { get; set; }
+  public void InitSprite(int stage)
   {
-    
+
+    if (stage < 100)
+    {
+      SetSprite(tex.Orc_1);
+    }
+    else if (stage < 200)
+    {
+      SetSprite(tex.Orc_2);
+    }
+    else if (stage < 300)
+    {
+      SetSprite(tex.Orc_3);
+    }
+    else if (stage < 400)
+    {
+      SetSprite(tex.Orc_4);
+    }
+  }
+  private void SetSprite(Dictionary<string, Sprite> dict)
+  {
+    renderers[0].sprite = dict["Body"];
+    renderers[1].sprite = dict["Head"];
+    renderers[2].sprite = dict["Arm_L"];
+    renderers[3].sprite = dict["Arm_R"];
+    renderers[4].sprite = dict["Foot_R"];
+    renderers[5].sprite = dict["Foot_L"];
   }
 
-
-  // 몬스터 소환 시에 BT에 한번 적용 후 죽기 전까진 변하지 않을 값들
-  public float AttackDistance; //공격하기 위해 멈추는 사정거리
-    public float AttackDistanceWithClearance; //공격 중에 벗어날 경우 다시 추적하기 위한 사정거리 (Attackdistance보다 약간 높게)
-    public float AttackDelay; //공격 쿨타임
-    public float MoveSpeed; //이동속도
+  public void SetSpriteColor(Color color)
+  {
+    foreach (SpriteRenderer sr in renderers)
+    {
+      sr.color = color;
+    }
+  }
 }

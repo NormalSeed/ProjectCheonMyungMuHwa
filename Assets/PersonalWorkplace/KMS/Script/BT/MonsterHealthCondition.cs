@@ -12,7 +12,7 @@ public partial class MonsterHealthCondition : Condition
     public override bool IsTrue()
     {
 
-        if (Controller.Value.Model.CurHealth.Value <= 0)
+        if (Controller.Value.IsDead)
         {
             return true;
         }
