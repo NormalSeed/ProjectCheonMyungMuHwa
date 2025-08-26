@@ -15,9 +15,6 @@ public class HeroInfoSetting : MonoBehaviour
     private HeroRarity rarity;
     private HeroRelationship relationship;
 
-    // 개인 폴더 경로로 되어 있어서 추후 수정 필요
-    private string path = "Assets/PersonalWorkplace/MSK/MSK_Sprite/SampleChar";
-
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
     [SerializeField] private Sprite characterRoot;          // 캐릭터 이미지
