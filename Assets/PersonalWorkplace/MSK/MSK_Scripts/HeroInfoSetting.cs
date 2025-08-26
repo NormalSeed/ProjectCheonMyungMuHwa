@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
+using System.Threading.Tasks;
 
 public class HeroInfoSetting : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class HeroInfoSetting : MonoBehaviour
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
-    [SerializeField] private Sprite characterRoot;          // 캐릭터 이미지
+    [SerializeField] private Image characterRoot;          // 캐릭터 이미지
     [SerializeField] private Transform stageRoot;          // 돌파상태
     [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
     [SerializeField] private Transform selectRoot;         // 배치 선택여부 
@@ -71,11 +72,11 @@ public class HeroInfoSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += handle =>
+        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += task =>
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            if (task.Status == AsyncOperationStatus.Succeeded)
             {
-                characterRoot = handle.Result;
+                characterRoot.sprite = task.Result;
             }
         };
 
@@ -121,7 +122,7 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnClickCard()
     {
         Debug.Log(chardata);
-        partyManager.AddMember(chardata);
+        // partyManager.AddMember(chardata);
         //    HeroUIActive(); 
         //  TODO : 파티 편성 구현하기
         // 파티 편성중일 경우 HeroSetting()

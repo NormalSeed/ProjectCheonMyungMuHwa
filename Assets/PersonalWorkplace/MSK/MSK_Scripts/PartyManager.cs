@@ -7,7 +7,7 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class PartyManager : MonoBehaviour, IStartable
 {
-    public List<CardInfo> partyMembers = new List<CardInfo>();
+    public List<GameObject> partyMembers = new List<GameObject>();
 
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
@@ -25,7 +25,7 @@ public class PartyManager : MonoBehaviour, IStartable
     #endregion
 
     #region Public 
-    public void AddMember(CardInfo member)
+    public void AddMember(GameObject member)
     {
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
@@ -39,12 +39,11 @@ public class PartyManager : MonoBehaviour, IStartable
         }
     }
 
-    public void RemoveMember(CardInfo member)
+    public void RemoveMember(GameObject member)
     {
         if (partyMembers.Contains(member))
         {
             partyMembers.Remove(member);
-            partyInfo.Remove(member.HeroID);
         }
     }
     public void PartyInit()
