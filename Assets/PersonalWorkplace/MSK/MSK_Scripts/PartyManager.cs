@@ -1,56 +1,66 @@
-using Firebase.Auth;
-using Firebase.Database;
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using VContainer.Unity;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PartyManager : MonoBehaviour, IStartable
 {
+    #region SingleTon
     public static PartyManager Instance { get; private set; }
+    public PartyManager()
+    {
+        Instance = this;
+    }
+    #endregion
+
 
     public List<GameObject> partyMembers = new List<GameObject>();
-
+    public List<string> MembersID = new List<string>();
     public List<PlayerController> players = new();
 
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
-    private readonly int MaxPartySize = 5;
-    public int PartySixe = 1;
+
+    private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
+
+
+    private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
+    public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
+    private int partySixe = 1;                                  // 현재 편성된 파티인원
+    public int PartySize { get{ return partySixe; } }           //현재 편성인원 외부 참조
 
     public event Action<Dictionary<string, CardInfo>> partySet;
 
-    public PartyManager( )
-    {
-        Instance = this;
-    }
 
     #region Unity LifeCycle
     private void Awake() { }
 
-    public void Start() 
-    { 
-        PartyInit(); 
+    public void Start()
+    {
+        PartyLoadData();
+        PartyInit();
     }
     #endregion
 
     #region Public 
     public void AddMember(GameObject member)
     {
-        Debug.Log($"{member}파티 추가시도");
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+
+            partySixe++;;
+            var controller = member.GetComponent<PlayerController>();
+
             PartySixe++;
-            Debug.Log($"{member}파티 추가됨");
+
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
             // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
             int listOrder = partyMembers.Count - 1;
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
             controller.gameObject.SetActive(true);
+
             if (controller != null)
             {
                 controller.charID.Value = heroInfo.HeroID;
@@ -68,9 +78,8 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         if (partyMembers.Contains(member))
         {
-            Debug.Log($"{member}파티 제거됨");
             partyMembers.Remove(member);
-            PartySixe--;
+            partySixe--;
         }
     }
     public void PartyInit()
@@ -90,6 +99,35 @@ public class PartyManager : MonoBehaviour, IStartable
             }
         }
     }
+
+    // 파티 편성 진행 여부 트리거
+    public void StartPartySetting()
+    {
+        isHeroSetNow = true;
+    }
+    public void EndPartySetting()
+    {
+        PartyUpload();
+        isHeroSetNow = false;
+    }
+
+
+    // 추후 AddMember와 합칠 생각
+    public void AddMemberID(string memberID)
+    {
+        MembersID.Add(memberID);
+    }
+    public void RemoveMemberID(string memberID)
+    {
+        MembersID.Remove(memberID);
+    }
+    /// <summary>
+    /// 파티를 자동 편성하는 기능입니다.
+    /// </summary>
+    public void AutoPartySetting() 
+    {
+    
+    }
     #endregion
 
     #region Private
@@ -99,6 +137,16 @@ public class PartyManager : MonoBehaviour, IStartable
         {
 
         }
+    }
+
+    private void PartyUpload()
+    {
+        CurrencyManager.Instance.SavePartyToFirebase(MembersID);
+    }
+    
+    private void PartyLoadData()
+    {
+        CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
     }
     #endregion
 }

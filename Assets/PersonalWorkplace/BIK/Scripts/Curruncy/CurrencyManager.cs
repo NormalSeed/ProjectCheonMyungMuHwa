@@ -1,6 +1,9 @@
 using Firebase.Auth;
 using Firebase.Database;
+using Google.MiniJSON;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -76,22 +79,26 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid)) return;
 
-        try {
+        try
+        {
             var snapshot = await _dbRef.Child("users").Child(_uid).Child("currency").GetValueAsync();
 
-            if (snapshot.Exists) {
+            if (snapshot.Exists)
+            {
                 string json = snapshot.GetRawJsonValue();
                 var data = JsonUtility.FromJson<CurrencySaveData>(json);
                 ((CurrencyModel)_model).FromSaveData(data);
 
                 Debug.Log("[CurrencyManager] 서버에서 재화 로드 완료");
             }
-            else {
+            else
+            {
                 Debug.Log("[CurrencyManager] 서버에 데이터 없음 → 기본값 등록");
                 RegisterDefaultCurrencies();
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             Debug.LogError($"[CurrencyManager] Firebase 로드 실패: {ex.Message}");
             RegisterDefaultCurrencies();
         }
@@ -155,5 +162,28 @@ public class CurrencyManager : IStartable, IDisposable
         return _model.TrySpend(id, cost);
     }
 
+    public void SavePartyToFirebase(List<string> party)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+
+        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo").SetValueAsync(party);
+    }
+    public void LoadPartyIdsFromFirebase(List<string> list)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
+            .GetValueAsync().ContinueWith(task => 
+            {
+                list.Clear();
+                var raw = task.Result.Value as List<object>;
+                if (raw != null)
+                {
+                    foreach (var obj in raw)
+                        list.Add(obj.ToString());
+                }
+            });
+    }
     #endregion // public funcs
 }
