@@ -1,9 +1,5 @@
-using System;
 using System.Collections;
-using NUnit.Framework.Internal;
 using Unity.Behavior;
-using Unity.Mathematics;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.AI;
 
