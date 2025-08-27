@@ -28,17 +28,18 @@ public enum CurrencyType
 
 public enum UIType
 {
-    None = 0,
-    Notice,
-    Quest,
-    Mail,
-    Attendance,
-    Ranking,
-    Setting,
-    Hero,
-    Upgrade,
-    Dungeon,
-    Inventory,
-    Summon,
-    Shop,
+    None = 0,       
+    Notice,         // 공지
+    Quest,          // 퀘스트
+    Mail,           // 우편함
+    Attendance,     // 출석표
+    Ranking,        // 순위
+    Setting,        // 설정
+    Hero,           // 영웅 UI
+    Upgrade,        // 성장 UI
+    Dungeon,        // 던전 UI
+    Inventory,      // 인벤토리 UI
+    Summon,         // 소환/뽑기 UI
+    Shop,           // 상점 UI
+    HeroInfo,       // 영웅정보 UI
 }

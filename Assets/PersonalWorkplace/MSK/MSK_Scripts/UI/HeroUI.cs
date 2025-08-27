@@ -17,9 +17,6 @@ public class HeroUI : UIBase
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
-
-    private bool isHeroSetNow = false;
-    public bool IsHeroSetNow { get { return isHeroSetNow; } }
     private PartyManager partyManager;
 
     public HeroUI(PartyManager _partyManager)
@@ -66,7 +63,7 @@ public class HeroUI : UIBase
         heroSet.gameObject.SetActive(false);
 
         //  편성변수 True
-        isHeroSetNow = true;
+        PartyManager.Instance.StartPartySetting();  //편성 시작
         //  영웅 편성화면 활성화
         IsHeroSetting.gameObject.SetActive(true);
         heroSetSave.gameObject.SetActive(true);
@@ -89,11 +86,11 @@ public class HeroUI : UIBase
         IsHeroSetting.gameObject.SetActive(false);
         heroSetSave.gameObject.SetActive(false);
         autoSet.gameObject.SetActive(false);
-        isHeroSetNow = false;
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
-
+       
+        PartyManager.Instance.EndPartySetting();    // 편성 종료
         // partyManager.PartyInit();
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);

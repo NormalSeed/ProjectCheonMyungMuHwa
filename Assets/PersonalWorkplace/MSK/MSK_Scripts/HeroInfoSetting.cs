@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
-using VContainer;
-using VContainer.Unity;
 
 public class HeroInfoSetting : MonoBehaviour
 {
@@ -29,18 +27,17 @@ public class HeroInfoSetting : MonoBehaviour
 
 
 
+
     // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
-    [SerializeField ]private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
+    [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
     private HeroUI heroUI;
-    private PartyManager partyManager;
-    
 
     #region Unity LifeCycle
 
-    public void PostStart() 
+    public void PostStart()
     {
         Debug.Log("PostStart 실행됨");
-        
+
 
     }
     private void OnEnable()
@@ -129,14 +126,23 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
-        Debug.Log(chardata);
-        if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+        //  파티를 편성중이라면
+        if (PartyManager.Instance.IsHeroSetNow)
         {
-            PartyManager.Instance.AddMember(gameObject);
+            if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+            {
+                PartyManager.Instance.AddMember(gameObject);
+                selectRoot.gameObject.SetActive(true);
+            }
+            else
+            {
+                PartyManager.Instance.RemoveMember(gameObject);
+                selectRoot.gameObject.SetActive(false);
+            }
         }
         else 
         {
-            PartyManager.Instance.RemoveMember(gameObject);
+            HeroUIActive();
         }
     }
     #endregion
@@ -155,8 +161,8 @@ public class HeroInfoSetting : MonoBehaviour
     /// </summary>
     private void HeroUIActive()
     {
-        // 캐릭터 정보 SO도 함께 전달해주어야 한다.
-        // HeroInfoUI.SetActive(true);
+        heroInfoUI.HeroSOInfoSetting(chardata);
+        heroInfoUI.gameObject.SetActive(true);
     }
     #endregion
 }

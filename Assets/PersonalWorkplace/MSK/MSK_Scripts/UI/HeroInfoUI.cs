@@ -37,6 +37,7 @@ public class HeroInfoUI : UIBase
     private HeroRarity rarity;          // 레어도
     private HeroRelationship faction;  // 진영
 
+    #region Unity LiftCycle
     private void OnEnable()
     {
         Init();
@@ -47,8 +48,11 @@ public class HeroInfoUI : UIBase
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
         stageUPButton.onClick.RemoveListener(OnClickStageUP);
     }
+    #endregion
+
+    #region Init
     private void Init()
-    {  
+    {
         /*
           heroID = chardata.HeroID;
           heroStage = chardata.HeroStage;
@@ -57,15 +61,19 @@ public class HeroInfoUI : UIBase
           
           ... SO에서 정보 받아오기
         */
-
+        
         exitButton.onClick.AddListener(OnClickExit);
         upgradeButton.onClick.AddListener(OnClickUpgrade);
         stageUPButton.onClick.AddListener(OnClickStageUP);
+        Debug.Log("HeroInfoUI Init 실행됨");
     }
+    #endregion
+
     #region OnClick
     private void OnClickExit()
     {
-        SetHide();
+        Debug.Log("정보 UI 비활성화 입력됨");
+        heroInfoPanel.gameObject.SetActive(false);
     }
     private void OnClickUpgrade()
     {
@@ -103,6 +111,15 @@ public class HeroInfoUI : UIBase
     {
         int power = 0;
         return power;
+    }
+    #endregion
+
+    #region Public
+
+    public void HeroSOInfoSetting(CardInfo Info)
+    {
+        chardata = Info;
+        Debug.Log($"SO {Info}로 세팅됨");
     }
     #endregion
 }

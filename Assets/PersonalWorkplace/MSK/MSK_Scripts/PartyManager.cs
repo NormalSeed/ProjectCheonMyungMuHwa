@@ -1,36 +1,39 @@
-using Firebase.Auth;
-using Firebase.Database;
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using VContainer.Unity;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PartyManager : MonoBehaviour, IStartable
 {
+    #region SingleTon
     public static PartyManager Instance { get; private set; }
-
-    public List<GameObject> partyMembers = new List<GameObject>();
-
-    private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
-
-    private readonly int MaxPartySize = 5;
-    public int PartySixe = 1;
-
-    public event Action<Dictionary<string, CardInfo>> partySet;
-
-    public PartyManager( )
+    public PartyManager()
     {
         Instance = this;
     }
+    #endregion
+
+
+    public List<GameObject> partyMembers = new List<GameObject>();
+    public List<GameObject> newPartyMembers = new List<GameObject>();
+
+    private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
+
+
+    private readonly int MaxPartySize = 5;              // 파티 최대 편성 수 
+    private int partySixe = 1;                          // 현재 편성된 파티인원
+    private bool isHeroSetNow = false;                  // 파티 편성 진행중 여부
+    public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
+    public int PartySize { get{ return partySixe; } }       //현재 편성인원 외부 참조
+    public event Action<Dictionary<string, CardInfo>> partySet;
+
 
     #region Unity LifeCycle
     private void Awake() { }
 
-    public void Start() 
-    { 
-        PartyInit(); 
+    public void Start()
+    {
+        PartyInit();
     }
     #endregion
 
@@ -41,7 +44,7 @@ public class PartyManager : MonoBehaviour, IStartable
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
-            PartySixe++;
+            partySixe++;
             Debug.Log($"{member}파티 추가됨");
             var controller = member.GetComponent<PlayerController>();
             if (controller != null)
@@ -58,7 +61,7 @@ public class PartyManager : MonoBehaviour, IStartable
         {
             Debug.Log($"{member}파티 제거됨");
             partyMembers.Remove(member);
-            PartySixe--;
+            partySixe--;
         }
     }
     public void PartyInit()
@@ -77,6 +80,15 @@ public class PartyManager : MonoBehaviour, IStartable
                 Debug.LogWarning($"파티 멤버 {partyMembers[i].name}에 PlayerController가 없습니다.");
             }
         }
+    }
+
+    public void StartPartySetting()
+    {
+        isHeroSetNow = true;
+    }
+    public void EndPartySetting()
+    {
+        isHeroSetNow = false;
     }
     #endregion
 
