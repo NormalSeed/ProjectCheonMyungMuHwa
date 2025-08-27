@@ -21,18 +21,31 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private string assetID;
     private int maxCount;
     private bool activeOnGet;
+    private bool canExceedMaxCount;
+    private bool useWarmUp;
 
-    public DefaultPool(string id, int max, bool active = true)
+    public DefaultPool(string id, int max, bool active = true, bool exceed = false, bool warmup = true)
     {
         assetID = id;
+        targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
         maxCount = max;
         activeOnGet = active;
+        canExceedMaxCount = exceed;
+        useWarmUp = warmup;
+        Init();
+    }
+    public DefaultPool(GameObject go, int max, bool active = true, bool exceed = false, bool warmup = true)
+    {
+        targetObj = go;
+        maxCount = max;
+        activeOnGet = active;
+        canExceedMaxCount = exceed;
+        useWarmUp = warmup;
         Init();
     }
 
     private void Init()
     {
-        targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
         pool = new ObjectPool<IPooled<T>>(
             createFunc: () => Create(),
             actionOnGet: obj => Active(obj),
@@ -46,10 +59,15 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
 
     private IPooled<T> Create()
     {
-        IPooled<T> model = UnityEngine.Object.Instantiate(targetObj).GetComponent<IPooled<T>>();
-        model.OnLifeEnded = null;
-        model.OnLifeEnded += ReleaseItem;
-        return model;
+        IPooled<T> obj = UnityEngine.Object.Instantiate(targetObj).GetComponent<IPooled<T>>();
+        obj.OnLifeEnded = null;
+        obj.OnLifeEnded += ReleaseItem;
+        if (!activeOnGet)
+        {
+            (obj as MonoBehaviour).gameObject.SetActive(false);
+        }
+
+        return obj;
     }
     private void Active(IPooled<T> obj)
     {
@@ -64,6 +82,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     }
     private void WarmUp()
     {
+        if (!useWarmUp) return;
         List<IPooled<T>> list = new();
         for (int i = 0; i < maxCount; i++)
         {
@@ -77,7 +96,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
 
     public IPooled<T> GetPooledItem()
     {
-        if (pool.CountActive >= maxCount)
+        if (!canExceedMaxCount && pool.CountActive >= maxCount)
         {
             Debug.LogError("최대 개수 초과");
             return null;

@@ -21,6 +21,7 @@ public class PunchOrcController : MonsterController
     private IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return wfs;
+        AudioManager.Instance.PlaySound("Punch_Attack");
         if (target != null)
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);

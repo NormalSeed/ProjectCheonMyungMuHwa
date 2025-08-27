@@ -15,8 +15,9 @@ public class PartyManager : MonoBehaviour, IStartable
 
 
     public List<GameObject> partyMembers = new List<GameObject>();
-
     public List<string> MembersID = new List<string>();
+    public List<PlayerController> players = new();
+
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
 
@@ -50,7 +51,22 @@ public class PartyManager : MonoBehaviour, IStartable
 
             partySixe++;;
             var controller = member.GetComponent<PlayerController>();
+
+            PartySixe++;
+
+            var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
+            // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+            int listOrder = partyMembers.Count - 1;
+            // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
+            PlayerController controller = players[listOrder];
+            controller.gameObject.SetActive(true);
+
             if (controller != null)
+            {
+                controller.charID.Value = heroInfo.HeroID;
+            }
+            // 그 후 해당 PlayerController 안의 partyNum을 변경시킨다.
+            if (heroInfo != null)
             {
                 controller.partyNum = partyMembers.Count - 1;
                 Debug.Log($"추가된 멤버 {controller.name}의 partyNum 설정됨: {controller.partyNum}");

@@ -21,6 +21,7 @@ public class BowOrcController : MonsterController
     private IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return wfs;
+        AudioManager.Instance.PlaySound("Bow_Attack");
         if (target != null)
         {
             MonsterProjectile proj = PoolManager.Instance.ArrowPool.GetItem(transform.position);

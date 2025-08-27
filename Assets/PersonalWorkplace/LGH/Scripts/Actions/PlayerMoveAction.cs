@@ -16,9 +16,13 @@ public partial class PlayerMoveAction : Action
     private PlayerController controller;
     private NavMeshAgent NMagent;
     private AlignPoint alignPoint;
+    private Transform targetPoint;
+    private bool hasAligned = false;
 
     protected override Status OnStart()
     {
+        hasAligned = false;
+
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
 
@@ -27,7 +31,8 @@ public partial class PlayerMoveAction : Action
 
         // 자신의 배치 번호에 따라 이동 포인트로 이동하는 기능 구현 필요
         // 이동 포인트의 position을 NavMeshAgent의 목적지로 설정
-        NMagent.SetDestination(GetMovePoint(alignPoint.alignPoints).position); // 배치 번호를 바꾸면 이동할 포인트도 변경됨
+        targetPoint = GetMovePoint(alignPoint.alignPoints);
+        NMagent.SetDestination(targetPoint.position); // 배치 번호를 바꾸면 이동할 포인트도 변경됨
 
         return Status.Running;
     }
@@ -43,17 +48,33 @@ public partial class PlayerMoveAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Vector2.Distance(Self.Value.transform.position, GetMovePoint(alignPoint.alignPoints).position) < 0.01f)
+        if (!NMagent.pathPending && NMagent.remainingDistance <= NMagent.stoppingDistance)
         {
-            NMagent.ResetPath();
-            return Status.Success;
+            if (!NMagent.hasPath || NMagent.velocity.sqrMagnitude == 0f)
+            {
+                if (!hasAligned)
+                {
+                    InGameManager.Instance.alignedNum.Value++;
+                    hasAligned = true;
+                }
+
+                // 모든 캐릭터가 정렬됐는지 확인
+                if (InGameManager.Instance.alignedNum.Value >= PartyManager.Instance.partyMembers.Count)//PartyManager.Instance.partyMembers.Count
+                {
+                    NMagent.ResetPath();
+                    return Status.Success; // 모두 정렬 완료 -> Idle로 전환
+                }
+
+                return Status.Running; // 나만 도착했음 -> 대기
+            }
         }
+
         return Status.Running;
     }
 
     protected override void OnEnd()
     {
-        InGameManager.Instance.alignedNum.Value++;
+        Debug.Log($"현재 정렬된 플레이어 수 : {InGameManager.Instance.alignedNum.Value}");
     }
 }
 
