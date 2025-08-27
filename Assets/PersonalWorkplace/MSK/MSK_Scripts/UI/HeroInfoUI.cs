@@ -37,7 +37,7 @@ public class HeroInfoUI : UIBase
     private string heroID;              // 캐릭터 ID
     private int heroStage;              // 돌파정보
     private HeroRarity rarity;          // 레어도
-    private HeroFaction faction;  // 진영
+    private HeroFaction faction;        // 진영
 
     #region Unity LiftCycle
     private void OnEnable()
