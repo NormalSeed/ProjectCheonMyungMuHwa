@@ -20,6 +20,7 @@ public class StickOrcController : MonsterController
     private IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return wfs;
+        AudioManager.Instance.PlaySound("Stick_Attack");
         if (target != null)
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);

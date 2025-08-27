@@ -48,6 +48,7 @@ public class PoolManager : MonoBehaviour
 
     public void ActiveAll(int stageNum)
     {
+        AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
 
         ActiveMonster(PunchPool, 0, 0);
