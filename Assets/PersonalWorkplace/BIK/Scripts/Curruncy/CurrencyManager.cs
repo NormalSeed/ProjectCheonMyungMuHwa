@@ -37,6 +37,7 @@ public class CurrencyManager : IStartable, IDisposable
 
     public ICurrencyModel Model => _model;
 
+    public static event Action OnInitialized;
     #endregion // properties
 
 
@@ -105,6 +106,7 @@ public class CurrencyManager : IStartable, IDisposable
 
         _model.OnChanged += SaveToFirebase;
         _initialized = true;
+        OnInitialized?.Invoke();
     }
 
     private void SaveToFirebase(CurrencyType id, BigCurrency value)
@@ -164,6 +166,11 @@ public class CurrencyManager : IStartable, IDisposable
 
     public void SavePartyToFirebase(List<string> party)
     {
+        if (party == null)
+        {
+            Debug.LogError("파티가 Null임");
+        }
+
         if (string.IsNullOrEmpty(_uid))
             return;
 

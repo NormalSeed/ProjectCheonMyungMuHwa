@@ -25,8 +25,12 @@ public class CurrencyUI : MonoBehaviour
 
 
     #region mono funcs
-
     private void Start()
+    {
+        CurrencyManager.OnInitialized += HandleInitialized;
+    }
+
+    private void HandleInitialized()
     {
         _model = CurrencyManager.Instance.Model;
 
