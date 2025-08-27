@@ -9,7 +9,7 @@ using VContainer.Unity;
 public class HeroInfoSetting : MonoBehaviour
 {
     [Header("SO")]
-    [SerializeField] private CardInfo chardata;
+    [SerializeField] public CardInfo chardata;
 
     public string HeroID { get; private set; }
     public int HeroStage { get; private set; }
@@ -80,7 +80,7 @@ public class HeroInfoSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += task =>
+        Addressables.LoadAssetAsync<Sprite>(HeroID + "_sprite").Completed += task =>
         {
             if (task.Status == AsyncOperationStatus.Succeeded)
             {
@@ -130,7 +130,14 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnClickCard()
     {
         Debug.Log(chardata);
-        // partyManager.AddMember(gameObject);
+        if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+        {
+            PartyManager.Instance.AddMember(gameObject);
+        }
+        else 
+        {
+            PartyManager.Instance.RemoveMember(gameObject);
+        }
     }
     #endregion
 

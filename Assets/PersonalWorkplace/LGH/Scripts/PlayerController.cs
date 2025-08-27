@@ -25,19 +25,38 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
-    private void Start()
+    public event System.Action OnModelLoaded;
+
+    private void Awake()
     {
         model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
 
         NMagent = GetComponent<NavMeshAgent>();
         BGagent = GetComponent<BehaviorGraphAgent>();
+        BGagent.enabled = false;
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
+    }
 
+    private void OnEnable()
+    {
         charID.Subscribe(LoadPlayerData);
-        charID.Value = "A01";
+
+        OnModelLoaded += () =>
+        {
+            if (BGagent != null)
+            {
+                BGagent.enabled = true;
+            }
+        };
+    }
+
+    private void OnDisable()
+    {
+        charID.Unsubscribe(LoadPlayerData);
+        OnModelLoaded = null;
     }
 
     private void LoadPlayerData(string charID)
@@ -53,6 +72,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
                     LoadPlayerSPUMAsset(charID);
                     LoadPlayerSkillData(model.modelSO.SkillSetID);
+                    OnModelLoaded?.Invoke();
                 }
                 else
                 {
