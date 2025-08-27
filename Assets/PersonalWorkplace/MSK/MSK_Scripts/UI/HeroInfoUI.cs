@@ -15,10 +15,14 @@ public class HeroInfoUI : UIBase
         
         HeroLevelUpgrade() 코드에서 레벨 업그레이드 후 데이터베이스에 저장
 
+        추가 작업 학단 UI 이미지 필요
+        나가기 버튼 이미지가 임시 이미지
+
      */
 
     private string modelPath = "LGH/PlayerModels/";
 
+    #region SerializeField
     [Header("Hero Info SO")]
     [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
     [SerializeField] private PlayerModelSO modelInfo;   // 캐릭터 스텟 SO
@@ -32,7 +36,7 @@ public class HeroInfoUI : UIBase
     [Header("UI Text")]
     [SerializeField] private TextMeshProUGUI charName;  // 이름
     [SerializeField] private TextMeshProUGUI level;     // 레벨
-    [SerializeField] private TextMeshProUGUI power;     // 전투력
+    [SerializeField] private TextMeshProUGUI power;     // 종합전투력
     [SerializeField] private TextMeshProUGUI outPow;    // 외공
     [SerializeField] private TextMeshProUGUI inPow;     // 내공
     [SerializeField] private TextMeshProUGUI health;    // 체력
@@ -48,12 +52,24 @@ public class HeroInfoUI : UIBase
 
     [Header("Panel")]
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
+    #endregion
 
+    #region CardInfo SO
+    // CardInfo SO 에서 받아오는 정보들
     private string heroID;              // 캐릭터 ID
     private int heroStage;              // 돌파정보
     private HeroRarity rarity;          // 레어도
     private HeroFaction faction;        // 진영
+    #endregion
 
+    #region PlayerModel SO
+    private string heroName;        // 이름정보
+    private int heroLevel;          // 레벨정보
+    private double HealthPoint;     // 체력정보
+    private double ExtAtkPoint;     // 종합전투력????
+    private double InnAtkPoint;     // 내공????
+    private double DefPoint;        // 외곻????
+    #endregion
     #region Unity LiftCycle
     private void OnEnable()
     {
@@ -70,20 +86,50 @@ public class HeroInfoUI : UIBase
     #region Init
     private void Init()
     {
-        // CardInfo 정보 받아옴
+        // CardInfo 정보
+        CardInfInit();
+        // PlayerModelSO 정보
+        ModelInfoInit();
+        // 버튼 리스너 추가
+        ButtonAddListener();
+        // 텍스트정보 추가
+        InfoTextSetting();
+        Debug.Log("HeroInfoUI Init 실행됨");
+    }
+    private void CardInfInit()
+    {
         heroID = chardata.HeroID;
         heroStage = chardata.HeroStage;
         rarity = chardata.rarity;
         faction = chardata.faction;
 
-        modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID +"_model");
-
-        // PlayerModelSO 정보를 받아옴
-
+        modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID + "_model");
+    }
+    private void ModelInfoInit()
+    {
+        heroName = modelInfo.CharName;
+        heroLevel = modelInfo.Level;
+        HealthPoint = modelInfo.HealthPoint;
+        ExtAtkPoint = modelInfo.ExtAtkPoint;
+        InnAtkPoint = modelInfo.InnAtkPoint;
+        DefPoint = modelInfo.DefPoint;
+    }
+    private void ButtonAddListener()
+    {
         exitButton.onClick.AddListener(OnClickExit);
         upgradeButton.onClick.AddListener(OnClickUpgrade);
         stageUPButton.onClick.AddListener(OnClickStageUP);
-        Debug.Log("HeroInfoUI Init 실행됨");
+    }
+    private void InfoTextSetting()
+    {
+        charName.text = heroName;
+        level.text = heroLevel.ToString();
+
+        // 인권님 수치 단위 변환 코드 참고가 필요함
+        power.text = ExtAtkPoint.ToString();
+        inPow.text = InnAtkPoint.ToString();
+        outPow.text = DefPoint.ToString();
+        health.text = HealthPoint.ToString();
     }
     #endregion
 
