@@ -1,20 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum UIType
-{
-    None = 0,
-    Notice,
-    Quest,
-    Mail,
-    Attendance,
-    Ranking,
-    Setting,
-}
-
-
 public class MainSceneUIController : MonoBehaviour
 {
+    #region Structs
+
     [System.Serializable]
     public struct UIEntry
     {
@@ -22,13 +12,36 @@ public class MainSceneUIController : MonoBehaviour
         public UIBase ui;
     }
 
+    #endregion // Structs
+
+
+
+
+
+    #region serialized fields
+
     [Header("등록된 UI 패널들")]
     [SerializeField] private List<UIEntry> _uiEntries = new List<UIEntry>();
+
+    #endregion // serialized fields
+
+
+
+
+
+    #region private fields
 
     private Dictionary<UIType, UIBase> _uiDict = new Dictionary<UIType, UIBase>();
     private Stack<UIBase> _uiStack = new Stack<UIBase>();
 
-    #region Unity Methods
+    #endregion // private fields
+
+
+
+
+
+    #region mono funcs
+
     private void Start()
     {
         // 딕셔너리에 매핑
@@ -40,9 +53,15 @@ public class MainSceneUIController : MonoBehaviour
             }
         }
     }
-    #endregion
 
-    #region Public Methods
+    #endregion // mono funcs
+
+
+
+
+
+    #region public funcs
+
     /// <summary>
     /// UIType으로 UI 열기
     /// </summary>
@@ -94,5 +113,6 @@ public class MainSceneUIController : MonoBehaviour
     {
         return _uiDict.TryGetValue(type, out var ui) ? ui : null;
     }
-    #endregion
+
+    #endregion // public funcs
 }

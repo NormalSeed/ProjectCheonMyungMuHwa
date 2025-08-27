@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7753395779941901153}
-  - component: {fileID: 3500450377393572754}
   - component: {fileID: 8299540426428846270}
   m_Layer: 5
   m_Name: TopUI
@@ -39,26 +38,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &3500450377393572754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 119452854242400173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ab357e0606a9fa40aa120909174ee28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _goldText: {fileID: 78748667634919464}
-  _openGoldText: {fileID: 3936506251767617231}
-  _jewelText: {fileID: 2478189609922832400}
-  _soulText: {fileID: 5664616565524833682}
-  _spiritStoneText: {fileID: 1168057881546644804}
-  _summonTicketText: {fileID: 1845915974261543735}
-  _invitationTicketText: {fileID: 4490853111426955886}
-  _challengeTicketText: {fileID: 5042027493629573105}
 --- !u!114 &8299540426428846270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,12 +57,6 @@ MonoBehaviour:
   _menuClose: {fileID: 5657048623490464538}
   _menuUI: {fileID: 5328234054447996456}
   _uiController: {fileID: 0}
-  _noticeUI: {fileID: 0}
-  _questUI: {fileID: 0}
-  _mailUI: {fileID: 0}
-  _attendanceUI: {fileID: 0}
-  _rankingUI: {fileID: 0}
-  _settingUI: {fileID: 0}
 --- !u!1 &127386962403014914
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,6 +66,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1375434300825100138}
+  - component: {fileID: 6647093527054995799}
   m_Layer: 5
   m_Name: ChallengeTicket
   m_TagString: Untagged
@@ -121,6 +95,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -359}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6647093527054995799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127386962403014914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 6
+  _currencyText: {fileID: 5042027493629573105}
 --- !u!1 &464712478814450213
 GameObject:
   m_ObjectHideFlags: 0
@@ -950,6 +938,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2836405955331425523}
+  - component: {fileID: 1721254465491227792}
   m_Layer: 5
   m_Name: Gold
   m_TagString: Untagged
@@ -978,6 +967,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -35}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1721254465491227792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3423446499169771684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 1
+  _currencyText: {fileID: 3936506251767617231}
 --- !u!1 &3890747297849953689
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,7 +993,6 @@ GameObject:
   - component: {fileID: 6509573514313825481}
   - component: {fileID: 9051874854515886737}
   - component: {fileID: 58580887062089120}
-  - component: {fileID: 1756412623979720836}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1099,9 +1101,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1756412623979720836}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 6647093527054995799}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1111,20 +1113,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1756412623979720836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3890747297849953689}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 6
 --- !u!1 &3922894616697867685
 GameObject:
   m_ObjectHideFlags: 0
@@ -1134,6 +1122,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1663901679221781528}
+  - component: {fileID: 6407661359025214935}
   m_Layer: 5
   m_Name: Soul
   m_TagString: Untagged
@@ -1162,6 +1151,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -143}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6407661359025214935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3922894616697867685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 2
+  _currencyText: {fileID: 5664616565524833682}
 --- !u!1 &4097130418553378670
 GameObject:
   m_ObjectHideFlags: 0
@@ -1322,6 +1325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5612628957977778587}
+  - component: {fileID: 6278990923921296548}
   m_Layer: 5
   m_Name: SummonTicket
   m_TagString: Untagged
@@ -1350,6 +1354,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -251}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6278990923921296548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4193364220779749421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 4
+  _currencyText: {fileID: 1845915974261543735}
 --- !u!1 &4375646360757997330
 GameObject:
   m_ObjectHideFlags: 0
@@ -1566,6 +1584,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8372698869672039297}
+  - component: {fileID: 7303393126783584792}
   m_Layer: 5
   m_Name: InvitationTicket
   m_TagString: Untagged
@@ -1594,6 +1613,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -305}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7303393126783584792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4740246974822476271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 5
+  _currencyText: {fileID: 4490853111426955886}
 --- !u!1 &4769206159570165502
 GameObject:
   m_ObjectHideFlags: 0
@@ -1606,7 +1639,6 @@ GameObject:
   - component: {fileID: 4329663502705100886}
   - component: {fileID: 3762523676592224587}
   - component: {fileID: 590648803503786005}
-  - component: {fileID: 6071698105388720394}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1715,9 +1747,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6071698105388720394}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 6407661359025214935}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1727,20 +1759,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6071698105388720394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4769206159570165502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 2
 --- !u!1 &4855549023748390322
 GameObject:
   m_ObjectHideFlags: 0
@@ -1992,7 +2010,6 @@ GameObject:
   - component: {fileID: 4472354428984683688}
   - component: {fileID: 3633802033199223440}
   - component: {fileID: 3300047470925564929}
-  - component: {fileID: 1338344967088260687}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -2101,9 +2118,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1338344967088260687}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 5525705047801058154}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2113,20 +2130,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1338344967088260687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4886169483486827750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 3
 --- !u!1 &4907125523018278750
 GameObject:
   m_ObjectHideFlags: 0
@@ -3043,7 +3046,6 @@ GameObject:
   - component: {fileID: 4338035026701637767}
   - component: {fileID: 8318393783267739606}
   - component: {fileID: 6958650381592834479}
-  - component: {fileID: 613209446219588950}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -3152,9 +3154,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 613209446219588950}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 1721254465491227792}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3164,20 +3166,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &613209446219588950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5961787594706071152}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 1
 --- !u!1 &6108889460251875748
 GameObject:
   m_ObjectHideFlags: 0
@@ -3190,7 +3178,6 @@ GameObject:
   - component: {fileID: 6525617893311183338}
   - component: {fileID: 8001349066838206102}
   - component: {fileID: 2695151443676526508}
-  - component: {fileID: 5926461958881815996}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -3299,9 +3286,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5926461958881815996}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 6278990923921296548}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3311,20 +3298,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &5926461958881815996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6108889460251875748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 4
 --- !u!1 &6334979326745193676
 GameObject:
   m_ObjectHideFlags: 0
@@ -3374,6 +3347,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6191247034593955704}
+  - component: {fileID: 5525705047801058154}
   m_Layer: 5
   m_Name: SpiritStone
   m_TagString: Untagged
@@ -3402,6 +3376,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -197}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5525705047801058154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7068000322023119030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 3
+  _currencyText: {fileID: 1168057881546644804}
 --- !u!1 &7938998599932427266
 GameObject:
   m_ObjectHideFlags: 0
@@ -3914,7 +3902,6 @@ GameObject:
   - component: {fileID: 8815537739613847949}
   - component: {fileID: 879497323430296162}
   - component: {fileID: 3297995592703481337}
-  - component: {fileID: 9088049459435869543}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -4023,9 +4010,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 9088049459435869543}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 7303393126783584792}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4035,20 +4022,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &9088049459435869543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8556070651778923844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 5
 --- !u!1 &8713654974527853959
 GameObject:
   m_ObjectHideFlags: 0
@@ -4061,7 +4034,6 @@ GameObject:
   - component: {fileID: 8817152377859740670}
   - component: {fileID: 206145348351104396}
   - component: {fileID: 3792525286255192160}
-  - component: {fileID: 2456834643012911508}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -4170,9 +4142,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2456834643012911508}
-        m_TargetAssemblyTypeName: TestCurrencyButton, Assembly-CSharp
-        m_MethodName: Add
+      - m_Target: {fileID: 3539434270374106791}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Currency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4182,20 +4154,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2456834643012911508
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8713654974527853959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e2aabc04d570f40b4e11aa9461a055, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hud: {fileID: 3500450377393572754}
-  _type: 0
 --- !u!1 &8736686898412095111
 GameObject:
   m_ObjectHideFlags: 0
@@ -4280,6 +4238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4759539471502107292}
+  - component: {fileID: 3539434270374106791}
   m_Layer: 5
   m_Name: Jewel
   m_TagString: Untagged
@@ -4308,6 +4267,20 @@ RectTransform:
   m_AnchoredPosition: {x: 93.15, y: -89}
   m_SizeDelta: {x: 186.3, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3539434270374106791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8756295316641513474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCurrency: 0
+  _currencyText: {fileID: 2478189609922832400}
 --- !u!1 &8983488058188709853
 GameObject:
   m_ObjectHideFlags: 0
@@ -4599,17 +4572,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
---- !u!114 &78748667634919464 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8624420201437250817, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
-  m_PrefabInstance: {fileID: 8550045428391144745}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &4363047201983523077 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5344494386590352428, guid: 57fde5bcc9a3614498a628848223f084, type: 3}

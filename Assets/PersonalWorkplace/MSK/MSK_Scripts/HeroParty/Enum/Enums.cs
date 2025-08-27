@@ -14,3 +14,25 @@ public enum HeroRelationship
     M,  // 마교
     S,  // 사파
 }
+
+public enum CurrencyType
+{
+    Jewel,          // 용옥(다이아)
+    Gold,           // 금화
+    Soul,           // 혼백(경험치)
+    SpiritStone,    // 영석(보물 강화)
+    SummonTicket,   // 등용패(뽑기권)
+    InvitationTicket,// 초대장(입장권)
+    ChallengeTicket // 도전장(입장권)
+}
+
+public enum UIType
+{
+    None = 0,
+    Notice,
+    Quest,
+    Mail,
+    Attendance,
+    Ranking,
+    Setting,
+}
