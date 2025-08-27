@@ -1,9 +1,7 @@
 using Firebase.Auth;
 using Firebase.Database;
-using Google.MiniJSON;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -166,22 +164,29 @@ public class CurrencyManager : IStartable, IDisposable
 
     public void SavePartyToFirebase(List<string> party)
     {
-        if (party == null)
-        {
-            Debug.LogError("파티가 Null임");
-        }
-
         if (string.IsNullOrEmpty(_uid))
             return;
 
-        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo").SetValueAsync(party);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo");
+
+        //  기존 저장된 리스트 삭제
+        partyInfoRef.RemoveValueAsync().ContinueWith(removeTask =>
+        {
+            if (removeTask.IsFaulted)
+                return;
+            // 새로운 리스트 저장
+            partyInfoRef.SetValueAsync(party).ContinueWith(setTask =>
+            {
+                if (setTask.IsFaulted) { }
+            });
+        });
     }
     public void LoadPartyIdsFromFirebase(List<string> list)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
         _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
-            .GetValueAsync().ContinueWith(task => 
+            .GetValueAsync().ContinueWith(task =>
             {
                 list.Clear();
                 var raw = task.Result.Value as List<object>;

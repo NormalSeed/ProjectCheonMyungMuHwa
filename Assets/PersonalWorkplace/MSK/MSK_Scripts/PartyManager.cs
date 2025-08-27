@@ -103,6 +103,7 @@ public class PartyManager : MonoBehaviour, IStartable
     // 파티 편성 진행 여부 트리거
     public void StartPartySetting()
     {
+
         isHeroSetNow = true;
     }
     public void EndPartySetting()
@@ -115,8 +116,11 @@ public class PartyManager : MonoBehaviour, IStartable
     // 추후 AddMember와 합칠 생각
     public void AddMemberID(string memberID)
     {
+        if (MaxPartySize <= MembersID.Count)
+            return;
         MembersID.Add(memberID);
     }
+
     public void RemoveMemberID(string memberID)
     {
         MembersID.Remove(memberID);
