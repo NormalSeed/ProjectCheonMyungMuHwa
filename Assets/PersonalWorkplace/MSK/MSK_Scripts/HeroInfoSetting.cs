@@ -30,7 +30,7 @@ public class HeroInfoSetting : MonoBehaviour
 
     // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
     [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
-    private HeroUI heroUI;
+    [SerializeField] private HeroUI heroUI;
 
     #region Unity LifeCycle
 
@@ -48,6 +48,7 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
+        heroUI.partySetFin -= HeroSetting;
     }
     #endregion
 
@@ -65,6 +66,7 @@ public class HeroInfoSetting : MonoBehaviour
         SetBadge();
 
         CardButton.onClick.AddListener(OnClickCard);
+        heroUI.partySetFin += HeroSetting;
     }
     private void SetBackground()
     {
@@ -132,11 +134,13 @@ public class HeroInfoSetting : MonoBehaviour
             if (!PartyManager.Instance.partyMembers.Contains(gameObject))
             {
                 PartyManager.Instance.AddMember(gameObject);
+                PartyManager.Instance.AddMemberID(HeroID);
                 selectRoot.gameObject.SetActive(true);
             }
             else
             {
                 PartyManager.Instance.RemoveMember(gameObject);
+                PartyManager.Instance.RemoveMemberID(HeroID);
                 selectRoot.gameObject.SetActive(false);
             }
         }
@@ -150,11 +154,11 @@ public class HeroInfoSetting : MonoBehaviour
 
     #region Private
     /// <summary>
-    /// 회색으로 표시하여 배치되었음을 표시하는 스크립트
+    /// 회색으로 표시된 배치표시를 비활성화
     /// </summary>
     private void HeroSetting()
     {
-        selectRoot.gameObject.SetActive(true);
+        selectRoot.gameObject.SetActive(false);
     }
     /// <summary>
     /// 캐릭터 정보 UI로 연결하는 스크립트

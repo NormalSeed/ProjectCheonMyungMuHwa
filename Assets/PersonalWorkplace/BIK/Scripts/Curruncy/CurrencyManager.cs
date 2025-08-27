@@ -1,5 +1,6 @@
 using Firebase.Auth;
 using Firebase.Database;
+using Google.MiniJSON;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -161,15 +162,28 @@ public class CurrencyManager : IStartable, IDisposable
         return _model.TrySpend(id, cost);
     }
 
-    public void SavePartyToFirebase(List<GameObject> party)
+    public void SavePartyToFirebase(List<string> party)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
+
+        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo").SetValueAsync(party);
     }
-    public void LoadPartyIdsFromFirebase()
+    public void LoadPartyIdsFromFirebase(List<string> list)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
+        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
+            .GetValueAsync().ContinueWith(task => 
+            {
+                list.Clear();
+                var raw = task.Result.Value as List<object>;
+                if (raw != null)
+                {
+                    foreach (var obj in raw)
+                        list.Add(obj.ToString());
+                }
+            });
     }
     #endregion // public funcs
 }

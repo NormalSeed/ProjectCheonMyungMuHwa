@@ -15,7 +15,8 @@ public class HeroInfoUI : UIBase
     [SerializeField] private Button stageUPButton;      // 승급 버튼
 
     [Header("UI Text")]
-    [SerializeField] private TextMeshProUGUI CharName;  // 이름
+    [SerializeField] private TextMeshProUGUI charName;  // 이름
+    [SerializeField] private TextMeshProUGUI level;     // 레벨
     [SerializeField] private TextMeshProUGUI power;     // 전투력
     [SerializeField] private TextMeshProUGUI outPow;    // 외공
     [SerializeField] private TextMeshProUGUI inPow;     // 내공
@@ -98,7 +99,14 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroLevelUpgrade()
     {
+       bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, new BigCurrency(1000, 0));
 
+        if (result)
+        {
+            Debug.Log("[HeroLevelUpgrade] : 골드 소모");
+        }
+        else
+            Debug.Log("[HeroLevelUpgrade] :골드 부족함");
     }
 
     /// <summary>

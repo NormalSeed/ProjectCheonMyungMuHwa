@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +20,7 @@ public class HeroUI : UIBase
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
+    public event Action partySetFin;
     #region Unity LifeCycle
     public void Start()
     {
@@ -86,6 +89,8 @@ public class HeroUI : UIBase
        
         PartyManager.Instance.EndPartySetting();    // 편성 종료
         PartyManager.Instance.PartyInit();
+
+        partySetFin?.Invoke();
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
     }

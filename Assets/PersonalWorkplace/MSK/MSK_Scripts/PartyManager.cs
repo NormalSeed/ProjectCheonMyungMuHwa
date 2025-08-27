@@ -15,6 +15,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
 
     public List<GameObject> partyMembers = new List<GameObject>();
+
     public List<string> MembersID = new List<string>();
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
@@ -35,6 +36,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public void Start()
     {
+        PartyLoadData();
         PartyInit();
     }
     #endregion
@@ -45,6 +47,7 @@ public class PartyManager : MonoBehaviour, IStartable
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+
             partySixe++;;
             var controller = member.GetComponent<PlayerController>();
             if (controller != null)
@@ -92,6 +95,16 @@ public class PartyManager : MonoBehaviour, IStartable
         isHeroSetNow = false;
     }
 
+
+    // 추후 AddMember와 합칠 생각
+    public void AddMemberID(string memberID)
+    {
+        MembersID.Add(memberID);
+    }
+    public void RemoveMemberID(string memberID)
+    {
+        MembersID.Remove(memberID);
+    }
     /// <summary>
     /// 파티를 자동 편성하는 기능입니다.
     /// </summary>
@@ -112,12 +125,12 @@ public class PartyManager : MonoBehaviour, IStartable
 
     private void PartyUpload()
     {
-        CurrencyManager.Instance.SavePartyToFirebase(partyMembers);
+        CurrencyManager.Instance.SavePartyToFirebase(MembersID);
     }
     
     private void PartyLoadData()
     {
-
+        CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
     }
     #endregion
 }
