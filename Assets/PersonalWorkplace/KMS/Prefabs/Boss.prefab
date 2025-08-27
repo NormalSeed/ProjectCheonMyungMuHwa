@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7464385322391382706}
   m_Layer: 10
   m_Name: Boss
-  m_TagString: Untagged
+  m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -147,6 +147,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Spum: {fileID: 0}
   Model: {fileID: 0}
+  NavAgent: {fileID: 0}
+  effect: {fileID: 8172849020266659018, guid: 2af5562ce69fc2d448481a1587a352a5, type: 3}
 --- !u!114 &7464385322391382706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,7 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tex: {fileID: 11400000, guid: ec64d9e55ef62814481318bad7c961e7, type: 2}
   renderers:
-  - {fileID: 0}
+  - {fileID: 3686923274064844036}
 --- !u!1001 &108068868902241760
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -174,6 +176,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BossModel
       objectReference: {fileID: 0}
+    - target: {fileID: 1160356261127867848, guid: 1e3405cad700fbc4ca6ad77b143ef8db, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 710256f49eca06a4fb997614ffee4738, type: 2}
     - target: {fileID: 7878350319992209165, guid: 1e3405cad700fbc4ca6ad77b143ef8db, type: 3}
       propertyPath: m_LocalScale.x
       value: 3.38
@@ -235,6 +241,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 1e3405cad700fbc4ca6ad77b143ef8db, type: 3}
+--- !u!212 &3686923274064844036 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3626916397498700004, guid: 1e3405cad700fbc4ca6ad77b143ef8db, type: 3}
+  m_PrefabInstance: {fileID: 108068868902241760}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7794171639738546925 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: 1e3405cad700fbc4ca6ad77b143ef8db, type: 3}

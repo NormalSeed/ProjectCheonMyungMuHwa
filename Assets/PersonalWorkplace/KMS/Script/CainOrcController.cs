@@ -21,6 +21,7 @@ public class CainOrcController : MonsterController
     private IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return wfs;
+        AudioManager.Instance.PlaySound("Cane_Attack");
         if (target != null)
         {
             MonsterProjectile proj = PoolManager.Instance.MagicPool.GetItem(transform.position);

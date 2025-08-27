@@ -20,7 +20,7 @@ public class MonsterProjectile : MonoBehaviour, IPooled<MonsterProjectile>
     {
         if (timer >= lifetime)
         {
-            OnLifeEnded?.Invoke(this);
+            if (gameObject.activeSelf) OnLifeEnded?.Invoke(this);
         }
         timer += Time.deltaTime;
     }
@@ -47,7 +47,7 @@ public class MonsterProjectile : MonoBehaviour, IPooled<MonsterProjectile>
                 DamageText text = PoolManager.Instance.DamagePool.GetItem(TargetPos);
                 text.SetText(Damage);
             }
-            OnLifeEnded?.Invoke(this);
+            if (gameObject.activeSelf) OnLifeEnded?.Invoke(this);
         }
 
     }
