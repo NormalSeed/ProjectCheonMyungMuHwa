@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
 public class HeroInfoUI : UIBase
@@ -44,8 +46,7 @@ public class HeroInfoUI : UIBase
     [SerializeField] private TextMeshProUGUI exp;       // 성장재화
 
     [Header("Root References")]
-    [SerializeField] private Transform cardBackgroundRoot; // 레어도
-    [SerializeField] private Transform characterRoot;      // 이미지
+    [SerializeField] private Image characterRoot;          // 이미지
     [SerializeField] private Transform stageRoot;          // 돌파
     [SerializeField] private Transform badgeRoot;          // 팩션,소속
     [SerializeField] private Transform SkillRoot;          // 스킬정보
@@ -94,6 +95,12 @@ public class HeroInfoUI : UIBase
         ButtonAddListener();
         // 텍스트정보 추가
         InfoTextSetting();
+
+        // HeroInfoSetting 에 있는 함수 그대로
+        SetCharacter();         // 이미지세팅
+        SetStage();             // 돌파세팅
+        SetBadge();             // 진영(소속) 세팅
+
         Debug.Log("HeroInfoUI Init 실행됨");
     }
     private void CardInfInit()
@@ -130,6 +137,49 @@ public class HeroInfoUI : UIBase
         inPow.text = InnAtkPoint.ToString();
         outPow.text = DefPoint.ToString();
         health.text = HealthPoint.ToString();
+    }
+    private void SetCharacter()
+    {
+        Addressables.LoadAssetAsync<Sprite>(heroID + "_sprite").Completed += task =>
+        {
+            if (task.Status == AsyncOperationStatus.Succeeded)
+            {
+                characterRoot.sprite = task.Result;
+            }
+        };
+    }
+    private void SetBadge()
+    {
+        foreach (Transform child in badgeRoot)
+            child.gameObject.SetActive(false);
+
+        Transform target = badgeRoot.Find(faction.ToString());
+        if (target != null)
+            target.gameObject.SetActive(true);
+    }
+    private void SetStage()
+    {
+        foreach (Transform stage in stageRoot)
+        {
+            Transform red = stage.Find("Stage_Red");
+            Transform gray = stage.Find("Stage_gray");
+
+            if (red != null) red.gameObject.SetActive(false);
+            if (gray != null) gray.gameObject.SetActive(true);
+        }
+
+        for (int i = 1; i <= heroStage; i++)
+        {
+            Transform stage = stageRoot.Find("Stage" + i);
+            if (stage != null)
+            {
+                Transform red = stage.Find("Stage_Red");
+                Transform gray = stage.Find("Stage_gray");
+
+                if (red != null) red.gameObject.SetActive(true);
+                if (gray != null) gray.gameObject.SetActive(false);
+            }
+        }
     }
     #endregion
 
