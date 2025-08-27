@@ -34,7 +34,7 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         PunchPool = new DefaultPool<MonsterController>("Punch", 3, false);
         StickPool = new DefaultPool<MonsterController>("Stick", 3, false);
-        CainPool = new DefaultPool<MonsterController>("Cain", 3, false);
+        CainPool = new DefaultPool<MonsterController>("Cane", 3, false);
         BowPool = new DefaultPool<MonsterController>("Bow", 3, false);
         ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8);
         MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8);
