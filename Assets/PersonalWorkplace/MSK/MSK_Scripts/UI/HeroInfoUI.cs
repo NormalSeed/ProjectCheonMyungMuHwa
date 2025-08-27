@@ -4,10 +4,25 @@ using UnityEngine.UI;
 
 public class HeroInfoUI : UIBase
 {
+    /*
+        목표하는 워크 플로우 
+
+        CardInfo SO 에서 캐릭터 ID를 파악
+        일치하는 캐릭터 ID를 가진 PlayerModelSO 레퍼런스를 받아오기
+        PlayerModelSO에서 스킬 정보 SO 또한 받아오기
+
+        Init에서 초기화
+        
+        HeroLevelUpgrade() 코드에서 레벨 업그레이드 후 데이터베이스에 저장
+
+     */
+
+    private string modelPath = "LGH/PlayerModels/";
+
     [Header("Hero Info SO")]
     [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
-    [SerializeField] private PlayerModelSO ModelInfo;   // 캐릭터 스텟 SO
-    [SerializeField] private SkillSet SkillInfo;        // 캐릭터 스킬 SO
+    [SerializeField] private PlayerModelSO modelInfo;   // 캐릭터 스텟 SO
+    [SerializeField] private SkillSet skillInfo;        // 캐릭터 스킬 SO
 
     [Header("Button")]
     [SerializeField] private Button exitButton;         // 나가기 버튼
@@ -55,11 +70,15 @@ public class HeroInfoUI : UIBase
     #region Init
     private void Init()
     {
-
+        // CardInfo 정보 받아옴
         heroID = chardata.HeroID;
         heroStage = chardata.HeroStage;
         rarity = chardata.rarity;
         faction = chardata.faction;
+
+        modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID +"_model");
+
+        // PlayerModelSO 정보를 받아옴
 
         exitButton.onClick.AddListener(OnClickExit);
         upgradeButton.onClick.AddListener(OnClickUpgrade);

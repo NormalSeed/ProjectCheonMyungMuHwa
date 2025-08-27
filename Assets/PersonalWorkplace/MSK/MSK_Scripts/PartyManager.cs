@@ -116,6 +116,7 @@ public class PartyManager : MonoBehaviour, IStartable
     // 추후 AddMember와 합칠 생각
     public void AddMemberID(string memberID)
     {
+        //  현재 맴버수 체크
         if (MaxPartySize <= MembersID.Count)
             return;
         MembersID.Add(memberID);
