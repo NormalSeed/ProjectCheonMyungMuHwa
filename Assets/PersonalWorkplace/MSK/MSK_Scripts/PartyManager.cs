@@ -49,10 +49,7 @@ public class PartyManager : MonoBehaviour, IStartable
         {
             partyMembers.Add(member);
 
-            partySixe++;;
-            var controller = member.GetComponent<PlayerController>();
-
-            PartySixe++;
+            partySixe++;
 
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
             // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
