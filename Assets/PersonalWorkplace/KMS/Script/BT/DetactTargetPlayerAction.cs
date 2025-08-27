@@ -33,14 +33,14 @@ public partial class DetectTargetPlayerAction : Action
     /// <returns></returns>
     private void GetTarget(ref BlackboardVariable<GameObject> target)
     {
-        GameObject[] monsters = GameObject.FindGameObjectsWithTag("Player");
-        if (monsters.Length == 0)
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        if (players.Length == 0)
         {
             return;
         }
         float minDistance = Mathf.Infinity;
 
-        foreach (GameObject monster in monsters)
+        foreach (GameObject monster in players)
         {
             float distance = Vector3.Distance(selfPosition, monster.transform.position);
             if (distance < minDistance)
