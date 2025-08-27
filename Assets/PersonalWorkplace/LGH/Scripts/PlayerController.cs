@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour, IDamagable
     public GameObject skillSet;
     public GameObject SPUMAsset;
 
+    public int partyNum;
+
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
     private NavMeshAgent NMagent;

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Unity.Behavior;
-using UnityEngine;
-using Action = Unity.Behavior.Action;
 using Unity.Properties;
-using System.Linq;
+using UnityEngine;
 using UnityEngine.AI;
+using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "PlayerMove", story: "[Self] move to [AlignPoint]", category: "Action", id: "ac6be75cade22ceed3bfae9a3e9af1c2")]
@@ -14,11 +13,13 @@ public partial class PlayerMoveAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> AlignPoint;
 
+    private PlayerController controller;
     private NavMeshAgent NMagent;
     private AlignPoint alignPoint;
 
     protected override Status OnStart()
     {
+        controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
 
         AlignPoint.Value = GameObject.FindGameObjectWithTag("AlignPoint");
@@ -34,7 +35,7 @@ public partial class PlayerMoveAction : Action
     private Transform GetMovePoint(List<GameObject> points)
     {
         // 배치 번호에 따라 이동 포인트로 이동하는 로직 구현 필요
-        Transform point = points[1].transform;
+        Transform point = points[controller.partyNum].transform;
 
         Debug.Log($"이동 포인트 : {point.gameObject.name}");
         return point;
@@ -42,12 +43,17 @@ public partial class PlayerMoveAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Vector2.Distance(Self.Value.transform.position, GetMovePoint(alignPoint.alignPoints).position) < 0.1f)
+        if (Vector2.Distance(Self.Value.transform.position, GetMovePoint(alignPoint.alignPoints).position) < 0.01f)
         {
             NMagent.ResetPath();
             return Status.Success;
         }
         return Status.Running;
+    }
+
+    protected override void OnEnd()
+    {
+        InGameManager.Instance.alignedNum.Value++;
     }
 }
 

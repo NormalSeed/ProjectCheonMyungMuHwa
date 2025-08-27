@@ -42,13 +42,13 @@ public class PoolManager : MonoBehaviour
         ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 100);
 
         //test
-        bossPool = new DefaultPool<MonsterController>("Boss", 1, false);
+        bossPool = new DefaultPool<MonsterController>("Boss", 10, false);
     }
 
 
-    public void ActiveAll()
+    public void ActiveAll(int stageNum)
     {
-        SetModelStates(currentstage);
+        SetModelStates(stageNum);
 
         ActiveMonster(PunchPool, 0, 0);
         ActiveMonster(PunchPool, 1, 0);
@@ -64,10 +64,10 @@ public class PoolManager : MonoBehaviour
         ActiveMonster(BowPool, 11, 3);
     }
 
-    public void ActiveBoss()
+    public void ActiveBoss(int stageNum)
     {
-        SetModelStates(currentstage);
-        bossModel.SetFinalBoss(currentstage, models[0]);
+        SetModelStates(stageNum);
+        bossModel.SetFinalBoss(stageNum, models[0]);
         MonsterController boss = bossPool.GetItem(bossPoint.position);
         boss.Model.BaseModel = bossModel;
         boss.gameObject.SetActive(true);

@@ -15,13 +15,13 @@ public class PoolPresenter : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            poolManager.ActiveAll();
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            poolManager.ActiveBoss();
-        }
+        //if (Input.GetKeyDown(KeyCode.F1))
+        //{
+        //    //poolManager.ActiveAll();
+        //}
+        //if (Input.GetKeyDown(KeyCode.F2))
+        //{
+        //    //poolManager.ActiveBoss();
+        //}
     }
 }
