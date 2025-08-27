@@ -63,12 +63,11 @@ public class PoolManager : MonoBehaviour
         ActiveMonster(BowPool, 9, 3);
         ActiveMonster(BowPool, 10, 3);
         ActiveMonster(BowPool, 11, 3);
-
-        ActiveBoss(stageNum);
     }
 
     public void ActiveBoss(int stageNum)
     {
+        AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
         bossModel.SetFinalBoss(stageNum, models[0]);
         MonsterController boss = bossPool.GetItem(bossPoint.position);
