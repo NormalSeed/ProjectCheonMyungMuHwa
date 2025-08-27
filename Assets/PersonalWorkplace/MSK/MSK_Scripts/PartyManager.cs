@@ -37,8 +37,11 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public void Start()
     {
-        PartyLoadData();
-        PartyInit();
+        CurrencyManager.OnInitialized += HandleCurrencyReady;
+    }
+    private void OnDestroy()
+    {
+        CurrencyManager.OnInitialized -= HandleCurrencyReady;
     }
     #endregion
 
@@ -135,6 +138,12 @@ public class PartyManager : MonoBehaviour, IStartable
 
         }
     }
+    private void HandleCurrencyReady()
+    {
+        PartyLoadData();
+        PartyInit();
+    }
+
 
     private void PartyUpload()
     {
