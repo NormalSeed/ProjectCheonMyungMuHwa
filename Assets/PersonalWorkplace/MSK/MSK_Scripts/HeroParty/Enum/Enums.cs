@@ -35,4 +35,10 @@ public enum UIType
     Attendance,
     Ranking,
     Setting,
+    Hero,
+    Upgrade,
+    Dungeon,
+    Inventory,
+    Summon,
+    Shop,
 }

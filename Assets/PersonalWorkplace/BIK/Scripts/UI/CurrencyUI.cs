@@ -73,6 +73,7 @@ public class CurrencyUI : MonoBehaviour
     public void OnClick_Currency() // TODO : 삭제하기
     {
         CurrencyManager.Instance.Add(_targetCurrency, new BigCurrency(50, 0));
+        //CurrencyManager.Instance.TrySpend(_targetCurrency, new BigCurrency(50, 0));
     }
 
     #endregion // test code
