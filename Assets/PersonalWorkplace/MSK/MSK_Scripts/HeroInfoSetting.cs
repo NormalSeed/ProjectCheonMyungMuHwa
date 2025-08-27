@@ -1,6 +1,10 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
+using VContainer;
+using VContainer.Unity;
 
 public class HeroInfoSetting : MonoBehaviour
 {
@@ -12,19 +16,33 @@ public class HeroInfoSetting : MonoBehaviour
     private HeroRarity rarity;
     private HeroRelationship relationship;
 
-
     [Header("Root References")]
-    [SerializeField] private Transform cardBackgroundRoot;
-    [SerializeField] private Transform characterRoot;
-    [SerializeField] private Transform stageRoot;
-    [SerializeField] private Transform badgeRoot;
-    [SerializeField] private Transform selectRoot;
+    [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
+    [SerializeField] private Image characterRoot;          // 캐릭터 이미지
+    [SerializeField] private Transform stageRoot;          // 돌파상태
+    [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
+    [SerializeField] private Transform selectRoot;         // 배치 선택여부 
 
     [Header("UI")]
-    [SerializeField] private Button CardButton;
-    [SerializeField] private TextMeshProUGUI PartyNum;
-    [SerializeField] private GameObject HeroInfoUI;
+    [SerializeField] private Button CardButton;             // 캐릭터 카드
+    [SerializeField] private TextMeshProUGUI PartyNum;      // 배치 순서
 
+
+
+    // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
+    [SerializeField ]private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
+    private HeroUI heroUI;
+    private PartyManager partyManager;
+    
+
+    #region Unity LifeCycle
+
+    public void PostStart() 
+    {
+        Debug.Log("PostStart 실행됨");
+        
+
+    }
     private void OnEnable()
     {
         Init();
@@ -34,7 +52,9 @@ public class HeroInfoSetting : MonoBehaviour
     {
         CardButton.onClick.RemoveListener(OnClickCard);
     }
+    #endregion
 
+    #region Init    
     private void Init()
     {
         HeroID = chardata.HeroID;
@@ -49,8 +69,6 @@ public class HeroInfoSetting : MonoBehaviour
 
         CardButton.onClick.AddListener(OnClickCard);
     }
-
-    #region Init
     private void SetBackground()
     {
         foreach (Transform child in cardBackgroundRoot)
@@ -62,12 +80,14 @@ public class HeroInfoSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        foreach (Transform child in characterRoot)
-            child.gameObject.SetActive(false);
+        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += task =>
+        {
+            if (task.Status == AsyncOperationStatus.Succeeded)
+            {
+                characterRoot.sprite = task.Result;
+            }
+        };
 
-        Transform target = characterRoot.Find(HeroID.ToString());
-        if (target != null)
-            target.gameObject.SetActive(true);
     }
     private void SetBadge()
     {
@@ -109,23 +129,27 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
-        //  TODO : 파티 편성 구현하기
-        // 파티 편성중일 경우 HeroSetting()
-        // 선택 효과 + 편성 번호 표시
-        HeroUIActive();
-        // 일반적 상황에서   HeroUIActive()
-        /* 영웅 개별 UI 활성화 */
+        Debug.Log(chardata);
+        // partyManager.AddMember(gameObject);
     }
     #endregion
 
+
+    #region Private
+    /// <summary>
+    /// 회색으로 표시하여 배치되었음을 표시하는 스크립트
+    /// </summary>
     private void HeroSetting()
     {
         selectRoot.gameObject.SetActive(true);
-
     }
-
+    /// <summary>
+    /// 캐릭터 정보 UI로 연결하는 스크립트
+    /// </summary>
     private void HeroUIActive()
     {
-        HeroInfoUI.SetActive(true);
+        // 캐릭터 정보 SO도 함께 전달해주어야 한다.
+        // HeroInfoUI.SetActive(true);
     }
+    #endregion
 }
