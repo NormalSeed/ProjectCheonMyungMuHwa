@@ -8,7 +8,7 @@ public enum HeroRarity
     Unique = 3,  // 유니크(노란색)
 }
 
-public enum HeroRelationship
+public enum HeroFaction
 {
     J,  // 정파
     M,  // 마교
@@ -17,13 +17,13 @@ public enum HeroRelationship
 
 public enum CurrencyType
 {
-    Jewel,          // 용옥(다이아)
-    Gold,           // 금화
-    Soul,           // 혼백(경험치)
-    SpiritStone,    // 영석(보물 강화)
-    SummonTicket,   // 등용패(뽑기권)
-    InvitationTicket,// 초대장(입장권)
-    ChallengeTicket // 도전장(입장권)
+    Jewel,            // 용옥(다이아)
+    Gold,             // 금화
+    Soul,             // 혼백(경험치)
+    SpiritStone,      // 영석(보물 강화)
+    SummonTicket,     // 등용패(뽑기권)
+    InvitationTicket, // 초대장(입장권)
+    ChallengeTicket   // 도전장(입장권)
 }
 
 public enum UIType

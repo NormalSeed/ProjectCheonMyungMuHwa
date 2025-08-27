@@ -12,7 +12,7 @@ public class HeroInfoSetting : MonoBehaviour
     public string HeroID { get; private set; }
     public int HeroStage { get; private set; }
     private HeroRarity rarity;
-    private HeroRelationship relationship;
+    private HeroFaction faction;
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
@@ -57,7 +57,7 @@ public class HeroInfoSetting : MonoBehaviour
         HeroID = chardata.HeroID;
         HeroStage = chardata.HeroStage;
         rarity = chardata.rarity;
-        relationship = chardata.relationship;
+        faction = chardata.faction;
 
         SetBackground();
         SetCharacter();
@@ -91,7 +91,7 @@ public class HeroInfoSetting : MonoBehaviour
         foreach (Transform child in badgeRoot)
             child.gameObject.SetActive(false);
 
-        Transform target = badgeRoot.Find(relationship.ToString());
+        Transform target = badgeRoot.Find(faction.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
     }

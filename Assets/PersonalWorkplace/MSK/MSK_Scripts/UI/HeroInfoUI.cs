@@ -5,37 +5,38 @@ using UnityEngine.UI;
 public class HeroInfoUI : UIBase
 {
     [Header("Hero Info SO")]
-    [SerializeField] private CardInfo chardata;  // 캐릭터 정보 SO
- // [SerializeField] private          SkillInfo; // 스킬 정보 SO
+    [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
+    [SerializeField] private PlayerModelSO ModelInfo;   // 캐릭터 스텟 SO
+    [SerializeField] private SkillSet SkillInfo;        // 캐릭터 스킬 SO
 
     [Header("Button")]
-    [SerializeField] private Button exitButton;
-    [SerializeField] private Button upgradeButton;
-    [SerializeField] private Button stageUPButton;
+    [SerializeField] private Button exitButton;         // 나가기 버튼
+    [SerializeField] private Button upgradeButton;      // 레벨업 버튼
+    [SerializeField] private Button stageUPButton;      // 승급 버튼
 
     [Header("UI Text")]
-    [SerializeField] private TextMeshProUGUI name;      // 이름
+    [SerializeField] private TextMeshProUGUI CharName;  // 이름
     [SerializeField] private TextMeshProUGUI power;     // 전투력
     [SerializeField] private TextMeshProUGUI outPow;    // 외공
     [SerializeField] private TextMeshProUGUI inPow;     // 내공
     [SerializeField] private TextMeshProUGUI health;    // 체력
     [SerializeField] private TextMeshProUGUI heroPiece; // 영웅조각
     [SerializeField] private TextMeshProUGUI exp;       // 성장재화
-                                                        
+
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 레어도
     [SerializeField] private Transform characterRoot;      // 이미지
     [SerializeField] private Transform stageRoot;          // 돌파
     [SerializeField] private Transform badgeRoot;          // 팩션,소속
     [SerializeField] private Transform SkillRoot;          // 스킬정보
-    
+
     [Header("Panel")]
-    [SerializeField] private GameObject heroInfoPanel;
+    [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
 
     private string heroID;              // 캐릭터 ID
     private int heroStage;              // 돌파정보
     private HeroRarity rarity;          // 레어도
-    private HeroRelationship faction;  // 진영
+    private HeroFaction faction;  // 진영
 
     #region Unity LiftCycle
     private void OnEnable()
@@ -53,15 +54,12 @@ public class HeroInfoUI : UIBase
     #region Init
     private void Init()
     {
-        /*
-          heroID = chardata.HeroID;
-          heroStage = chardata.HeroStage;
-          rarity = chardata.rarity;
-          faction = chardata.relationship;
-          
-          ... SO에서 정보 받아오기
-        */
-        
+
+        heroID = chardata.HeroID;
+        heroStage = chardata.HeroStage;
+        rarity = chardata.rarity;
+        faction = chardata.faction;
+
         exitButton.onClick.AddListener(OnClickExit);
         upgradeButton.onClick.AddListener(OnClickUpgrade);
         stageUPButton.onClick.AddListener(OnClickStageUP);
