@@ -45,27 +45,24 @@ public class InGameManager : MonoBehaviour
 
     public void ExamineAllAligned(int num)
     {
-        if (isProcessingAlignment) return;
+        if (isProcessingAlignment || num != 5)return;
 
-        if (alignedNum.Value == 5)
+        isProcessingAlignment = true;
+        if (stageProgress < 2)
         {
-            if (stageProgress < 2)
-            {
-                RespawnMonsters();
-            }
-            else
-            {
-                SpawnBoss();
-            }
-
-            alignedNum.Value = 0;
-
-            StartCoroutine(ResetAlignmentFlag());
+            RespawnMonsters();
         }
+        else
+        {
+            SpawnBoss();
+        }
+
+        StartCoroutine(ResetAlignmentFlag());
     }
     private IEnumerator ResetAlignmentFlag()
     {
         yield return new WaitForSeconds(0.1f);
+        alignedNum.Value = 0;
         isProcessingAlignment = false;
     }
 
