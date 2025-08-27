@@ -80,7 +80,7 @@ public class MonsterModelBaseSO : ScriptableObject
     }
     else
     {
-      finalMaxHealth = model.finalMaxHealth * 100;
+      finalMaxHealth = model.finalMaxHealth * 20;
     }
     finalAttackPower = model.finalAttackPower * 3;
     finalDefense = stage * baseDefense;
