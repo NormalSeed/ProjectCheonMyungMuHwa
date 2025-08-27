@@ -130,7 +130,14 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnClickCard()
     {
         Debug.Log(chardata);
-        // partyManager.AddMember(gameObject);
+        if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+        {
+            PartyManager.Instance.AddMember(gameObject);
+        }
+        else 
+        {
+            PartyManager.Instance.RemoveMember(gameObject);
+        }
     }
     #endregion
 
