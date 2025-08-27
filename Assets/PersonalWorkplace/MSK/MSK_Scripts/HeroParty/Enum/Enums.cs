@@ -41,4 +41,5 @@ public enum UIType
     Inventory,
     Summon,
     Shop,
+    PlayerProfile,
 }

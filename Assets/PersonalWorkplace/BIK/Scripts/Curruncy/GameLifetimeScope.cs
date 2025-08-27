@@ -18,6 +18,6 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<CurrencyManager>(Lifetime.Singleton);
 
         // 프로필
-
+        builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
     }
 }
