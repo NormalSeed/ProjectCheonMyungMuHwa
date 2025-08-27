@@ -1,34 +1,48 @@
+using Firebase.Auth;
+using Firebase.Database;
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using VContainer.Unity;
 using static UnityEngine.Rendering.DebugUI;
 
 public class PartyManager : MonoBehaviour, IStartable
 {
+    public static PartyManager Instance { get; private set; }
+
     public List<GameObject> partyMembers = new List<GameObject>();
 
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
 
     private readonly int MaxPartySize = 5;
-
     public int PartySixe = 1;
 
     public event Action<Dictionary<string, CardInfo>> partySet;
 
+    public PartyManager( )
+    {
+        Instance = this;
+    }
 
     #region Unity LifeCycle
     private void Awake() { }
 
-    public void Start() { }
+    public void Start() 
+    { 
+        PartyInit(); 
+    }
     #endregion
 
     #region Public 
     public void AddMember(GameObject member)
     {
+        Debug.Log($"{member}파티 추가시도");
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+            PartySixe++;
+            Debug.Log($"{member}파티 추가됨");
             var controller = member.GetComponent<PlayerController>();
             if (controller != null)
             {
@@ -42,7 +56,9 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         if (partyMembers.Contains(member))
         {
+            Debug.Log($"{member}파티 제거됨");
             partyMembers.Remove(member);
+            PartySixe--;
         }
     }
     public void PartyInit()
