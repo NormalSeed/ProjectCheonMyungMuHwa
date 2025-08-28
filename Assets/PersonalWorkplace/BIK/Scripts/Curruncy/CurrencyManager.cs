@@ -1,9 +1,9 @@
 using Firebase.Auth;
 using Firebase.Database;
-using Google.MiniJSON;
+using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -164,24 +164,39 @@ public class CurrencyManager : IStartable, IDisposable
         return _model.TrySpend(id, cost);
     }
 
+    /// <summary>
+    /// 파티 편성정보 저장
+    /// </summary>
+    /// <param name="party"></param>
     public void SavePartyToFirebase(List<string> party)
     {
-        if (party == null)
-        {
-            Debug.LogError("파티가 Null임");
-        }
-
         if (string.IsNullOrEmpty(_uid))
             return;
 
-        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo").SetValueAsync(party);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo");
+
+        //  기존 저장된 리스트 삭제
+        partyInfoRef.RemoveValueAsync().ContinueWith(removeTask =>
+        {
+            if (removeTask.IsFaulted)
+                return;
+            // 새로운 리스트 저장
+            partyInfoRef.SetValueAsync(party).ContinueWith(setTask =>
+            {
+                if (setTask.IsFaulted) { }
+            });
+        });
     }
+    /// <summary>
+    /// 파티 편성정보 로딩
+    /// </summary>
+    /// <param name="list"></param>
     public void LoadPartyIdsFromFirebase(List<string> list)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
         _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
-            .GetValueAsync().ContinueWith(task => 
+            .GetValueAsync().ContinueWith(task =>
             {
                 list.Clear();
                 var raw = task.Result.Value as List<object>;
@@ -191,6 +206,42 @@ public class CurrencyManager : IStartable, IDisposable
                         list.Add(obj.ToString());
                 }
             });
+    }
+
+    /// <summary>
+    /// 캐릭터 성장정보 저장
+    /// </summary>
+    /// <param name="chariID"></param>
+    /// <param name="level"></param>
+    public void SaveCharatorInfoToFireBase(string chariID, int level)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+
+        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => 
+        {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+    /// <summary>
+    /// 캐릭터 성장정보 로딩
+    /// </summary>
+    public async Task<int> LoadCharatorInfoFromFireBase(string chariID)
+    {
+        int level = -1;
+        if (string.IsNullOrEmpty(_uid))
+            return level;
+
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var dataSnapshot = await partyInfoRef.Child("level").GetValueAsync();
+
+        if (dataSnapshot.Exists)
+            int.TryParse(dataSnapshot.Value.ToString(), out level);
+
+        Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
+        return level;
     }
     #endregion // public funcs
 }

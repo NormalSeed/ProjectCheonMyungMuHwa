@@ -21,6 +21,8 @@ public class BossController : MonsterController
 
     private MonsterAnimationState currentLoopState;
 
+    private bool isInvulnerable;
+
     public System.Action OnSpawnAmimEnd;
     protected override void InitComponent()
     {
@@ -51,6 +53,7 @@ public class BossController : MonsterController
 
     public void OnSpawn()
     {
+        isInvulnerable = true;
         StartCoroutine(SpawnRoutine());
 
     }
@@ -91,6 +94,7 @@ public class BossController : MonsterController
         }
         Destroy(go);
         OnSpawnAmimEnd?.Invoke();
+        isInvulnerable = false;
     }
 
     private void SetAnimation(MonsterAnimationState state)
@@ -129,6 +133,11 @@ public class BossController : MonsterController
             DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
             text.SetText(Model.BaseModel.finalAttackPower);
         }
+    }
+    protected override void OnTakeDamage(double amount)
+    {
+        if (isInvulnerable) return;
+        base.OnTakeDamage(amount);
     }
 
 }
