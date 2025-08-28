@@ -56,9 +56,9 @@ public class AS02_SkillSet : SkillSet
         effect0.SetActive(false);
 
         // 1번 이펙트 활성화
-        effect1.transform.SetParent(null);
         effect1.transform.position = target.position;
         effect1.SetActive(true);
+        effect1.transform.SetParent(null);
 
         yield return new WaitForSeconds(skill1Duration);
 

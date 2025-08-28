@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class JeokRang_BlazingSlash : SkillEffect
 {
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         duration = 5f;
     }
 

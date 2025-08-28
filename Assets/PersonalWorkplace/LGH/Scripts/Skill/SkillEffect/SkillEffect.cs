@@ -3,14 +3,14 @@ using UnityEngine;
 public class SkillEffect : MonoBehaviour
 {
     protected PlayerController controller;
-    protected PlayerSkillSO skill1Data;
-    protected PlayerSkillSO skill2Data;
+    public PlayerSkillSO skill1Data;
+    public PlayerSkillSO skill2Data;
 
     protected float duration;
 
     protected Transform target;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         controller = GetComponentInParent<PlayerController>();
         skill1Data = controller.skillSet.GetComponent<SkillSet>().skills[0];

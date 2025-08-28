@@ -5,9 +5,9 @@ public class JeokRang_explosion : SkillEffect
 {
     private Coroutine damageLoop;
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
     }
 
     private void OnEnable()
