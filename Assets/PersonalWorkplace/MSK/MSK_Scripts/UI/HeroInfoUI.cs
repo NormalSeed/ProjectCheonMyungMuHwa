@@ -94,6 +94,8 @@ public class HeroInfoUI : UIBase
         SetCharacter();         // 이미지세팅
         SetStage();             // 돌파세팅
         SetBadge();             // 진영(소속) 세팅
+        SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 상호작용 가능 여부
+        SetRankUpInteractable(stageUPButton);  // 캐릭터 돌파버튼 상호작용 여부
 
         Debug.Log("HeroInfoUI Init 실행됨");
     }
@@ -114,8 +116,8 @@ public class HeroInfoUI : UIBase
         HealthPoint = BigCurrency.FromBaseAmount(modelInfo.HealthPoint);
         ExtAtkPoint = BigCurrency.FromBaseAmount(modelInfo.ExtAtkPoint);
         InnAtkPoint = BigCurrency.FromBaseAmount(modelInfo.InnAtkPoint);
+        requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
     }
-
     private void ButtonAddListener()
     {
         exitButton.onClick.AddListener(OnClickExit);
@@ -175,6 +177,32 @@ public class HeroInfoUI : UIBase
             }
         }
     }
+    private void SetUpgradeInteractable(Button btn)
+    {
+        if (CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold)
+        {
+            btn.interactable = true;
+        }
+        else
+        {
+            btn.interactable = false;
+        }
+    }
+    private void SetRankUpInteractable(Button btn)
+    {
+        btn.interactable = false;
+        // TODO : 가챠 작성 후 수정하기
+        /*
+        if (ownerPiece >= requirePiece)
+        {
+            btn.interactable = true;
+        }
+        else
+        {
+            btn.interactable = false;
+        }
+        */
+    }
     #endregion
 
     #region OnClick
@@ -215,6 +243,7 @@ public class HeroInfoUI : UIBase
             heroLevel++;
             level.text = heroLevel.ToString();
             exp.text = RequireLevelUpGold(heroLevel);
+            requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
             CurrencyManager.Instance.SaveCharatorInfoToFireBase(heroID, heroLevel);
             Debug.Log("[HeroLevelUpgrade] : 골드 소모");
         }
@@ -239,10 +268,10 @@ public class HeroInfoUI : UIBase
     /// <param name="level"></param>
     private string RequireLevelUpGold(int level)
     {
-       string gold = CurrencyManager.Instance.Model.Get(CurrencyType.Gold).ToString();
-       string requireGOld = BigCurrency.FromBaseAmount(level * 500).ToString();
-       string result = requireGOld + " / " + gold;
-       return result;                 // 임시 계산식 level * 500
+        string myGold = CurrencyManager.Instance.Model.Get(CurrencyType.Gold).ToString();
+        string reqGold = requireGold.ToString();
+        string result = reqGold + " / " + myGold;
+        return result;                 // 임시 계산식 level * 500
     }
 
     /// <summary>
@@ -288,10 +317,7 @@ public class HeroInfoUI : UIBase
 TODO : 영웅 정보 UI 작업 예정 목록
     나가기 버튼 이미지 교체하기
     골드 부족 시 버튼 상호작용 불가능 추가
-    전투력 계산 식 추가
-    소유 골드 정보 가져오기
-    소모 골드 정보 가져오기
     소유 카드 조각 가져오기
     돌파용 카드조각 개수 가져오기
-    임시 작성한 영웅 레벨업, 돌파에 필요한 재화 계산식 수정하기
+    임시 작성한 영웅 레벨업, 돌파에 필요한 재화, 종합 전투력 계산식 수정하기
  */
