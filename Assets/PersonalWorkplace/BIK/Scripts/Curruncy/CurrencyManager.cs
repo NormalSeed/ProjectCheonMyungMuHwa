@@ -241,8 +241,6 @@ public class CurrencyManager : IStartable, IDisposable
 
         if (dataSnapshot.Exists)
             int.TryParse(dataSnapshot.Value.ToString(), out level);
-
-        Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
         return level;
     }
 

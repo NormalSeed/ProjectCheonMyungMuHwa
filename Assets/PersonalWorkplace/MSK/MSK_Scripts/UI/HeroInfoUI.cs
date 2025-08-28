@@ -52,14 +52,14 @@ public class HeroInfoUI : UIBase
     #region PlayerModel SO Properties
     private string heroName;        // 이름정보
     private int heroLevel;          // 레벨정보
-    private double HealthPoint;     // 체력정보
-    private double FinalPower;      // 종합전투
-    private double InnAtkPoint;     // 내공????
-    private double ExtAtkPoint;     // 외곻????
+    private BigCurrency HealthPoint = new();     // 체력정보
+    private BigCurrency FinalPower = new();      // 종합전투
+    private BigCurrency InnAtkPoint = new();     // 내공????
+    private BigCurrency ExtAtkPoint = new();     // 외곻????
     #endregion
 
     #region Goods Properties
-    private int requireGold = 1000;              // 필요 골드
+    private BigCurrency requireGold = new();              // 필요 골드
     private int requirePiece;                    // 필요 영웅 조각
     private int ownerPiece;                      // 보유중인 영웅 조각
     #endregion
@@ -109,11 +109,11 @@ public class HeroInfoUI : UIBase
     private async Task ModelInfoInit()
     {
         heroName = modelInfo.CharName;
+        // 레벨 정보 불러오고 진행
         heroLevel = await CurrencyManager.Instance.LoadCharatorInfoFromFireBase(heroID);
-        Debug.Log($"[ModelInfoInit] : 불러온 영웅 레벨 {heroLevel}");
-        HealthPoint = modelInfo.HealthPoint;
-        ExtAtkPoint = modelInfo.ExtAtkPoint;
-        InnAtkPoint = modelInfo.InnAtkPoint;
+        HealthPoint = BigCurrency.FromBaseAmount(modelInfo.HealthPoint);
+        ExtAtkPoint = BigCurrency.FromBaseAmount(modelInfo.ExtAtkPoint);
+        InnAtkPoint = BigCurrency.FromBaseAmount(modelInfo.InnAtkPoint);
     }
 
     private void ButtonAddListener()
@@ -126,12 +126,11 @@ public class HeroInfoUI : UIBase
     {
         charName.text = heroName;
         level.text = heroLevel.ToString();
-        power.text = FinalPower.ToString();
-
-        // 인권님 수치 단위 변환 코드 참고가 필요함
         inPow.text = InnAtkPoint.ToString();
         outPow.text = ExtAtkPoint.ToString();
         health.text = HealthPoint.ToString();
+        power.text = CountingHeroPower();
+        exp.text = RequireLevelUpGold(heroLevel);
     }
     private void SetCharacter()
     {
@@ -209,12 +208,13 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroLevelUpgrade()
     {
-        bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, new BigCurrency(requireGold, 0));
+        bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold);
 
         if (result)
         {
             heroLevel++;
             level.text = heroLevel.ToString();
+            exp.text = RequireLevelUpGold(heroLevel);
             CurrencyManager.Instance.SaveCharatorInfoToFireBase(heroID, heroLevel);
             Debug.Log("[HeroLevelUpgrade] : 골드 소모");
         }
@@ -226,18 +226,25 @@ public class HeroInfoUI : UIBase
     /// 전투력을 계산하는 코드입니다.
     /// </summary>
     /// <returns></returns>
-    private void CountingHeroPower()
+    private string CountingHeroPower()
     {
-        FinalPower = 0;
+        //  임시 계산식
+        double power = modelInfo.ExtAtkPoint * modelInfo.HealthPoint * modelInfo.InnAtkPoint * 0.7;
+        return BigCurrency.FromBaseAmount(power).ToString();
     }
+
     /// <summary>
     /// 레벨업 시 필요한 골드 계산용 코드입니다.
     /// </summary>
     /// <param name="level"></param>
-    private void RequireLevelUpGold(int level)
+    private string RequireLevelUpGold(int level)
     {
-        requireGold = heroLevel * 1000;                 // 임시 계산식
+       string gold = CurrencyManager.Instance.Model.Get(CurrencyType.Gold).ToString();
+       string requireGOld = BigCurrency.FromBaseAmount(level * 500).ToString();
+       string result = requireGOld + " / " + gold;
+       return result;                 // 임시 계산식 level * 500
     }
+
     /// <summary>
     /// 캐릭터 돌파 시 필요한 영웅조각 계산용의 코드입니다.
     /// </summary>
