@@ -112,6 +112,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public virtual void OnDeath()
     {
         StartCoroutine(DeathRoutine());
+        QuestManager.Instance.UpdateQuest("Monster", 1);
         AudioManager.Instance.PlaySound("Monster_Dead");
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
