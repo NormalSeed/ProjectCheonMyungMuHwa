@@ -4,6 +4,12 @@ public class MyungHwa_Void : SkillEffect
 {
     public Collider2D coll;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        coll = GetComponent<Collider2D>();
+    }
+
     public void ActivateCollider()
     {
         coll.enabled = true;

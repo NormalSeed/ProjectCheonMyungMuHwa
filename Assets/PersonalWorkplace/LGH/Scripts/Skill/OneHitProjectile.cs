@@ -3,6 +3,26 @@ using UnityEngine.InputSystem.XR;
 
 public class OneHitProjectile : Projectile
 {
+    private SkillSet skillSet;
+
+    private float duration;
+
+    protected override void Start()
+    {
+        base.Start();
+        duration = 5f;
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        duration -= Time.deltaTime;
+        if (duration <= 0)
+        {
+            ReturnPool();
+        }
+    }
+
     protected override void FixedUpdate()
     {
         // 타겟이 null이면 가장 가까운 몬스터를 찾아서 재지정
@@ -37,7 +57,11 @@ public class OneHitProjectile : Projectile
         }
 
         // 이동 처리
-        transform.Translate(target.position * speed * Time.deltaTime, Space.World);
+        // 타겟 방향 계산
+        Vector2 direction = (target.position - transform.position).normalized;
+
+        // 그 방향으로 이동
+        transform.position += (Vector3)(direction * speed * Time.deltaTime);
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision)
@@ -58,6 +82,12 @@ public class OneHitProjectile : Projectile
             {
                 Debug.Log("IDamagable이 없음");
             }
+            ReturnPool();
         }
+    }
+
+    private void OnDisable()
+    {
+        duration = 5f;
     }
 }

@@ -58,7 +58,7 @@ public class BS01_SkillSet : SkillSet
 
         if (projectile != null)
         {
-            projectile.Configure(controller.transform.position, target, skill2Speed, skill1Range, skills[1]);
+            projectile.Configure(controller.transform.position, target, skill2Speed, skill2Range, skills[1]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else

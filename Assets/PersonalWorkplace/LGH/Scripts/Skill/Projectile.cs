@@ -15,7 +15,7 @@ public class Projectile : PooledObject
     protected Vector2 fireDirection;
     protected bool isFired;
 
-    protected void Start()
+    protected virtual void Start()
     {
         controller = GetComponentInParent<PlayerController>();
     }

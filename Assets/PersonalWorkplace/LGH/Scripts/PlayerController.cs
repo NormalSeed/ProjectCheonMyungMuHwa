@@ -164,17 +164,6 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void Update()
     {
-        // 플레이어 데이터 교체 테스트를 위한 코드
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            charID.Value = "A01";
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            charID.Value = "A02";
-        }
-
         if (curCool > 0)
         {
             isSkillReady = false;
