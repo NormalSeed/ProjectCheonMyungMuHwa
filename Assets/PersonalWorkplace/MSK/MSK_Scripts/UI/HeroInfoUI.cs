@@ -71,6 +71,7 @@ public class HeroInfoUI : UIBase
     private double InnAtkPoint;     // 내공????
     private double DefPoint;        // 외곻????
     #endregion
+
     #region Unity LiftCycle
     private void OnEnable()
     {
@@ -112,10 +113,11 @@ public class HeroInfoUI : UIBase
 
         modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID + "_model");
     }
-    private void ModelInfoInit()
+    private async void ModelInfoInit()
     {
         heroName = modelInfo.CharName;
-        heroLevel = modelInfo.Level;
+        heroLevel = await CurrencyManager.Instance.LoadCharatorInfoFromFireBase(heroID);
+        Debug.Log($"[ModelInfoInit] : 불러온 영웅 레벨 {heroLevel}");
         HealthPoint = modelInfo.HealthPoint;
         ExtAtkPoint = modelInfo.ExtAtkPoint;
         InnAtkPoint = modelInfo.InnAtkPoint;
@@ -218,6 +220,9 @@ public class HeroInfoUI : UIBase
 
         if (result)
         {
+            heroLevel++;
+            level.text = heroLevel.ToString();
+            CurrencyManager.Instance.SaveCharatorInfoToFireBase(heroID, heroLevel);
             Debug.Log("[HeroLevelUpgrade] : 골드 소모");
         }
         else

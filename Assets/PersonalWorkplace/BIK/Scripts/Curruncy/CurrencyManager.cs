@@ -1,7 +1,9 @@
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -162,6 +164,10 @@ public class CurrencyManager : IStartable, IDisposable
         return _model.TrySpend(id, cost);
     }
 
+    /// <summary>
+    /// 파티 편성정보 저장
+    /// </summary>
+    /// <param name="party"></param>
     public void SavePartyToFirebase(List<string> party)
     {
         if (string.IsNullOrEmpty(_uid))
@@ -181,6 +187,10 @@ public class CurrencyManager : IStartable, IDisposable
             });
         });
     }
+    /// <summary>
+    /// 파티 편성정보 로딩
+    /// </summary>
+    /// <param name="list"></param>
     public void LoadPartyIdsFromFirebase(List<string> list)
     {
         if (string.IsNullOrEmpty(_uid))
@@ -196,6 +206,42 @@ public class CurrencyManager : IStartable, IDisposable
                         list.Add(obj.ToString());
                 }
             });
+    }
+
+    /// <summary>
+    /// 캐릭터 성장정보 저장
+    /// </summary>
+    /// <param name="chariID"></param>
+    /// <param name="level"></param>
+    public void SaveCharatorInfoToFireBase(string chariID, int level)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+
+        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => 
+        {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+    /// <summary>
+    /// 캐릭터 성장정보 로딩
+    /// </summary>
+    public async Task<int> LoadCharatorInfoFromFireBase(string chariID)
+    {
+        int level = -1;
+        if (string.IsNullOrEmpty(_uid))
+            return level;
+
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var dataSnapshot = await partyInfoRef.Child("level").GetValueAsync();
+
+        if (dataSnapshot.Exists)
+            int.TryParse(dataSnapshot.Value.ToString(), out level);
+
+        Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
+        return level;
     }
     #endregion // public funcs
 }
