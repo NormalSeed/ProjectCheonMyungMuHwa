@@ -42,4 +42,5 @@ public enum UIType
     Summon,         // 소환/뽑기 UI
     Shop,           // 상점 UI
     HeroInfo,       // 영웅정보 UI
+    PlayerProfile,  // 플레이어 프로필
 }

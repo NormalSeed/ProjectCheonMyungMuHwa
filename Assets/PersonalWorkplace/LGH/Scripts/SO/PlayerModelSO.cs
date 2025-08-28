@@ -45,4 +45,7 @@ public class PlayerModelSO : ScriptableObject
     public float MoveSpeed;
     public float AtkRange;
     public string SkillSetID;
+
+    [Header("리소스 키")]
+    public string SpriteKey; // Addressables 키
 }
