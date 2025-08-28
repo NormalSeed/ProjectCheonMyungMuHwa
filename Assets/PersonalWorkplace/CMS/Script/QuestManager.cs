@@ -3,6 +3,7 @@ using Firebase.Database;
 using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -63,68 +64,64 @@ public class QuestManager : MonoBehaviour
             });
     }
 
-    private DateTime NowUtc() =>
+    public DateTime NowUtc() =>
         DateTime.UtcNow.AddMilliseconds(serverTimeOffsetMs);
 
     private void LoadQuests()
     {
         Debug.Log("CSV 퀘스트 불러오기 시작");
 
-        QuestDatabase.LoadFromCSV(questCSV);
+        QuestDatabase.LoadAll();
 
         activeQuests.Clear();
-        foreach (var baseQuest in QuestDatabase.AllQuests)
-            activeQuests[baseQuest.questID] = baseQuest;
+        foreach (var quest in QuestDatabase.DailyQuests.Concat(QuestDatabase.WeeklyQuests).Concat(QuestDatabase.RepeatQuests))
+            activeQuests[quest.questID] = quest;
 
         string userId = BackendManager.Auth.CurrentUser.UserId;
-        dbRef.Child("users").Child(userId).Child("quests").Child("quests")
-    .GetValueAsync().ContinueWithOnMainThread(task =>
-    {
-        Debug.Log("Firebase 응답 도착");
-
-        if (task.IsFaulted || task.IsCanceled)
-        {
-            Debug.LogError("서버 퀘스트 로드 실패, CSV 데이터만 사용");
-            IsReady = true;
-            OnQuestsUpdated?.Invoke();
-            return;
-        }
-
-        if (task.Result.Exists)
-        {
-            Debug.Log($"퀘스트 데이터 존재, childCount={task.Result.ChildrenCount}");
-
-            foreach (var child in task.Result.Children)
+        dbRef.Child("users").Child(userId).Child("quests")
+            .GetValueAsync().ContinueWithOnMainThread(task =>
             {
-                Debug.Log($"Child key={child.Key}, raw={child.GetRawJsonValue()}");
+                Debug.Log("Firebase 응답 도착");
 
-                Quest quest = JsonUtility.FromJson<Quest>(child.GetRawJsonValue());
-                if (quest != null)
+                if (task.IsFaulted || task.IsCanceled)
                 {
-                    Debug.Log($"불러온 퀘스트: {quest.questID}, {quest.questName}");
-                    if (activeQuests.ContainsKey(quest.questID))
-                        activeQuests[quest.questID] = quest;
-                    else
-                        activeQuests.Add(quest.questID, quest);
+                    Debug.LogError("서버 퀘스트 로드 실패, CSV 데이터만 사용");
+                    IsReady = true;
+                    OnQuestsUpdated?.Invoke();
+                    return;
+                }
+
+                if (task.Result.Exists)
+                {
+                    Debug.Log($"퀘스트 데이터 존재, {task.Result.GetRawJsonValue()}");
+
+                    QuestList wrapper = JsonUtility.FromJson<QuestList>(task.Result.GetRawJsonValue());
+                    if (wrapper != null && wrapper.quests != null)
+                    {
+                        foreach (var quest in wrapper.quests)
+                        {
+                            if (activeQuests.ContainsKey(quest.questID))
+                                activeQuests[quest.questID] = quest;
+                            else
+                                activeQuests.Add(quest.questID, quest);
+
+                            Debug.Log($"불러온 퀘스트: {quest.questID}, {quest.questName}");
+                        }
+                    }
+
+                    Debug.Log($"서버 퀘스트 로드 성공, {activeQuests.Count}개 퀘스트 적용됨");
+                    CheckAndResetQuests();
+                    IsReady = true;
+                    OnQuestsUpdated?.Invoke();
                 }
                 else
                 {
-                    Debug.LogError($"퀘스트 파싱 실패: {child.GetRawJsonValue()}");
+                    Debug.Log("서버 데이터 없음, CSV 데이터 저장");
+                    SaveQuests();
+                    IsReady = true;
+                    OnQuestsUpdated?.Invoke();
                 }
-            }
-
-            Debug.Log($"서버 퀘스트 로드 성공, {activeQuests.Count}개 퀘스트 적용됨");
-            CheckAndResetQuests();
-            IsReady = true;
-        }
-        else
-        {
-            Debug.Log("서버 데이터 없음, CSV 데이터 저장");
-            SaveQuests();
-            IsReady = true;
-            OnQuestsUpdated?.Invoke();
-        }
-    });
+            });
     }
 
     // 퀘스트 자동 리셋 체크 (서버 시간 기준)
@@ -157,7 +154,7 @@ public class QuestManager : MonoBehaviour
                     }
                     break;
 
-                case QuestCategory.Repeatable:
+                case QuestCategory.Repeat:
                     break;
             }
         }
@@ -244,6 +241,13 @@ public class QuestManager : MonoBehaviour
     {
         var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
         return cal.GetWeekOfYear(timeUtc, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+    }
+
+    public List<Quest> GetQuestsByCategory(QuestCategory type)
+    {
+        return activeQuests.Values
+            .Where(q => q.questType == type)
+            .ToList();
     }
 
     [System.Serializable]
