@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -75,13 +77,13 @@ public class HeroInfoUI : UIBase
     }
     #endregion
 
-    #region Init
-    private void Init()
+    #region Init 
+    private async void Init()
     {
         // CardInfo 정보
         CardInfInit();
         // PlayerModelSO 정보
-        ModelInfoInit();
+        await ModelInfoInit();
         // 버튼 리스너 추가
         ButtonAddListener();
         // 텍스트정보 추가
@@ -104,7 +106,7 @@ public class HeroInfoUI : UIBase
 
         modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID + "_model");
     }
-    private async void ModelInfoInit()
+    private async Task ModelInfoInit()
     {
         heroName = modelInfo.CharName;
         heroLevel = await CurrencyManager.Instance.LoadCharatorInfoFromFireBase(heroID);
@@ -113,6 +115,7 @@ public class HeroInfoUI : UIBase
         ExtAtkPoint = modelInfo.ExtAtkPoint;
         InnAtkPoint = modelInfo.InnAtkPoint;
     }
+
     private void ButtonAddListener()
     {
         exitButton.onClick.AddListener(OnClickExit);
@@ -198,7 +201,7 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroStageUpgrade()
     {
-       // CurrencyManager.Instance.SaveHeroPieceToFireBase(heroID, ownerPiece);
+        // CurrencyManager.Instance.SaveHeroPieceToFireBase(heroID, ownerPiece);
     }
 
     /// <summary>
@@ -232,7 +235,7 @@ public class HeroInfoUI : UIBase
     /// </summary>
     /// <param name="level"></param>
     private void RequireLevelUpGold(int level)
-    {   
+    {
         requireGold = heroLevel * 1000;                 // 임시 계산식
     }
     /// <summary>
@@ -265,6 +268,12 @@ public class HeroInfoUI : UIBase
         Debug.Log($"SO {Info}로 세팅됨");
     }
     #endregion
+
+
+    private IEnumerator WaitLoad()
+    {
+        yield return new WaitForSeconds(3f);
+    }
 }
 
 

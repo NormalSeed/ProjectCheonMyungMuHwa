@@ -187,6 +187,7 @@ public class CurrencyManager : IStartable, IDisposable
             });
         });
     }
+
     /// <summary>
     /// 파티 편성정보 로딩
     /// </summary>
@@ -225,6 +226,7 @@ public class CurrencyManager : IStartable, IDisposable
                 return;
         });
     }
+
     /// <summary>
     /// 캐릭터 성장정보 로딩
     /// </summary>
@@ -243,6 +245,7 @@ public class CurrencyManager : IStartable, IDisposable
         Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
         return level;
     }
+
     /// <summary>
     /// 캐릭터 돌파에 필요한 조각개수 저장
     /// </summary>
@@ -258,6 +261,7 @@ public class CurrencyManager : IStartable, IDisposable
                 return;
         });
     }
+
     /// <summary>
     /// 캐릭터 돌파에 필요한 조각 개수 불러오기
     /// </summary>
