@@ -6,12 +6,12 @@ using UnityEngine.Pool;
 public class ParticlePool : MonoBehaviour
 {
     ObjectPool<ParticleSystem> projPool;
-    GameObject targetObj;
+    [SerializeField] GameObject targetObj; //DEMO
     [SerializeField] string assetID;
 
     private void Awake()
     {
-        targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
+        //targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
         projPool = new ObjectPool<ParticleSystem>(
             createFunc: () => Create(), // 생성 규칙
             actionOnGet: obj => { },     // 꺼내올 때

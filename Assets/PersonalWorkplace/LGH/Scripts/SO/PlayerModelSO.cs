@@ -25,6 +25,16 @@ public class PlayerModelSO : ScriptableObject
     public float AttackRatio;
     public float DefRatio;
 
+    [Header("성장능력치")]
+    public float Vital_Increase;
+    public float ExtPow_Increase;
+    public float InnPow_Increase;
+    public float CritRate_Increase;
+    public float CritDamage_Increase;
+    public float HealthRatio_Increase;
+    public float AttackRatio_Increase;
+    public float DefRatio_Increase;
+
     [Header("최종 능력치")]
     public double HealthPoint;
     public double ExtAtkPoint;

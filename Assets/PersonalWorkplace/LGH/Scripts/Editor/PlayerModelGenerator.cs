@@ -10,7 +10,7 @@ public class PlayerModelGenerator
     public static void GeneratePlayerModels()
     {
         // CSV 저장경로. 현재는 test 경로라 나중에 바꿔야 함
-        string csvPath = "Assets/PersonalWorkplace/LGH/Test/Data/TestPlayerData.csv"; // CSV 경로
+        string csvPath = "Assets/PersonalWorkplace/LGH/Data/CharacterTable.csv"; // CSV 경로
         string outputPath = "Assets/PersonalWorkplace/LGH/Test/Data/PlayerModels";    // SO 저장 경로
 
         if (!Directory.Exists(outputPath))
@@ -42,10 +42,18 @@ public class PlayerModelGenerator
             model.HealthRatio = float.Parse(values[13]);
             model.AttackRatio = float.Parse(values[14]);
             model.DefRatio = float.Parse(values[15]);
-            model.AtkSpeed = float.Parse(values[16]);
-            model.MoveSpeed = float.Parse(values[17]);
-            model.AtkRange = float.Parse(values[18]);
-            model.SkillSetID = values[19];
+            model.Vital_Increase = float.Parse(values[16]);
+            model.ExtPow_Increase = float.Parse(values[17]);
+            model.InnPow_Increase = float.Parse(values[18]);
+            model.CritRate_Increase = float.Parse(values[19]);
+            model.CritDamage_Increase = float.Parse(values[20]);
+            model.HealthRatio_Increase = float.Parse(values[21]);
+            model.AttackRatio_Increase = float.Parse(values[22]);
+            model.DefRatio_Increase = float.Parse(values[23]);
+            model.AtkSpeed = float.Parse(values[28]);
+            model.MoveSpeed = float.Parse(values[29]);
+            model.AtkRange = float.Parse(values[30]);
+            model.SkillSetID = values[31];
 
             string assetName = $"{model.CharID}_PlayerModel.asset";
             string fullPath = Path.Combine(outputPath, assetName);

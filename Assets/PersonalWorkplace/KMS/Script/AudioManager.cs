@@ -10,12 +10,14 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private GameObject AudioSourcePrefab;
     private Dictionary<string, AudioClip> clips;
 
+    public List<AudioClip> loadedSoundList; // D
+
     private void Awake()
     {
         Instance = this;
         soundPool = new DefaultPool<AudioSourceController>(AudioSourcePrefab, 100, true, true, false);
         clips = new();
-        IList<AudioClip> loadedSoundList = Addressables.LoadAssetsAsync<AudioClip>("Sound").WaitForCompletion();
+        //IList<AudioClip> loadedSoundList = Addressables.LoadAssetsAsync<AudioClip>("Sound").WaitForCompletion();
         foreach (AudioClip clip in loadedSoundList)
         {
             clips.Add(clip.name, clip);
