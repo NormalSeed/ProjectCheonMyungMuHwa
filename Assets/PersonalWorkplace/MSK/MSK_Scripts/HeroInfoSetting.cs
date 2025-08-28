@@ -3,18 +3,16 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
-using VContainer;
-using VContainer.Unity;
 
 public class HeroInfoSetting : MonoBehaviour
 {
     [Header("SO")]
-    [SerializeField] private CardInfo chardata;
+    [SerializeField] public CardInfo chardata;
 
     public string HeroID { get; private set; }
     public int HeroStage { get; private set; }
     private HeroRarity rarity;
-    private HeroRelationship relationship;
+    private HeroFaction faction;
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
@@ -29,18 +27,17 @@ public class HeroInfoSetting : MonoBehaviour
 
 
 
+
     // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
-    [SerializeField ]private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
-    private HeroUI heroUI;
-    private PartyManager partyManager;
-    
+    [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
+    [SerializeField] private HeroUI heroUI;
 
     #region Unity LifeCycle
 
-    public void PostStart() 
+    public void PostStart()
     {
         Debug.Log("PostStart 실행됨");
-        
+
 
     }
     private void OnEnable()
@@ -51,6 +48,7 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
+        heroUI.partySetFin -= HeroSetting;
     }
     #endregion
 
@@ -60,7 +58,7 @@ public class HeroInfoSetting : MonoBehaviour
         HeroID = chardata.HeroID;
         HeroStage = chardata.HeroStage;
         rarity = chardata.rarity;
-        relationship = chardata.relationship;
+        faction = chardata.faction;
 
         SetBackground();
         SetCharacter();
@@ -68,6 +66,7 @@ public class HeroInfoSetting : MonoBehaviour
         SetBadge();
 
         CardButton.onClick.AddListener(OnClickCard);
+        heroUI.partySetFin += HeroSetting;
     }
     private void SetBackground()
     {
@@ -80,7 +79,7 @@ public class HeroInfoSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        Addressables.LoadAssetAsync<Sprite>(HeroID).Completed += task =>
+        Addressables.LoadAssetAsync<Sprite>(HeroID + "_sprite").Completed += task =>
         {
             if (task.Status == AsyncOperationStatus.Succeeded)
             {
@@ -94,7 +93,7 @@ public class HeroInfoSetting : MonoBehaviour
         foreach (Transform child in badgeRoot)
             child.gameObject.SetActive(false);
 
-        Transform target = badgeRoot.Find(relationship.ToString());
+        Transform target = badgeRoot.Find(faction.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
     }
@@ -129,27 +128,45 @@ public class HeroInfoSetting : MonoBehaviour
     #region OnClick
     private void OnClickCard()
     {
-        Debug.Log(chardata);
-        // partyManager.AddMember(gameObject);
+        //  파티를 편성중이라면
+        if (PartyManager.Instance.IsHeroSetNow)
+        {
+            if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+            {
+                PartyManager.Instance.AddMember(gameObject);
+                PartyManager.Instance.AddMemberID(HeroID);
+                selectRoot.gameObject.SetActive(true);
+            }
+            else
+            {
+                PartyManager.Instance.RemoveMember(gameObject);
+                PartyManager.Instance.RemoveMemberID(HeroID);
+                selectRoot.gameObject.SetActive(false);
+            }
+        }
+        else 
+        {
+            HeroUIActive();
+        }
     }
     #endregion
 
 
     #region Private
     /// <summary>
-    /// 회색으로 표시하여 배치되었음을 표시하는 스크립트
+    /// 회색으로 표시된 배치표시를 비활성화
     /// </summary>
     private void HeroSetting()
     {
-        selectRoot.gameObject.SetActive(true);
+        selectRoot.gameObject.SetActive(false);
     }
     /// <summary>
     /// 캐릭터 정보 UI로 연결하는 스크립트
     /// </summary>
     private void HeroUIActive()
     {
-        // 캐릭터 정보 SO도 함께 전달해주어야 한다.
-        // HeroInfoUI.SetActive(true);
+        heroInfoUI.HeroSOInfoSetting(chardata);
+        heroInfoUI.gameObject.SetActive(true);
     }
     #endregion
 }

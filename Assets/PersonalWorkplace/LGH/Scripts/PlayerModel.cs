@@ -12,9 +12,9 @@ public class PlayerModel : MonoBehaviour
     /// </summary>
     public void SetPoints()
     {
-        modelSO.HealthPoint = modelSO.Vital * modelSO.HealthRatio;
-        modelSO.ExtAtkPoint = modelSO.ExtPow * modelSO.AttackRatio;
-        modelSO.InnAtkPoint = modelSO.InnPow * modelSO.AttackRatio;
-        modelSO.DefPoint = (modelSO.ExtPow + modelSO.InnPow) * modelSO.DefRatio;
+        modelSO.HealthPoint = (modelSO.Vital + (modelSO.Level * modelSO.Vital_Increase)) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Level));
+        modelSO.ExtAtkPoint = (modelSO.ExtPow + (modelSO.Level * modelSO.ExtPow_Increase)) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Level));
+        modelSO.InnAtkPoint = (modelSO.InnPow + (modelSO.Level * modelSO.InnPow_Increase)) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Level));
+        modelSO.DefPoint = (modelSO.ExtPow + modelSO.InnPow) * (modelSO.DefRatio + (modelSO.DefRatio_Increase * modelSO.Level));
     }
 }

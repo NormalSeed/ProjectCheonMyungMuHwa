@@ -25,95 +25,145 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
-    private void Start()
+    public event System.Action OnModelLoaded;
+
+    private void Awake()
     {
         model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
 
         NMagent = GetComponent<NavMeshAgent>();
         BGagent = GetComponent<BehaviorGraphAgent>();
+        BGagent.enabled = false;
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
+    }
 
+    private void OnEnable()
+    {
         charID.Subscribe(LoadPlayerData);
-        charID.Value = "A01";
+
+        OnModelLoaded += () =>
+        {
+            if (BGagent != null)
+            {
+                BGagent.enabled = true;
+            }
+        };
+    }
+
+    private void OnDisable()
+    {
+        charID.Unsubscribe(LoadPlayerData);
+        OnModelLoaded = null;
     }
 
     private void LoadPlayerData(string charID)
     {
-        // csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
-        Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
-            .Completed += handle =>
-            {
-                if (handle.Status == AsyncOperationStatus.Succeeded)
-                {
-                    model.modelSO = handle.Result;
-                    model.SetPoints();
+        // Addressable 로딩 형식
+        //// csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
+        //Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
+        //    .Completed += handle =>
+        //    {
+        //        if (handle.Status == AsyncOperationStatus.Succeeded)
+        //        {
+        //            model.modelSO = handle.Result;
+        //            model.SetPoints();
 
-                    LoadPlayerSPUMAsset(charID);
-                    LoadPlayerSkillData(model.modelSO.SkillSetID);
-                }
-                else
-                {
-                    Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
-                }
-            };
+        //            LoadPlayerSPUMAsset(charID);
+        //            LoadPlayerSkillData(model.modelSO.SkillSetID);
+        //            OnModelLoaded?.Invoke();
+        //        }
+        //        else
+        //        {
+        //            Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
+        //        }
+        //    };
+        // Resources 폴더에서 PlayerModelSO 로드
+        var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
+        if (modelSO != null)
+        {
+            model.modelSO = modelSO;
+            model.SetPoints();
+
+            LoadPlayerSPUMAsset(charID);
+            LoadPlayerSkillData(model.modelSO.SkillSetID);
+            OnModelLoaded?.Invoke();
+        }
+        else
+        {
+            Debug.LogError($"'{charID}' 모델 로드 실패: Resources/LGH/PlayerModels/{charID}_model");
+        }
     }
 
     private void LoadPlayerSkillData(string skillSetID)
     {
-        Addressables.LoadAssetAsync<GameObject>(skillSetID)
-        .Completed += handle =>
-        {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                GameObject skillSetInstance = Instantiate(handle.Result, transform);
-                skillSet = skillSetInstance;
+        //Addressables.LoadAssetAsync<GameObject>(skillSetID)
+        //.Completed += handle =>
+        //{
+        //    if (handle.Status == AsyncOperationStatus.Succeeded)
+        //    {
+        //        GameObject skillSetInstance = Instantiate(handle.Result, transform);
+        //        skillSet = skillSetInstance;
 
-                // 컴포넌트 초기화도 여기서
-                var skillSetComponent = skillSet.GetComponent<SkillSet>();
-                skillSetComponent.Init(this); // 예시: PlayerController를 넘겨주는 방식
-            }
-            else
-            {
-                Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
-            }
-        };
+        //        // 컴포넌트 초기화도 여기서
+        //        var skillSetComponent = skillSet.GetComponent<SkillSet>();
+        //        skillSetComponent.Init(this); // 예시: PlayerController를 넘겨주는 방식
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
+        //    }
+        //};
+        var prefab = Resources.Load<GameObject>($"LGH/SkillSets/{skillSetID}");
+        if (prefab != null)
+        {
+            GameObject skillSetInstance = Instantiate(prefab, transform);
+            skillSet = skillSetInstance;
+
+            var skillSetComponent = skillSet.GetComponent<SkillSet>();
+            skillSetComponent?.Init(this);
+        }
+        else
+        {
+            Debug.LogError($"SkillSet 로드 실패: Resources/SkillSets/{skillSetID}");
+        }
     }
 
     private void LoadPlayerSPUMAsset(string charID)
     {
-        Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
-        .Completed += handle =>
+        //Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
+        //.Completed += handle =>
+        //{
+        //    if (handle.Status == AsyncOperationStatus.Succeeded)
+        //    {
+        //        GameObject SPUMInstance = Instantiate(handle.Result, transform);
+        //        SPUMInstance.transform.localPosition = Vector3.zero;
+        //        SPUMInstance.transform.localScale = Vector3.one;
+        //        SPUMAsset = SPUMInstance;
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
+        //    }
+        //};
+        var prefab = Resources.Load<GameObject>($"LGH/SPUMAssets/{charID}_SPUM");
+        if (prefab != null)
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                GameObject SPUMInstance = Instantiate(handle.Result, transform);
-                SPUMInstance.transform.localPosition = Vector3.zero;
-                SPUMInstance.transform.localScale = Vector3.one;
-                SPUMAsset = SPUMInstance;
-            }
-            else
-            {
-                Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
-            }
-        };
+            GameObject SPUMInstance = Instantiate(prefab, transform);
+            SPUMInstance.transform.localPosition = Vector3.zero;
+            SPUMInstance.transform.localScale = Vector3.one;
+            SPUMAsset = SPUMInstance;
+        }
+        else
+        {
+            Debug.LogError($"SPUM 로드 실패: Resources/SPUMAssets/{charID}_SPUM");
+        }
     }
 
     private void Update()
     {
-        // 플레이어 데이터 교체 테스트를 위한 코드
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            charID.Value = "A01";
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            charID.Value = "A02";
-        }
-
         if (curCool > 0)
         {
             isSkillReady = false;

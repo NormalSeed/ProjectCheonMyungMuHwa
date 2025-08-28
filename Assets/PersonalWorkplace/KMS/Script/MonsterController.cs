@@ -18,10 +18,10 @@ public interface IDamagable2
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
 
-    [SerializeField] public SPUM_Prefabs Spum;
-    [SerializeField] public MonsterModel Model;
+    public SPUM_Prefabs Spum;
+    public MonsterModel Model;
     protected BehaviorGraphAgent treeAgent;
-    protected NavMeshAgent navAgent;
+    public NavMeshAgent NavAgent;
     public Action<IPooled<MonsterController>> OnLifeEnded { get; set; }
     protected WaitForSeconds hurtWfs;
     protected Coroutine hurtCo;
@@ -35,11 +35,11 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         hurtWfs = new WaitForSeconds(0.15f);
         Spum = GetComponent<SPUM_Prefabs>();
-        navAgent = GetComponent<NavMeshAgent>();
+        NavAgent = GetComponent<NavMeshAgent>();
         treeAgent = GetComponent<BehaviorGraphAgent>();
         Model = GetComponent<MonsterModel>();
-        navAgent.updateRotation = false;
-        navAgent.updateUpAxis = false;
+        NavAgent.updateRotation = false;
+        NavAgent.updateUpAxis = false;
         Spum.OverrideControllerInit();
         Model.CurHealth = new ObservableProperty<double>(10f);
 
@@ -112,6 +112,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public virtual void OnDeath()
     {
         StartCoroutine(DeathRoutine());
+        QuestManager.Instance.UpdateQuest("Monster", 1);
+        AudioManager.Instance.PlaySound("Monster_Dead");
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
 }

@@ -19,8 +19,6 @@ public class ProjectileController : MonoBehaviour
             var pool = new LGH_ObjectPool(transform, prefab, 5);
             projectilePools.Add(prefab.name, pool);
         }
-        Debug.Log($"Skill1의 이펙트 이름 : {projectilePools["Slashwave"]}");
-
     }
 
     public Projectile SpawnProjectile(string projectileID, Vector3 spawnPos, Transform target)

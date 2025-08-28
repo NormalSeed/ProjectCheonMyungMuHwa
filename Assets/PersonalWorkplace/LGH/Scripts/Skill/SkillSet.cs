@@ -14,7 +14,11 @@ public class SkillSet : MonoBehaviour
     public void Init(PlayerController controller)
     {
         pController = GetComponent<ProjectileController>();
-        pController.Init();
+        if (pController != null)
+        {
+            pController.Init();
+        }
+        
         this.controller = controller;
         parentTransform = this.controller.gameObject.transform;
     }

@@ -34,7 +34,7 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         PunchPool = new DefaultPool<MonsterController>("Punch", 3, false);
         StickPool = new DefaultPool<MonsterController>("Stick", 3, false);
-        CainPool = new DefaultPool<MonsterController>("Cain", 3, false);
+        CainPool = new DefaultPool<MonsterController>("Cane", 3, false);
         BowPool = new DefaultPool<MonsterController>("Bow", 3, false);
         ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8);
         MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8);
@@ -48,6 +48,7 @@ public class PoolManager : MonoBehaviour
 
     public void ActiveAll(int stageNum)
     {
+        AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
 
         ActiveMonster(PunchPool, 0, 0);
@@ -66,6 +67,7 @@ public class PoolManager : MonoBehaviour
 
     public void ActiveBoss(int stageNum)
     {
+        AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
         bossModel.SetFinalBoss(stageNum, models[0]);
         MonsterController boss = bossPool.GetItem(bossPoint.position);

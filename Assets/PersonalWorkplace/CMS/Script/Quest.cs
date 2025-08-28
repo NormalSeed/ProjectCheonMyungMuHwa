@@ -45,47 +45,53 @@ public class Quest
     this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
 }
 
-//진행도 추가
-public void AddProgress(int amount)
-{
-    if (isComplete) return;
-
-    valueProgress += amount;
-    if (valueProgress >= valueGoal)
+    //진행도 추가
+    public void AddProgress(int amount)
     {
-        valueProgress = valueGoal;
-        isComplete = true;
-    }
-    lastUpdated = DateTime.UtcNow;
-}
+        if (isComplete) return;
 
-//퀘스트 리셋
-public void ResetProgress()
-{
-    valueProgress = 0;
-    isComplete = false;
-    isClaimed = false;
-    lastUpdated = DateTime.UtcNow;
-}
-// 주차 계산 (주간 퀘스트 체크용)
-private int GetCurrentWeek(DateTime time)
-{
-    var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
-    return cal.GetWeekOfYear(time, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
-}
+        valueProgress += amount;
+        if (valueProgress >= valueGoal)
+        {
+            valueProgress = valueGoal;
+            isComplete = true;
+        }
+        lastUpdated = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+    }
+
+
+    //퀘스트 리셋
+    public void ResetProgress()
+    {
+        valueProgress = 0;
+        isComplete = false;
+        isClaimed = false;
+        lastUpdated = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+    }
+    // 주차 계산 (주간 퀘스트 체크용)
+    private int GetCurrentWeek(DateTime time)
+    {
+        var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
+        return cal.GetWeekOfYear(time, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+    }
 }
 public enum QuestCategory
 {
-    Daily = 1, // 일일 퀘스트
-    Weekly = 2, // 주간 퀘스트
-    Repeatable = 3 // 반복 퀘스트 (확장용)
+    Daily = 1,
+    Weekly = 2,
+    Repeat = 3,
+    Objective = 4
 }
 
 public enum QuestTargetType
 {
-    Collect = 1, // 아이템/재화 수집
-    Kill = 2, // 몬스터 처치
-    Explore = 3 // 탐험 (확장용)
+    None = 0,       // DB에서 매핑 안되는 경우 fallback
+    OnLogin = 1,    // 접속 시 달성
+    Collect = 2,    // 아이템/재화 수집
+    Kill = 3,       // 몬스터 처치
+    Explore = 4,    // 탐험
+    StageClear = 5, // 특정 스테이지 클리어
+    LevelReach = 6  // 특정 레벨 도달
 }
 
 public enum RewardType
