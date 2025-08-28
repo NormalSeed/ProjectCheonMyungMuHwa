@@ -15,19 +15,18 @@ public class PartyManager : MonoBehaviour, IStartable
 
 
     public List<GameObject> partyMembers = new List<GameObject>();
+
     public List<string> MembersID = new List<string>();
+
     public List<PlayerController> players = new();
-
     private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
-
-
     private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
 
 
     private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
     public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
     private int partySixe = 1;                                  // 현재 편성된 파티인원
-    public int PartySize { get{ return partySixe; } }           //현재 편성인원 외부 참조
+    public int PartySize { get { return partySixe; } }           //현재 편성인원 외부 참조
 
     public event Action<Dictionary<string, CardInfo>> partySet;
 
@@ -103,6 +102,8 @@ public class PartyManager : MonoBehaviour, IStartable
     // 파티 편성 진행 여부 트리거
     public void StartPartySetting()
     {
+        // 맴버 리스트 초기화
+        MembersID = new List<string>();
         isHeroSetNow = true;
     }
     public void EndPartySetting()
@@ -115,8 +116,12 @@ public class PartyManager : MonoBehaviour, IStartable
     // 추후 AddMember와 합칠 생각
     public void AddMemberID(string memberID)
     {
+        //  현재 맴버수 체크
+        if (MaxPartySize <= MembersID.Count)
+            return;
         MembersID.Add(memberID);
     }
+
     public void RemoveMemberID(string memberID)
     {
         MembersID.Remove(memberID);
@@ -124,9 +129,9 @@ public class PartyManager : MonoBehaviour, IStartable
     /// <summary>
     /// 파티를 자동 편성하는 기능입니다.
     /// </summary>
-    public void AutoPartySetting() 
+    public void AutoPartySetting()
     {
-    
+
     }
     #endregion
 
@@ -149,7 +154,7 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         CurrencyManager.Instance.SavePartyToFirebase(MembersID);
     }
-    
+
     private void PartyLoadData()
     {
         CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
