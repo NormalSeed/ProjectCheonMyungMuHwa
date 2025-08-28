@@ -6,22 +6,6 @@ using UnityEngine.UI;
 
 public class HeroInfoUI : UIBase
 {
-    /*
-        목표하는 워크 플로우 
-
-        CardInfo SO 에서 캐릭터 ID를 파악
-        일치하는 캐릭터 ID를 가진 PlayerModelSO 레퍼런스를 받아오기
-        PlayerModelSO에서 스킬 정보 SO 또한 받아오기
-
-        Init에서 초기화
-        
-        HeroLevelUpgrade() 코드에서 레벨 업그레이드 후 데이터베이스에 저장
-
-        추가 작업 학단 UI 이미지 필요
-        나가기 버튼 이미지가 임시 이미지
-
-     */
-
     private string modelPath = "LGH/PlayerModels/";
 
     #region SerializeField
@@ -55,7 +39,7 @@ public class HeroInfoUI : UIBase
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     #endregion
 
-    #region CardInfo SO
+    #region CardInfo SO Properties
     // CardInfo SO 에서 받아오는 정보들
     private string heroID;              // 캐릭터 ID
     private int heroStage;              // 돌파정보
@@ -63,13 +47,19 @@ public class HeroInfoUI : UIBase
     private HeroFaction faction;        // 진영
     #endregion
 
-    #region PlayerModel SO
+    #region PlayerModel SO Properties
     private string heroName;        // 이름정보
     private int heroLevel;          // 레벨정보
     private double HealthPoint;     // 체력정보
-    private double ExtAtkPoint;     // 종합전투력????
+    private double FinalPower;      // 종합전투
     private double InnAtkPoint;     // 내공????
-    private double DefPoint;        // 외곻????
+    private double ExtAtkPoint;     // 외곻????
+    #endregion
+
+    #region Goods Properties
+    private int requireGold = 1000;              // 필요 골드
+    private int requirePiece;                    // 필요 영웅 조각
+    private int ownerPiece;                      // 보유중인 영웅 조각
     #endregion
 
     #region Unity LiftCycle
@@ -96,7 +86,8 @@ public class HeroInfoUI : UIBase
         ButtonAddListener();
         // 텍스트정보 추가
         InfoTextSetting();
-
+        // 전투력 계산 코드
+        CountingHeroPower();
         // HeroInfoSetting 에 있는 함수 그대로
         SetCharacter();         // 이미지세팅
         SetStage();             // 돌파세팅
@@ -121,7 +112,6 @@ public class HeroInfoUI : UIBase
         HealthPoint = modelInfo.HealthPoint;
         ExtAtkPoint = modelInfo.ExtAtkPoint;
         InnAtkPoint = modelInfo.InnAtkPoint;
-        DefPoint = modelInfo.DefPoint;
     }
     private void ButtonAddListener()
     {
@@ -133,11 +123,11 @@ public class HeroInfoUI : UIBase
     {
         charName.text = heroName;
         level.text = heroLevel.ToString();
+        power.text = FinalPower.ToString();
 
         // 인권님 수치 단위 변환 코드 참고가 필요함
-        power.text = ExtAtkPoint.ToString();
         inPow.text = InnAtkPoint.ToString();
-        outPow.text = DefPoint.ToString();
+        outPow.text = ExtAtkPoint.ToString();
         health.text = HealthPoint.ToString();
     }
     private void SetCharacter()
@@ -208,7 +198,7 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroStageUpgrade()
     {
-
+       // CurrencyManager.Instance.SaveHeroPieceToFireBase(heroID, ownerPiece);
     }
 
     /// <summary>
@@ -216,7 +206,7 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroLevelUpgrade()
     {
-       bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, new BigCurrency(1000, 0));
+        bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, new BigCurrency(requireGold, 0));
 
         if (result)
         {
@@ -233,15 +223,42 @@ public class HeroInfoUI : UIBase
     /// 전투력을 계산하는 코드입니다.
     /// </summary>
     /// <returns></returns>
-    private int CountingHeroPower()
+    private void CountingHeroPower()
     {
-        int power = 0;
-        return power;
+        FinalPower = 0;
+    }
+    /// <summary>
+    /// 레벨업 시 필요한 골드 계산용 코드입니다.
+    /// </summary>
+    /// <param name="level"></param>
+    private void RequireLevelUpGold(int level)
+    {   
+        requireGold = heroLevel * 1000;                 // 임시 계산식
+    }
+    /// <summary>
+    /// 캐릭터 돌파 시 필요한 영웅조각 계산용의 코드입니다.
+    /// </summary>
+    /// <param name="piece"></param>
+    private void RequireRankUpPiece(int piece)
+    {
+        requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
+    }
+    /// <summary>
+    /// 정보 동기화용 코드입니다.
+    /// </summary>
+    /// <param name="Info"></param>
+    private void OnInfoValueChange()
+    {
+
     }
     #endregion
 
     #region Public
 
+    /// <summary>
+    /// CardInfo SO 세팅용 코드입니다.
+    /// </summary>
+    /// <param name="Info"></param>
     public void HeroSOInfoSetting(CardInfo Info)
     {
         chardata = Info;
@@ -249,3 +266,16 @@ public class HeroInfoUI : UIBase
     }
     #endregion
 }
+
+
+/*
+TODO : 영웅 정보 UI 작업 예정 목록
+    나가기 버튼 이미지 교체하기
+    골드 부족 시 버튼 상호작용 불가능 추가
+    전투력 계산 식 추가
+    소유 골드 정보 가져오기
+    소모 골드 정보 가져오기
+    소유 카드 조각 가져오기
+    돌파용 카드조각 개수 가져오기
+    임시 작성한 영웅 레벨업, 돌파에 필요한 재화 계산식 수정하기
+ */

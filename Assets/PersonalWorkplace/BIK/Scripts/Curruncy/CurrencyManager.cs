@@ -243,5 +243,30 @@ public class CurrencyManager : IStartable, IDisposable
         Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
         return level;
     }
+    /// <summary>
+    /// 캐릭터 돌파에 필요한 조각개수 저장
+    /// </summary>
+    /// <param name="piece"></param>
+    public void SaveHeroPieceToFireBase(string chariID, int piece)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        partyInfoRef.Child("piece").SetValueAsync(piece).ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+    /// <summary>
+    /// 캐릭터 돌파에 필요한 조각 개수 불러오기
+    /// </summary>
+    public void LoadHeroPieceFromFireBase(string chariID)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+
+    }
     #endregion // public funcs
 }
