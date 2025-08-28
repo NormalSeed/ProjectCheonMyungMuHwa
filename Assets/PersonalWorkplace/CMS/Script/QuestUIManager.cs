@@ -1,16 +1,32 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+
 
 public class QuestUIManager : MonoBehaviour
 {
     [SerializeField] private GameObject questUIPrefab;
     [SerializeField] private Transform contentParent;
 
+    [Header("탭 버튼")]
+    [SerializeField] private Button dailyTabButton;
+    [SerializeField] private Button weeklyTabButton;
+    [SerializeField] private Button repeatTabButton;
+
+    [Header("탭 색상")]
+    [SerializeField] private Color activeColor = new(0.29f, 0.56f, 0.89f);   // 파랑
+    [SerializeField] private Color inactiveColor = new(0.87f, 0.87f, 0.87f); // 회색
+
     private Coroutine waitRoutine;
+    private QuestCategory currentCategory = QuestCategory.Daily; // 기본은 일일
+
+    private void Start()
+    {
+        SetActiveCategory(QuestCategory.Daily); // 시작은 일일 퀘스트
+    }
 
     private void OnEnable()
     {
-        // 데이터 준비까지 대기
         waitRoutine = StartCoroutine(WaitAndBind());
     }
 
@@ -28,32 +44,62 @@ public class QuestUIManager : MonoBehaviour
 
     private IEnumerator WaitAndBind()
     {
-        // QuestManager 인스턴스가 생길 때까지
         while (QuestManager.Instance == null)
             yield return null;
 
-        // 데이터 준비(IsReady) 완료될 때까지
         while (!QuestManager.Instance.IsReady)
             yield return null;
 
-        // 이제 안전하게 이벤트 구독 + 최초 1회 렌더
         QuestManager.Instance.OnQuestsUpdated += RefreshQuestUI;
         RefreshQuestUI();
     }
 
+    /// <summary>
+    /// 탭 전환 (UI 버튼에서 호출)
+    /// </summary>
+    public void SetActiveCategory(QuestCategory category)
+    {
+        currentCategory = category;
+        RefreshQuestUI();
+        UpdateTabUI();
+    }
+
+    public void OnClickDaily() => SetActiveCategory(QuestCategory.Daily);
+    public void OnClickWeekly() => SetActiveCategory(QuestCategory.Weekly);
+    public void OnClickRepeat() => SetActiveCategory(QuestCategory.Repeat);
+
+    /// <summary>
+    /// 퀘스트 UI 갱신
+    /// </summary>
     public void RefreshQuestUI()
     {
-        if (QuestManager.Instance == null || QuestManager.Instance.activeQuests == null)
+        if (QuestManager.Instance == null)
             return;
 
+        // 기존 UI 제거
         foreach (Transform child in contentParent)
             Destroy(child.gameObject);
 
-        foreach (var quest in QuestManager.Instance.activeQuests.Values)
+        // 새로운 UI 생성
+        var quests = QuestManager.Instance.GetQuestsByCategory(currentCategory);
+
+        foreach (var quest in quests)
         {
             var ui = Instantiate(questUIPrefab, contentParent);
             var ctrl = ui.GetComponent<QuestUIController>();
             if (ctrl != null) ctrl.SetData(quest);
         }
+    }
+
+    private void UpdateTabUI()
+    {
+        dailyTabButton.GetComponent<Image>().color =
+            currentCategory == QuestCategory.Daily ? activeColor : inactiveColor;
+
+        weeklyTabButton.GetComponent<Image>().color =
+            currentCategory == QuestCategory.Weekly ? activeColor : inactiveColor;
+
+        repeatTabButton.GetComponent<Image>().color =
+            currentCategory == QuestCategory.Repeat ? activeColor : inactiveColor;
     }
 }

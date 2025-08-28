@@ -22,6 +22,10 @@ public class QuestUIController : MonoBehaviour
         progressBar.maxValue = quest.valueGoal;
         progressBar.value = quest.valueProgress;
         claimButton.interactable = quest.isComplete && !quest.isClaimed;
+
+        // 버튼 이벤트 연결 (중복 방지)
+        claimButton.onClick.RemoveAllListeners();
+        claimButton.onClick.AddListener(OnClickClaim);
     }
 
     // 보상 버튼 클릭
