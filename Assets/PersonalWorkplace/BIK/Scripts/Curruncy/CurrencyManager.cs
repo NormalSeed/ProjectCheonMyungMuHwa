@@ -38,6 +38,9 @@ public class CurrencyManager : IStartable, IDisposable
     public ICurrencyModel Model => _model;
 
     public static event Action OnInitialized;
+
+    public bool IsInitialized => _initialized;
+
     #endregion // properties
 
 
@@ -80,26 +83,22 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid)) return;
 
-        try
-        {
+        try {
             var snapshot = await _dbRef.Child("users").Child(_uid).Child("currency").GetValueAsync();
 
-            if (snapshot.Exists)
-            {
+            if (snapshot.Exists) {
                 string json = snapshot.GetRawJsonValue();
                 var data = JsonUtility.FromJson<CurrencySaveData>(json);
                 ((CurrencyModel)_model).FromSaveData(data);
 
                 Debug.Log("[CurrencyManager] 서버에서 재화 로드 완료");
             }
-            else
-            {
+            else {
                 Debug.Log("[CurrencyManager] 서버에 데이터 없음 → 기본값 등록");
                 RegisterDefaultCurrencies();
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             Debug.LogError($"[CurrencyManager] Firebase 로드 실패: {ex.Message}");
             RegisterDefaultCurrencies();
         }
@@ -176,17 +175,16 @@ public class CurrencyManager : IStartable, IDisposable
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo");
 
         //  기존 저장된 리스트 삭제
-        partyInfoRef.RemoveValueAsync().ContinueWith(removeTask =>
-        {
+        partyInfoRef.RemoveValueAsync().ContinueWith(removeTask => {
             if (removeTask.IsFaulted)
                 return;
             // 새로운 리스트 저장
-            partyInfoRef.SetValueAsync(party).ContinueWith(setTask =>
-            {
+            partyInfoRef.SetValueAsync(party).ContinueWith(setTask => {
                 if (setTask.IsFaulted) { }
             });
         });
     }
+
     /// <summary>
     /// 파티 편성정보 로딩
     /// </summary>
@@ -196,12 +194,10 @@ public class CurrencyManager : IStartable, IDisposable
         if (string.IsNullOrEmpty(_uid))
             return;
         _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
-            .GetValueAsync().ContinueWith(task =>
-            {
+            .GetValueAsync().ContinueWith(task => {
                 list.Clear();
                 var raw = task.Result.Value as List<object>;
-                if (raw != null)
-                {
+                if (raw != null) {
                     foreach (var obj in raw)
                         list.Add(obj.ToString());
                 }
@@ -219,12 +215,12 @@ public class CurrencyManager : IStartable, IDisposable
             return;
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
 
-        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => 
-        {
+        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => {
             if (task.IsFaulted)
                 return;
         });
     }
+
     /// <summary>
     /// 캐릭터 성장정보 로딩
     /// </summary>
@@ -239,9 +235,34 @@ public class CurrencyManager : IStartable, IDisposable
 
         if (dataSnapshot.Exists)
             int.TryParse(dataSnapshot.Value.ToString(), out level);
-
-        Debug.Log($"[LoadCharatorInfoFromFireBaseAsync] : level {level}");
         return level;
+    }
+
+    /// <summary>
+    /// 캐릭터 돌파에 필요한 조각개수 저장
+    /// </summary>
+    /// <param name="piece"></param>
+    public void SaveHeroPieceToFireBase(string chariID, int piece)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        partyInfoRef.Child("piece").SetValueAsync(piece).ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+
+    /// <summary>
+    /// 캐릭터 돌파에 필요한 조각 개수 불러오기
+    /// </summary>
+    public void LoadHeroPieceFromFireBase(string chariID)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+
     }
     #endregion // public funcs
 }
