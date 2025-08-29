@@ -22,6 +22,7 @@ public class AS01_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         if (target == null || pController == null) return;
 
         // 발사 위치
@@ -53,6 +54,7 @@ public class AS01_SkillSet : SkillSet
 
     public override void Skill2(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 3);
         if (target == null || pController == null) return;
 
         // 발사 위치
