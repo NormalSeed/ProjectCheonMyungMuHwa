@@ -66,13 +66,14 @@ public class PlayerProfileUI : UIBase
         InitBackgroundUI();
     }
 
-    private void Start()
+    private void OnEnable()
     {
+        Debug.Log("11111");
+
         LoadProfileFromServer();
         ToggleNicknameEdit(false);
 
-        // 예시 보유 캐릭터 목록 (실제는 서버에서 불러옴)
-        List<string> ownedIds = new List<string> { "A01", "B02" };
+        List<string> ownedIds = new List<string> { "A01", "B02" }; // TODO : 보유 캐릭터로 바꿔줘야함
         ApplyCharacterList(ownedIds);
     }
 
@@ -125,7 +126,8 @@ public class PlayerProfileUI : UIBase
 
         _playerNicknameText.text = profile.Nickname;
         _playerUIDText.text = profile.Uid;
-        _playerStyleText.text = profile.Title;
+        var titleData = _titleDataList.FirstOrDefault(t => t.Id == profile.Title);
+        _playerStyleText.text = titleData != null ? titleData.DisplayName : "";
 
         _tempTitle = profile.Title;
         _tempBackground = profile.Background;
@@ -214,13 +216,24 @@ public class PlayerProfileUI : UIBase
 
     private void InitBackgroundUI()
     {
+        if (_backgroundButtons == null || _backgroundDataList == null) return;
+
         for (int i = 0; i < _backgroundButtons.Count && i < _backgroundDataList.Count; i++) {
             var btn = _backgroundButtons[i];
             var data = _backgroundDataList[i];
+            if (btn == null || data == null) continue;
 
             bool unlocked = IsUnlocked(data.Conditions);
             btn.interactable = unlocked;
-            btn.GetComponentInChildren<TMP_Text>().text = data.DisplayName;
+
+            // 버튼에 달린 Image 컴포넌트에 Addressable 로드 결과 세팅
+            Addressables.LoadAssetAsync<Sprite>(data.SpriteKey).Completed += op => {
+                if (op.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded) {
+                    var img = btn.GetComponent<Image>();
+                    if (img != null)
+                        img.sprite = op.Result;
+                }
+            };
 
             btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() => {
