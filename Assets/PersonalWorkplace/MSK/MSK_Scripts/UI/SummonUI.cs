@@ -5,25 +5,28 @@ using UnityEngine.UI;
 public class SummonUI : UIBase
 {
     [Header("Buttons")]
-    [SerializeField] private Button summonButton;
-    [SerializeField] private Button summon10thButton;
-    [SerializeField] private Button summon50thTimesButton;
+    [SerializeField] private Button summonButton;           // 단챠
+    [SerializeField] private Button summon10thButton;       // 10챠
+    [SerializeField] private Button summon50thTimesButton;  // 50챠
+    [SerializeField] private Button summonInfo;             // 확률정보
 
     [Header("Text")]
-    [SerializeField] private TextMeshProUGUI summonLevel;
-    [SerializeField] private TextMeshProUGUI button1;
-    [SerializeField] private TextMeshProUGUI button10;
-    [SerializeField] private TextMeshProUGUI button50;
+    [SerializeField] private TextMeshProUGUI summonLevelText;   // 소환레벨 텍스트
+    [SerializeField] private TextMeshProUGUI button1Text;       // 단챠 버튼 텍스트
+    [SerializeField] private TextMeshProUGUI button10Text;      // 10챠 버튼 텍스트
+    [SerializeField] private TextMeshProUGUI button50Text;      // 50챠 버튼 텍스트
 
     [Header("Hero Image")]
-    [SerializeField] private Transform Hero1;
-    [SerializeField] private Transform Hero2;
-    [SerializeField] private Transform Hero3;
-    [SerializeField] private Transform Hero4;
+    [SerializeField] private Transform Hero1;               // 영웅 이미지
+    [SerializeField] private Transform Hero2;               // 영웅 이미지
+    [SerializeField] private Transform Hero3;               // 영웅 이미지
+    [SerializeField] private Transform Hero4;               // 영웅 이미지
 
     [Header("Panel")]
-    [SerializeField] private GameObject SummonResult;
+    [SerializeField] private GameObject summonResult;       // 소환 결과창
+    [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
 
+    private int summonLevel;      
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -35,6 +38,7 @@ public class SummonUI : UIBase
         summonButton.onClick.RemoveListener(onClickSummon);
         summon10thButton.onClick.RemoveListener(onClickSummon10th);
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
+        summonInfo.onClick.RemoveListener(OnClickShowInfo);
     }
 
     private void Init()
@@ -42,6 +46,7 @@ public class SummonUI : UIBase
         summonButton.onClick.AddListener(onClickSummon);
         summon10thButton.onClick.AddListener(onClickSummon10th);
         summon50thTimesButton.onClick.AddListener(onClickSummon50th);
+        summonInfo.onClick.AddListener(OnClickShowInfo);
     }
     #endregion
 
@@ -58,13 +63,17 @@ public class SummonUI : UIBase
     {
         SummonHeros(50);
     }
+    private void OnClickShowInfo()
+    {
+        summonInfoPanel.SetActive(true);
+    }
     #endregion
 
     
     #region private
     private void SummonHeros(int times)
     {
-        SummonResult.gameObject.SetActive(true);
+        summonResult.gameObject.SetActive(true);
     }
 
     private void ChangeButtonText(TextMeshProUGUI text)
