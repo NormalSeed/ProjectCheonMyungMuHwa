@@ -4,13 +4,10 @@ using VContainer;
 
 public class BowOrcController : MonsterController
 {
-    [SerializeField] float realAttackDelay;
-    private WaitForSeconds wfs;
-
     protected override void InitComponent()
     {
         base.InitComponent();
-        wfs = new WaitForSeconds(realAttackDelay);
+        RealAttackDelay = new WaitForSeconds(0.15f);
     }
     public override void OnAttack(GameObject me, IDamagable target)
     {
@@ -20,7 +17,7 @@ public class BowOrcController : MonsterController
 
     private IEnumerator RealAttackRoutine(IDamagable target)
     {
-        yield return wfs;
+        yield return RealAttackDelay;
         AudioManager.Instance.PlaySound("Bow_Attack");
         if (target != null)
         {

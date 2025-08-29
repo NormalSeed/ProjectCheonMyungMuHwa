@@ -36,11 +36,11 @@ public partial class MonsterChaseAction : Action
         float dot = Vector3.Dot(Vector3.right, dir);
         if (dot >= 0)
         {
-            Self.Value.transform.localScale = new Vector3(-0.7f, 0.7f, 0.7f);
+            Self.Value.transform.localScale = new Vector3(-1f, 1f, 1f);
         }
         else
         {
-            Self.Value.transform.localScale = new Vector3(0.7f,0.7f,0.7f);
+            Self.Value.transform.localScale = new Vector3(1f, 1f, 1f);
         }
 
 

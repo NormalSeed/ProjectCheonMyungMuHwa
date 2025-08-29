@@ -4,45 +4,24 @@ using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem.Controls;
-public struct AttackResult
-{
-    public double damage;
-    public bool isDead;
-}
-public interface IDamagable2
-{
-    //amount- 내 공격력
-    public AttackResult TakeDamage(double amount);
-}
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
 
+    public Action<IPooled<MonsterController>> OnLifeEnded { get; set; }
     public SPUM_Prefabs Spum;
     public MonsterModel Model;
     protected BehaviorGraphAgent treeAgent;
     public NavMeshAgent NavAgent;
-    public Action<IPooled<MonsterController>> OnLifeEnded { get; set; }
     protected WaitForSeconds hurtWfs;
     protected Coroutine hurtCo;
+
+    protected WaitForSeconds RealAttackDelay;
 
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
     {
         InitComponent();
-    }
-    protected virtual void InitComponent()
-    {
-        hurtWfs = new WaitForSeconds(0.15f);
-        Spum = GetComponent<SPUM_Prefabs>();
-        NavAgent = GetComponent<NavMeshAgent>();
-        treeAgent = GetComponent<BehaviorGraphAgent>();
-        Model = GetComponent<MonsterModel>();
-        NavAgent.updateRotation = false;
-        NavAgent.updateUpAxis = false;
-        Spum.OverrideControllerInit();
-        Model.CurHealth = new ObservableProperty<double>(10f);
-
     }
     void OnEnable()
     {
@@ -50,6 +29,18 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         {
             SetValue();
         }
+    }
+    protected virtual void InitComponent()
+    {
+        hurtWfs = new WaitForSeconds(0.15f);
+        Spum = GetComponent<SPUM_Prefabs>();
+        treeAgent = GetComponent<BehaviorGraphAgent>();
+        Model = GetComponent<MonsterModel>();
+        Spum.OverrideControllerInit();
+        NavAgent = GetComponent<NavMeshAgent>();
+        Model.CurHealth = new ObservableProperty<double>(10f);
+        NavAgent.updateRotation = false;
+        NavAgent.updateUpAxis = false;
     }
     protected virtual void SetValue()
     {
@@ -61,8 +52,43 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         treeAgent.SetVariableValue<float>("CurrentDistance", float.MaxValue);
         treeAgent.SetVariableValue<MonsterController>("Controller", this);
         treeAgent.Restart();
-
     }
+
+
+
+    public void TakeDamage(double amount)
+    {
+        OnTakeDamage(amount);
+    }
+    protected virtual void OnTakeDamage(double amount)
+    {
+        if (IsDead) return;
+        Model.CurHealth.Value -= amount;
+        if (hurtCo != null)
+        {
+            StopCoroutine(hurtCo);
+            hurtCo = null;
+        }
+        hurtCo = StartCoroutine(HurtEffectRoutine());
+    }
+    public virtual void OnIdle()
+    {
+        Spum.PlayAnimation(PlayerState.IDLE, 0);
+    }
+    public virtual void OnMove()
+    {
+        Spum.PlayAnimation(PlayerState.MOVE, 0);
+    }
+
+    public virtual void OnDeath()
+    {
+        StartCoroutine(DeathRoutine());
+        AudioManager.Instance.PlaySound("Monster_Dead");
+        QuestManager.Instance.UpdateQuest("Monster", 1);
+    }
+    public abstract void OnAttack(GameObject me, IDamagable target);
+
+
 
     protected virtual IEnumerator HurtEffectRoutine()
     {
@@ -82,38 +108,4 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         treeAgent.End();
         OnLifeEnded?.Invoke(this);
     }
-
-    public void TakeDamage(double amount)
-    {
-        OnTakeDamage(amount);
-    }
-    protected virtual void OnTakeDamage(double amount)
-    {
-        if (IsDead) return;
-        Model.CurHealth.Value -= amount;
-        if (hurtCo != null)
-        {
-            StopCoroutine(hurtCo);
-            hurtCo = null;
-        }
-        hurtCo = StartCoroutine(HurtEffectRoutine());
-
-    }
-
-    public virtual void OnIdle()
-    {
-        Spum.PlayAnimation(PlayerState.IDLE, 0);
-    }
-    public virtual void OnMove()
-    {
-        Spum.PlayAnimation(PlayerState.MOVE, 0);
-    }
-
-    public virtual void OnDeath()
-    {
-        StartCoroutine(DeathRoutine());
-        QuestManager.Instance.UpdateQuest("Monster", 1);
-        AudioManager.Instance.PlaySound("Monster_Dead");
-    }
-    public abstract void OnAttack(GameObject me, IDamagable target);
 }
