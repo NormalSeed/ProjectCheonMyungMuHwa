@@ -49,7 +49,7 @@ public class PlayerProfileManager : IStartable, IDisposable
                 string json = snapshot.GetRawJsonValue();
                 CurrentProfile = JsonUtility.FromJson<PlayerProfileData>(json);
 
-                Debug.Log($"[ProfileManager] 프로필 로드 완료: {CurrentProfile.Nickname}");
+                Debug.Log($"[ProfileManager] 프로필 로드 완료:  {CurrentProfile.Nickname}, {CurrentProfile.Title}, {CurrentProfile.Background}, {CurrentProfile.ProfileImage}");
             }
             else {
                 Debug.Log("[ProfileManager] 서버에 프로필 없음 → 기본값 등록");
@@ -68,12 +68,12 @@ public class PlayerProfileManager : IStartable, IDisposable
 
     public void SaveProfileToFirebase()
     {
-        if (!_initialized || string.IsNullOrEmpty(_uid)) return;
+        if (string.IsNullOrEmpty(_uid)) return;
 
         string json = JsonUtility.ToJson(CurrentProfile);
         _dbRef.Child("users").Child(_uid).Child("profile").SetRawJsonValueAsync(json);
 
-        Debug.Log($"[ProfileManager] 프로필 저장됨: {CurrentProfile.Nickname}, {CurrentProfile.Title}, BG={CurrentProfile.Background}, Profile={CurrentProfile.ProfileImage}");
+        Debug.Log($"[ProfileManager] 프로필 저장됨: {CurrentProfile.Nickname}, {CurrentProfile.Title}, {CurrentProfile.Background}, {CurrentProfile.ProfileImage}, ");
 
         OnProfileChanged?.Invoke(CurrentProfile);
     }
