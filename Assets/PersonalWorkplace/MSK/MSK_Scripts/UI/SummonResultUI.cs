@@ -10,13 +10,9 @@ public class SummonResultUI : UIBase
 {
     [Header("Button")]
     [SerializeField] private Button resultButton;
-
-    [Header("SummonResult")]
-    [SerializeField] private Transform resultContents;
-
-    [Header("Prefab")]
-    [SerializeField] private GameObject heroCardPrefab; // 프리팹 GameObject
-
+    
+    [Header("Pool")]
+    [SerializeField] private GachaCardPoolManager poolManager;
     private CardInfo cardInfo;
 
     #region Unity LifeCycle
@@ -50,23 +46,26 @@ public class SummonResultUI : UIBase
     /// <param name="times"></param>
     public async void ShowSummonResult(int times)
     {
+        // (선택) 이전 결과 모두 리셋
+        poolManager.ReturnAll();
+
         for (int i = 0; i < times; i++)
         {
-            cardInfo = await LoadCardInfo();
+            CardInfo cardInfo = await LoadCardInfo();
+            GameObject card = poolManager.GetCard();
 
-            GameObject card = Instantiate(heroCardPrefab, resultContents);
-            CardSetting setting = card.GetComponent<CardSetting>();
+            var setting = card.GetComponent<CardSetting>();
             setting.chardata = cardInfo;
-            card.gameObject.SetActive(true);
-            await Task.Delay(TimeSpan.FromSeconds(0.01f));
+            card.transform.SetAsLastSibling();
+            card.SetActive(true);
 
+            await Task.Delay(TimeSpan.FromSeconds(0.01f));
         }
     }
 
     private async Task<CardInfo> LoadCardInfo()
     {
         var handle = Addressables.LoadAssetAsync<CardInfo>("C001CardInfo");
-
         await handle.Task;
         if (handle.Status == AsyncOperationStatus.Succeeded)
             return handle.Result;

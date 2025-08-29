@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GaChaManager : MonoBehaviour
+public class GachaManager : MonoBehaviour
 {
     #region FireBase Properties
     private int summonLevel;                // 소환 레벨
