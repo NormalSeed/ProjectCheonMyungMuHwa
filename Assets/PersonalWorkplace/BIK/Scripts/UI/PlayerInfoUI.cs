@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -23,13 +24,22 @@ public class PlayerInfoUI : MonoBehaviour
         _profileButton.onClick.AddListener(OnClick_ProfileButton);
     }
 
-    private void OnEnable()
+    private IEnumerator Start()
     {
-        if (PlayerProfileManager.Instance != null)
-            PlayerProfileManager.Instance.OnProfileChanged += ApplyProfileData;
+        while (PlayerProfileManager.Instance == null)
+            yield return null;
 
-        ApplyProfileData(PlayerProfileManager.Instance?.CurrentProfile);
+        PlayerProfileManager.Instance.OnProfileChanged += ApplyProfileData;
+        ApplyProfileData(PlayerProfileManager.Instance.CurrentProfile);
     }
+
+    //private void OnEnable()
+    //{
+    //    if (PlayerProfileManager.Instance != null)
+    //        PlayerProfileManager.Instance.OnProfileChanged += ApplyProfileData;
+
+    //    ApplyProfileData(PlayerProfileManager.Instance?.CurrentProfile);
+    //}
 
     private void OnDisable()
     {

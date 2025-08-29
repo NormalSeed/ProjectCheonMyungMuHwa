@@ -25,9 +25,19 @@ public class CurrencyUI : MonoBehaviour
 
 
     #region mono funcs
-    private void Start()
+    private void OnEnable()
     {
         CurrencyManager.OnInitialized += HandleInitialized;
+
+        // 이미 초기화 끝났다면 즉시 실행
+        if (CurrencyManager.Instance != null && CurrencyManager.Instance.IsInitialized) {
+            HandleInitialized();
+        }
+    }
+
+    private void OnDisable()
+    {
+        CurrencyManager.OnInitialized -= HandleInitialized;
     }
 
     private void HandleInitialized()
