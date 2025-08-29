@@ -28,7 +28,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     {
         assetID = id;
         //targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
-        targetObj = Resources.Load<GameObject>($"KMS/{assetID}"); 
+        targetObj = Resources.Load<GameObject>($"KMS/{assetID}");
         maxCount = max;
         activeOnGet = active;
         canExceedMaxCount = exceed;

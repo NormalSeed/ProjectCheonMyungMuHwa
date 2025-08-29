@@ -19,12 +19,10 @@ public class PoolManager : MonoBehaviour
 
     public DefaultPool<MonsterController> bossPool;
 
-    public ParticlePool SpawnPartPool;
-
     [SerializeField] private Transform[] spawwnPoints;
     [SerializeField] private Transform bossPoint;
 
-    int currentstage = 5;
+    int currentstage;
 
     [SerializeField] private MonsterModelBaseSO[] models;
     [SerializeField] private MonsterModelBaseSO bossModel;
@@ -42,12 +40,13 @@ public class PoolManager : MonoBehaviour
         ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 100);
 
         //test
-        bossPool = new DefaultPool<MonsterController>("Boss", 10, false);
+        bossPool = new DefaultPool<MonsterController>("PunchBoss", 1, false);
     }
 
 
     public void ActiveAll(int stageNum)
     {
+        currentstage = stageNum;
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
 
@@ -67,6 +66,7 @@ public class PoolManager : MonoBehaviour
 
     public void ActiveBoss(int stageNum)
     {
+        currentstage = stageNum;
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         SetModelStates(stageNum);
         bossModel.SetFinalBoss(stageNum, models[0]);
@@ -77,10 +77,14 @@ public class PoolManager : MonoBehaviour
     }
     private void ActiveMonster(DefaultPool<MonsterController> pool, int pointIndex, int modelIndex)
     {
-        ParticleSystem pt = SpawnPartPool.GetProj();
-        pt.transform.position = spawwnPoints[pointIndex].position;
-        pt.gameObject.SetActive(true);
-        StartCoroutine(WaitForParticleEnd(pt));
+        if (currentstage < 601)
+        {
+            ParticleManager.Instance.GetParticle("M_12_Recall", spawwnPoints[pointIndex].position);
+        }
+        else
+        {
+            ParticleManager.Instance.GetParticle("M_34_Recall", spawwnPoints[pointIndex].position);
+        }
 
         MonsterController monster = pool.GetItem(spawwnPoints[pointIndex].position);
         monster.Model.InitSprite(currentstage);
@@ -93,13 +97,6 @@ public class PoolManager : MonoBehaviour
         {
             model.SetFinal(currentstage);
         }
-    }
-
-    IEnumerator WaitForParticleEnd(ParticleSystem pt)
-    {
-        pt.Play();
-        yield return new WaitForSeconds(pt.main.duration);
-        SpawnPartPool.ReleaseItem(pt);
     }
 
 

@@ -13,74 +13,32 @@ public enum MonsterAnimationState
     DEATH
 }
 
-public class BossController : MonsterController
+public abstract class BossController : MonsterController
 {
-
-    private Animator animator;
-    private WaitForSeconds wfs;
-
-    private MonsterAnimationState currentLoopState;
-
     private bool isInvulnerable;
-
     public System.Action OnSpawnAmimEnd;
-    protected override void InitComponent()
-    {
-        currentLoopState = MonsterAnimationState.IDLE;
-        hurtWfs = new WaitForSeconds(0.15f);
-        NavAgent = GetComponent<NavMeshAgent>();
-        treeAgent = GetComponent<BehaviorGraphAgent>();
-        Model = GetComponent<MonsterModel>();
-        animator = GetComponentInChildren<Animator>();
-        NavAgent.updateRotation = false;
-        NavAgent.updateUpAxis = false;
-        Model.CurHealth = new ObservableProperty<double>(10f);
-        wfs = new WaitForSeconds(1f);
-    }
     protected override void SetValue()
     {
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
         treeAgent.SetVariableValue<float>("AttackDelay", Model.BaseModel.AttackDelay);
         treeAgent.SetVariableValue<BossController>("Controller", this);
         treeAgent.Restart();
-
     }
-    public override void OnIdle()
-    {
-        SetAnimation(MonsterAnimationState.IDLE);
-
-    }
-
     public void OnSpawn()
     {
         isInvulnerable = true;
         StartCoroutine(SpawnRoutine());
-
     }
-
     public override void OnDeath()
     {
         InGameManager.Instance.SetNextStage();
+        AudioManager.Instance.PlaySound("Monster_Dead");
         StartCoroutine(DeathRoutine());
     }
-    protected override IEnumerator DeathRoutine()
-    {
-        SetAnimation(MonsterAnimationState.DEATH);
-        for (int i = 0; i < 5; i++)
-        {
-            DroppedItem item = PoolManager.Instance.ItemPool.GetItem(transform.position);
-            item.Shot();
-        }
-        yield return new WaitForSeconds(2);
-        treeAgent.End();
-        OnLifeEnded?.Invoke(this);
-    }
-
-    [SerializeField] GameObject effect;
     private IEnumerator SpawnRoutine()
     {
-        GameObject go = Instantiate(effect, transform.position, Quaternion.identity);
-        for (int i = 0; i < 55; i++)
+        ParticleSystem part = ParticleManager.Instance.GetParticle("CFXR2 Firewall A", transform.position);
+        for (int i = 0; i < 20; i++)
         {
             if (i % 2 == 0)
             {
@@ -92,52 +50,35 @@ public class BossController : MonsterController
             }
             yield return new WaitForSeconds(0.1f);
         }
-        Destroy(go);
+        ParticleManager.Instance.ReleaseParticle(part, "CFXR2 Firewall A");
         OnSpawnAmimEnd?.Invoke();
         isInvulnerable = false;
-    }
-
-    private void SetAnimation(MonsterAnimationState state)
-    {
-        if (((int)state) < 0)
-        {
-            animator.SetBool(currentLoopState.ToString(), false);
-            animator.SetBool(state.ToString(), true);
-            currentLoopState = state;
-        }
-        else
-        {
-            StartCoroutine(SetAnimationRoutine(state.ToString()));
-        }
-    }
-
-    private IEnumerator SetAnimationRoutine(string state)
-    {
-        animator.SetBool(state, true);
-        yield return new WaitForSeconds(0.25f);
-        animator.SetBool(state, false);
-    }
-    public override void OnAttack(GameObject me, IDamagable target)
-    {
-        SetAnimation(MonsterAnimationState.ATTACK);
-        StartCoroutine(RealAttackRoutine(target));
-    }
-
-    private IEnumerator RealAttackRoutine(IDamagable target)
-    {
-        yield return wfs;
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        foreach (GameObject go in players)
-        {
-            go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
-            text.SetText(Model.BaseModel.finalAttackPower);
-        }
     }
     protected override void OnTakeDamage(double amount)
     {
         if (isInvulnerable) return;
         base.OnTakeDamage(amount);
     }
+
+    //private void SetAnimation(MonsterAnimationState state)
+    //{
+    //    if (((int)state) < 0)
+    //    {
+    //        animator.SetBool(currentLoopState.ToString(), false);
+    //        animator.SetBool(state.ToString(), true);
+    //        currentLoopState = state;
+    //    }
+    //    else
+    //    {
+    //        StartCoroutine(SetAnimationRoutine(state.ToString()));
+    //    }
+    //}
+    //
+    //private IEnumerator SetAnimationRoutine(string state)
+    //{
+    //    animator.SetBool(state, true);
+    //    yield return new WaitForSeconds(0.25f);
+    //    animator.SetBool(state, false);
+    //}
 
 }
