@@ -21,7 +21,7 @@ public class GachaManager : MonoBehaviour
     private float summonRare;               // 레어 소환확률
     private float summonUnique;             // 유니트 소환확률
     private float summonEpic;               // 에픽 소환확률
-    private string userSummonLevel;            // 소환 레벨
+    private SummonLevel userSummonLevel;    // 소환 레벨
     private int userSummonCount;            // 유저의 소환 레벨업 수치 
     private int requireSummonCount;         // 소환 레벨업 요구량
     #endregion
@@ -46,7 +46,7 @@ public class GachaManager : MonoBehaviour
         _dbRef = FirebaseDatabase.DefaultInstance.RootReference;
 
         await LoadUserDataAsync();
-        await LoadSummonConfigAsync(userSummonLevel);
+        await LoadSummonConfigAsync();
     }
     private void OnDisable() { }
     #endregion
@@ -54,9 +54,9 @@ public class GachaManager : MonoBehaviour
     #region Private
 
     //  소환 레벨 별 확률정보 로딩
-    private async Task LoadSummonConfigAsync(string summonlevel)
+    private async Task LoadSummonConfigAsync()
     {
-        var snapshot = await _dbRef.Child("summon").Child(summonlevel).GetValueAsync();
+        var snapshot = await _dbRef.Child("summon").Child(userSummonLevel.ToString()).GetValueAsync();
 
         summonNormal = Convert.ToSingle(snapshot.Child("normal").Value);
         summonRare = Convert.ToSingle(snapshot.Child("rare").Value);
@@ -64,17 +64,26 @@ public class GachaManager : MonoBehaviour
         summonEpic = Convert.ToSingle(snapshot.Child("epic").Value);
         requireSummonCount = Convert.ToInt32(snapshot.Child("count").Value);
     }
-
     // 유저 뽑기정보 로딩
     private async Task LoadUserDataAsync()
     {
         var snapLevel = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").GetValueAsync();
         var snapCount = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").GetValueAsync();
-
+        int levelInt = snapLevel.Exists ? Convert.ToInt32(snapLevel.Value) : (int)SummonLevel.level01;
         //  가져오고 없을 경우에 설정하기
-        userSummonLevel = snapLevel.Exists ? Convert.ToString(snapLevel.Value) : "level01";
+        userSummonLevel = (SummonLevel)levelInt;
         userSummonCount = snapCount.Exists ? Convert.ToInt32(snapCount.Value) : 0;
     }
+    private Task SaveUserSummonLevelAsync()
+    {
+        return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").SetValueAsync((int)userSummonLevel);
+    }
+
+    private Task SaveUserSummonCountAsync()
+    {
+        return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
+    }
+
     private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
     {
         string addressKey = rarity switch
@@ -98,10 +107,11 @@ public class GachaManager : MonoBehaviour
     {
         if (userSummonCount >= requireSummonCount)
         {
-            userSummonLevel = $"level{int.Parse(userSummonLevel.Substring(5)) + 1:00}";
+            if (userSummonLevel < SummonLevel.level10)
+                userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
             userSummonCount = 0;
-            await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").SetValueAsync(userSummonLevel);
-            await LoadSummonConfigAsync(userSummonLevel);
+            await SaveUserSummonLevelAsync();
+            await LoadSummonConfigAsync();
         }
 
         var results = new List<CardInfo>();
@@ -109,16 +119,29 @@ public class GachaManager : MonoBehaviour
         {
             string rarityKey = DrawOne();
             CardInfo info = await LoadCardInfoByRarity(rarityKey);
-
             results.Add(info);
             userSummonCount++;
 
             if (userSummonCount >= requireSummonCount)
-                break;
+            {
+                await LevelUpAsync();
+            }
         }
 
         await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
         resultUI.ShowSummonResult(results);
+    }
+
+    private async Task LevelUpAsync()
+    {
+        if (userSummonLevel < SummonLevel.level10)
+        {
+            userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
+            userSummonCount = 0;
+
+            await SaveUserSummonLevelAsync();
+            await LoadSummonConfigAsync();
+        }
     }
 
     private string DrawOne()
