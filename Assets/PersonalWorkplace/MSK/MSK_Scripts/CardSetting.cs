@@ -16,7 +16,6 @@ public class CardSetting : MonoBehaviour
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
     [SerializeField] private Image characterRoot;          // 캐릭터 이미지
-    [SerializeField] private Transform stageRoot;          // 돌파상태
     [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
 
     #region Unity LifeCycle
@@ -33,6 +32,9 @@ public class CardSetting : MonoBehaviour
     #region Init    
     private void Init()
     {
+        if (chardata == null)
+            return;
+
         HeroID = chardata.HeroID;
         HeroStage = chardata.HeroStage;
         rarity = chardata.rarity;
@@ -40,7 +42,6 @@ public class CardSetting : MonoBehaviour
 
         SetBackground();
         SetCharacter();
-        SetStage();
         SetBadge();
     }
     private void SetBackground()
@@ -71,30 +72,6 @@ public class CardSetting : MonoBehaviour
         Transform target = badgeRoot.Find(faction.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
-    }
-    private void SetStage()
-    {
-        foreach (Transform stage in stageRoot)
-        {
-            Transform red = stage.Find("Stage_Red");
-            Transform gray = stage.Find("Stage_gray");
-
-            if (red != null) red.gameObject.SetActive(false);
-            if (gray != null) gray.gameObject.SetActive(true);
-        }
-
-        for (int i = 1; i <= HeroStage; i++)
-        {
-            Transform stage = stageRoot.Find("Stage" + i);
-            if (stage != null)
-            {
-                Transform red = stage.Find("Stage_Red");
-                Transform gray = stage.Find("Stage_gray");
-
-                if (red != null) red.gameObject.SetActive(true);
-                if (gray != null) gray.gameObject.SetActive(false);
-            }
-        }
     }
     #endregion
 }
