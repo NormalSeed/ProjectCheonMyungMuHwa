@@ -15,22 +15,19 @@ public class PartyManager : MonoBehaviour, IStartable
 
 
     public List<GameObject> partyMembers = new List<GameObject>();
-
     public List<string> MembersID = new List<string>();
 
     public List<PlayerController> players = new();
-    private Dictionary<string, CardInfo> partyInfo = new Dictionary<string, CardInfo>();
     private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
 
 
     private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
     public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
+
     private int partySixe = 1;                                  // 현재 편성된 파티인원
     public int PartySize { get { return partySixe; } }           //현재 편성인원 외부 참조
 
     public event Action<Dictionary<string, CardInfo>> partySet;
-
-
     #region Unity LifeCycle
     private void Awake() { }
 
