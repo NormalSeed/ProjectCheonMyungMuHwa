@@ -26,19 +26,7 @@ public class AS02_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
-        //// 임시 스킬 기능
-        //IDamagable damagable = target.GetComponent<IDamagable>();
-
-        //if (damagable != null)
-        //{
-        //    damagable.TakeDamage(
-        //    controller.model.modelSO.ExtAtkPoint * skills[0].ExtSkillDmg  * 5+
-        //    controller.model.modelSO.InnAtkPoint * skills[0].InnSkillDmg);
-        //}
-        //else
-        //{
-        //    Debug.Log("IDamagable이 없음");
-        //}
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
     private IEnumerator Skill1Routine(Transform target)
@@ -65,18 +53,7 @@ public class AS02_SkillSet : SkillSet
 
     public override void Skill2(Transform target)
     {
-        //IDamagable damagable = target.GetComponent<IDamagable>();
-
-        //if (damagable != null)
-        //{
-        //    damagable.TakeDamage(
-        //    controller.model.modelSO.ExtAtkPoint * skills[1].ExtSkillDmg * 2 +
-        //    controller.model.modelSO.InnAtkPoint * skills[1].InnSkillDmg);
-        //}
-        //else
-        //{
-        //    Debug.Log("IDamagable이 없음");
-        //}
+        spumC.PlayAnimation(PlayerState.ATTACK, 3);
         StartCoroutine(Skill2Routine(target));
     }
     private IEnumerator Skill2Routine(Transform target)

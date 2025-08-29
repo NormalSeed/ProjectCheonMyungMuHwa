@@ -26,7 +26,7 @@ public class OneHitProjectile : Projectile
     protected override void FixedUpdate()
     {
         // 타겟이 null이면 가장 가까운 몬스터를 찾아서 재지정
-        if (target == null)
+        if (target == null || !target.gameObject.activeInHierarchy)
         {
             GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");
             float minDistance = Mathf.Infinity;

@@ -22,6 +22,7 @@ public class BS02_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         if (target == null || pController == null) return;
 
         // 발사 위치
@@ -88,6 +89,7 @@ public class BS02_SkillSet : SkillSet
 
     public override void Skill2(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         if (target == null || pController == null) return;
 
         Vector3 spawnPos = transform.position;
