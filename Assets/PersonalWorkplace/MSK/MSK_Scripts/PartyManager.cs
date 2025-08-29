@@ -158,3 +158,9 @@ public class PartyManager : MonoBehaviour, IStartable
     }
     #endregion
 }
+
+/*
+    TODO : 파티편성 필요 작업 목록
+        드래그 드롭으로 순서를 변경하는 기능
+        
+ */
