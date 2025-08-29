@@ -25,6 +25,7 @@ public class SummonUI : UIBase
 
     [Header("Panel")]
     [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
+    [SerializeField] private GachaManager gachaManager;     // 가챠 메니저
     [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
 
 
@@ -81,7 +82,7 @@ public class SummonUI : UIBase
     private void SummonHeros(int times)
     {
         summonResultUI.gameObject.SetActive(true);
-        summonResultUI.ShowSummonResult(times);
+        gachaManager.Summon(times);
     }
 
     private void ChangeButtonText(TextMeshProUGUI text)

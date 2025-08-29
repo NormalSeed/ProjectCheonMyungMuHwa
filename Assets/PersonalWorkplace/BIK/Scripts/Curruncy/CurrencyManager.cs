@@ -273,6 +273,5 @@ public class CurrencyManager : IStartable, IDisposable
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
 
     }
-
     #endregion
 }

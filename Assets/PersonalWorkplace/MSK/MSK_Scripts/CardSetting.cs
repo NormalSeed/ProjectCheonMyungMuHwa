@@ -9,7 +9,6 @@ public class CardSetting : MonoBehaviour
     [SerializeField] public CardInfo chardata;
 
     public string HeroID { get; private set; }
-    public int HeroStage { get; private set; }
     private HeroRarity rarity;
     private HeroFaction faction;
 
@@ -36,7 +35,6 @@ public class CardSetting : MonoBehaviour
             return;
 
         HeroID = chardata.HeroID;
-        HeroStage = chardata.HeroStage;
         rarity = chardata.rarity;
         faction = chardata.faction;
 

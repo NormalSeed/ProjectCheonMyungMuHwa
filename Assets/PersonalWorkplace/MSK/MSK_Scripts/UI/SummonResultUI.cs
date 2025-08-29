@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -44,33 +45,24 @@ public class SummonResultUI : UIBase
     /// 소환 결과를 보여줍니다.
     /// </summary>
     /// <param name="times"></param>
-    public async void ShowSummonResult(int times)
+    public async void ShowSummonResult(List<CardInfo> results)
     {
-        // (선택) 이전 결과 모두 리셋
+        gameObject.SetActive(true);
         poolManager.ReturnAll();
 
-        for (int i = 0; i < times; i++)
+        for (int i = 0; i < results.Count; i++)
         {
-            CardInfo cardInfo = await LoadCardInfo();
-            GameObject card = poolManager.GetCard();
-
+            var info = results[i];
+            var card = poolManager.GetCard();
             var setting = card.GetComponent<CardSetting>();
-            setting.chardata = cardInfo;
+
+            setting.chardata = info;
             card.transform.SetAsLastSibling();
             card.SetActive(true);
 
-            await Task.Delay(TimeSpan.FromSeconds(0.01f));
+            // 연출 간격 조정
+            await Task.Delay(100);
         }
-    }
-
-    private async Task<CardInfo> LoadCardInfo()
-    {
-        var handle = Addressables.LoadAssetAsync<CardInfo>("C001CardInfo");
-        await handle.Task;
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            return handle.Result;
-
-        throw new InvalidOperationException("[LoadCardInfo] : 카드정보 불러오기 실패");
     }
     #endregion
 }
