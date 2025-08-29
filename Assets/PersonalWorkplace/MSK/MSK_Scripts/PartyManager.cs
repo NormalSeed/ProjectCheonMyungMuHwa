@@ -47,6 +47,7 @@ public class PartyManager : MonoBehaviour, IStartable
         if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
         {
             partyMembers.Add(member);
+            InGameManager.Instance.playerCount++;
 
             partySixe++;
 
@@ -74,7 +75,20 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         if (partyMembers.Contains(member))
         {
+            var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
+            // 현재 제거될 멤버가 List의 몇번째에 있는지 체크해서
+            int listOrder = partyMembers.Count - 1;
+            // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
+            PlayerController controller = players[listOrder];
+            controller.gameObject.SetActive(true);
+
+            if (controller != null)
+            {
+                controller.charID.Value = null;
+            }
+
             partyMembers.Remove(member);
+            InGameManager.Instance.playerCount--;
             partySixe--;
         }
     }

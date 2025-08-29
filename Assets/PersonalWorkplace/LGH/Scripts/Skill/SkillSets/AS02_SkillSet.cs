@@ -57,14 +57,10 @@ public class AS02_SkillSet : SkillSet
 
         // 1번 이펙트 활성화
         effect1.transform.position = target.position;
+        var timed = effect1.GetComponent<JeokRang_explosion>();
+        timed.SetParent(this.transform);
         effect1.SetActive(true);
         effect1.transform.SetParent(null);
-
-        yield return new WaitForSeconds(skill1Duration);
-
-        // 1번 이펙트 비활성화
-        effect1.SetActive(false);
-        effect1.transform.SetParent(this.transform);
     }
 
     public override void Skill2(Transform target)

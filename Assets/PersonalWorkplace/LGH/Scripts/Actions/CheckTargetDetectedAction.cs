@@ -11,8 +11,17 @@ public partial class CheckTargetDetectedAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<bool> IsTargetDetected;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
+
+    private PlayerController controller;
+    private SPUM_Prefabs spumC;
+
     protected override Status OnStart()
     {
+        controller = Self.Value.GetComponent<PlayerController>();
+        spumC = controller.spumController;
+
+        spumC.PlayAnimation(PlayerState.IDLE, 0);
+
         Target.Value = GetTarget();
 
         return Status.Running;

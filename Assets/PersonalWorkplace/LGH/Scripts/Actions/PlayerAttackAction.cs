@@ -16,6 +16,7 @@ public partial class PlayerAttackAction : Action
     private PlayerController controller;
     private PlayerModel model;
     private BehaviorGraphAgent BGagent;
+    private SPUM_Prefabs spumC;
 
     private float attackDelay;
 
@@ -24,6 +25,8 @@ public partial class PlayerAttackAction : Action
         controller = Self.Value.GetComponent<PlayerController>();
         model = Self.Value.GetComponent<PlayerModel>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
+        spumC = controller.spumController;
+
         Target.Value = GetTarget();
         // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
 
@@ -73,6 +76,7 @@ public partial class PlayerAttackAction : Action
             IDamagable target = Target.Value.GetComponent<IDamagable>();
             if (target != null && attackDelay <= 0f)
             {
+                spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
                 target.TakeDamage(10.0f);
                 attackDelay = 1f / model.modelSO.AtkSpeed;

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public PlayerView view;
     public GameObject skillSet;
     public GameObject SPUMAsset;
+    public SPUM_Prefabs spumController;
 
     public int partyNum;
 
@@ -81,6 +82,13 @@ public class PlayerController : MonoBehaviour, IDamagable
         //        }
         //    };
         // Resources 폴더에서 PlayerModelSO 로드
+        if (string.IsNullOrEmpty(charID))
+        {
+            Debug.LogWarning("charID가 null 또는 빈 문자열입니다. 캐릭터 오브젝트를 비활성화합니다.");
+            gameObject.SetActive(false);
+            return;
+        }
+
         var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
         if (modelSO != null)
         {
@@ -155,6 +163,9 @@ public class PlayerController : MonoBehaviour, IDamagable
             SPUMInstance.transform.localPosition = Vector3.zero;
             SPUMInstance.transform.localScale = Vector3.one;
             SPUMAsset = SPUMInstance;
+            spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
+            // 이걸 해줘야 애니메이션이 등록됨
+            spumController.OverrideControllerInit();
         }
         else
         {

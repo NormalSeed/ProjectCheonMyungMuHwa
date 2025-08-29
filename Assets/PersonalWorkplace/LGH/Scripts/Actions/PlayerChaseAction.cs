@@ -17,15 +17,18 @@ public partial class PlayerChaseAction : Action
     private NavMeshAgent agent;
     private PlayerModel model;
     private PlayerController controller;
-    private SkillSet skillSet;
     private float distance;
+    private SPUM_Prefabs spumC;
 
     protected override Status OnStart()
     {
         agent = Self.Value.GetComponent<NavMeshAgent>();
         model = Self.Value.GetComponent<PlayerModel>();
         controller = Self.Value.GetComponent<PlayerController>();
-        skillSet = controller.skillSet.GetComponent<SkillSet>();
+        spumC = controller.spumController;
+
+        // 이동 애니메이션 재생
+        spumC.PlayAnimation(PlayerState.MOVE, 0);
 
         // 타겟 지정(가장 가까운 상대)
         Target.Value = GetTarget();

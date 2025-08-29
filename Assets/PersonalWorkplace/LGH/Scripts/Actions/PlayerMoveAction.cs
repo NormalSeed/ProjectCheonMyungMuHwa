@@ -15,6 +15,8 @@ public partial class PlayerMoveAction : Action
 
     private PlayerController controller;
     private NavMeshAgent NMagent;
+    private SPUM_Prefabs spumC;
+
     private AlignPoint alignPoint;
     private Transform targetPoint;
     private bool hasAligned = false;
@@ -25,6 +27,9 @@ public partial class PlayerMoveAction : Action
 
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
+        spumC = controller.spumController;
+
+        spumC.PlayAnimation(PlayerState.MOVE, 0);
 
         AlignPoint.Value = GameObject.FindGameObjectWithTag("AlignPoint");
         alignPoint = AlignPoint.Value.GetComponent<AlignPoint>();

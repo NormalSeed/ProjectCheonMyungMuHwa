@@ -4,15 +4,24 @@ using UnityEngine;
 public class JeokRang_explosion : SkillEffect
 {
     private Coroutine damageLoop;
+    private Transform originalParent;
 
     protected override void Awake()
     {
         base.Awake();
+        duration = 5f;
+    }
+
+    public void SetParent(Transform parent)
+    {
+        originalParent = parent;
+
     }
 
     private void OnEnable()
     {
         damageLoop = StartCoroutine(DamageOverTime());
+        StartCoroutine(AutoDisable());
     }
 
     private void OnDisable()
@@ -22,6 +31,13 @@ public class JeokRang_explosion : SkillEffect
             StopCoroutine(damageLoop);
             damageLoop = null;
         }
+    }
+
+    private IEnumerator AutoDisable()
+    {
+        yield return new WaitForSeconds(duration);
+        transform.SetParent(originalParent);
+        gameObject.SetActive(false);
     }
 
     private IEnumerator DamageOverTime()
