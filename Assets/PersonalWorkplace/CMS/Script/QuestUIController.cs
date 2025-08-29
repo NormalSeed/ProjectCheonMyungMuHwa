@@ -1,55 +1,59 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-public class QuestUIController : MonoBehaviour
+public class QuestUIController : UIBase
 {
     [Header("UI")]
-    public TextMeshProUGUI questNameText;  // TMP
-    public Slider progressBar;
+    public TextMeshProUGUI questNameText;
+    public Image progressFill; // Slider 대신 Image로!
+    public TextMeshProUGUI progressText;
     public Button claimButton;
+
+    public Transform rewardIconsParent; // RewardIcons 
+    public GameObject rewardIconPrefab; // 아이콘 프리팹
 
     private string questId;
 
-    // 퀘스트 UI 데이터 세팅
     public void SetData(Quest quest)
     {
         questId = quest.questID;
 
-        Debug.Log($"[UI 생성됨] {quest.questName} - {quest.valueProgress}/{quest.valueGoal}");
-
-        questNameText.text = $"{quest.questName} ({quest.valueProgress}/{quest.valueGoal})";
-        progressBar.maxValue = quest.valueGoal;
-        progressBar.value = quest.valueProgress;
+        questNameText.text = quest.questName;
+        progressFill.fillAmount = (float)quest.valueProgress / quest.valueGoal;
+        progressText.text = $"{quest.valueProgress}/{quest.valueGoal}";
         claimButton.interactable = quest.isComplete && !quest.isClaimed;
 
-        // 버튼 이벤트 연결 (중복 방지)
         claimButton.onClick.RemoveAllListeners();
         claimButton.onClick.AddListener(OnClickClaim);
     }
 
-    // 보상 버튼 클릭
     private void OnClickClaim()
     {
         QuestManager.Instance.ClaimReward(questId);
         RefreshUI();
     }
 
-    // 외부에서 UI 갱신
     public void RefreshUI()
     {
         if (QuestManager.Instance.activeQuests.TryGetValue(questId, out Quest quest))
         {
-            UpdateUI(quest);
+            SetData(quest);
         }
     }
 
-    // 내부 UI 업데이트 로직
-    private void UpdateUI(Quest quest)
+    public void SetRewards(List<Sprite> rewardSprites)
     {
-        questNameText.text = $"{quest.questName} ({quest.valueProgress}/{quest.valueGoal})";
-        progressBar.maxValue = quest.valueGoal;
-        progressBar.value = quest.valueProgress;
-        claimButton.interactable = quest.isComplete && !quest.isClaimed;
+        // 기존 아이콘 제거
+        foreach (Transform child in rewardIconsParent)
+            Destroy(child.gameObject);
+
+        // 새로운 아이콘 생성
+        foreach (var sprite in rewardSprites)
+        {
+            var icon = Instantiate(rewardIconPrefab, rewardIconsParent);
+            icon.GetComponent<Image>().sprite = sprite;
+        }
     }
 }
