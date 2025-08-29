@@ -26,19 +26,7 @@ public class AS02_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
-        //// 임시 스킬 기능
-        //IDamagable damagable = target.GetComponent<IDamagable>();
-
-        //if (damagable != null)
-        //{
-        //    damagable.TakeDamage(
-        //    controller.model.modelSO.ExtAtkPoint * skills[0].ExtSkillDmg  * 5+
-        //    controller.model.modelSO.InnAtkPoint * skills[0].InnSkillDmg);
-        //}
-        //else
-        //{
-        //    Debug.Log("IDamagable이 없음");
-        //}
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
     private IEnumerator Skill1Routine(Transform target)
@@ -57,30 +45,15 @@ public class AS02_SkillSet : SkillSet
 
         // 1번 이펙트 활성화
         effect1.transform.position = target.position;
+        var timed = effect1.GetComponent<JeokRang_explosion>();
+        timed.SetParent(this.transform);
         effect1.SetActive(true);
         effect1.transform.SetParent(null);
-
-        yield return new WaitForSeconds(skill1Duration);
-
-        // 1번 이펙트 비활성화
-        effect1.SetActive(false);
-        effect1.transform.SetParent(this.transform);
     }
 
     public override void Skill2(Transform target)
     {
-        //IDamagable damagable = target.GetComponent<IDamagable>();
-
-        //if (damagable != null)
-        //{
-        //    damagable.TakeDamage(
-        //    controller.model.modelSO.ExtAtkPoint * skills[1].ExtSkillDmg * 2 +
-        //    controller.model.modelSO.InnAtkPoint * skills[1].InnSkillDmg);
-        //}
-        //else
-        //{
-        //    Debug.Log("IDamagable이 없음");
-        //}
+        spumC.PlayAnimation(PlayerState.ATTACK, 3);
         StartCoroutine(Skill2Routine(target));
     }
     private IEnumerator Skill2Routine(Transform target)

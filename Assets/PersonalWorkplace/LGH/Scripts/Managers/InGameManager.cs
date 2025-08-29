@@ -9,6 +9,7 @@ public class InGameManager : MonoBehaviour
     public int stageNum = 1;
     public ObservableProperty<int> alignedNum { get; private set; } = new();
     private bool isProcessingAlignment = false;
+    public int playerCount;
 
     public bool isBossDead = false;
 
@@ -45,7 +46,7 @@ public class InGameManager : MonoBehaviour
 
     public void ExamineAllAligned(int num)
     {
-        if (isProcessingAlignment || num != 5)return;
+        if (isProcessingAlignment || num < playerCount)return;
 
         isProcessingAlignment = true;
         if (stageProgress < 2)

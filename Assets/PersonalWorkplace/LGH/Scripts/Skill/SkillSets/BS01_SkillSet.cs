@@ -24,6 +24,7 @@ public class BS01_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
 
@@ -42,6 +43,7 @@ public class BS01_SkillSet : SkillSet
 
     public override void Skill2(Transform target)
     {
+        spumC.PlayAnimation(PlayerState.ATTACK, 1);
         if (target == null || pController == null) return;
 
         // 반지름 5짜리 원 안의 랜덤 위치 계산

@@ -10,6 +10,7 @@ public class SkillSet : MonoBehaviour
 
     protected PlayerController controller;
     protected Transform parentTransform;
+    protected SPUM_Prefabs spumC;
 
     public void Init(PlayerController controller)
     {
@@ -21,6 +22,7 @@ public class SkillSet : MonoBehaviour
         
         this.controller = controller;
         parentTransform = this.controller.gameObject.transform;
+        spumC = controller.spumController;
     }
 
     public virtual void Skill1(Transform target)

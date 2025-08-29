@@ -24449,6 +24449,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageProgress: 0
   stageNum: 1
+  playerCount: 0
   isBossDead: 0
   isStartReady: 0
 --- !u!4 &1331494749
@@ -25562,6 +25563,34 @@ PrefabInstance:
     - target: {fileID: 8089584962320658526, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
       propertyPath: m_Name
       value: Player1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: 'managedReferences[1028523417207833570]'
+      value: 'Unity.Behavior Unity.Behavior.BlackboardVariable`1[[PlayerStates, Assembly-CSharp]]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[1028523417207833570].Name
+      value: CurState
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: m_BlackboardVariableOverridesList.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[1028523417207833570].m_Value
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: 'm_BlackboardVariableOverridesList.Array.data[1]'
+      value: 1028523417207833570
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[1028523417207833570].GUID.m_Value0
+      value: 16556224651354025114
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[1028523417207833570].GUID.m_Value1
+      value: 8129779710548472583
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
