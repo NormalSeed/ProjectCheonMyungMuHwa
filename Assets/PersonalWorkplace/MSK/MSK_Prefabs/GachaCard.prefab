@@ -1844,14 +1844,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1387521790237539608}
   - component: {fileID: 6401930154016326512}
-  - component: {fileID: 7265513270467812149}
+  - component: {fileID: 8658577632544733694}
   m_Layer: 5
-  m_Name: Card
+  m_Name: GachaCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1387521790237539608
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1919,7 +1919,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7265513270467812149
+--- !u!114 &8658577632544733694
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1928,7 +1928,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8668137161547698167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e79c8afff2870df4594765cc76aacbf1, type: 3}
+  m_Script: {fileID: 11500000, guid: d7253b5a0dab7604288d6462ac3a8b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   chardata: {fileID: 0}
@@ -1936,11 +1936,6 @@ MonoBehaviour:
   characterRoot: {fileID: 4176019649291878584}
   stageRoot: {fileID: 4378642867801762798}
   badgeRoot: {fileID: 6465474065209308693}
-  selectRoot: {fileID: 4479699641184255218}
-  CardButton: {fileID: 6401930154016326512}
-  PartyNum: {fileID: 1104398409212230728}
-  heroInfoUI: {fileID: -612307817280898805, guid: b2b41e1a2c376c3418e10cd4934a3ad0, type: 3}
-  heroUI: {fileID: 0}
 --- !u!1 &9200265662119359430
 GameObject:
   m_ObjectHideFlags: 0

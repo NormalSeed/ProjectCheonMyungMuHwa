@@ -44,3 +44,17 @@ public enum UIType
     HeroInfo,       // 영웅정보 UI
     PlayerProfile,  // 플레이어 프로필
 }
+
+public enum SummonLevel
+{
+    level01 = 1,        // 소환레벨
+    level02 = 2,
+    level03 = 3,
+    level04 = 4,
+    level05 = 5,
+    level06 = 6,
+    level07 = 7,
+    level08 = 8,
+    level09 = 9,
+    level10 = 10
+}

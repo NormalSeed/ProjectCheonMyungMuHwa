@@ -163,7 +163,10 @@ public class CurrencyManager : IStartable, IDisposable
     {
         return _model.TrySpend(id, cost);
     }
+    #endregion // public funcs
 
+
+    #region MSK add
     /// <summary>
     /// 파티 편성정보 저장
     /// </summary>
@@ -220,7 +223,7 @@ public class CurrencyManager : IStartable, IDisposable
             return;
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
 
-        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => 
+        partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task =>
         {
             if (task.IsFaulted)
                 return;
@@ -270,5 +273,6 @@ public class CurrencyManager : IStartable, IDisposable
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
 
     }
-    #endregion // public funcs
+
+    #endregion
 }

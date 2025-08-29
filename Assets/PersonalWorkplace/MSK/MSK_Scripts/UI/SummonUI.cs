@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class SummonUI : UIBase
 {
+    #region SerializeField
     [Header("Buttons")]
     [SerializeField] private Button summonButton;           // 단챠
     [SerializeField] private Button summon10thButton;       // 10챠
@@ -23,10 +24,16 @@ public class SummonUI : UIBase
     [SerializeField] private Transform Hero4;               // 영웅 이미지
 
     [Header("Panel")]
-    [SerializeField] private GameObject summonResult;       // 소환 결과창
+    [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
     [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
 
-    private int summonLevel;      
+
+    #endregion
+
+    #region Properties
+
+    #endregion
+
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -73,7 +80,8 @@ public class SummonUI : UIBase
     #region private
     private void SummonHeros(int times)
     {
-        summonResult.gameObject.SetActive(true);
+        summonResultUI.gameObject.SetActive(true);
+        summonResultUI.ShowSummonResult(times);
     }
 
     private void ChangeButtonText(TextMeshProUGUI text)
