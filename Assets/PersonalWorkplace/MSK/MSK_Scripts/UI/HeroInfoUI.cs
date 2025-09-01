@@ -126,6 +126,7 @@ public class HeroInfoUI : UIBase
         requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
 
         // 조각정보 불러오기
+        heroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(heroID);
         ownerPiece = await CurrencyManager.Instance.LoadPieceFromFireBase(heroID);
         requirePiece = heroStage * (5 - (int)rarity);
     }
@@ -190,6 +191,7 @@ public class HeroInfoUI : UIBase
             }
         }
     }
+    // 버튼 설정여부
     private void SetUpgradeInteractable(Button btn)
     {
         if (CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold)
@@ -201,11 +203,9 @@ public class HeroInfoUI : UIBase
             btn.interactable = false;
         }
     }
+    // 버틑 설정여부
     private void SetRankUpInteractable(Button btn)
     {
-        btn.interactable = false;
-        // TODO : 가챠 작성 후 수정하기
-        /*
         if (ownerPiece >= requirePiece)
         {
             btn.interactable = true;
@@ -214,7 +214,6 @@ public class HeroInfoUI : UIBase
         {
             btn.interactable = false;
         }
-        */
     }
     #endregion
 
@@ -230,7 +229,7 @@ public class HeroInfoUI : UIBase
     }
     private void OnClickStageUP()
     {
-
+        HeroRankUpPiece();
     }
     #endregion
 
@@ -253,6 +252,8 @@ public class HeroInfoUI : UIBase
         }
         else
             Debug.Log("[HeroLevelUpgrade] :골드 부족함");
+
+        SetUpgradeInteractable(upgradeButton);
     }
 
     /// <summary>
@@ -279,13 +280,21 @@ public class HeroInfoUI : UIBase
     }
 
     /// <summary>
-    /// 캐릭터 돌파 시 필요한 영웅조각 계산용의 코드입니다.
+    /// 캐릭터 돌파 코드입니다.
     /// </summary>
     /// <param name="piece"></param>
-    private void RequireRankUpPiece(int piece)
+    private void HeroRankUpPiece( )
     {
+        ownerPiece -= requirePiece;
+        heroStage++;
+        //  돌파저장
+        CurrencyManager.Instance.SaveHeroStageToFireBase(heroID, heroStage);
+        //  조각 사용 후 저장
+        CurrencyManager.Instance.SavePieceToFireBase(heroID, ownerPiece);
 
         requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
+        heroPiece.text = $"{ownerPiece} / {requirePiece}";
+        SetRankUpInteractable(stageUPButton);
     }
 
     /// <summary>

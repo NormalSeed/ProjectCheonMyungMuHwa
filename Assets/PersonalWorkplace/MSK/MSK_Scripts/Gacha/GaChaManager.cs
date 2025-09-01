@@ -201,7 +201,7 @@ public class GachaManager : MonoBehaviour
         }
     }
 
-    // 영웅조각을 반환하는 코드
+    // 영웅정보를 업로드하는 코드
     private async Task ProcessGachaResultAsync(CardInfo card)
     {
         var charRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(card.HeroID);
@@ -218,7 +218,7 @@ public class GachaManager : MonoBehaviour
             {
                 { "hasHero", true },
                 { "heroPiece", 0 }, // 조각은 0부터 시작
-                { "stage", card.HeroStage },
+                { "stage", 1 },
                 { "rarity", card.rarity.ToString() }
             };
 

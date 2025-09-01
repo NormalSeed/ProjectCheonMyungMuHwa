@@ -241,18 +241,59 @@ public class CurrencyManager : IStartable, IDisposable
             int.TryParse(dataSnapshot.Value.ToString(), out level);
         return level;
     }
+
     /// <summary>
-    /// 영웅을 조각정보를 불러오는 코드입니다.
+    /// 영웅 조각정보를 불러오는 코드입니다.
     /// </summary>
     public async Task<int> LoadPieceFromFireBase(string charID)
     {
         var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
         var dataSnapshop = await heroIDRef.Child("heroPiece").GetValueAsync();
-        
-        long rawValue = (long)dataSnapshop.Value;
-        int heroPieceInt = Convert.ToInt32(rawValue);
 
+        int heroPieceInt = Convert.ToInt32(dataSnapshop.Value);
         return heroPieceInt;
     }
+    /// <summary>
+    /// 영웅 조각정보를 저장하는 코드입니다.
+    /// </summary>
+    public void SavePieceToFireBase(string charID, int piece)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        partyInfoRef.Child("heroPiece").SetValueAsync(piece).ContinueWith(task => {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+
+    /// <summary>
+    /// 파이어베이스에서 영웅 돌파정보를 가져옵니다.
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <returns></returns>
+    public async Task<int> LoadHeroStageFromFireBase(string charID)
+    {
+        var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        var dataSnapshop = await heroIDRef.Child("stage").GetValueAsync();
+        return Convert.ToInt32(dataSnapshop.Value); ;
+    }
+
+    /// <summary>
+    /// 파이어베이스에 영웅 돌파정보를 저장합니다.
+    /// </summary>
+    /// <param name="chariID"></param>
+    /// <param name="level"></param>
+    public void SaveHeroStageToFireBase(string chariID, int stage)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
+        partyInfoRef.Child("stage").SetValueAsync(stage).ContinueWith(task => {
+            if (task.IsFaulted)
+                return;
+        });
+    }
+
     #endregion
 }
