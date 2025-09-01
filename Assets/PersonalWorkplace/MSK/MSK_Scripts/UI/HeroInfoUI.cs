@@ -1,3 +1,5 @@
+using Firebase.Database;
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
@@ -64,6 +66,11 @@ public class HeroInfoUI : UIBase
     private int ownerPiece;                      // 보유중인 영웅 조각
     #endregion
 
+    #region FireBase
+    private string _uid;
+    private DatabaseReference _dbRef;
+    #endregion
+
     #region Unity LiftCycle
     private void OnEnable()
     {
@@ -117,6 +124,10 @@ public class HeroInfoUI : UIBase
         ExtAtkPoint = BigCurrency.FromBaseAmount(modelInfo.ExtAtkPoint);
         InnAtkPoint = BigCurrency.FromBaseAmount(modelInfo.InnAtkPoint);
         requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
+
+        // 조각정보 불러오기
+        ownerPiece = await CurrencyManager.Instance.LoadPieceFromFireBase(heroID);
+        requirePiece = heroStage * (5 - (int)rarity);
     }
     private void ButtonAddListener()
     {
@@ -133,7 +144,9 @@ public class HeroInfoUI : UIBase
         health.text = HealthPoint.ToString();
         power.text = CountingHeroPower();
         exp.text = RequireLevelUpGold(heroLevel);
+        heroPiece.text = $"{ownerPiece} / {requirePiece}";
     }
+
     private void SetCharacter()
     {
         Addressables.LoadAssetAsync<Sprite>(heroID + "_sprite").Completed += task =>
@@ -217,20 +230,11 @@ public class HeroInfoUI : UIBase
     }
     private void OnClickStageUP()
     {
-        HeroStageUpgrade();
+
     }
     #endregion
 
     #region Private
-
-    /// <summary>
-    /// 영웅을 돌파하는 코드입니다.
-    /// </summary>
-    private void HeroStageUpgrade()
-    {
-        // CurrencyManager.Instance.SaveHeroPieceToFireBase(heroID, ownerPiece);
-    }
-
     /// <summary>
     /// 영웅 강화하는 코드입니다.
     /// </summary>
@@ -280,8 +284,10 @@ public class HeroInfoUI : UIBase
     /// <param name="piece"></param>
     private void RequireRankUpPiece(int piece)
     {
+
         requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
     }
+
     /// <summary>
     /// 정보 동기화용 코드입니다.
     /// </summary>

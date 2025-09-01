@@ -241,32 +241,18 @@ public class CurrencyManager : IStartable, IDisposable
             int.TryParse(dataSnapshot.Value.ToString(), out level);
         return level;
     }
-
     /// <summary>
-    /// 캐릭터 돌파에 필요한 조각개수 저장
+    /// 영웅을 조각정보를 불러오는 코드입니다.
     /// </summary>
-    /// <param name="piece"></param>
-    public void SaveHeroPieceToFireBase(string chariID, int piece)
+    public async Task<int> LoadPieceFromFireBase(string charID)
     {
-        if (string.IsNullOrEmpty(_uid))
-            return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
-        partyInfoRef.Child("piece").SetValueAsync(piece).ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-                return;
-        });
-    }
+        var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        var dataSnapshop = await heroIDRef.Child("heroPiece").GetValueAsync();
+        
+        long rawValue = (long)dataSnapshop.Value;
+        int heroPieceInt = Convert.ToInt32(rawValue);
 
-    /// <summary>
-    /// 캐릭터 돌파에 필요한 조각 개수 불러오기
-    /// </summary>
-    public void LoadHeroPieceFromFireBase(string chariID)
-    {
-        if (string.IsNullOrEmpty(_uid))
-            return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
-
+        return heroPieceInt;
     }
     #endregion
 }

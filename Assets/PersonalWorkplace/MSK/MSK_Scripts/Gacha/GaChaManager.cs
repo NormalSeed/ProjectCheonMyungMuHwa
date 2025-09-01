@@ -1,11 +1,13 @@
 using Firebase.Auth;
 using Firebase.Database;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class GachaManager : MonoBehaviour
 {
@@ -108,10 +110,10 @@ public class GachaManager : MonoBehaviour
             "Epic" => "C004CardInfo",
         };
 
-        var handle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<CardInfo>(addressKey);
+        var handle = Addressables.LoadAssetAsync<CardInfo>(addressKey);
 
         await handle.Task;
-        if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+        if (handle.Status == AsyncOperationStatus.Succeeded)
             return handle.Result;
 
         Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {addressKey} 로드 실패");

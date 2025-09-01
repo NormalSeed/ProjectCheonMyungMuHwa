@@ -1,43 +1,54 @@
+using Firebase.Database;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class HeroListManager : MonoBehaviour
 {
-    [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform parentTransform;
-    [SerializeField] private int poolSize = 50;
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
-    private Dictionary<string, GameObject> activeCards = new Dictionary<string, GameObject>();
+    private DatabaseReference _dbRef;
+    private string _uid;
 
-    private void Awake()
+    private void OnEnable()
     {
-        // 1) 풀 초기화: 미리 Instantiate 후 비활성화
-        for (int i = 0; i < poolSize; i++)
-        {
-            var go = Instantiate(cardPrefab, parentTransform);
-            go.SetActive(false);
-            pool.Enqueue(go);
-        }
+        _uid = CurrencyManager.Instance.UserID;
+        _dbRef = CurrencyManager.Instance.DbRef;
+
+        StartCoroutine(RefreshHeroList());
     }
 
-    // 2) UI 오픈 시 호출
-    public void ShowHeroes(List<CardInfo> ownedHeroes)
+    private IEnumerator RefreshHeroList()
     {
-        foreach (var hero in ownedHeroes)
+        var ownedIds = new List<string>();
+        var charInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
+
+        var loadTask = charInfoRef.GetValueAsync();
+        yield return new WaitUntil(() => loadTask.IsCompleted);
+
+        if (loadTask.Exception != null)
         {
-            // 이미 활성화된 카드면 건너뛰기
-            if (activeCards.ContainsKey(hero.HeroID))
+            Debug.LogError($"Failed to load hero info: {loadTask.Exception}");
+            yield break;
+        }
+
+        DataSnapshot snapshot = loadTask.Result;
+        foreach (var child in snapshot.Children)
+        {
+            var hasHero = child.Child("hasHero");
+            if (hasHero.Exists && (bool)hasHero.Value)
+                ownedIds.Add(child.Key);
+        }
+
+        foreach (Transform cardTransform in parentTransform)
+        {
+            var infoSetter = cardTransform.GetComponent<HeroInfoSetting>();
+            if (infoSetter == null || infoSetter.chardata == null)
                 continue;
 
-            // 풀에서 카드 꺼내기 (없으면 추가 Instantiate)
-            GameObject card = pool.Count > 0
-                ? pool.Dequeue()
-                : Instantiate(cardPrefab, parentTransform);
-
-            // 활성화 및 매핑 등록
-            card.SetActive(true);
-            activeCards.Add(hero.HeroID, card);
+            string heroId = infoSetter.chardata.HeroID;
+            bool isOwned = ownedIds.Contains(heroId);
+            cardTransform.gameObject.SetActive(isOwned);
         }
     }
 }
