@@ -22,13 +22,7 @@ public class ParticleManager : MonoBehaviour
         poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
         particleDelays = new Dictionary<string, WaitForSeconds>();
         particleName = new Dictionary<ParticleSystem, string>();
-        LoadAssetAsync();
-    }
-
-    private async void LoadAssetAsync()
-    {
-        var handle = Addressables.LoadAssetsAsync<GameObject>("particle");
-        IList<GameObject> loadedParticlePrefabs = await handle.Task;
+        IList<GameObject> loadedParticlePrefabs = Addressables.LoadAssetsAsync<GameObject>("Particle").WaitForCompletion();
         foreach (GameObject prefab in loadedParticlePrefabs)
         {
             ObjectPool<ParticleSystem> Pool = new ObjectPool<ParticleSystem>(
@@ -44,7 +38,6 @@ public class ParticleManager : MonoBehaviour
             poolDict.Add(prefab.name, Pool);
             particleName.Add(part, prefab.name);
         }
-
     }
     public ParticleSystem GetParticle(string name, Vector2 pos, Transform parent = null, float scale = 1)
     {

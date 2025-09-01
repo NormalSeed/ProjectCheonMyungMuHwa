@@ -10,14 +10,10 @@ public class DroppedItemDataSO : ScriptableObject
 
   private void OnEnable()
   {
-    sprites = new();
-    Init();
-  }
 
-  private async void Init()
-  {
-    var handle = Addressables.LoadAssetsAsync<Sprite>("droppeditem");
-    IList<Sprite> loadedSprites = await handle.Task;
+    sprites = new();
+    IList<Sprite> loadedSprites = Addressables.LoadAssetsAsync<Sprite>("DroppedItem").WaitForCompletion();
+
     foreach (Sprite s in loadedSprites)
     {
       switch (s.name)
@@ -39,6 +35,8 @@ public class DroppedItemDataSO : ScriptableObject
           break;
       }
     }
+
+
   }
 }
 
