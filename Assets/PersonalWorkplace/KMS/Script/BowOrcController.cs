@@ -4,18 +4,14 @@ using VContainer;
 
 public class BowOrcController : MonsterController
 {
-    protected override void InitComponent()
-    {
-        base.InitComponent();
-        RealAttackDelay = new WaitForSeconds(0.15f);
-    }
+
     public override void OnAttack(GameObject me, IDamagable target)
     {
         Spum.PlayAnimation(PlayerState.ATTACK, 2);
         StartCoroutine(RealAttackRoutine(target));
     }
 
-    private IEnumerator RealAttackRoutine(IDamagable target)
+    protected override IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return RealAttackDelay;
         AudioManager.Instance.PlaySound("Bow_Attack");

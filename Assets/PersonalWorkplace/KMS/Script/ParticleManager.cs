@@ -14,11 +14,14 @@ public class ParticleManager : MonoBehaviour
 
     private Dictionary<string, WaitForSeconds> particleDelays;
 
+    private Dictionary<ParticleSystem, string> particleName;
+
     private void Awake()
     {
         Instance = this;
         poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
         particleDelays = new Dictionary<string, WaitForSeconds>();
+        particleName = new Dictionary<ParticleSystem, string>();
         IList<GameObject> loadedParticlePrefabs = Addressables.LoadAssetsAsync<GameObject>("Particle").WaitForCompletion();
         foreach (GameObject prefab in loadedParticlePrefabs)
         {
@@ -30,8 +33,10 @@ public class ParticleManager : MonoBehaviour
             defaultCapacity: 20,
             maxSize: 20
         );
-            particleDelays.Add(prefab.name, new WaitForSeconds(prefab.GetComponent<ParticleSystem>().main.duration));
+            ParticleSystem part = prefab.GetComponent<ParticleSystem>();
+            particleDelays.Add(prefab.name, new WaitForSeconds(part.main.duration));
             poolDict.Add(prefab.name, Pool);
+            particleName.Add(part, prefab.name);
         }
     }
     public ParticleSystem GetParticle(string name, Vector2 pos, Transform parent = null, float scale = 1)
