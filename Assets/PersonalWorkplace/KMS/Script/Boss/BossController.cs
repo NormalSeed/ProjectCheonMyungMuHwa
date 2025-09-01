@@ -41,7 +41,7 @@ public abstract class BossController : MonsterController
     }
     public override void OnDeath()
     {
-        //InGameManager.Instance.SetNextStage();
+        InGameManager.Instance.SetNextStage();
         InGameManager.Instance.monsterDeathStack.Value--;
         healthBar.transform.parent.gameObject.SetActive(false);
         AudioManager.Instance.PlaySound("Monster_Dead");

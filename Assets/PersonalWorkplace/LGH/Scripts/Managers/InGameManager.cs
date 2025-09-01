@@ -27,7 +27,6 @@ public class InGameManager : MonoBehaviour
     private void Start()
     {
         monsterDeathStack.Value = 0;
-        monsterDeathStack.Subscribe(val => { if (val == 0) PoolManager.Instance.GetItems(); });
         stageProgress = 0;
 
         alignedNum.Value = 0;
@@ -49,7 +48,7 @@ public class InGameManager : MonoBehaviour
         PoolManager.Instance.ActiveBoss(stageNum);
         Debug.Log("보스 소환함");
         stageProgress = 0;
-        stageNum++;
+        //stageNum++;
     }
 
     public void ExamineAllAligned(int num)
@@ -80,6 +79,7 @@ public class InGameManager : MonoBehaviour
         {
             alignedNum.Value = 0; // 전투 종료 후 초기화
             isProcessingAlignment = false;
+            PoolManager.Instance.GetItems();
         }
     }
 
