@@ -55,8 +55,8 @@ public class GachaManager : MonoBehaviour
 
     private async void OnEnable()
     {
-        _uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "dev-local-test";
-        _dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        _uid = CurrencyManager.Instance.UserID;
+        _dbRef = CurrencyManager.Instance.DbRef;
 
         await LoadUserDataAsync();
         await LoadSummonConfigAsync();
@@ -153,6 +153,7 @@ public class GachaManager : MonoBehaviour
     //  소환레벨 업
     private async Task LevelUpAsync()
     {
+        // 1~9까지만 처리
         if (userSummonLevel < SummonLevel.level10)
         {
             userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
@@ -233,6 +234,7 @@ public class GachaManager : MonoBehaviour
             await charRef.Child("heroPiece").SetValueAsync(currentPiece + addedPiece);
         }
     }
+    // 영웅 조각 정보를 업로드하는 코루틴
     private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
     {
         foreach (var info in results)

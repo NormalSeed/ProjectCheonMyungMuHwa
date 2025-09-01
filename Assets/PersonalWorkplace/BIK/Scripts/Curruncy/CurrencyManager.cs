@@ -40,6 +40,8 @@ public class CurrencyManager : IStartable, IDisposable
     public static event Action OnInitialized;
 
     public bool IsInitialized => _initialized;
+    public DatabaseReference DbRef { get { return _dbRef; } }
+    public string UserID { get { return _uid; } }
 
     #endregion // properties
 
