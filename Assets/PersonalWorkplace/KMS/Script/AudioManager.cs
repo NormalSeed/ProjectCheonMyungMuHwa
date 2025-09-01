@@ -35,21 +35,5 @@ public class AudioManager : MonoBehaviour
     {
         soundPool.ReleaseItem(asc);
     }
-    AudioSourceController aaa;
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            PlaySound("Cane_Attack");
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            aaa = PlaySound("Cane_Attack", 1, SoundMode.Permanent);
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            StopSound(aaa);
-        }
-    }
 
 }

@@ -1,7 +1,10 @@
 
 using UnityEngine;
 using System.Collections;
-
+using VContainer;
+using UnityEngine.UI;
+using VContainer.Unity;
+using System.Collections.Generic;
 public class PoolManager : MonoBehaviour
 {
     public static PoolManager Instance;
@@ -17,8 +20,6 @@ public class PoolManager : MonoBehaviour
 
     public DefaultPool<DroppedItem> ItemPool;
 
-    public DefaultPool<MonsterController> bossPool;
-
     [SerializeField] private Transform[] spawwnPoints;
     [SerializeField] private Transform bossPoint;
 
@@ -27,9 +28,29 @@ public class PoolManager : MonoBehaviour
     [SerializeField] private MonsterModelBaseSO[] models;
     [SerializeField] private MonsterModelBaseSO bossModel;
 
+    [SerializeField] private RectTransform mainCanvasRect;
+    [SerializeField] private RectTransform goldRect;
+
+    private Dictionary<string, MonsterController> bosses;
+
+    private Stack<DroppedItem> droppedItems;
+
+    private IObjectResolver container;
+
+    private WaitForSeconds GetItemWfs;
+    [Inject]
+    public void VCTest(IObjectResolver container)
+    {
+        this.container = container;
+
+    }
+
     void Awake()
     {
+        GetItemWfs = new WaitForSeconds(0.05f);
         Instance = this;
+        droppedItems = new();
+        bosses = new();
         PunchPool = new DefaultPool<MonsterController>("Punch", 3, false);
         StickPool = new DefaultPool<MonsterController>("Stick", 3, false);
         CainPool = new DefaultPool<MonsterController>("Cane", 3, false);
@@ -37,10 +58,17 @@ public class PoolManager : MonoBehaviour
         ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8);
         MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8);
         DamagePool = new DefaultPool<DamageText>("DamageText", 15);
-        ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 100);
+        ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 60);
 
-        //test
-        bossPool = new DefaultPool<MonsterController>("PunchBoss", 1, false);
+        GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/Boss");
+        foreach (GameObject go in loadedbosses)
+        {
+            GameObject boss = container.Instantiate(go);
+            MonsterController con = boss.GetComponent<MonsterController>();
+            bosses.Add(go.name, con);
+            con.OnLifeEnded += a => con.gameObject.SetActive(false);
+            boss.SetActive(false);
+        }
     }
 
 
@@ -48,7 +76,7 @@ public class PoolManager : MonoBehaviour
     {
         currentstage = stageNum;
         AudioManager.Instance.PlaySound("Monster_Recall_New");
-        SetModelStates(stageNum);
+        SetModelStates();
 
         ActiveMonster(PunchPool, 0, 0);
         ActiveMonster(PunchPool, 1, 0);
@@ -64,15 +92,28 @@ public class PoolManager : MonoBehaviour
         ActiveMonster(BowPool, 11, 3);
     }
 
-    public void ActiveBoss(int stageNum)
+    public void ActiveBoss(int stageNum) //3의 배수로만 들어오는 것을 상정함
     {
         currentstage = stageNum;
+        int last = currentstage / 3 % 10;
+        string str;
+        switch (last)
+        {
+            case 0: case 5: str = "LastBoss"; break;
+            case 1: case 6: str = "PunchBoss"; break;
+            case 2: case 7: str = "StickBoss"; break;
+            case 3: case 8: str = "CaneBoss"; break;
+            case 4: case 9: str = "BowBoss"; break;
+            default: str = ""; break;
+
+        }
         AudioManager.Instance.PlaySound("Monster_Recall_New");
-        SetModelStates(stageNum);
-        bossModel.SetFinalBoss(stageNum, models[0]);
-        MonsterController boss = bossPool.GetItem(bossPoint.position);
-        boss.Model.BaseModel = bossModel;
-        boss.gameObject.SetActive(true);
+        bossModel.SetFinalBoss(currentstage, models[0]);
+
+        MonsterController bosscon = bosses[str];
+        bosscon.transform.position = bossPoint.position;
+        bosscon.Model.BaseModel = bossModel;
+        bosscon.gameObject.SetActive(true);
 
     }
     private void ActiveMonster(DefaultPool<MonsterController> pool, int pointIndex, int modelIndex)
@@ -91,12 +132,34 @@ public class PoolManager : MonoBehaviour
         monster.Model.BaseModel = models[modelIndex];
         monster.gameObject.SetActive(true);
     }
-    private void SetModelStates(int currentstage)
+    private void SetModelStates()
     {
         foreach (MonsterModelBaseSO model in models)
         {
             model.SetFinal(currentstage);
         }
+    }
+
+    public void AddItemToList(DroppedItem item)
+    {
+        droppedItems.Push(item);
+    }
+
+    public void GetItems()
+    {
+        StartCoroutine(GetitemRoutine());
+    }
+    private IEnumerator GetitemRoutine()
+    {
+        yield return GetItemWfs;
+        while (droppedItems.Count > 0)
+        {
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, goldRect.position);
+            Vector2 target = Camera.main.ScreenToWorldPoint(screenPos);
+            droppedItems.Pop().Release(target);
+            yield return GetItemWfs;
+        }
+
     }
 
 
