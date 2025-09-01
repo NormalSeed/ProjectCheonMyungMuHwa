@@ -15,6 +15,10 @@ public class InGameManager : MonoBehaviour
 
     public bool isStartReady = false;
 
+    private string stage => $"<color=yellow>{Mathf.Ceil(stageNum / 3f)}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
+
+    [SerializeField] TMPro.TMP_Text stagetext;
+
     private void Awake()
     {
         Instance = this;
@@ -23,6 +27,7 @@ public class InGameManager : MonoBehaviour
     private void Start()
     {
         monsterDeathStack.Value = 0;
+        monsterDeathStack.Subscribe(val => { if (val == 0) PoolManager.Instance.GetItems(); });
         stageProgress = 0;
 
         alignedNum.Value = 0;
@@ -35,7 +40,8 @@ public class InGameManager : MonoBehaviour
     {
         PoolManager.Instance.ActiveAll(stageNum);
         stageProgress++;
-        
+        if (stageProgress < 3) stageNum++;
+
     }
 
     public void SpawnBoss()
@@ -43,14 +49,16 @@ public class InGameManager : MonoBehaviour
         PoolManager.Instance.ActiveBoss(stageNum);
         Debug.Log("보스 소환함");
         stageProgress = 0;
+        stageNum++;
     }
 
     public void ExamineAllAligned(int num)
     {
         if (isProcessingAlignment || num < playerCount)return;
+        if (stagetext != null) stagetext.text = stage;
 
         isProcessingAlignment = true;
-        if (stageProgress < 2)
+        if (stageProgress < 3)
         {
             RespawnMonsters();
         }
@@ -58,7 +66,6 @@ public class InGameManager : MonoBehaviour
         {
             SpawnBoss();
         }
-
         StartCoroutine(ResetAlignmentFlag());
     }
     private IEnumerator ResetAlignmentFlag()
