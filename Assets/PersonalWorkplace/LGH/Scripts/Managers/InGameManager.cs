@@ -33,6 +33,7 @@ public class InGameManager : MonoBehaviour
         alignedNum.Value = 0;
 
         alignedNum.Subscribe(ExamineAllAligned);
+        monsterDeathStack.Subscribe(CheckMonsterClear);
     }
 
     public void RespawnMonsters()
@@ -70,8 +71,16 @@ public class InGameManager : MonoBehaviour
     private IEnumerator ResetAlignmentFlag()
     {
         yield return new WaitForSeconds(0.1f);
-        alignedNum.Value = 0;
         isProcessingAlignment = false;
+    }
+
+    public void CheckMonsterClear(int deathStack)
+    {
+        if (monsterDeathStack.Value <= 0 || monsterDeathStack.Value <= 0)
+        {
+            alignedNum.Value = 0; // 전투 종료 후 초기화
+            isProcessingAlignment = false;
+        }
     }
 
 

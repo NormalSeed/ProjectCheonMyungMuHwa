@@ -142,22 +142,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SlashMotion2
       objectReference: {fileID: 0}
-    - target: {fileID: 796037762503735558, guid: c664644b6316bf4478ec806218383302, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7511794785410095559, guid: c664644b6316bf4478ec806218383302, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7511794785410095559, guid: c664644b6316bf4478ec806218383302, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7511794785410095559, guid: c664644b6316bf4478ec806218383302, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7511794785410095559, guid: c664644b6316bf4478ec806218383302, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -265,20 +249,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlazingSlash
       objectReference: {fileID: 0}
-    - target: {fileID: 5031126124961620347, guid: 51b25bcef1b033e4a8d4f1929249d7b1, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5031126124961620347, guid: 51b25bcef1b033e4a8d4f1929249d7b1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7588696056010490445}
-    - targetCorrespondingSourceObject: {fileID: 5031126124961620347, guid: 51b25bcef1b033e4a8d4f1929249d7b1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5383650971238508068}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51b25bcef1b033e4a8d4f1929249d7b1, type: 3}
 --- !u!4 &3539414391040546443 stripped
 Transform:
@@ -290,56 +264,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5031126124961620347, guid: 51b25bcef1b033e4a8d4f1929249d7b1, type: 3}
   m_PrefabInstance: {fileID: 2377443031626944327}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7588696056010490445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7290335327336295996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35b7b2a9092efb249834324025d2d540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skill1Data: {fileID: 11400000, guid: 924a70066a699b3419df3c4e8d5bcad5, type: 2}
-  skill2Data: {fileID: 11400000, guid: 4dec66ff5ae59434690cf39725420800, type: 2}
---- !u!58 &5383650971238508068
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7290335327336295996}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 2.5
 --- !u!1001 &7800877753766249975
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -391,10 +315,6 @@ PrefabInstance:
     - target: {fileID: 7389287062017899989, guid: 3aa289537737c0e4fb3001fb6c970527, type: 3}
       propertyPath: m_Name
       value: EarthQuake
-      objectReference: {fileID: 0}
-    - target: {fileID: 7389287062017899989, guid: 3aa289537737c0e4fb3001fb6c970527, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

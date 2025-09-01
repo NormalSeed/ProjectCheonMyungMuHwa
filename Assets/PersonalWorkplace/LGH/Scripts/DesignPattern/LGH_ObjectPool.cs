@@ -34,6 +34,7 @@ public class LGH_ObjectPool
         if (pool.Count == 0) CreatePooledObject();
 
         PooledObject obj = pool.Pop();
+        obj.transform.SetParent(null);
         obj.gameObject.SetActive(true);
         return obj;
     }
