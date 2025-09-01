@@ -1,9 +1,9 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 
-public class QuestUIManager : MonoBehaviour
+public class QuestUIManager : UIBase
 {
     [SerializeField] private GameObject questUIPrefab;
     [SerializeField] private Transform contentParent;
@@ -32,8 +32,7 @@ public class QuestUIManager : MonoBehaviour
 
     private void OnDisable()
     {
-        if (waitRoutine != null)
-        {
+        if (waitRoutine != null) {
             StopCoroutine(waitRoutine);
             waitRoutine = null;
         }
@@ -83,8 +82,7 @@ public class QuestUIManager : MonoBehaviour
         // 새로운 UI 생성
         var quests = QuestManager.Instance.GetQuestsByCategory(currentCategory);
 
-        foreach (var quest in quests)
-        {
+        foreach (var quest in quests) {
             var ui = Instantiate(questUIPrefab, contentParent);
             var ctrl = ui.GetComponent<QuestUIController>();
             if (ctrl != null) ctrl.SetData(quest);
