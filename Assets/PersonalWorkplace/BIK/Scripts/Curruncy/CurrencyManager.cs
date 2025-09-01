@@ -175,7 +175,7 @@ public class CurrencyManager : IStartable, IDisposable
         if (string.IsNullOrEmpty(_uid))
             return;
 
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo");
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo");
 
         //  기존 저장된 리스트 삭제
         partyInfoRef.RemoveValueAsync().ContinueWith(removeTask => {
@@ -196,7 +196,7 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
+        _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo")
             .GetValueAsync().ContinueWith(task => {
                 list.Clear();
                 var raw = task.Result.Value as List<object>;
@@ -212,11 +212,11 @@ public class CurrencyManager : IStartable, IDisposable
     /// </summary>
     /// <param name="chariID"></param>
     /// <param name="level"></param>
-    public void SaveCharatorInfoToFireBase(string chariID, int level)
+    public void SaveCharacterInfoToFireBase(string chariID, int level)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
         partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => {
             if (task.IsFaulted)
                 return;
@@ -226,13 +226,13 @@ public class CurrencyManager : IStartable, IDisposable
     /// <summary>
     /// 캐릭터 성장정보 로딩
     /// </summary>
-    public async Task<int> LoadCharatorInfoFromFireBase(string chariID)
+    public async Task<int> LoadCharacterInfoFromFireBase(string chariID)
     {
         int level = -1;
         if (string.IsNullOrEmpty(_uid))
             return level;
 
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
         var dataSnapshot = await partyInfoRef.Child("level").GetValueAsync();
 
         if (dataSnapshot.Exists)
@@ -248,7 +248,7 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
         partyInfoRef.Child("piece").SetValueAsync(piece).ContinueWith(task =>
         {
             if (task.IsFaulted)
@@ -263,7 +263,7 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
 
     }
     #endregion

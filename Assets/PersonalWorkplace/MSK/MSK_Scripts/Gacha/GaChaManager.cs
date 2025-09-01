@@ -201,7 +201,7 @@ public class GachaManager : MonoBehaviour
     // 영웅조각을 반환하는 코드
     private async Task ProcessGachaResultAsync(CardInfo card)
     {
-        var charRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(card.HeroID);
+        var charRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(card.HeroID);
 
         // 보유 여부 확인
         var hasHeroSnap = await charRef.Child("hasHero").GetValueAsync();

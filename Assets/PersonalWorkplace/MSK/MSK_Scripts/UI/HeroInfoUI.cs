@@ -112,7 +112,7 @@ public class HeroInfoUI : UIBase
     {
         heroName = modelInfo.CharName;
         // 레벨 정보 불러오고 진행
-        heroLevel = await CurrencyManager.Instance.LoadCharatorInfoFromFireBase(heroID);
+        heroLevel = await CurrencyManager.Instance.LoadCharacterInfoFromFireBase(heroID);
         HealthPoint = BigCurrency.FromBaseAmount(modelInfo.HealthPoint);
         ExtAtkPoint = BigCurrency.FromBaseAmount(modelInfo.ExtAtkPoint);
         InnAtkPoint = BigCurrency.FromBaseAmount(modelInfo.InnAtkPoint);
@@ -244,7 +244,7 @@ public class HeroInfoUI : UIBase
             level.text = heroLevel.ToString();
             exp.text = RequireLevelUpGold(heroLevel);
             requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
-            CurrencyManager.Instance.SaveCharatorInfoToFireBase(heroID, heroLevel);
+            CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroID, heroLevel);
             Debug.Log("[HeroLevelUpgrade] : 골드 소모");
         }
         else
