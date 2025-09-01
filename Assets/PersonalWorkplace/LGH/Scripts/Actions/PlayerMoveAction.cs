@@ -69,12 +69,8 @@ public partial class PlayerMoveAction : Action
                     NMagent.ResetPath();
                     return Status.Success; // 모두 정렬 완료 -> Idle로 전환
                 }
-                else if()
-                {
 
-                }
-
-                    return Status.Running; // 나만 도착했음 -> 대기
+                return Status.Running; // 나만 도착했음 -> 대기
             }
         }
 
