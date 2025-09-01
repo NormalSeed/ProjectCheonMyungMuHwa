@@ -15,6 +15,7 @@ public class QuestManager : MonoBehaviour
 
     [SerializeField] private string questCSV = "QuestData"; // Resources/QuestData.csv
 
+    public Quest SelectedQuest { get; private set; }
     public bool IsReady { get; private set; } = false;
 
     //UI 갱신용 이벤트
@@ -212,18 +213,34 @@ public class QuestManager : MonoBehaviour
     }
 
     // 보상 수령
-    public void ClaimReward(string questID)
+    public void ClaimReward(string questId)
     {
-        if (activeQuests.TryGetValue(questID, out Quest quest))
+        if (!activeQuests.TryGetValue(questId, out Quest quest)) return;
+        if (!quest.isComplete || quest.isClaimed) return;
+
+        foreach (var reward in quest.rewards)
         {
-            if (quest.isComplete && !quest.isClaimed)
-            {
-                quest.isClaimed = true;
-                quest.lastUpdated = NowUtc();
-                Debug.Log($"보상 수령: {quest.rewardID} x {quest.rewardCount}");
-                SaveQuests();
-                OnQuestsUpdated?.Invoke();
-            }
+            GrantReward(reward);
+        }
+
+        quest.isClaimed = true;
+        Debug.Log($"퀘스트 보상 수령 완료: {quest.questName}");
+    }
+
+    // 보상 지급 로직
+    private void GrantReward(Reward reward)
+    {
+        switch (reward.rewardType)
+        {
+            case RewardType.Currency:
+                // 재화 증가 로직
+                break;
+            case RewardType.Equipment:
+                // 장비 지급 로직
+                break;
+            case RewardType.Item:
+                // 아이템 지급 로직
+                break;
         }
     }
 
@@ -248,6 +265,40 @@ public class QuestManager : MonoBehaviour
         return activeQuests.Values
             .Where(q => q.questType == type)
             .ToList();
+    }
+    public string GetRemainingTimeFormatted(QuestCategory category)
+    {
+        DateTime now = NowUtc();
+        TimeSpan remain = TimeSpan.Zero;
+
+        switch (category)
+        {
+            case QuestCategory.Daily:
+                // 오늘 자정까지 남은 시간
+                DateTime nextDay = now.Date.AddDays(1);
+                remain = nextDay - now;
+                break;
+
+            case QuestCategory.Weekly:
+                // 이번 주 월요일 기준, 다음 주 월요일 0시까지
+                int daysUntilNextMonday = ((int)DayOfWeek.Monday - (int)now.DayOfWeek + 7) % 7;
+                if (daysUntilNextMonday == 0) daysUntilNextMonday = 7; // 이번 주가 끝난 경우
+                DateTime nextWeek = now.Date.AddDays(daysUntilNextMonday);
+                remain = nextWeek - now;
+                break;
+
+            case QuestCategory.Repeat:
+                remain = TimeSpan.Zero; // 제한 없음
+                break;
+        }
+
+        if (remain < TimeSpan.Zero) remain = TimeSpan.Zero;
+
+        return $"{remain.Days}일 {remain.Hours:D2}:{remain.Minutes:D2}:{remain.Seconds:D2}";
+    }
+    public void SetSelectedQuest(Quest quest)
+    {
+        SelectedQuest = quest;
     }
 
     [System.Serializable]

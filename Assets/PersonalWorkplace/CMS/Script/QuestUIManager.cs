@@ -1,28 +1,42 @@
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 public class QuestUIManager : UIBase
 {
+    [Header("상단 UI")]
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI timeText;   // 남은 시간 표시
+
+    [Header("퀘스트 리스트")]
     [SerializeField] private GameObject questUIPrefab;
     [SerializeField] private Transform contentParent;
 
     [Header("탭 버튼")]
-    [SerializeField] private Button dailyTabButton;
-    [SerializeField] private Button weeklyTabButton;
-    [SerializeField] private Button repeatTabButton;
+    [SerializeField] private Toggle dailyToggle;
+    [SerializeField] private Toggle weeklyToggle;
+    [SerializeField] private Toggle repeatToggle;
 
-    [Header("탭 색상")]
-    [SerializeField] private Color activeColor = new(0.29f, 0.56f, 0.89f);   // 파랑
-    [SerializeField] private Color inactiveColor = new(0.87f, 0.87f, 0.87f); // 회색
+    [Header("기타 버튼")]
+    [SerializeField] private Button exitButton;
 
     private Coroutine waitRoutine;
-    private QuestCategory currentCategory = QuestCategory.Daily; // 기본은 일일
+    private QuestCategory currentCategory = QuestCategory.Daily; // 기본 Daily
 
     private void Start()
     {
-        SetActiveCategory(QuestCategory.Daily); // 시작은 일일 퀘스트
+        // 토글 이벤트 등록
+        dailyToggle.onValueChanged.AddListener((isOn) => { if (isOn) SetActiveCategory(QuestCategory.Daily); });
+        weeklyToggle.onValueChanged.AddListener((isOn) => { if (isOn) SetActiveCategory(QuestCategory.Weekly); });
+        repeatToggle.onValueChanged.AddListener((isOn) => { if (isOn) SetActiveCategory(QuestCategory.Repeat); });
+
+        // 닫기 버튼
+        exitButton.onClick.AddListener(ClosePanel);
+
+        SetActiveCategory(QuestCategory.Daily);
     }
 
     private void OnEnable()
@@ -32,13 +46,19 @@ public class QuestUIManager : UIBase
 
     private void OnDisable()
     {
-        if (waitRoutine != null) {
+        if (waitRoutine != null)
+        {
             StopCoroutine(waitRoutine);
             waitRoutine = null;
         }
 
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestsUpdated -= RefreshQuestUI;
+    }
+
+    private void ClosePanel()
+    {
+        gameObject.SetActive(false);
     }
 
     private IEnumerator WaitAndBind()
@@ -53,27 +73,33 @@ public class QuestUIManager : UIBase
         RefreshQuestUI();
     }
 
+    private void Update()
+    {
+        // 남은 시간 갱신
+        if (QuestManager.Instance != null)
+        {
+            string remainTime = QuestManager.Instance.GetRemainingTimeFormatted(currentCategory);
+            timeText.text = $"남은시간 {remainTime}";
+        }
+
+        UpdateCurrency();
+    }
+
     /// <summary>
-    /// 탭 전환 (UI 버튼에서 호출)
+    /// 탭 전환
     /// </summary>
     public void SetActiveCategory(QuestCategory category)
     {
         currentCategory = category;
         RefreshQuestUI();
-        UpdateTabUI();
     }
-
-    public void OnClickDaily() => SetActiveCategory(QuestCategory.Daily);
-    public void OnClickWeekly() => SetActiveCategory(QuestCategory.Weekly);
-    public void OnClickRepeat() => SetActiveCategory(QuestCategory.Repeat);
 
     /// <summary>
     /// 퀘스트 UI 갱신
     /// </summary>
     public void RefreshQuestUI()
     {
-        if (QuestManager.Instance == null)
-            return;
+        if (QuestManager.Instance == null) return;
 
         // 기존 UI 제거
         foreach (Transform child in contentParent)
@@ -82,22 +108,20 @@ public class QuestUIManager : UIBase
         // 새로운 UI 생성
         var quests = QuestManager.Instance.GetQuestsByCategory(currentCategory);
 
-        foreach (var quest in quests) {
+        foreach (var quest in quests)
+        {
             var ui = Instantiate(questUIPrefab, contentParent);
             var ctrl = ui.GetComponent<QuestUIController>();
             if (ctrl != null) ctrl.SetData(quest);
         }
     }
 
-    private void UpdateTabUI()
+    /// <summary>
+    /// 골드 갱신
+    /// </summary>
+    private void UpdateCurrency()
     {
-        dailyTabButton.GetComponent<Image>().color =
-            currentCategory == QuestCategory.Daily ? activeColor : inactiveColor;
-
-        weeklyTabButton.GetComponent<Image>().color =
-            currentCategory == QuestCategory.Weekly ? activeColor : inactiveColor;
-
-        repeatTabButton.GetComponent<Image>().color =
-            currentCategory == QuestCategory.Repeat ? activeColor : inactiveColor;
+        int gold = 1000; // TODO: 나중에 PlayerDataManager에서 불러오기
+        goldText.text = $"{gold:N0}";
     }
 }

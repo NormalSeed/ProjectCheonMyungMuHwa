@@ -2,17 +2,15 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 public class QuestUIController : UIBase
 {
     [Header("UI")]
     public TextMeshProUGUI questNameText;
-    public Image progressFill; // Slider 대신 Image로!
+    public Image progressFill;
     public TextMeshProUGUI progressText;
-    public Button claimButton;
-
-    public Transform rewardIconsParent; // RewardIcons 
-    public GameObject rewardIconPrefab; // 아이콘 프리팹
+    public Button claimButton; // 보상 받기 버튼
 
     private string questId;
 
@@ -21,12 +19,17 @@ public class QuestUIController : UIBase
         questId = quest.questID;
 
         questNameText.text = quest.questName;
+
         progressFill.fillAmount = (float)quest.valueProgress / quest.valueGoal;
         progressText.text = $"{quest.valueProgress}/{quest.valueGoal}";
-        claimButton.interactable = quest.isComplete && !quest.isClaimed;
 
+        // 보상 받기 버튼 설정
         claimButton.onClick.RemoveAllListeners();
         claimButton.onClick.AddListener(OnClickClaim);
+
+        // 완료 상태에 따라 버튼 활성화
+        claimButton.interactable = quest.isComplete && !quest.isClaimed;
+
     }
 
     private void OnClickClaim()
@@ -35,25 +38,11 @@ public class QuestUIController : UIBase
         RefreshUI();
     }
 
-    public void RefreshUI()
+    public override void RefreshUI()
     {
         if (QuestManager.Instance.activeQuests.TryGetValue(questId, out Quest quest))
         {
             SetData(quest);
-        }
-    }
-
-    public void SetRewards(List<Sprite> rewardSprites)
-    {
-        // 기존 아이콘 제거
-        foreach (Transform child in rewardIconsParent)
-            Destroy(child.gameObject);
-
-        // 새로운 아이콘 생성
-        foreach (var sprite in rewardSprites)
-        {
-            var icon = Instantiate(rewardIconPrefab, rewardIconsParent);
-            icon.GetComponent<Image>().sprite = sprite;
         }
     }
 }

@@ -49,13 +49,19 @@ public static class QuestDatabase
                 valueGoal = int.Parse(values[5].Trim()),
                 isComplete = values[6].Trim().ToUpper() == "TRUE",
                 isClaimed = values[7].Trim().ToUpper() == "TRUE",
-                rewardID = values[8].Trim(),
-                rewardType = (RewardType)int.Parse(values[9].Trim()),
-                rewardCount = int.Parse(values[10].Trim()),
-
                 lastUpdated = DateTime.UtcNow,
                 lastWeek = GetWeekOfYearUTC(DateTime.UtcNow)
             };
+
+            // 보상 파싱 (기존 rewardID, rewardType, rewardCount)
+            // 지금은 단일 보상만 파싱하지만, 여러 개 확장 가능
+            var reward = new Reward
+            {
+                rewardID = values[8].Trim(),
+                rewardType = (RewardType)int.Parse(values[9].Trim()),
+                rewardCount = int.Parse(values[10].Trim())
+            };
+            quest.rewards.Add(reward);
 
             targetList.Add(quest);
         }

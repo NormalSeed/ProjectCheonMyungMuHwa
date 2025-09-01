@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 [System.Serializable]
 public class Quest
@@ -17,9 +19,7 @@ public class Quest
     public bool isClaimed; //보상 수령 여부
 
     //보상 정보
-    public string rewardID; //보상 ID
-    public RewardType rewardType; //보상 유형 (장비/재화 등)
-    public int rewardCount; //보상 수량
+    public List<Reward> rewards = new List<Reward>();
 
     //리셋 관리
     public DateTime lastUpdated; //마지막 갱신
@@ -28,7 +28,7 @@ public class Quest
     public Quest() { }
 
     public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal, string rewardId, RewardType rewardType, int rewardCount)
-{
+    {
     questID = id;
     questName = name;
     questType = type;
@@ -37,13 +37,44 @@ public class Quest
     valueGoal = goal;
     isComplete = false;
     isClaimed = false;
-    rewardID = rewardId;
-    this.rewardType = rewardType;
-    this.rewardCount = rewardCount;
     
     this.lastUpdated = DateTime.UtcNow;
     this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
-}
+
+    rewards.Add(new Reward
+    {
+        rewardID = rewardId,
+        rewardType = rewardType,
+        rewardCount = rewardCount // ← OK (count 아님)
+    });
+    }
+    public string GetRemainingTimeString()
+    {
+        DateTime now = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+        TimeSpan remain = TimeSpan.Zero;
+
+        switch (questType)
+        {
+            case QuestCategory.Daily:
+                // 마지막 갱신일 기준 자정까지 남은 시간
+                DateTime nextReset = lastUpdated.Date.AddDays(1);
+                remain = nextReset - now;
+                break;
+
+            case QuestCategory.Weekly:
+                // 마지막 갱신일 기준 다음 주 월요일 0시까지 남은 시간
+                int daysUntilMonday = ((int)DayOfWeek.Monday - (int)now.DayOfWeek + 7) % 7;
+                DateTime nextWeekReset = now.Date.AddDays(daysUntilMonday).Date;
+                remain = nextWeekReset - now;
+                break;
+
+            default:
+                return ""; // 반복/목표 퀘스트는 제한 시간 없음
+        }
+
+        if (remain.TotalSeconds < 0) remain = TimeSpan.Zero;
+        return $"남은 시간: {remain:hh\\:mm\\:ss}";
+    }
 
     //진행도 추가
     public void AddProgress(int amount)
@@ -99,4 +130,17 @@ public enum RewardType
     Currency = 1, // 재화
     Equipment = 2, // 장비
     Item = 3 // 아이템 (확장용)
+}
+
+[System.Serializable]
+public class Reward
+{
+    public string rewardID;
+    public RewardType rewardType;
+    public int rewardCount;
+
+    public string GetDisplayName()
+    {
+        return $"{rewardType} {rewardID} x{rewardCount}";
+    }
 }
