@@ -60,28 +60,12 @@ public class PlayerController : MonoBehaviour, IDamagable
         OnModelLoaded = null;
     }
 
+    /// <summary>
+    /// charID를 기준으로 charID_model 형식의 주소를 가진 어드레서블 에셋을 불러와 플레이어 데이터를 로딩하는 메서드
+    /// </summary>
+    /// <param name="charID"></param>
     private void LoadPlayerData(string charID)
     {
-        // Addressable 로딩 형식
-        //// csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
-        //Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
-        //    .Completed += handle =>
-        //    {
-        //        if (handle.Status == AsyncOperationStatus.Succeeded)
-        //        {
-        //            model.modelSO = handle.Result;
-        //            model.SetPoints();
-
-        //            LoadPlayerSPUMAsset(charID);
-        //            LoadPlayerSkillData(model.modelSO.SkillSetID);
-        //            OnModelLoaded?.Invoke();
-        //        }
-        //        else
-        //        {
-        //            Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
-        //        }
-        //    };
-        // Resources 폴더에서 PlayerModelSO 로드
         if (string.IsNullOrEmpty(charID))
         {
             Debug.LogWarning("charID가 null 또는 빈 문자열입니다. 캐릭터 오브젝트를 비활성화합니다.");
@@ -89,88 +73,116 @@ public class PlayerController : MonoBehaviour, IDamagable
             return;
         }
 
-        var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
-        if (modelSO != null)
-        {
-            model.modelSO = modelSO;
-            model.SetPoints();
+        // Addressable 로딩 형식
+        // csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
+        Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
+            .Completed += handle =>
+            {
+                if (handle.Status == AsyncOperationStatus.Succeeded)
+                {
+                    model.modelSO = handle.Result;
+                    model.SetPoints();
 
-            LoadPlayerSPUMAsset(charID);
-            LoadPlayerSkillData(model.modelSO.SkillSetID);
-            OnModelLoaded?.Invoke();
-        }
-        else
-        {
-            Debug.LogError($"'{charID}' 모델 로드 실패: Resources/LGH/PlayerModels/{charID}_model");
-        }
+                    LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
+                }
+                else
+                {
+                    // 실패하면 비활성화
+                    gameObject.SetActive(false);
+                    Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
+                }
+            };
+
+        // Resources 폴더에서 PlayerModelSO 로드
+        //var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
+        //if (modelSO != null)
+        //{
+        //    model.modelSO = modelSO;
+        //    model.SetPoints();
+
+        //    LoadPlayerSPUMAsset(charID);
+        //    LoadPlayerSkillData(model.modelSO.SkillSetID);
+        //    OnModelLoaded?.Invoke();
+        //}
+        //else
+        //{
+        //    Debug.LogError($"'{charID}' 모델 로드 실패: Resources/LGH/PlayerModels/{charID}_model");
+        //}
     }
 
     private void LoadPlayerSkillData(string skillSetID)
     {
-        //Addressables.LoadAssetAsync<GameObject>(skillSetID)
-        //.Completed += handle =>
+        Addressables.LoadAssetAsync<GameObject>(skillSetID)
+        .Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject skillSetInstance = Instantiate(handle.Result, transform);
+                skillSet = skillSetInstance;
+
+                // 컴포넌트 초기화도 여기서
+                var skillSetComponent = skillSet.GetComponent<SkillSet>();
+                skillSetComponent.Init(this); // PlayerController를 넘겨주는 방식
+                OnModelLoaded?.Invoke();
+            }
+            else
+            {
+                Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
+            }
+        };
+
+        //var prefab = Resources.Load<GameObject>($"LGH/SkillSets/{skillSetID}");
+        //if (prefab != null)
         //{
-        //    if (handle.Status == AsyncOperationStatus.Succeeded)
-        //    {
-        //        GameObject skillSetInstance = Instantiate(handle.Result, transform);
-        //        skillSet = skillSetInstance;
+        //    GameObject skillSetInstance = Instantiate(prefab, transform);
+        //    skillSet = skillSetInstance;
 
-        //        // 컴포넌트 초기화도 여기서
-        //        var skillSetComponent = skillSet.GetComponent<SkillSet>();
-        //        skillSetComponent.Init(this); // 예시: PlayerController를 넘겨주는 방식
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
-        //    }
-        //};
-        var prefab = Resources.Load<GameObject>($"LGH/SkillSets/{skillSetID}");
-        if (prefab != null)
-        {
-            GameObject skillSetInstance = Instantiate(prefab, transform);
-            skillSet = skillSetInstance;
-
-            var skillSetComponent = skillSet.GetComponent<SkillSet>();
-            skillSetComponent?.Init(this);
-        }
-        else
-        {
-            Debug.LogError($"SkillSet 로드 실패: Resources/SkillSets/{skillSetID}");
-        }
+        //    var skillSetComponent = skillSet.GetComponent<SkillSet>();
+        //    skillSetComponent?.Init(this);
+        //}
+        //else
+        //{
+        //    Debug.LogError($"SkillSet 로드 실패: Resources/SkillSets/{skillSetID}");
+        //}
     }
 
-    private void LoadPlayerSPUMAsset(string charID)
+    private void LoadPlayerSPUMAsset(string charID, string skillSetID)
     {
-        //Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
-        //.Completed += handle =>
+        Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
+        .Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject SPUMInstance = Instantiate(handle.Result, transform);
+                SPUMInstance.transform.localPosition = Vector3.zero;
+                SPUMInstance.transform.localScale = Vector3.one;
+                SPUMAsset = SPUMInstance;
+                spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
+                // 이걸 해줘야 애니메이션이 등록됨
+                spumController.OverrideControllerInit();
+                LoadPlayerSkillData(skillSetID);
+            }
+            else
+            {
+                Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
+            }
+        };
+
+        //var prefab = Resources.Load<GameObject>($"LGH/SPUMAssets/{charID}_SPUM");
+        //if (prefab != null)
         //{
-        //    if (handle.Status == AsyncOperationStatus.Succeeded)
-        //    {
-        //        GameObject SPUMInstance = Instantiate(handle.Result, transform);
-        //        SPUMInstance.transform.localPosition = Vector3.zero;
-        //        SPUMInstance.transform.localScale = Vector3.one;
-        //        SPUMAsset = SPUMInstance;
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
-        //    }
-        //};
-        var prefab = Resources.Load<GameObject>($"LGH/SPUMAssets/{charID}_SPUM");
-        if (prefab != null)
-        {
-            GameObject SPUMInstance = Instantiate(prefab, transform);
-            SPUMInstance.transform.localPosition = Vector3.zero;
-            SPUMInstance.transform.localScale = Vector3.one;
-            SPUMAsset = SPUMInstance;
-            spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
-            // 이걸 해줘야 애니메이션이 등록됨
-            spumController.OverrideControllerInit();
-        }
-        else
-        {
-            Debug.LogError($"SPUM 로드 실패: Resources/SPUMAssets/{charID}_SPUM");
-        }
+        //    GameObject SPUMInstance = Instantiate(prefab, transform);
+        //    SPUMInstance.transform.localPosition = Vector3.zero;
+        //    SPUMInstance.transform.localScale = Vector3.one;
+        //    SPUMAsset = SPUMInstance;
+        //spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
+        //// 이걸 해줘야 애니메이션이 등록됨
+        //spumController.OverrideControllerInit();
+        //}
+        //else
+        //{
+        //    Debug.LogError($"SPUM 로드 실패: Resources/SPUMAssets/{charID}_SPUM");
+        //}
     }
 
     private void Update()
