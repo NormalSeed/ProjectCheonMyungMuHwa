@@ -291,9 +291,11 @@ public class HeroInfoUI : UIBase
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroID, heroStage);
         //  조각 사용 후 저장
         CurrencyManager.Instance.SavePieceToFireBase(heroID, ownerPiece);
-
         requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
+        
         heroPiece.text = $"{ownerPiece} / {requirePiece}";
+        SetStage();
+
         SetRankUpInteractable(stageUPButton);
     }
 

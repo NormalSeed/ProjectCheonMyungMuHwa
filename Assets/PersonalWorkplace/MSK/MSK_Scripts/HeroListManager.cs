@@ -10,6 +10,7 @@ public class HeroListManager : MonoBehaviour
     private DatabaseReference _dbRef;
     private string _uid;
 
+    #region Unity
     private void OnEnable()
     {
         _uid = CurrencyManager.Instance.UserID;
@@ -17,7 +18,8 @@ public class HeroListManager : MonoBehaviour
 
         StartCoroutine(RefreshHeroList());
     }
-
+    #endregion
+    
     private IEnumerator RefreshHeroList()
     {
         var ownedIds = new List<string>();
