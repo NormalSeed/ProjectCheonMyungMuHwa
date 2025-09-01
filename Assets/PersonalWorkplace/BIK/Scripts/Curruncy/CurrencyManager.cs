@@ -40,6 +40,8 @@ public class CurrencyManager : IStartable, IDisposable
     public static event Action OnInitialized;
 
     public bool IsInitialized => _initialized;
+    public DatabaseReference DbRef { get { return _dbRef; } }
+    public string UserID { get { return _uid; } }
 
     #endregion // properties
 
@@ -175,7 +177,7 @@ public class CurrencyManager : IStartable, IDisposable
         if (string.IsNullOrEmpty(_uid))
             return;
 
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo");
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo");
 
         //  기존 저장된 리스트 삭제
         partyInfoRef.RemoveValueAsync().ContinueWith(removeTask => {
@@ -196,7 +198,7 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        _dbRef.Child("users").Child(_uid).Child("charator").Child("partyInfo")
+        _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo")
             .GetValueAsync().ContinueWith(task => {
                 list.Clear();
                 var raw = task.Result.Value as List<object>;
@@ -212,11 +214,11 @@ public class CurrencyManager : IStartable, IDisposable
     /// </summary>
     /// <param name="chariID"></param>
     /// <param name="level"></param>
-    public void SaveCharatorInfoToFireBase(string chariID, int level)
+    public void SaveCharacterInfoToFireBase(string chariID, int level)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
         partyInfoRef.Child("level").SetValueAsync(level).ContinueWith(task => {
             if (task.IsFaulted)
                 return;
@@ -226,13 +228,13 @@ public class CurrencyManager : IStartable, IDisposable
     /// <summary>
     /// 캐릭터 성장정보 로딩
     /// </summary>
-    public async Task<int> LoadCharatorInfoFromFireBase(string chariID)
+    public async Task<int> LoadCharacterInfoFromFireBase(string chariID)
     {
         int level = -1;
         if (string.IsNullOrEmpty(_uid))
             return level;
 
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
         var dataSnapshot = await partyInfoRef.Child("level").GetValueAsync();
 
         if (dataSnapshot.Exists)
@@ -241,30 +243,57 @@ public class CurrencyManager : IStartable, IDisposable
     }
 
     /// <summary>
-    /// 캐릭터 돌파에 필요한 조각개수 저장
+    /// 영웅 조각정보를 불러오는 코드입니다.
     /// </summary>
-    /// <param name="piece"></param>
-    public void SaveHeroPieceToFireBase(string chariID, int piece)
+    public async Task<int> LoadPieceFromFireBase(string charID)
+    {
+        var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        var dataSnapshop = await heroIDRef.Child("heroPiece").GetValueAsync();
+
+        int heroPieceInt = Convert.ToInt32(dataSnapshop.Value);
+        return heroPieceInt;
+    }
+    /// <summary>
+    /// 영웅 조각정보를 저장하는 코드입니다.
+    /// </summary>
+    public void SavePieceToFireBase(string charID, int piece)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
-        partyInfoRef.Child("piece").SetValueAsync(piece).ContinueWith(task =>
-        {
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        partyInfoRef.Child("heroPiece").SetValueAsync(piece).ContinueWith(task => {
             if (task.IsFaulted)
                 return;
         });
     }
 
     /// <summary>
-    /// 캐릭터 돌파에 필요한 조각 개수 불러오기
+    /// 파이어베이스에서 영웅 돌파정보를 가져옵니다.
     /// </summary>
-    public void LoadHeroPieceFromFireBase(string chariID)
+    /// <param name="charID"></param>
+    /// <returns></returns>
+    public async Task<int> LoadHeroStageFromFireBase(string charID)
+    {
+        var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
+        var dataSnapshop = await heroIDRef.Child("stage").GetValueAsync();
+        return Convert.ToInt32(dataSnapshop.Value); ;
+    }
+
+    /// <summary>
+    /// 파이어베이스에 영웅 돌파정보를 저장합니다.
+    /// </summary>
+    /// <param name="chariID"></param>
+    /// <param name="level"></param>
+    public void SaveHeroStageToFireBase(string chariID, int stage)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("charator").Child("charInfo").Child(chariID);
-
+        var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(chariID);
+        partyInfoRef.Child("stage").SetValueAsync(stage).ContinueWith(task => {
+            if (task.IsFaulted)
+                return;
+        });
     }
+
     #endregion
 }
