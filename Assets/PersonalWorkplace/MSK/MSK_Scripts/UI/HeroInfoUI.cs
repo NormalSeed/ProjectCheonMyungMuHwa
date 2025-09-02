@@ -10,8 +10,6 @@ using UnityEngine.UI;
 
 public class HeroInfoUI : UIBase
 {
-    private string modelPath = "LGH/PlayerModels/";
-
     #region SerializeField
     [Header("Hero Info SO")]
     [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
@@ -89,10 +87,10 @@ public class HeroInfoUI : UIBase
     {
         // CardInfo 정보
         CardInfInit();
-        // PlayerModelSO 정보
-        await ModelInfoInit();
         // 버튼 리스너 추가
         ButtonAddListener();
+        // PlayerModelSO 정보
+        await LoadModelInfo(heroID);
         // 텍스트정보 추가
         InfoTextSetting();
         // 전투력 계산 코드
@@ -103,8 +101,6 @@ public class HeroInfoUI : UIBase
         SetBadge();             // 진영(소속) 세팅
         SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 상호작용 가능 여부
         SetRankUpInteractable(stageUPButton);  // 캐릭터 돌파버튼 상호작용 여부
-
-        Debug.Log("HeroInfoUI Init 실행됨");
     }
     private void CardInfInit()
     {
@@ -112,12 +108,20 @@ public class HeroInfoUI : UIBase
         heroStage = chardata.HeroStage;
         rarity = chardata.rarity;
         faction = chardata.faction;
+    }
+    private async Task LoadModelInfo(string heroID)
+    {
+        var handle = Addressables.LoadAssetAsync<PlayerModelSO>(heroID + "_model");
+        await handle.Task;
 
-        modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID + "_model");
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+        {
+            modelInfo = handle.Result;
+            await ModelInfoInit();
+        }
     }
     private async Task ModelInfoInit()
     {
-        heroName = modelInfo.CharName;
         // 레벨 정보 불러오고 진행
         heroLevel = await CurrencyManager.Instance.LoadCharacterInfoFromFireBase(heroID);
         HealthPoint = BigCurrency.FromBaseAmount(modelInfo.HealthPoint);
@@ -129,6 +133,8 @@ public class HeroInfoUI : UIBase
         heroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(heroID);
         ownerPiece = await CurrencyManager.Instance.LoadPieceFromFireBase(heroID);
         requirePiece = heroStage * (5 - (int)rarity);
+
+        heroName = modelInfo.CharName;
     }
     private void ButtonAddListener()
     {
