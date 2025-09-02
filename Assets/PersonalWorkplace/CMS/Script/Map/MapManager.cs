@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapManager : MonoBehaviour
@@ -14,6 +15,8 @@ public class MapManager : MonoBehaviour
 
     private int currentStageIndex = 1; // 1스테이지부터 시작
     private List<GameObject> spawnedMaps = new List<GameObject>(); // 생성된 맵 기록
+
+    [SerializeField] private GameObject[] monsterPrefabs; // 몬스터 프리팹
 
     private bool isSpawning = false;
 
@@ -41,36 +44,43 @@ public class MapManager : MonoBehaviour
         currentStageIndex++;
         SpawnStage(currentStageIndex, spawnPosition);
 
-        // 한 프레임 기다렸다가 풀어줌
-        yield return null;
+        yield return null; // 한 프레임 기다렸다가 풀어줌
         isSpawning = false;
     }
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        // 테마 인덱스 계산
+        // 맵 생성
         int themeIndex = (stageIndex - 1) / 100;
         if (themeIndex >= mapThemes.Length)
             themeIndex = mapThemes.Length - 1;
 
         string prefabName = mapThemes[themeIndex];
-
         GameObject prefab = Resources.Load<GameObject>(prefabName);
+
         if (prefab != null)
         {
             GameObject newMap = Instantiate(prefab, spawnPosition, Quaternion.identity, mapParent);
             newMap.name = $"Stage_{stageIndex}_{prefabName}";
             spawnedMaps.Add(newMap);
 
-            Debug.Log($"스테이지 {stageIndex} → {prefabName} 생성 완료");
-
-            // 오래된 맵 삭제 (5개까지만 유지)
             if (spawnedMaps.Count > 5)
             {
                 GameObject oldMap = spawnedMaps[0];
                 spawnedMaps.RemoveAt(0);
                 Destroy(oldMap);
-                Debug.Log("오래된 맵 삭제 완료");
+            }
+
+            Debug.Log($"스테이지 {stageIndex}, {prefabName} 생성 완료");
+
+            // 여기서 보스/일반 체크
+            if (stageIndex % 3 == 0)  // 스테이지마다 보스
+            {
+                PoolManager.Instance.ActiveBoss(stageIndex);
+            }
+            else
+            {
+                PoolManager.Instance.ActiveAll(stageIndex);
             }
         }
         else
