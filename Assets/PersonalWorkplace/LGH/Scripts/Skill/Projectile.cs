@@ -6,6 +6,7 @@ public class Projectile : PooledObject
 {
     protected PlayerController controller;
     protected PlayerSkillSO skillData;
+    protected Rigidbody2D rb;
 
     public float speed;
     public float range;
@@ -15,13 +16,10 @@ public class Projectile : PooledObject
     protected Vector2 fireDirection;
     protected bool isFired;
 
-    protected virtual void Start()
+    protected virtual void OnEnable()
     {
         controller = GetComponentInParent<PlayerController>();
-    }
-
-    protected void OnEnable()
-    {
+        rb = GetComponent<Rigidbody2D>();
         isFired = false;
     }
 
@@ -40,7 +38,8 @@ public class Projectile : PooledObject
     {
         if (!isFired || target == null) return;
 
-        transform.Translate(fireDirection * speed * Time.deltaTime, Space.World);
+        Vector2 newPosition = rb.position + fireDirection * speed * Time.fixedDeltaTime;
+        rb.MovePosition(newPosition);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -75,6 +74,7 @@ public class Projectile : PooledObject
         skillData = skillSO;
 
         isFired = true;
+        transform.SetParent(null);
         Debug.Log($"FireOrigin: {fireOrigin}, Target: {targetTransform.position}, Direction: {fireDirection}");
     }
 }

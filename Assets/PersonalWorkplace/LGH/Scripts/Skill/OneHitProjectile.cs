@@ -7,9 +7,9 @@ public class OneHitProjectile : Projectile
 
     private float duration;
 
-    protected override void Start()
+    protected override void OnEnable()
     {
-        base.Start();
+        base.OnEnable();
         duration = 5f;
     }
 
