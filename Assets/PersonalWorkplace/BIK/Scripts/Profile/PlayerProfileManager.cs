@@ -88,8 +88,8 @@ public class PlayerProfileManager : IStartable, IDisposable
             nickname: "새로운 모험가",
             uid: _uid,
             title: "",
-            background: "DefaultBG",       // Resources/Backgrounds/DefaultBG.png
-            profileImage: "DefaultProfile" // Resources/Profile/DefaultProfile.png
+            background: "",
+            profileImage: "C001_sprite"
         );
     }
 
