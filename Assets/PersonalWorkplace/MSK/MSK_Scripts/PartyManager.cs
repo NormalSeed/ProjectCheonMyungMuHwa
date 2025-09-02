@@ -97,7 +97,7 @@ public class PartyManager : MonoBehaviour, IStartable
         // 파티 멤버 초기화
         for (int i = 0; i < partyMembers.Count; i++)
         {
-            var controller = partyMembers[i].GetComponent<PlayerController>();
+            var controller = players[i].GetComponent<PlayerController>();
             if (controller != null)
             {
                 controller.partyNum = i;

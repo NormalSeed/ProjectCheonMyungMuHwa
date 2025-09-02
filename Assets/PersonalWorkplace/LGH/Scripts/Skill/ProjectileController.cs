@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
-    [SerializeField] private PooledObject[] projectilePrefabs;
+    [SerializeField] private GameObject[] projectilePrefabs;
     public Dictionary<string, LGH_ObjectPool> projectilePools;
 
     private SkillSet skillSet;
@@ -16,7 +16,8 @@ public class ProjectileController : MonoBehaviour
 
         foreach (var prefab in projectilePrefabs)
         {
-            var pool = new LGH_ObjectPool(transform, prefab, 5);
+            PooledObject po = prefab.GetComponent<PooledObject>();
+            var pool = new LGH_ObjectPool(transform, po, 5);
             projectilePools.Add(prefab.name, pool);
         }
     }

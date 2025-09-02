@@ -18,6 +18,13 @@ public class MonsterModelBaseSO : ScriptableObject
   public double finalDefense;
   public double finalAttackPower;
 
+  public int GoldQuant;
+  public int SpiritBackQuant;
+  public int SoulStoneQuant;
+
+  public float NormalChestDropChance;
+  public float RareChestDropChance;
+
 
 
   //초기 값부터 계산
@@ -47,6 +54,12 @@ public class MonsterModelBaseSO : ScriptableObject
     {
       finalDefense = 300 * stage;
     }
+
+    GoldQuant = stage;
+    SpiritBackQuant = stage;
+    SoulStoneQuant = stage;
+    NormalChestDropChance = 1;
+    RareChestDropChance = 1;
   }
   //다음 스테이지에 맞게 업데이트
   public void UpdateFinal(int stage)

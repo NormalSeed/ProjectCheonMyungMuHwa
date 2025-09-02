@@ -21112,6 +21112,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a08a13190ab641459cbfb4ebf78e407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &420631021 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7759986016715182575, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+  m_PrefabInstance: {fileID: 1702075909}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &444811871 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7160734919211266327, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
@@ -21394,9 +21399,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player5
       objectReference: {fileID: 0}
-    - target: {fileID: 8089584962320658526, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[5429710598101270646].m_Value
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21455,9 +21460,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player3
       objectReference: {fileID: 0}
-    - target: {fileID: 8089584962320658526, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[5429710598101270646].m_Value
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21553,6 +21558,7 @@ MonoBehaviour:
   playerCount: 0
   isBossDead: 0
   isStartReady: 0
+  stagetext: {fileID: 0}
 --- !u!4 &1331494749
 Transform:
   m_ObjectHideFlags: 0
@@ -21680,6 +21686,10 @@ PrefabInstance:
     - target: {fileID: 8089584962320658526, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
       propertyPath: m_Name
       value: Player2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[5429710598101270646].m_Value
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21810,6 +21820,11 @@ Transform:
   - {fileID: 948921550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1575925007 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6526315356739818226, guid: f35b85ec4194a4744a2bc05f7d39f15a, type: 3}
+  m_PrefabInstance: {fileID: 1731014509}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1580865347 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7160734919211266327, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
@@ -21874,32 +21889,8 @@ PrefabInstance:
       value: Player1
       objectReference: {fileID: 0}
     - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: 'managedReferences[1028523417207833570]'
-      value: 'Unity.Behavior Unity.Behavior.BlackboardVariable`1[[PlayerStates, Assembly-CSharp]]'
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: managedReferences[1028523417207833570].Name
-      value: CurState
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: m_BlackboardVariableOverridesList.Array.size
+      propertyPath: managedReferences[5429710598101270646].m_Value
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: managedReferences[1028523417207833570].m_Value
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: 'm_BlackboardVariableOverridesList.Array.data[1]'
-      value: 1028523417207833570
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: managedReferences[1028523417207833570].GUID.m_Value0
-      value: 16556224651354025114
-      objectReference: {fileID: 0}
-    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: managedReferences[1028523417207833570].GUID.m_Value1
-      value: 8129779710548472583
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22066,6 +22057,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4158260088731569080, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4158260088731569080, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4158260088731569080, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4158260088731569080, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5295959572589471107, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_Name
       value: MainSceneCanvas
@@ -22094,6 +22101,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5750192750670844274, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: 'autoInjectGameObjects.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1575925007}
     - target: {fileID: 5948048485023271002, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -22116,6 +22127,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5948048485023271002, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7746203760425477042, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8769698654928675167, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
@@ -22178,6 +22193,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 3.19
       objectReference: {fileID: 0}
+    - target: {fileID: 3130949458360777391, guid: f35b85ec4194a4744a2bc05f7d39f15a, type: 3}
+      propertyPath: goldRect
+      value: 
+      objectReference: {fileID: 420631021}
+    - target: {fileID: 3130949458360777391, guid: f35b85ec4194a4744a2bc05f7d39f15a, type: 3}
+      propertyPath: mainCanvasRect
+      value: 
+      objectReference: {fileID: 1831449192}
     - target: {fileID: 4382278023481856785, guid: f35b85ec4194a4744a2bc05f7d39f15a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -22319,6 +22342,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3431006d107786e419e37678d47c6260, type: 3}
+--- !u!224 &1831449192 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1620040997066792629, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+  m_PrefabInstance: {fileID: 1702075909}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1871353895 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7160734919211266327, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
@@ -22382,9 +22410,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player4
       objectReference: {fileID: 0}
-    - target: {fileID: 8089584962320658526, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 9164700113795773833, guid: 96e32e11b28ca344ca188e75fecda4e6, type: 3}
+      propertyPath: managedReferences[5429710598101270646].m_Value
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

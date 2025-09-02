@@ -2755,6 +2755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a40b2c1eeb5b4a85496df42367fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  datas: {fileID: 0}
 --- !u!1 &4023206290499667740
 GameObject:
   m_ObjectHideFlags: 0
@@ -3628,9 +3629,9 @@ GameObject:
   - component: {fileID: 94761623221087431}
   - component: {fileID: 8427438595419694839}
   - component: {fileID: 4460636153579323541}
-  - component: {fileID: 1522147205424402225}
+  - component: {fileID: 3911746185811965072}
   m_Layer: 10
-  m_Name: PunchBoss
+  m_Name: BowBoss
   m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6648,7 +6649,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.22, y: 2.07}
   m_EdgeRadius: 0
---- !u!114 &1522147205424402225
+--- !u!114 &3911746185811965072
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6657,12 +6658,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4999875624023369911}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9912760e5c5b90043a6dad65ee3973b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 05b10ec4acf88e94abd316869aa6e165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Spum: {fileID: 0}
   Model: {fileID: 0}
   NavAgent: {fileID: 0}
+  healthBar: {fileID: 0}
+  attackDelay: 0.3
 --- !u!1 &5244886714086304714
 GameObject:
   m_ObjectHideFlags: 0
@@ -7189,7 +7192,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -15
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 1242d9257f164482a9504def032942ed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7197,7 +7200,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6158768949475066556
@@ -7365,6 +7368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a40b2c1eeb5b4a85496df42367fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  datas: {fileID: 0}
 --- !u!1 &6487028741481439018
 GameObject:
   m_ObjectHideFlags: 0
@@ -7606,6 +7610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a40b2c1eeb5b4a85496df42367fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  datas: {fileID: 0}
 --- !u!1 &7505688696584931918
 GameObject:
   m_ObjectHideFlags: 0
@@ -8101,6 +8106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a40b2c1eeb5b4a85496df42367fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  datas: {fileID: 0}
 --- !u!1 &8691989477361617577
 GameObject:
   m_ObjectHideFlags: 0
@@ -8355,6 +8361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a40b2c1eeb5b4a85496df42367fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  datas: {fileID: 0}
 --- !u!1 &9051495899536111297
 GameObject:
   m_ObjectHideFlags: 0

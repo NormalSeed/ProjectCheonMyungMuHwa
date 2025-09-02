@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC77C\uC77C\uD018\uC2A4\uD2B8"
+  m_text: "\uC8FC\uAC04\uD018\uC2A4\uD2B8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ada6d14095912444d949013d0728dfef, type: 2}
   m_sharedMaterial: {fileID: 7863189952179728171, guid: ada6d14095912444d949013d0728dfef, type: 2}
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC77C\uC77C\uD018\uC2A4\uD2B8"
+  m_text: "\uBC18\uBCF5\uD018\uC2A4\uD2B8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ada6d14095912444d949013d0728dfef, type: 2}
   m_sharedMaterial: {fileID: 7863189952179728171, guid: ada6d14095912444d949013d0728dfef, type: 2}
@@ -647,7 +647,7 @@ GameObject:
   - component: {fileID: 4502706347068487261}
   - component: {fileID: 2549224585682048905}
   m_Layer: 5
-  m_Name: Toggle
+  m_Name: DailyToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2773,7 +2773,7 @@ GameObject:
   - component: {fileID: 7797413445445752586}
   - component: {fileID: 1702002332199953986}
   - component: {fileID: 1310804445226030163}
-  - component: {fileID: 3463379709261957904}
+  - component: {fileID: 6658213640386165993}
   m_Layer: 5
   m_Name: QuestPanel
   m_TagString: Untagged
@@ -2842,7 +2842,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3463379709261957904
+--- !u!114 &6658213640386165993
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2854,13 +2854,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d04fc0586d9f8842849960c9f9eabb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goldText: {fileID: 6056368757151079339}
+  timeText: {fileID: 466983082325866060}
   questUIPrefab: {fileID: 4999888622307801808, guid: 60c2fd27a007a234d9506f79eaa75b92, type: 3}
   contentParent: {fileID: 2695787487445155403}
-  dailyTabButton: {fileID: 0}
-  weeklyTabButton: {fileID: 0}
-  repeatTabButton: {fileID: 0}
-  activeColor: {r: 0.29, g: 0.56, b: 0.89, a: 1}
-  inactiveColor: {r: 0.87, g: 0.87, b: 0.87, a: 1}
+  dailyToggle: {fileID: 122987564944106934}
+  weeklyToggle: {fileID: 3890998159937081919}
+  repeatToggle: {fileID: 7658188341071086891}
+  exitButton: {fileID: 8403991263154722412}
 --- !u!1 &5130475247267824815
 GameObject:
   m_ObjectHideFlags: 0
@@ -2910,7 +2911,7 @@ GameObject:
   - component: {fileID: 1800359874022890043}
   - component: {fileID: 1682729955457184743}
   m_Layer: 5
-  m_Name: Toggle (2)
+  m_Name: RepeatToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3248,7 +3249,7 @@ GameObject:
   - component: {fileID: 8402790789523776396}
   - component: {fileID: 5375653082434665209}
   m_Layer: 5
-  m_Name: Toggle (1)
+  m_Name: WeeklyToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4501,6 +4502,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
+--- !u!114 &6056368757151079339 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8624420201437250817, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
+  m_PrefabInstance: {fileID: 2575094926863589034}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7608803418044684934 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5344494386590352428, guid: 57fde5bcc9a3614498a628848223f084, type: 3}

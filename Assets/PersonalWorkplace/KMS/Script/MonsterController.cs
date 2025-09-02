@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using Unity.Behavior;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.Controls;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
@@ -15,6 +17,10 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public NavMeshAgent NavAgent;
     protected WaitForSeconds hurtWfs;
     protected Coroutine hurtCo;
+
+    [SerializeField] protected Image healthBar;
+
+    [SerializeField] protected float attackDelay;
 
     protected WaitForSeconds RealAttackDelay;
 
@@ -28,6 +34,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         if (Model.BaseModel != null)
         {
             SetValue();
+            InGameManager.Instance.monsterDeathStack.Value++;
         }
     }
     protected virtual void InitComponent()
@@ -41,10 +48,12 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         Model.CurHealth = new ObservableProperty<double>(10f);
         NavAgent.updateRotation = false;
         NavAgent.updateUpAxis = false;
+        RealAttackDelay = new WaitForSeconds(attackDelay);
     }
     protected virtual void SetValue()
     {
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
+        healthBar.fillAmount = 1;
         treeAgent.SetVariableValue<float>("MoveSpeed", Model.BaseModel.MoveSpeed);
         treeAgent.SetVariableValue<float>("AttackDistance", Model.BaseModel.AttackDistance);
         treeAgent.SetVariableValue<float>("AttackDistanceWithClearance", Model.BaseModel.AttackDistanceWithClearance);
@@ -59,6 +68,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public void TakeDamage(double amount)
     {
         OnTakeDamage(amount);
+        SetHealthBar();
     }
     protected virtual void OnTakeDamage(double amount)
     {
@@ -82,11 +92,13 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public virtual void OnDeath()
     {
+        InGameManager.Instance.monsterDeathStack.Value--;
         StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
-        QuestManager.Instance.UpdateQuest("Monster", 1);
+        //QuestManager.Instance.UpdateQuest("Monster", 1);
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
+    protected abstract IEnumerator RealAttackRoutine(IDamagable target);
 
 
 
@@ -99,13 +111,34 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected virtual IEnumerator DeathRoutine()
     {
         Spum.PlayAnimation(PlayerState.DEATH, 0);
-        for (int i = 0; i < 5; i++)
-        {
-            DroppedItem item = PoolManager.Instance.ItemPool.GetItem(transform.position);
-            item.Shot();
-        }
+        DropItem();
         yield return new WaitForSeconds(2);
         treeAgent.End();
         OnLifeEnded?.Invoke(this);
+    }
+
+    protected virtual void DropItem()
+    {
+        DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+        i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
+        DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+        i2.Init(DroppedItemType.SpiritBack, Model.BaseModel.SpiritBackQuant);
+        DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+        i3.Init(DroppedItemType.SoulStone, Model.BaseModel.SoulStoneQuant);
+        i1.Shot(); i2.Shot(); i3.Shot();
+        
+        DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+        i4.Init(DroppedItemType.NormalChest, 1);
+         i4.Shot();
+
+
+    }
+
+    private void SetHealthBar()
+    {
+        double val = Model.CurHealth.Value / Model.BaseModel.finalMaxHealth;
+        float v = (float)val;
+        float res = Mathf.Max(0, v);
+        healthBar.fillAmount = res;
     }
 }

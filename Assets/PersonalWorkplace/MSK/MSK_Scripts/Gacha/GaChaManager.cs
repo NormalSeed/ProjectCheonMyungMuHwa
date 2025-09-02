@@ -1,10 +1,13 @@
 using Firebase.Auth;
 using Firebase.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class GachaManager : MonoBehaviour
 {
@@ -14,8 +17,8 @@ public class GachaManager : MonoBehaviour
 
 
     #region FireBase Properties
-    private string _uid;               
-    private DatabaseReference _dbRef;  
+    private string _uid;
+    private DatabaseReference _dbRef;
 
     private float summonNormal;             // 노말 소환확률           
     private float summonRare;               // 레어 소환확률
@@ -38,12 +41,24 @@ public class GachaManager : MonoBehaviour
         };
     }
 
+    // 영웅 조각 반환 매칭용
+    private int GetPieceAmountByRarity(HeroRarity rarity)
+    {
+        switch (rarity)
+        {
+            case HeroRarity.Normal: return 1;
+            case HeroRarity.Rare: return 3;
+            case HeroRarity.Epic: return 5;
+            case HeroRarity.Unique: return 10;
+            default: return 0;
+        }
+    }
     #region Unity LifeCycle
 
-    private  async void OnEnable()
+    private async void OnEnable()
     {
-        _uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "dev-local-test";
-        _dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        _uid = CurrencyManager.Instance.UserID;
+        _dbRef = CurrencyManager.Instance.DbRef;
 
         await LoadUserDataAsync();
         await LoadSummonConfigAsync();
@@ -84,6 +99,7 @@ public class GachaManager : MonoBehaviour
         return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
     }
 
+    // 카드 정보 표기
     private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
     {
         string addressKey = rarity switch
@@ -94,16 +110,18 @@ public class GachaManager : MonoBehaviour
             "Epic" => "C004CardInfo",
         };
 
-        var handle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<CardInfo>(addressKey);
+        var handle = Addressables.LoadAssetAsync<CardInfo>(addressKey);
 
         await handle.Task;
-        if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+        if (handle.Status == AsyncOperationStatus.Succeeded)
             return handle.Result;
 
         Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {addressKey} 로드 실패");
         return null;
     }
-    public async void Summon(int times)
+
+    // 실제 소환 코드
+    public async Task Summon(int times)
     {
         if (userSummonCount >= requireSummonCount)
         {
@@ -128,12 +146,16 @@ public class GachaManager : MonoBehaviour
             }
         }
 
-        await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
+        await SaveUserSummonCountAsync();
         resultUI.ShowSummonResult(results);
+        StartCoroutine(ProcessResultsCoroutine(results));
+        await SaveGachaHistoryAsync(results);
     }
 
+    //  소환레벨 업
     private async Task LevelUpAsync()
     {
+        // 1~9까지만 처리
         if (userSummonLevel < SummonLevel.level10)
         {
             userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
@@ -144,6 +166,7 @@ public class GachaManager : MonoBehaviour
         }
     }
 
+    //  소환 확률 결정
     private string DrawOne()
     {
         var weightPool = GetWeightPool();
@@ -156,6 +179,75 @@ public class GachaManager : MonoBehaviour
             random -= keyValue.Value;
         }
         return weightPool.Keys.Last();
+    }
+
+    //  소환기록 저장하기
+    private async Task SaveGachaHistoryAsync(List<CardInfo> results)
+    {
+        var historyRef = _dbRef.Child("users").Child(_uid).Child("summonHistory");
+
+        foreach (var card in results)
+        {
+            string key = historyRef.Push().Key;
+
+            var data = new Dictionary<string, object>
+        {
+            { "timestamp", ServerValue.Timestamp },
+            { "heroID", card.HeroID },
+
+        };
+
+            await historyRef.Child(key).SetValueAsync(data);
+        }
+    }
+
+    // 영웅정보를 업로드하는 코드
+    private async Task ProcessGachaResultAsync(CardInfo card)
+    {
+        var charRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(card.HeroID);
+
+        // 보유 여부 확인
+        var hasHeroSnap = await charRef.Child("hasHero").GetValueAsync();
+        bool hasHero = hasHeroSnap.Exists && Convert.ToBoolean(hasHeroSnap.Value);
+
+        if (!hasHero)
+        {
+            Debug.Log("영웅 최초 처리");
+            // 캐릭터 최초 획득 시 정보 등록
+            var newHeroData = new Dictionary<string, object>
+            {
+                { "hasHero", true },
+                { "heroPiece", 0 }, // 조각은 0부터 시작
+                { "stage", 1 },
+                { "rarity", card.rarity.ToString() }
+            };
+
+            await charRef.UpdateChildrenAsync(newHeroData);
+        }
+        else
+        {
+            // 중복 획득: 조각 추가
+            var pieceSnap = await charRef.Child("heroPiece").GetValueAsync();
+            int currentPiece = pieceSnap.Exists ? Convert.ToInt32(pieceSnap.Value) : 0;
+            int addedPiece = GetPieceAmountByRarity(card.rarity); // 레어도에 따라 조각 수 결정
+
+            Debug.Log($"[조각 추가] {card.HeroID} → 기존: {currentPiece}, 추가: {addedPiece}, 최종: {currentPiece + addedPiece}");
+           
+            await charRef.Child("heroPiece").SetValueAsync(currentPiece + addedPiece);
+        }
+    }
+    // 영웅 조각 정보를 업로드하는 코루틴
+    private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
+    {
+        foreach (var info in results)
+        {
+            var task = ProcessGachaResultAsync(info);
+            while (!task.IsCompleted)
+                yield return null;
+            if (task.IsFaulted)
+                Debug.LogError($"ProcessGachaResultAsync 실패: {task.Exception}");
+        }
+        Debug.Log("모든 결과 처리 완료");
     }
     #endregion
 }
