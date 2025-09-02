@@ -17,7 +17,8 @@ public class PunchOrcController : MonsterController
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);
             DamageText text = PoolManager.Instance.DamagePool.GetItem((target as PlayerController).transform.position);
-            text.SetText(Model.BaseModel.finalAttackPower);
+            text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
+            
         }
 
     }
