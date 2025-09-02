@@ -162,6 +162,11 @@ public class PoolManager : MonoBehaviour
 
     }
 
+    public void MoveTo(Vector2 pos)
+    {
+        transform.position = pos;
+    }
+
 
 
 }

@@ -77,6 +77,17 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     }
     private void AddCurrency()
     {
-        CurrencyManager.Instance.Add(CurrencyType.Gold, new BigCurrency(quantity));
+        if (type == DroppedItemType.Gold)
+        {
+            CurrencyManager.Instance.Add(CurrencyType.Gold, new BigCurrency(quantity));
+        }
+        else if (type == DroppedItemType.SpiritBack)
+        {
+            CurrencyManager.Instance.Add(CurrencyType.Soul, new BigCurrency(quantity));
+        }
+        else if (type == DroppedItemType.SoulStone)
+        {
+            CurrencyManager.Instance.Add(CurrencyType.SpiritStone, new BigCurrency(quantity));
+        }
     }
 }

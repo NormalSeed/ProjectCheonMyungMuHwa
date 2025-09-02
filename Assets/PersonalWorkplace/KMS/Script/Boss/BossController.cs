@@ -80,7 +80,7 @@ public abstract class BossController : MonsterController
         {
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
             DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
-            text.SetText(Model.BaseModel.finalAttackPower);
+            text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
     }
 
