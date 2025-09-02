@@ -3,19 +3,13 @@ using UnityEngine;
 
 public class PunchOrcController : MonsterController
 {
-
-    protected override void InitComponent()
-    {
-        base.InitComponent();
-        RealAttackDelay = new WaitForSeconds(0.15f);
-    }
     public override void OnAttack(GameObject me, IDamagable target)
     {
         Spum.PlayAnimation(PlayerState.ATTACK, 0);
         StartCoroutine(RealAttackRoutine(target));
     }
 
-    private IEnumerator RealAttackRoutine(IDamagable target)
+    protected override IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return RealAttackDelay;
         AudioManager.Instance.PlaySound("Punch_Attack");
@@ -23,7 +17,8 @@ public class PunchOrcController : MonsterController
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);
             DamageText text = PoolManager.Instance.DamagePool.GetItem((target as PlayerController).transform.position);
-            text.SetText(Model.BaseModel.finalAttackPower);
+            text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
+            
         }
 
     }

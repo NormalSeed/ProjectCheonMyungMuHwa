@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,8 @@ public class SummonUI : UIBase
     [SerializeField] private GachaManager gachaManager;     // 가챠 메니저
     [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
 
+    [Header("Slider")]
+    [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
 
     #endregion
 
@@ -79,10 +82,10 @@ public class SummonUI : UIBase
 
     
     #region private
-    private void SummonHeros(int times)
+    private async Task SummonHeros(int times)
     {
         summonResultUI.gameObject.SetActive(true);
-        gachaManager.Summon(times);
+        await gachaManager.Summon(times);
     }
 
     private void ChangeButtonText(TextMeshProUGUI text)

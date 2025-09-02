@@ -34,13 +34,15 @@ public class LGH_ObjectPool
         if (pool.Count == 0) CreatePooledObject();
 
         PooledObject obj = pool.Pop();
+        //obj.transform.SetParent(null);
         obj.gameObject.SetActive(true);
         return obj;
     }
 
     private void CreatePooledObject()
     {
-        PooledObject obj = MonoBehaviour.Instantiate(prefab);
+        GameObject objGO = MonoBehaviour.Instantiate(prefab.gameObject); // GameObject 기준으로 복제
+        PooledObject obj = objGO.GetComponent<PooledObject>();           // 다시 컴포넌트 꺼내기
         obj.PooledInit(this);
         PushPool(obj);
     }

@@ -68,8 +68,6 @@ public class PlayerProfileUI : UIBase
 
     private void OnEnable()
     {
-        Debug.Log("11111");
-
         LoadProfileFromServer();
         ToggleNicknameEdit(false);
 

@@ -22,9 +22,9 @@ public class DamageText : MonoBehaviour, IPooled<DamageText>
         timer += Time.deltaTime;
         transform.position += Vector3.up * Time.deltaTime;
     }
-    public void SetText(double damage)
+    public void SetText(string damage)
     {
-        damageText.text = damage.ToString();
+        damageText.text = damage;
     }
 
     void OnEnable()

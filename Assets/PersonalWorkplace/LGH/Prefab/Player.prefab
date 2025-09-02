@@ -53,6 +53,7 @@ MonoBehaviour:
   m_Graph: {fileID: 7606715451951034946, guid: 11c0b208cd9663143874c8c9eb46619d, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 1028523189753872668
+  - rid: 5429710598101270646
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -66,6 +67,14 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 8089584962320658526}
+    - rid: 5429710598101270646
+      type: {class: 'BlackboardVariable`1[[PlayerStates, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 16556224651354025114
+          m_Value1: 8129779710548472583
+        Name: CurState
+        m_Value: 2
 --- !u!114 &7160734919211266327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +91,7 @@ MonoBehaviour:
   view: {fileID: 0}
   skillSet: {fileID: 1292851195521690489, guid: 8c3154d7ae3a9514e902feb50223c763, type: 3}
   SPUMAsset: {fileID: 0}
+  spumController: {fileID: 0}
   partyNum: 0
   isSkillReady: 1
   isSkill1Ready: 1
@@ -112,7 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0a1e818274cbc43886d0e6dfcff656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelSO: {fileID: 11400000, guid: 6f109a1e9398f0c41969b9b397a5fe24, type: 2}
+  modelSO: {fileID: 0}
 --- !u!50 &1666091133234881422
 Rigidbody2D:
   serializedVersion: 5

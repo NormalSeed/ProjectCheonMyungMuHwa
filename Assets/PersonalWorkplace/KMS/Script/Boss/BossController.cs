@@ -2,6 +2,8 @@ using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
+using VContainer;
+using UnityEngine.UI;
 
 public enum MonsterAnimationState
 {
@@ -17,9 +19,17 @@ public abstract class BossController : MonsterController
 {
     private bool isInvulnerable;
     public System.Action OnSpawnAmimEnd;
+
+    [Inject]
+    public void Construct(Image bossbar)
+    {
+        healthBar = bossbar;
+    }
     protected override void SetValue()
     {
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
+        healthBar.fillAmount = 1;
+        healthBar.transform.parent.gameObject.SetActive(true);
         treeAgent.SetVariableValue<float>("AttackDelay", Model.BaseModel.AttackDelay);
         treeAgent.SetVariableValue<BossController>("Controller", this);
         treeAgent.Restart();
@@ -32,13 +42,15 @@ public abstract class BossController : MonsterController
     public override void OnDeath()
     {
         InGameManager.Instance.SetNextStage();
+        InGameManager.Instance.monsterDeathStack.Value--;
+        healthBar.transform.parent.gameObject.SetActive(false);
         AudioManager.Instance.PlaySound("Monster_Dead");
         StartCoroutine(DeathRoutine());
     }
     private IEnumerator SpawnRoutine()
     {
         ParticleSystem part = ParticleManager.Instance.GetParticle("CFXR2 Firewall A", transform.position);
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 10; i++)
         {
             if (i % 2 == 0)
             {
@@ -58,6 +70,18 @@ public abstract class BossController : MonsterController
     {
         if (isInvulnerable) return;
         base.OnTakeDamage(amount);
+    }
+
+    protected override IEnumerator RealAttackRoutine(IDamagable target)
+    {
+        yield return RealAttackDelay;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject go in players)
+        {
+            go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
+            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
+            text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
+        }
     }
 
     //private void SetAnimation(MonsterAnimationState state)
