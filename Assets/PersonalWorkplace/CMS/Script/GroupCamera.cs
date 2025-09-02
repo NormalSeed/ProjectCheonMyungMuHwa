@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GroupCamera2D : MonoBehaviour
@@ -30,6 +31,9 @@ public class GroupCamera2D : MonoBehaviour
         Vector3 centerPoint = GetCenterPoint();
         Vector3 newPosition = centerPoint + offset;
 
+        // Z축 고정
+        newPosition.z = -10f;
+
         transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref velocity, smoothTime);
     }
 
@@ -43,24 +47,48 @@ public class GroupCamera2D : MonoBehaviour
 
     float GetGreatestDistance()
     {
-        var bounds = new Bounds(units[0].position, Vector3.zero);
+        List<Transform> activeUnits = new();
+
         foreach (var unit in units)
+        {
+            if (unit != null && unit.gameObject.activeSelf)
+                activeUnits.Add(unit);
+        }
+
+        if (activeUnits.Count == 0)
+            return 0f;
+
+        var bounds = new Bounds(activeUnits[0].position, Vector3.zero);
+        foreach (var unit in activeUnits)
         {
             bounds.Encapsulate(unit.position);
         }
-        return Mathf.Max(bounds.size.x, bounds.size.y); // 2D니까 x,y 기준
+
+        return Mathf.Max(bounds.size.x, bounds.size.y); // 2D니까 x, y 기준
     }
 
     Vector3 GetCenterPoint()
     {
-        if (units.Length == 1)
-            return units[0].position;
+        List<Transform> activeUnits = new();
 
-        var bounds = new Bounds(units[0].position, Vector3.zero);
         foreach (var unit in units)
+        {
+            if (unit != null && unit.gameObject.activeSelf)
+                activeUnits.Add(unit);
+        }
+
+        if (activeUnits.Count == 0)
+            return transform.position; // 아무것도 없으면 현재 위치 유지
+
+        if (activeUnits.Count == 1)
+            return activeUnits[0].position;
+
+        var bounds = new Bounds(activeUnits[0].position, Vector3.zero);
+        foreach (var unit in activeUnits)
         {
             bounds.Encapsulate(unit.position);
         }
+
         return bounds.center;
     }
 }
