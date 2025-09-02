@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using VContainer.Unity;
 
 
 public class HeroUI : UIBase
@@ -13,6 +11,7 @@ public class HeroUI : UIBase
     [SerializeField] private Button heroSet;            // 파티편성 시작
     [SerializeField] private Button autoSet;            // 파티 자동편성
     [SerializeField] private Button heroSetSave;        // 편성파티 저장
+    [SerializeField] private Button heroSetEnd;         // 파티 편성 취소
 
     [Header("Root References")]
     [SerializeField] private Transform IsHeroSetting;
@@ -21,11 +20,10 @@ public class HeroUI : UIBase
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
     public event Action partySetFin;
+
     #region Unity LifeCycle
-    public void Start()
-    {
-        
-    }
+
+    public void Start() { }
 
     private void OnEnable()
     {
@@ -43,13 +41,19 @@ public class HeroUI : UIBase
 
 
     #region Button OnClick
-    
-    //  자동 승급
+
+    //  자동 승급 
     private void onClickStageUpgrade()
     {
         stageUpgrade.gameObject.SetActive(false);
         // 승급 완료 후 버튼 비활성화
         stageUpgrade.onClick.RemoveListener(onClickStageUpgrade);
+    }
+
+    //  영웅 자동 배치
+    private void OnClickAutoSet()
+    {
+        // 규칙에 따라서 영웅을 자동으로 배치
     }
 
 
@@ -70,11 +74,6 @@ public class HeroUI : UIBase
         autoSet.onClick.AddListener(OnClickAutoSet);
     }
 
-    //  영웅 자동 배치
-    private void OnClickAutoSet()
-    {
-        // 규칙에 따라서 영웅을 자동으로 배치
-    }
 
     //  영웅 배치 저장
     private void OnClickHeroSetSave()
@@ -86,13 +85,14 @@ public class HeroUI : UIBase
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
-       
+
         PartyManager.Instance.EndPartySetting();    // 편성 종료
         PartyManager.Instance.PartyInit();
 
-        partySetFin?.Invoke();
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
+
+        partySetFin?.Invoke();
     }
     #endregion
 }
