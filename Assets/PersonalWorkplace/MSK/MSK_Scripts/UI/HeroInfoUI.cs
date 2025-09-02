@@ -10,8 +10,6 @@ using UnityEngine.UI;
 
 public class HeroInfoUI : UIBase
 {
-    private string modelPath = "LGH/PlayerModels/";
-
     #region SerializeField
     [Header("Hero Info SO")]
     [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
@@ -113,7 +111,17 @@ public class HeroInfoUI : UIBase
         rarity = chardata.rarity;
         faction = chardata.faction;
 
-        modelInfo = Resources.Load<PlayerModelSO>(modelPath + heroID + "_model");
+        LoadModelInfo(heroID);
+    }
+    private void LoadModelInfo(string heroID)
+    {
+        Addressables.LoadAssetAsync<PlayerModelSO>(heroID + "_model").Completed += task =>
+        {
+            if (task.Status == AsyncOperationStatus.Succeeded)
+            {
+                modelInfo = task.Result;
+            }
+        };
     }
     private async Task ModelInfoInit()
     {
