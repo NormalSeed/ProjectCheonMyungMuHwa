@@ -10,6 +10,8 @@ public static class QuestDatabase
 
     public static void LoadAll()
     {
+        Debug.Log("=== [QuestDatabase.LoadAll 호출됨] ===");
+
         LoadFromCSV("QuestTable_Day", QuestCategory.Daily, DailyQuests);
         LoadFromCSV("QuestTable_Week", QuestCategory.Weekly, WeeklyQuests);
         LoadFromCSV("QuestTable_Repeat", QuestCategory.Repeat, RepeatQuests);
@@ -30,40 +32,45 @@ public static class QuestDatabase
 
         string[] lines = csvFile.text.Split('\n');
 
-        // 0번줄은 헤더니까 i=1부터 시작
-        for (int i = 1; i < lines.Length; i++)
+        for (int i = 1; i < lines.Length; i++) // 첫 줄은 헤더
         {
             if (string.IsNullOrWhiteSpace(lines[i])) continue;
 
             string[] values = lines[i].Split(',');
-            if (values.Length < 11) continue;
+            if (values.Length < 8) // 최소 정의 컬럼 개수
+            {
+                Debug.LogWarning($"[{category}] {fileName} 줄 {i} 건너뜀 (컬럼 부족)");
+                continue;
+            }
 
             var quest = new Quest
             {
                 questID = values[0].Trim(),
                 questName = values[1].Trim(),
-                questType = category,  // CSV에 있는 Type(2)은 무시하고, 불러올 때 카테고리 지정
+                questType = category,
                 questTarget = Enum.TryParse(values[3].Trim(), out QuestTargetType targetType)
                                 ? targetType : QuestTargetType.None,
-                valueProgress = int.Parse(values[4].Trim()),
-                valueGoal = int.Parse(values[5].Trim()),
-                isComplete = values[6].Trim().ToUpper() == "TRUE",
-                isClaimed = values[7].Trim().ToUpper() == "TRUE",
+
+                // CSV에 없는 값, 기본 초기화
+                valueProgress = 0,
+                valueGoal = int.Parse(values[4].Trim()),
+                isComplete = false,
+                isClaimed = false,
+
                 lastUpdated = DateTime.UtcNow,
                 lastWeek = GetWeekOfYearUTC(DateTime.UtcNow)
             };
 
-            // 보상 파싱 (기존 rewardID, rewardType, rewardCount)
-            // 지금은 단일 보상만 파싱하지만, 여러 개 확장 가능
             var reward = new Reward
             {
-                rewardID = values[8].Trim(),
-                rewardType = (RewardType)int.Parse(values[9].Trim()),
-                rewardCount = int.Parse(values[10].Trim())
+                rewardID = values[5].Trim(),
+                rewardType = (RewardType)int.Parse(values[6].Trim()),
+                rewardCount = int.Parse(values[7].Trim())
             };
             quest.rewards.Add(reward);
 
             targetList.Add(quest);
+            Debug.Log($"[{category}] {quest.questID} / {quest.questName}");
         }
     }
 
