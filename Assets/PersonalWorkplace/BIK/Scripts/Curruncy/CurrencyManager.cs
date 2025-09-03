@@ -306,7 +306,6 @@ public class CurrencyManager : IStartable, IDisposable
     {
         if (string.IsNullOrEmpty(_uid))
             return -1;
-        Debug.Log($"[LoadSummonLevelFromFireBase] : UID : {_uid} ");
         var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
         var dataSnapshop = await profileRef.Child("summonLevel").GetValueAsync();
         int level = Convert.ToInt32(dataSnapshop.Value);

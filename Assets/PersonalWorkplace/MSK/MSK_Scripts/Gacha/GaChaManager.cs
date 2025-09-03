@@ -14,7 +14,7 @@ public class GachaManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private SummonResultUI resultUI;
 
-
+    public event Action OnGachaCompleted;
 
     #region FireBase Properties
     private string _uid;
@@ -248,6 +248,7 @@ public class GachaManager : MonoBehaviour
                 Debug.LogError($"ProcessGachaResultAsync 실패: {task.Exception}");
         }
         Debug.Log("모든 결과 처리 완료");
+        OnGachaCompleted?.Invoke();
     }
     #endregion
 }
