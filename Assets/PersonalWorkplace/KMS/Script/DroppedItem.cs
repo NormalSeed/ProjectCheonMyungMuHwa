@@ -47,7 +47,7 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     {
         throwing = false;
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(pos, 1));
+        seq.Append(transform.DOMove(pos, 0.5f));
         seq.OnComplete(() =>
         {
             AddCurrency();
