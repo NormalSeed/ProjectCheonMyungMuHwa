@@ -57,6 +57,12 @@ public class PartyManager : MonoBehaviour, IStartable
             int listOrder = partyMembers.Count - 1;
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
+            // 여기서 InGameManager의 alignPoint의 AlignPoint 컴포넌트의 AlignPoints 리스트의 오브젝트 중 동일한 순서에 있는 포인트의 position을 가져와서 controller를 옮겨준다.
+            AlignPoint points = InGameManager.Instance.alignPoint.GetComponent<AlignPoint>();
+            Vector3 position = points.alignPoints[listOrder].transform.position;
+
+            controller.transform.position = position;
+
             controller.gameObject.SetActive(true);
 
             if (controller != null)
