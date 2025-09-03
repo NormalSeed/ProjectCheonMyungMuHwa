@@ -98,11 +98,19 @@ public class SummonUI : UIBase
     {
         summonCount = await CurrencyManager.Instance.LoadSummonCountFromFireBase();
         int levelValue = await CurrencyManager.Instance.LoadSummonLevelFromFireBase();
+        requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
+
         userSummonLevel = (SummonLevel)levelValue;
         Debug.Log($"[levelValue] : {levelValue}");
         summonLevelText.text = "영웅 뽑기 레벨 " + levelValue.ToString();
-    }
 
+        UpdateSummonSlider();
+    }
+    private void UpdateSummonSlider()
+    {
+        summonSlider.maxValue = requireCount;
+        summonSlider.value = summonCount;
+    }
     private async Task SummonHeros(int times)
     {
         summonResultUI.gameObject.SetActive(true);

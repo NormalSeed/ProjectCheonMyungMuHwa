@@ -323,14 +323,13 @@ public class CurrencyManager : IStartable, IDisposable
         return Count;
     }
 
-    public async Task<int> LoadRequireCountFromFireBase(int level)
+    public async Task<int> LoadRequireCountFromFireBase(string level)
     {
         if (string.IsNullOrEmpty(_uid))
             return -1;
-        var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
-        var dataSnapshop = await profileRef.Child("summonCount").GetValueAsync();
-        int Count = Convert.ToInt32(dataSnapshop.Value);
-        return Count;
+        var dataSnapshop = await _dbRef.Child("summon").Child(level).Child("count").GetValueAsync();
+        int count = Convert.ToInt32(dataSnapshop.Value);
+        return count;
     }
     #endregion
 }
