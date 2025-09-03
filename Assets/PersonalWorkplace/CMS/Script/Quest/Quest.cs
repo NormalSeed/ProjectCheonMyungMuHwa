@@ -116,13 +116,13 @@ public enum QuestCategory
 
 public enum QuestTargetType
 {
-    None = 0,       // DB에서 매핑 안되는 경우 fallback
-    OnLogin = 1,    // 접속 시 달성
-    Collect = 2,    // 아이템/재화 수집
-    Kill = 3,       // 몬스터 처치
-    Explore = 4,    // 탐험
-    StageClear = 5, // 특정 스테이지 클리어
-    LevelReach = 6  // 특정 레벨 도달
+    None,
+    Onlogin,
+    Monster,
+    Summon,
+    Training,
+    Upgrade,
+    Playtime
 }
 
 public enum RewardType

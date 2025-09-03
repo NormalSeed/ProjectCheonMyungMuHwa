@@ -18,6 +18,10 @@ public class QuestManager : MonoBehaviour
     public Quest SelectedQuest { get; private set; }
     public bool IsReady { get; private set; } = false;
 
+    private float playtimeBuffer = 0f;    // 누적 시간(초)
+    private float saveInterval = 30f;     // 30초마다 Firebase 저장
+    private float saveTimer = 0f;
+
     //UI 갱신용 이벤트
     public event Action OnQuestsUpdated;
 
@@ -28,6 +32,27 @@ public class QuestManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
+     private void Update()
+    {
+        // --- Playtime 진행도 누적 ---
+        playtimeBuffer += Time.deltaTime;
+        if (playtimeBuffer >= 1f)
+        {
+            int seconds = Mathf.FloorToInt(playtimeBuffer);
+            playtimeBuffer -= seconds;
+
+            // 진행도는 바로 업데이트
+            ReportEvent(QuestTargetType.Playtime, seconds, saveImmediately: false);
+        }
+
+        // --- 주기적 저장 ---
+        saveTimer += Time.deltaTime;
+        if (saveTimer >= saveInterval)
+        {
+            saveTimer = 0f;
+            SaveQuests();
+        }
     }
     public void InitializeAfterLogin()
     {
@@ -40,11 +65,37 @@ public class QuestManager : MonoBehaviour
             FetchServerTimeOffset(() =>
             {
                 LoadQuests();
+
+                // 로그인 퀘스트 진행도 보고
+                ReportEvent(QuestTargetType.Onlogin);
             });
         }
         else
         {
             Debug.LogError("BackendManager 준비 안됨");
+        }
+    }
+    private void HandleLoginQuest()
+    {
+        DateTime now = NowUtc();
+
+        // 오늘 날짜 기준으로 이미 카운트했는지 체크
+        foreach (var quest in activeQuests.Values)
+        {
+            if (quest.questTarget == QuestTargetType.Onlogin && quest.questType == QuestCategory.Daily)
+            {
+                if (quest.lastUpdated.Date < now.Date)
+                {
+                    // 오늘은 아직 로그인 보상 미처리 → 카운트 증가
+                    ReportEvent(QuestTargetType.Onlogin);
+                    quest.lastUpdated = now; // 오늘 처리한 걸로 갱신
+                    SaveQuests();
+                }
+                else
+                {
+                    Debug.Log("오늘 이미 로그인 퀘스트 처리됨");
+                }
+            }
         }
     }
     private void FetchServerTimeOffset(Action onDone)
@@ -77,6 +128,10 @@ public class QuestManager : MonoBehaviour
         activeQuests.Clear();
         foreach (var quest in QuestDatabase.DailyQuests.Concat(QuestDatabase.WeeklyQuests).Concat(QuestDatabase.RepeatQuests))
             activeQuests[quest.questID] = quest;
+        Debug.Log($"[로드 직후] activeQuests = {activeQuests.Count}개 " +
+            $"(Daily={activeQuests.Values.Count(q => q.questType == QuestCategory.Daily)}, " +
+            $"Weekly={activeQuests.Values.Count(q => q.questType == QuestCategory.Weekly)}, " +
+            $"Repeat={activeQuests.Values.Count(q => q.questType == QuestCategory.Repeat)})");
 
         string userId = BackendManager.Auth.CurrentUser.UserId;
         dbRef.Child("users").Child(userId).Child("quests")
@@ -100,20 +155,21 @@ public class QuestManager : MonoBehaviour
                 foreach (var kvp in dict)
                 {
                     string questId = kvp.Key;
-                    var progressData = kvp.Value;
+                    var progress = kvp.Value;
 
                     if (activeQuests.TryGetValue(questId, out var localQuest))
                     {
-                        // Firebase 진행상황 반영
-                        localQuest.valueProgress = progressData.progress;
-                        localQuest.isComplete = progressData.isComplete;
-                        localQuest.isClaimed = progressData.isClaimed;
-                        localQuest.lastUpdated = new DateTime(progressData.lastUpdated, DateTimeKind.Utc);
-                        localQuest.lastWeek = progressData.lastWeek;
+                        localQuest.valueProgress = progress.progress;
+                        localQuest.isComplete = progress.isComplete;
+                        localQuest.isClaimed = progress.isClaimed;
+                        localQuest.lastUpdated = new DateTime(progress.lastUpdated, DateTimeKind.Utc);
+                        localQuest.lastWeek = progress.lastWeek;
+
+                        Debug.Log($"[병합] {questId} 진행도 {progress.progress}, 완료={progress.isComplete}, 보상={progress.isClaimed}");
                     }
                     else
                     {
-                        Debug.LogWarning($"서버에만 존재하는 퀘스트 발견: {questId}, CSV에 없음, 무시");
+                        Debug.LogWarning($"CSV에 없는 퀘스트 발견: {questId}, Firebase 데이터 추가");
                     }
                 }
 
@@ -287,9 +343,9 @@ public class QuestManager : MonoBehaviour
 
     public List<Quest> GetQuestsByCategory(QuestCategory type)
     {
-        return activeQuests.Values
-            .Where(q => q.questType == type)
-            .ToList();
+        var list = activeQuests.Values.Where(q => q.questType == type).ToList();
+        Debug.Log($"[GetQuestsByCategory] {type}, {list.Count}개 반환");
+        return list;
     }
     public string GetRemainingTimeFormatted(QuestCategory category)
     {
@@ -324,6 +380,28 @@ public class QuestManager : MonoBehaviour
     public void SetSelectedQuest(Quest quest)
     {
         SelectedQuest = quest;
+    }
+    public void ReportEvent(QuestTargetType type, int amount = 1, bool saveImmediately = true)
+    {
+        var matchedQuests = activeQuests.Values
+            .Where(q => q.questTarget == type && !q.isComplete);
+
+        foreach (var quest in matchedQuests)
+        {
+            quest.valueProgress += amount;
+            if (quest.valueProgress >= quest.valueGoal)
+            {
+                quest.valueProgress = quest.valueGoal;
+                CompleteQuest(quest);
+            }
+            else
+            {
+                quest.lastUpdated = NowUtc();
+                if (saveImmediately) SaveQuests(); // 필요 시만 즉시 저장
+                OnQuestsUpdated?.Invoke();
+                Debug.Log($"[ReportEvent] {type} → {quest.questName}: {quest.valueProgress}/{quest.valueGoal}");
+            }
+        }
     }
 
     [System.Serializable]
