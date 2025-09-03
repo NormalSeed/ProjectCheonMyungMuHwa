@@ -133,7 +133,7 @@ public class HeroInfoUI : UIBase
         heroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(heroID);
         ownerPiece = await CurrencyManager.Instance.LoadPieceFromFireBase(heroID);
         requirePiece = heroStage * (5 - (int)rarity);
-
+        Debug.Log($"{heroStage} 돌파");
         heroName = modelInfo.CharName;
     }
     private void ButtonAddListener()
@@ -177,8 +177,8 @@ public class HeroInfoUI : UIBase
     {
         foreach (Transform stage in stageRoot)
         {
-            Transform red = stage.Find("Stage_Red");
-            Transform gray = stage.Find("Stage_gray");
+            Transform red = stage.Find("Red");
+            Transform gray = stage.Find("Gray");
 
             if (red != null) red.gameObject.SetActive(false);
             if (gray != null) gray.gameObject.SetActive(true);
@@ -189,8 +189,8 @@ public class HeroInfoUI : UIBase
             Transform stage = stageRoot.Find("Stage" + i);
             if (stage != null)
             {
-                Transform red = stage.Find("Stage_Red");
-                Transform gray = stage.Find("Stage_gray");
+                Transform red = stage.Find("Red");
+                Transform gray = stage.Find("Gray");
 
                 if (red != null) red.gameObject.SetActive(true);
                 if (gray != null) gray.gameObject.SetActive(false);
@@ -291,6 +291,10 @@ public class HeroInfoUI : UIBase
     /// <param name="piece"></param>
     private void HeroRankUpPiece( )
     {
+        // 5회 아상 돌파방지 코드
+        if (heroStage >= 5)
+            return;
+
         ownerPiece -= requirePiece;
         heroStage++;
         //  돌파저장
@@ -303,15 +307,6 @@ public class HeroInfoUI : UIBase
         SetStage();
 
         SetRankUpInteractable(stageUPButton);
-    }
-
-    /// <summary>
-    /// 정보 동기화용 코드입니다.
-    /// </summary>
-    /// <param name="Info"></param>
-    private void OnInfoValueChange()
-    {
-
     }
     #endregion
 
@@ -327,20 +322,11 @@ public class HeroInfoUI : UIBase
         Debug.Log($"SO {Info}로 세팅됨");
     }
     #endregion
-
-
-    private IEnumerator WaitLoad()
-    {
-        yield return new WaitForSeconds(3f);
-    }
 }
-
 
 /*
 TODO : 영웅 정보 UI 작업 예정 목록
-    나가기 버튼 이미지 교체하기
     골드 부족 시 버튼 상호작용 불가능 추가
-    소유 카드 조각 가져오기
-    돌파용 카드조각 개수 가져오기
     임시 작성한 영웅 레벨업, 돌파에 필요한 재화, 종합 전투력 계산식 수정하기
+    영웅 돌파 표시 수정
  */
