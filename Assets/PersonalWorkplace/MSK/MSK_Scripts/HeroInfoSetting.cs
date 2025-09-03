@@ -49,6 +49,7 @@ public class HeroInfoSetting : MonoBehaviour
     {
         CardButton.onClick.RemoveListener(OnClickCard);
         heroUI.partySetFin -= HeroSetting;
+        this.gameObject.SetActive(false);
     }
     #endregion
 

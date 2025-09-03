@@ -15,6 +15,7 @@ public class HeroUI : UIBase
 
     [Header("Root References")]
     [SerializeField] private Transform IsHeroSetting;
+    [SerializeField] private GameObject infoPanel;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
@@ -34,6 +35,7 @@ public class HeroUI : UIBase
 
     private void OnDisable()
     {
+        infoPanel.SetActive(false);
         heroSet.onClick.RemoveListener(OnClickHeroSet);
     }
     #endregion
