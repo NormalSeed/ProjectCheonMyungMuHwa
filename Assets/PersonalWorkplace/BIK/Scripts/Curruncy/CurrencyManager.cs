@@ -308,7 +308,11 @@ public class CurrencyManager : IStartable, IDisposable
             return -1;
         var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
         var dataSnapshop = await profileRef.Child("summonLevel").GetValueAsync();
+        
+        if (dataSnapshop == null || dataSnapshop.Value == null)
+            return 1;
         int level = Convert.ToInt32(dataSnapshop.Value);
+
         return level;
     }
 
@@ -318,6 +322,9 @@ public class CurrencyManager : IStartable, IDisposable
             return -1;
         var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
         var dataSnapshop = await profileRef.Child("summonCount").GetValueAsync();
+
+        if (dataSnapshop == null || dataSnapshop.Value == null)
+            return 1;
         int Count = Convert.ToInt32(dataSnapshop.Value);
         return Count;
     }
