@@ -28,6 +28,7 @@ public class PartyManager : MonoBehaviour, IStartable
     public int PartySize { get { return partySixe; } }           //현재 편성인원 외부 참조
 
     public event Action<Dictionary<string, CardInfo>> partySet;
+
     #region Unity LifeCycle
     private void Awake() { }
 
@@ -175,6 +176,5 @@ public class PartyManager : MonoBehaviour, IStartable
 
 /*
     TODO : 파티편성 필요 작업 목록
-        드래그 드롭으로 순서를 변경하는 기능
-        
+        드래그 드롭으로 순서를 변경하는 기능     
  */

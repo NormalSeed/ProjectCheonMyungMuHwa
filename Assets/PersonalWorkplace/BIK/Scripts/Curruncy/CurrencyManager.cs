@@ -253,6 +253,7 @@ public class CurrencyManager : IStartable, IDisposable
         int heroPieceInt = Convert.ToInt32(dataSnapshop.Value);
         return heroPieceInt;
     }
+
     /// <summary>
     /// 영웅 조각정보를 저장하는 코드입니다.
     /// </summary>

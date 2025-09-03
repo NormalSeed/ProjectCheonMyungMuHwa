@@ -15,6 +15,7 @@ public class HeroUI : UIBase
 
     [Header("Root References")]
     [SerializeField] private Transform IsHeroSetting;
+    [SerializeField] private GameObject infoPanel;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
@@ -34,6 +35,7 @@ public class HeroUI : UIBase
 
     private void OnDisable()
     {
+        infoPanel.SetActive(false);
         heroSet.onClick.RemoveListener(OnClickHeroSet);
     }
     #endregion
@@ -71,6 +73,7 @@ public class HeroUI : UIBase
         autoSet.gameObject.SetActive(true);
 
         heroSetSave.onClick.AddListener(OnClickHeroSetSave);
+        heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
         autoSet.onClick.AddListener(OnClickAutoSet);
     }
 
@@ -84,12 +87,31 @@ public class HeroUI : UIBase
         autoSet.gameObject.SetActive(false);
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
+        heroSetEnd.onClick.RemoveListener(OnClickHeroSetEnd);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
         PartyManager.Instance.EndPartySetting();    // 편성 종료
         PartyManager.Instance.PartyInit();
 
         // 배치하기 버튼 활성화
+        heroSet.gameObject.SetActive(true);
+
+        partySetFin?.Invoke();
+    }
+
+    // 영웅 배치하지 않고 저장
+    private void OnClickHeroSetEnd()
+    {
+        IsHeroSetting.gameObject.SetActive(false);
+        heroSetSave.gameObject.SetActive(false);
+        autoSet.gameObject.SetActive(false);
+
+        heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
+        heroSetEnd.onClick.RemoveListener(OnClickHeroSetEnd);
+        autoSet.onClick.RemoveListener(OnClickAutoSet);
+
+        PartyManager.Instance.EndPartySetting();
+
         heroSet.gameObject.SetActive(true);
 
         partySetFin?.Invoke();
