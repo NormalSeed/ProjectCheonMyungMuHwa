@@ -1,3 +1,4 @@
+using NavMeshPlus.Components;
 using System.Collections;
 using UnityEngine;
 
@@ -14,6 +15,10 @@ public class InGameManager : MonoBehaviour
     public bool isBossDead = false;
 
     public bool isStartReady = false;
+
+    public GameObject alignPoint;
+
+    public NavMeshSurface surface;
 
     private string stage => $"<color=yellow>{Mathf.Ceil(stageNum / 3f)}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
 
@@ -39,8 +44,6 @@ public class InGameManager : MonoBehaviour
     {
         PoolManager.Instance.ActiveAll(stageNum);
         stageProgress++;
-        if (stageProgress < 3) stageNum++;
-
     }
 
     public void SpawnBoss()
@@ -75,14 +78,27 @@ public class InGameManager : MonoBehaviour
 
     public void CheckMonsterClear(int deathStack)
     {
-        if (monsterDeathStack.Value <= 0 || monsterDeathStack.Value <= 0)
+        if (monsterDeathStack.Value <= 0)
         {
             alignedNum.Value = 0; // 전투 종료 후 초기화
             isProcessingAlignment = false;
             PoolManager.Instance.GetItems();
+            // 현재 정렬 포인트 비활성화
+            alignPoint.SetActive(false);
+
+            // 다음 스테이지로 이동
+            Map currentMap = MapManager.Instance.currentMap.GetComponent<Map>();
+            if (currentMap != null)
+            {
+                Vector3 nextSpawnPos = currentMap.endPoint.position;
+                MapManager.Instance.GoToNextStage(nextSpawnPos);
+            }
+            else
+            {
+                Debug.LogWarning("현재 맵을 찾을 수 없습니다.");
+            }
         }
     }
-
 
     public void SetNextStage()
     {
