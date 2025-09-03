@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -35,7 +36,9 @@ public class SummonUI : UIBase
     #endregion
 
     #region Properties
-
+    private int summonCount;
+    private int requireCount;
+    private SummonLevel userSummonLevel;
     #endregion
 
     #region Unity LifeCycle
@@ -54,10 +57,16 @@ public class SummonUI : UIBase
 
     private void Init()
     {
+        ButtonInit();
+        SummonLevelChange();
+    }
+
+    private void ButtonInit() 
+    {
+        summonInfo.onClick.AddListener(OnClickShowInfo);
         summonButton.onClick.AddListener(onClickSummon);
         summon10thButton.onClick.AddListener(onClickSummon10th);
         summon50thTimesButton.onClick.AddListener(onClickSummon50th);
-        summonInfo.onClick.AddListener(OnClickShowInfo);
     }
     #endregion
 
@@ -65,14 +74,17 @@ public class SummonUI : UIBase
     private void onClickSummon()
     {
         SummonHeros(1);
+        SummonLevelChange();
     }
     private void onClickSummon10th()
     {
         SummonHeros(10);
+        SummonLevelChange();
     }
     private void onClickSummon50th()
     {
         SummonHeros(50);
+        SummonLevelChange();
     }
     private void OnClickShowInfo()
     {
@@ -80,15 +92,24 @@ public class SummonUI : UIBase
     }
     #endregion
 
-    
+
     #region private
+    private async Task SummonLevelChange()
+    {
+        summonCount = await CurrencyManager.Instance.LoadSummonCountFromFireBase();
+        int levelValue = await CurrencyManager.Instance.LoadSummonLevelFromFireBase();
+        userSummonLevel = (SummonLevel)levelValue;
+        Debug.Log($"[levelValue] : {levelValue}");
+        summonLevelText.text = "영웅 뽑기 레벨 " + levelValue.ToString();
+    }
+
     private async Task SummonHeros(int times)
     {
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
     }
 
-    private void ChangeButtonText(TextMeshProUGUI text)
+    private void ChangeButtonText( )
     {
         /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
     }

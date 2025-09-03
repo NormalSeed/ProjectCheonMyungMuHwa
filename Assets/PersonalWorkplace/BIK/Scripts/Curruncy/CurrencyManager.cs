@@ -247,6 +247,8 @@ public class CurrencyManager : IStartable, IDisposable
     /// </summary>
     public async Task<int> LoadPieceFromFireBase(string charID)
     {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
         var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
         var dataSnapshop = await heroIDRef.Child("heroPiece").GetValueAsync();
 
@@ -275,9 +277,13 @@ public class CurrencyManager : IStartable, IDisposable
     /// <returns></returns>
     public async Task<int> LoadHeroStageFromFireBase(string charID)
     {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
         var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
         var dataSnapshop = await heroIDRef.Child("stage").GetValueAsync();
-        return Convert.ToInt32(dataSnapshop.Value); ;
+
+        int stage = Convert.ToInt32(dataSnapshop.Value);
+        return stage;
     }
 
     /// <summary>
@@ -296,5 +302,35 @@ public class CurrencyManager : IStartable, IDisposable
         });
     }
 
+    public async Task<int> LoadSummonLevelFromFireBase()
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
+        Debug.Log($"[LoadSummonLevelFromFireBase] : UID : {_uid} ");
+        var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
+        var dataSnapshop = await profileRef.Child("summonLevel").GetValueAsync();
+        int level = Convert.ToInt32(dataSnapshop.Value);
+        return level;
+    }
+
+    public async Task<int> LoadSummonCountFromFireBase()
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
+        var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
+        var dataSnapshop = await profileRef.Child("summonCount").GetValueAsync();
+        int Count = Convert.ToInt32(dataSnapshop.Value);
+        return Count;
+    }
+
+    public async Task<int> LoadRequireCountFromFireBase(int level)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
+        var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
+        var dataSnapshop = await profileRef.Child("summonCount").GetValueAsync();
+        int Count = Convert.ToInt32(dataSnapshop.Value);
+        return Count;
+    }
     #endregion
 }
