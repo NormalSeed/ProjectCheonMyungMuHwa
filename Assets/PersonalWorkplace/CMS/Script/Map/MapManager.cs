@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapManager : MonoBehaviour
@@ -14,6 +15,8 @@ public class MapManager : MonoBehaviour
 
     private int currentStageIndex = 1; // 1스테이지부터 시작
     private List<GameObject> spawnedMaps = new List<GameObject>(); // 생성된 맵 기록
+
+    [SerializeField] private GameObject[] monsterPrefabs; // 몬스터 프리팹
 
     private bool isSpawning = false;
 
@@ -95,14 +98,13 @@ public class MapManager : MonoBehaviour
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        // 테마 인덱스 계산
         int themeIndex = (stageIndex - 1) / 100;
         if (themeIndex >= mapThemes.Length)
             themeIndex = mapThemes.Length - 1;
 
         string prefabName = mapThemes[themeIndex];
-
         GameObject prefab = Resources.Load<GameObject>(prefabName);
+
         if (prefab != null)
         {
             GameObject newMap = Instantiate(prefab, spawnPosition, Quaternion.identity, mapParent);
@@ -111,15 +113,36 @@ public class MapManager : MonoBehaviour
             currentMap = newMap;
             GetAlignPoint();
 
-            Debug.Log($"스테이지 {stageIndex} → {prefabName} 생성 완료");
-
-            // 오래된 맵 삭제 (5개까지만 유지)
             if (spawnedMaps.Count > 5)
             {
                 GameObject oldMap = spawnedMaps[0];
                 spawnedMaps.RemoveAt(0);
                 Destroy(oldMap);
-                Debug.Log("오래된 맵 삭제 완료");
+            }
+
+            Debug.Log($"스테이지 {stageIndex}, {prefabName} 생성 완료");
+
+            // --- 몬스터 소환 로직 ---
+            PoolManager.Instance.SetMonsterState(stageIndex);
+
+            if (stageIndex % 3 == 0) // 보스 스테이지
+            {
+                PoolManager.Instance.SpawnMonster(
+                    newMap.transform.position,
+                    MonsterType.Boss
+                );
+            }
+            else // 일반 스테이지
+            {
+                var spawnPoints = newMap.GetComponentsInChildren<SpawnPoint>();
+                Debug.Log($"[MapManager] {newMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
+
+                foreach (var point in spawnPoints)
+                {
+                    Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
+                    PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
+                }
+
             }
         }
         else
