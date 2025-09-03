@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class MainSceneUIController : MonoBehaviour
 {
@@ -32,6 +33,14 @@ public class MainSceneUIController : MonoBehaviour
     [SerializeField] private Button _summonUI;
     [SerializeField] private Button _shopUI;
 
+    [Header("X 이미지")]
+    [SerializeField] private Image x_img1;
+    [SerializeField] private Image x_img2;
+    [SerializeField] private Image x_img3;
+    [SerializeField] private Image x_img4;
+    [SerializeField] private Image x_img5;
+    [SerializeField] private Image x_img6;
+
     #endregion // serialized fields
 
 
@@ -41,6 +50,8 @@ public class MainSceneUIController : MonoBehaviour
     #region private fields
 
     private Dictionary<UIType, UIBase> _uiDict = new Dictionary<UIType, UIBase>();
+
+    private Dictionary<UIType, GameObject> _xImageMap = new Dictionary<UIType, GameObject>();
     private UIBase _currentMainUI; // 현재 열려있는 메인 UI
 
     #endregion // private fields
@@ -53,6 +64,13 @@ public class MainSceneUIController : MonoBehaviour
 
     private void Awake()
     {
+        _xImageMap[UIType.Hero] = x_img1.gameObject;
+        _xImageMap[UIType.Dungeon] = x_img2.gameObject;
+        _xImageMap[UIType.Inventory] = x_img3.gameObject;
+        _xImageMap[UIType.Upgrade] = x_img4.gameObject;
+        _xImageMap[UIType.Summon] = x_img5.gameObject;
+        _xImageMap[UIType.Shop] = x_img6.gameObject;
+
         _heroUI.onClick.AddListener(() => ShowUI(UIType.Hero));
         _dungeonUI.onClick.AddListener(() => ShowUI(UIType.Dungeon));
         _upgradeUI.onClick.AddListener(() => ShowUI(UIType.Upgrade));
@@ -63,15 +81,16 @@ public class MainSceneUIController : MonoBehaviour
 
     private void Start()
     {
-        foreach (var entry in _uiEntries) {
+        foreach (var entry in _uiEntries)
+        {
             if (entry.ui == null) continue;
-            if (!_uiDict.ContainsKey(entry.type)) {
+            if (!_uiDict.ContainsKey(entry.type))
+            {
                 _uiDict.Add(entry.type, entry.ui);
                 entry.ui.SetHide(); // 시작 시 비활성화
             }
         }
     }
-
     #endregion // mono funcs
 
 
@@ -88,21 +107,28 @@ public class MainSceneUIController : MonoBehaviour
         if (!_uiDict.TryGetValue(type, out var ui) || ui == null) return;
 
         // 한번 더 눌렀을 때 닫기
-        if (_currentMainUI == ui) {
+        if (_currentMainUI == ui)
+        {
             _currentMainUI.SetHide();
             _currentMainUI = null;
+            HideAllXImages();
             return;
         }
 
         // 기존 메인 UI 닫기
-        if (_currentMainUI != null) {
+        if (_currentMainUI != null)
+        {
             _currentMainUI.SetHide();
         }
 
+        HideAllXImages();
         // 새로운 메인 UI 열기
         _currentMainUI = ui;
         _currentMainUI.SetShow();
         _currentMainUI.RefreshUI();
+
+        if (_xImageMap.TryGetValue(type, out var xImg))
+            xImg.SetActive(true);
     }
 
     /// <summary>
@@ -110,7 +136,8 @@ public class MainSceneUIController : MonoBehaviour
     /// </summary>
     public void CloseAllUI()
     {
-        if (_currentMainUI != null) {
+        if (_currentMainUI != null)
+        {
             _currentMainUI.SetHide();
             _currentMainUI = null;
         }
@@ -125,4 +152,16 @@ public class MainSceneUIController : MonoBehaviour
     }
 
     #endregion // public funcs
+
+
+    #region private Funcs
+    private void HideAllXImages()
+    {
+        foreach (var obj in _xImageMap.Values)
+        {
+            if (obj != null)
+                obj.SetActive(false);
+        }
+    }
+    #endregion
 }

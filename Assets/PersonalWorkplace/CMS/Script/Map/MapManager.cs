@@ -122,32 +122,59 @@ public class MapManager : MonoBehaviour
 
             Debug.Log($"스테이지 {stageIndex}, {prefabName} 생성 완료");
 
-            // --- 몬스터 소환 로직 ---
-            PoolManager.Instance.SetMonsterState(stageIndex);
-
-            if (stageIndex % 3 == 0) // 보스 스테이지
-            {
-                PoolManager.Instance.SpawnMonster(
-                    newMap.transform.position,
-                    MonsterType.Boss
-                );
-            }
-            else // 일반 스테이지
-            {
-                var spawnPoints = newMap.GetComponentsInChildren<SpawnPoint>();
-                Debug.Log($"[MapManager] {newMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
-
-                foreach (var point in spawnPoints)
-                {
-                    Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
-                    PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
-                }
-
-            }
+            //// --- 몬스터 소환 로직 ---
+            //PoolManager.Instance.SetMonsterState(stageIndex);
+            //
+            //if (stageIndex % 3 == 0) // 보스 스테이지
+            //{
+            //    PoolManager.Instance.SpawnMonster(
+            //        newMap.transform.position,
+            //        MonsterType.Boss
+            //    );
+            //}
+            //else // 일반 스테이지
+            //{
+            //    var spawnPoints = newMap.GetComponentsInChildren<SpawnPoint>();
+            //    Debug.Log($"[MapManager] {newMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
+            //
+            //    foreach (var point in spawnPoints)
+            //    {
+            //        Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
+            //        PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
+            //    }
+            //
+            //}
         }
         else
         {
             Debug.LogError($"맵 프리팹을 찾을 수 없습니다: {prefabName}");
+        }
+    }
+
+    public bool SpawnMonsters(int stageIndex, int stageProgress)
+    {
+        // --- 몬스터 소환 로직 ---
+        // 일반 스테이지
+        if (stageProgress < 3)
+        {
+            PoolManager.Instance.SetMonsterState((stageIndex - 1) * 3 + stageProgress + 1);
+            var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
+            Debug.Log($"[MapManager] {currentMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
+
+            foreach (var point in spawnPoints)
+            {
+                Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
+                PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
+            }
+            return false;
+        }
+        else
+        {
+            PoolManager.Instance.SpawnMonster(
+                currentMap.transform.position,
+                MonsterType.Boss
+            );
+            return true;
         }
     }
 }

@@ -20,7 +20,7 @@ public class InGameManager : MonoBehaviour
 
     public NavMeshSurface surface;
 
-    private string stage => $"<color=yellow>{Mathf.Ceil(stageNum / 3f)}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
+    private string stage => $"<color=yellow>{stageNum}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
 
     [SerializeField] TMPro.TMP_Text stagetext;
 
@@ -60,13 +60,14 @@ public class InGameManager : MonoBehaviour
         if (stagetext != null) stagetext.text = stage;
 
         isProcessingAlignment = true;
-        if (stageProgress < 3)
+        bool isBossSpawned = MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
+        if (isBossSpawned)
         {
-            RespawnMonsters();
+            stageProgress = 0;
         }
         else
         {
-            SpawnBoss();
+            stageProgress++;
         }
         StartCoroutine(ResetAlignmentFlag());
     }
