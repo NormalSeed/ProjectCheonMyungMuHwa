@@ -328,6 +328,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04976799df50f54ba128eff723155a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &391610867 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3194877786405714695, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+  m_PrefabInstance: {fileID: 1702075909}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &420631021 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7759986016715182575, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
@@ -907,7 +918,7 @@ MonoBehaviour:
   isStartReady: 0
   alignPoint: {fileID: 0}
   surface: {fileID: 346026367}
-  stagetext: {fileID: 0}
+  stagetext: {fileID: 391610867}
 --- !u!4 &1331494749
 Transform:
   m_ObjectHideFlags: 0
@@ -1171,6 +1182,8 @@ MonoBehaviour:
   - Map_Stage01
   - Map_Stage02
   - Map_Stage03
+  monsterPrefabs: []
+  currentMap: {fileID: 0}
 --- !u!4 &1501635565
 Transform:
   m_ObjectHideFlags: 0
