@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
         // 여기서 Map.OnEnemyDefeated() 호출
         Map currentMap = GetComponentInParent<Map>();
         if (currentMap != null)
-            currentMap.OnEnemyDefeated();
+            //currentMap.OnEnemyDefeated();
 
         Destroy(gameObject);
     }
