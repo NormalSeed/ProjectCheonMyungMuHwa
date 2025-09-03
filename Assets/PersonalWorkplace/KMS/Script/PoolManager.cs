@@ -47,7 +47,7 @@ public class PoolManager : MonoBehaviour
 
     void Awake()
     {
-        GetItemWfs = new WaitForSeconds(0.05f);
+        GetItemWfs = new WaitForSeconds(0.03f);
         Instance = this;
         droppedItems = new();
         bosses = new();
@@ -122,6 +122,7 @@ public class PoolManager : MonoBehaviour
 
     private void ActiveBoss(Vector2 pos)
     {
+        ParticleManager.Instance.GetParticle("Boss_1_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         int last = currentstage / 3 % 10;
         string str;
@@ -147,6 +148,7 @@ public class PoolManager : MonoBehaviour
     }
     private void ActiveMonster(DefaultPool<MonsterController> pool, int modelIndex, Vector2 pos)
     {
+        ParticleManager.Instance.GetParticle("M_12_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         MonsterController monster = pool.GetItem(pos);
         monster.Model.InitSprite(currentstage);

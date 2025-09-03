@@ -49,20 +49,8 @@ public abstract class BossController : MonsterController
     }
     private IEnumerator SpawnRoutine()
     {
-        ParticleSystem part = ParticleManager.Instance.GetParticle("CFXR2 Firewall A", transform.position);
-        for (int i = 0; i < 10; i++)
-        {
-            if (i % 2 == 0)
-            {
-                transform.localScale = new Vector3(-1, 1, 1);
-            }
-            else
-            {
-                transform.localScale = new Vector3(1, 1, 1);
-            }
-            yield return new WaitForSeconds(0.1f);
-        }
-        ParticleManager.Instance.ReleaseParticle(part, "CFXR2 Firewall A");
+        yield return new WaitForSeconds(1f);
+
         OnSpawnAmimEnd?.Invoke();
         isInvulnerable = false;
     }
