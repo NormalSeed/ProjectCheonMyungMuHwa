@@ -50,7 +50,6 @@ public class MapManager : MonoBehaviour
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        // 맵 생성
         int themeIndex = (stageIndex - 1) / 100;
         if (themeIndex >= mapThemes.Length)
             themeIndex = mapThemes.Length - 1;
@@ -73,14 +72,27 @@ public class MapManager : MonoBehaviour
 
             Debug.Log($"스테이지 {stageIndex}, {prefabName} 생성 완료");
 
-            // 여기서 보스/일반 체크
-            if (stageIndex % 3 == 0)  // 스테이지마다 보스
+            // --- 몬스터 소환 로직 ---
+            PoolManager.Instance.SetMonsterState(stageIndex);
+
+            if (stageIndex % 3 == 0) // 보스 스테이지
             {
-                PoolManager.Instance.ActiveBoss(stageIndex);
+                PoolManager.Instance.SpawnMonster(
+                    newMap.transform.position,
+                    MonsterType.Boss
+                );
             }
-            else
+            else // 일반 스테이지
             {
-                PoolManager.Instance.ActiveAll(stageIndex);
+                var spawnPoints = newMap.GetComponentsInChildren<SpawnPoint>();
+                Debug.Log($"[MapManager] {newMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
+
+                foreach (var point in spawnPoints)
+                {
+                    Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
+                    PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
+                }
+
             }
         }
         else
