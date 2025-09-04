@@ -82,12 +82,9 @@ public class GachaManager : MonoBehaviour
     // 유저 뽑기정보 로딩
     private async Task LoadUserDataAsync()
     {
-        var snapLevel = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").GetValueAsync();
-        var snapCount = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").GetValueAsync();
-        int levelInt = snapLevel.Exists ? Convert.ToInt32(snapLevel.Value) : (int)SummonLevel.level01;
-        //  가져오고 없을 경우에 설정하기
-        userSummonLevel = (SummonLevel)levelInt;
-        userSummonCount = snapCount.Exists ? Convert.ToInt32(snapCount.Value) : 0;
+        var snapProfile = await CurrencyManager.Instance.LoadUserProfileAsync();
+        userSummonLevel = snapProfile.SummonLevel;
+        userSummonCount = snapProfile.SummonCount;
     }
     private Task SaveUserSummonLevelAsync()
     {
@@ -123,13 +120,10 @@ public class GachaManager : MonoBehaviour
     // 실제 소환 코드
     public async Task Summon(int times)
     {
+        userSummonCount += times;
         if (userSummonCount >= requireSummonCount)
         {
-            if (userSummonLevel < SummonLevel.level10)
-                userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
-            userSummonCount = 0;
-            await SaveUserSummonLevelAsync();
-            await LoadSummonConfigAsync();
+            await LevelUpAsync();
         }
 
         var results = new List<CardInfo>();
@@ -138,13 +132,8 @@ public class GachaManager : MonoBehaviour
             string rarityKey = DrawOne();
             CardInfo info = await LoadCardInfoByRarity(rarityKey);
             results.Add(info);
-            userSummonCount++;
-
-            if (userSummonCount >= requireSummonCount)
-            {
-                await LevelUpAsync();
-            }
         }
+
         StartCoroutine(ProcessResultsCoroutine(results));
         await SaveUserSummonCountAsync();
         resultUI.ShowSummonResult(results);
