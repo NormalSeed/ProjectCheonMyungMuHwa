@@ -9,10 +9,6 @@ public class MonsterModelBaseSO : ScriptableObject
   public double baseDefense;
 
   public double baseAttackPower;
-  public float AttackDistance; //공격하기 위해 멈추는 사정거리
-  public float AttackDistanceWithClearance => AttackDistance + 0.5f; //공격 중에 벗어날 경우 다시 추적하기 위한 사정거리 (Attackdistance보다 약간 높게)
-  public float AttackDelay; //공격 쿨타임
-  public float MoveSpeed; //이동속도
 
   public double finalMaxHealth;
   public double finalDefense;
@@ -85,6 +81,7 @@ public class MonsterModelBaseSO : ScriptableObject
     }
 
   }
+  // 보스의 경우 이것을 이용
   public void SetFinalBoss(int stage, MonsterModelBaseSO model)
   {
     if (stage == 50 || stage == 100)
@@ -93,7 +90,7 @@ public class MonsterModelBaseSO : ScriptableObject
     }
     else
     {
-      finalMaxHealth = model.finalMaxHealth * 5;
+      finalMaxHealth = model.finalMaxHealth * 2000;
     }
     finalAttackPower = model.finalAttackPower * 3;
     finalDefense = stage * baseDefense;

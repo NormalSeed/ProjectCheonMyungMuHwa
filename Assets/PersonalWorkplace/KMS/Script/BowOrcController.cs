@@ -8,7 +8,7 @@ public class BowOrcController : MonsterController
     public override void OnAttack(GameObject me, IDamagable target)
     {
         Spum.PlayAnimation(PlayerState.ATTACK, 2);
-        StartCoroutine(RealAttackRoutine(target));
+        attackCo = StartCoroutine(RealAttackRoutine(target));
     }
 
     protected override IEnumerator RealAttackRoutine(IDamagable target)

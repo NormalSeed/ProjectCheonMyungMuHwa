@@ -5,11 +5,16 @@ public class MonsterModel : MonoBehaviour
 {
   public ObservableProperty<double> CurHealth;
 
-  [SerializeField] MonsterTextures tex;
-  [SerializeField] SpriteRenderer[] renderers;
+  [SerializeField] protected MonsterTextures tex;
+  [SerializeField] protected SpriteRenderer[] renderers;
+
+  [SerializeField] public float AttackDistance; //공격하기 위해 멈추는 사정거리
+  public float AttackDistanceWithClearance => AttackDistance + 0.5f; //공격 중에 벗어날 경우 다시 추적하기 위한 사정거리 (Attackdistance보다 약간 높게)
+  [SerializeField] public float AttackDelay; //공격 쿨타임
+  [SerializeField] public float MoveSpeed; //이동속도
 
   public MonsterModelBaseSO BaseModel { get; set; }
-  public void InitSprite(int stage)
+  public virtual void InitSprite(int stage)
   {
 
     if (stage < 100)
@@ -29,7 +34,7 @@ public class MonsterModel : MonoBehaviour
       SetSprite(tex.Orc_4);
     }
   }
-  private void SetSprite(Dictionary<string, Sprite> dict)
+  protected void SetSprite(Dictionary<string, Sprite> dict)
   {
     renderers[0].sprite = dict["Body"];
     renderers[1].sprite = dict["Head"];
@@ -39,7 +44,7 @@ public class MonsterModel : MonoBehaviour
     renderers[5].sprite = dict["Foot_L"];
   }
 
-  public void SetSpriteColor(Color color)
+  public virtual void SetSpriteColor(Color color)
   {
     foreach (SpriteRenderer sr in renderers)
     {
