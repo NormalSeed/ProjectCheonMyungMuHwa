@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class CharImage : MonoBehaviour
 {
+    // bugfix : 버그때문에 인식을 못하는 스크립트라 추가한 한 줄
+
     [SerializeField] private Image _characterImage;
     [SerializeField] private GameObject _lockOverlay;
 

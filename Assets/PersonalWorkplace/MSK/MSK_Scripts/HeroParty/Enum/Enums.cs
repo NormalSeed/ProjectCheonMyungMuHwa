@@ -28,7 +28,7 @@ public enum CurrencyType
 
 public enum UIType
 {
-    None = 0,       
+    None = 0,
     Notice,         // 공지
     Quest,          // 퀘스트
     Mail,           // 우편함
@@ -57,4 +57,10 @@ public enum SummonLevel
     level08 = 8,
     level09 = 9,
     level10 = 10
+}
+
+public enum PopupType
+{
+    OfflineRewardPopup,
+    RewardPopup,
 }
