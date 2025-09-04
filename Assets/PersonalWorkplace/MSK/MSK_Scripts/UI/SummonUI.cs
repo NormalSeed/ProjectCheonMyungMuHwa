@@ -114,7 +114,7 @@ public class SummonUI : UIBase
         userSummonLevel = profile.SummonLevel;
         requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
 
-        summonLevelText.text = "영웅 뽑기 레벨 " + userSummonLevel.ToString();
+        summonLevelText.text = "영웅 뽑기 레벨 " + ((int)userSummonLevel).ToString();
         UpdateSummonSlider();
     }
     private void UpdateSummonSlider()
