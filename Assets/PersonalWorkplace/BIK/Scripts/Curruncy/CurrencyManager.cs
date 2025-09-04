@@ -59,7 +59,11 @@ public class CurrencyManager : IStartable, IDisposable
         _uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "dev-local-test";
         _dbRef = FirebaseDatabase.DefaultInstance.RootReference;
     }
-
+    public class UserProfileData
+    {
+        public int SummonCount { get; set; } = 1;
+        public SummonLevel SummonLevel { get; set; } = SummonLevel.level01;
+    }
     #endregion // constructor
 
 
@@ -74,7 +78,7 @@ public class CurrencyManager : IStartable, IDisposable
     }
 
     #endregion // mono funcs
-
+    
 
 
 
@@ -247,6 +251,8 @@ public class CurrencyManager : IStartable, IDisposable
     /// </summary>
     public async Task<int> LoadPieceFromFireBase(string charID)
     {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
         var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
         var dataSnapshop = await heroIDRef.Child("heroPiece").GetValueAsync();
 
@@ -275,9 +281,13 @@ public class CurrencyManager : IStartable, IDisposable
     /// <returns></returns>
     public async Task<int> LoadHeroStageFromFireBase(string charID)
     {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
         var heroIDRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(charID);
         var dataSnapshop = await heroIDRef.Child("stage").GetValueAsync();
-        return Convert.ToInt32(dataSnapshop.Value); ;
+
+        int stage = Convert.ToInt32(dataSnapshop.Value);
+        return stage;
     }
 
     /// <summary>
@@ -295,6 +305,50 @@ public class CurrencyManager : IStartable, IDisposable
                 return;
         });
     }
+    /// <summary>
+    /// 파이어베이스에서 유저 프로파일을 가져옵니다.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<UserProfileData> LoadUserProfileAsync()
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return new UserProfileData();
+
+        var profileRef = _dbRef.Child("users").Child(_uid).Child("profile");
+        var snapshot = await profileRef.GetValueAsync();
+
+        var result = new UserProfileData();
+
+        if (snapshot != null && snapshot.Exists)
+        {
+            if (snapshot.Child("summonCount").Value != null)
+            {
+                result.SummonCount = Convert.ToInt32(snapshot.Child("summonCount").Value);
+            }
+
+            if (snapshot.Child("summonLevel").Value != null)
+            {
+                int levelValue = Convert.ToInt32(snapshot.Child("summonLevel").Value);
+                result.SummonLevel = (SummonLevel)levelValue;
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 파이어베이스에서 인풋 소환레벨의 필요한 레벨업 카운트를 가져옵니다.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    public async Task<int> LoadRequireCountFromFireBase(string level)
+    {
+        if (string.IsNullOrEmpty(_uid))
+            return -1;
+        var dataSnapshop = await _dbRef.Child("summon").Child(level).Child("count").GetValueAsync();
+        int count = Convert.ToInt32(dataSnapshop.Value);
+        return count;
+    }
+
 
     #endregion
 }

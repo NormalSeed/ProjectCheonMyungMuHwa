@@ -7,7 +7,7 @@ public class CainOrcController : MonsterController
     public override void OnAttack(GameObject me, IDamagable target)
     {
         Spum.PlayAnimation(PlayerState.ATTACK, 4);
-        StartCoroutine(RealAttackRoutine(target));
+        attackCo = StartCoroutine(RealAttackRoutine(target));
     }
 
     protected override IEnumerator RealAttackRoutine(IDamagable target)
