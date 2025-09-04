@@ -14,7 +14,7 @@ public class OfflineRewardUI : MonoBehaviour
     public TMP_Text timeText;
 
     [Header("Slots")]
-    public Transform rewardSlotsParent; // ItemSlot들이 들어있는 부모 오브젝트
+    public Transform rewardSlotsParent;
     private ItemSlotUI[] slots;
 
     [Header("Buttons")]
@@ -36,11 +36,8 @@ public class OfflineRewardUI : MonoBehaviour
     {
         offlineRewardPanel.SetActive(true);
 
-        // UI 표시
-        foreach (var slot in slots)
-        {
-            slot.gameObject.SetActive(false);
-        }
+        // UI 초기화
+        foreach (var slot in slots) slot.gameObject.SetActive(false);
 
         int i = 0;
         foreach (var reward in rewards)
@@ -48,14 +45,16 @@ public class OfflineRewardUI : MonoBehaviour
             if (i >= slots.Length) break;
             slots[i].SetSlot(reward.Key.ToString(), reward.Value);
             slots[i].gameObject.SetActive(true);
+            if (reward.Key == CurrencyType.Gold)
+                rewardGold = reward.Value;
             i++;
         }
 
-        // 버튼 리스너
+        // 광고 보상 버튼
         adButton.onClick.RemoveAllListeners();
         adButton.onClick.AddListener(() =>
         {
-            var extraGold = rewards[CurrencyType.Gold] * 0.3; // 30% 추가
+            double extraGold = rewardGold * adMultiplier;
             PlayerDataManager.Instance.AddGold(extraGold);
             BackendManager.Instance.UpdatePlayerData(
                 PlayerDataManager.Instance.ClearedStage,
@@ -64,33 +63,16 @@ public class OfflineRewardUI : MonoBehaviour
             offlineRewardPanel.SetActive(false);
         });
 
+        // 그냥 보상 버튼
         rewardButton.onClick.RemoveAllListeners();
         rewardButton.onClick.AddListener(() =>
         {
+            PlayerDataManager.Instance.AddGold(rewardGold);
+            BackendManager.Instance.UpdatePlayerData(
+                PlayerDataManager.Instance.ClearedStage,
+                PlayerDataManager.Instance.Gold
+            );
             offlineRewardPanel.SetActive(false);
         });
-    }
-
-    private void Start()
-    {
-        adButton.onClick.AddListener(OnAdButton);
-        rewardButton.onClick.AddListener(OnRewardButton);
-    }
-
-    private void OnAdButton()
-    {
-        double rewardedGold = rewardGold * adMultiplier;
-        PlayerDataManager.Instance.AddGold(rewardGold);
-
-        Debug.Log($"광고 보상 획득: {rewardedGold}");
-        offlineRewardPanel.SetActive(false);
-    }
-
-    private void OnRewardButton()
-    {
-        PlayerDataManager.Instance.AddGold(rewardGold);
-
-        Debug.Log($"보상 획득: {rewardGold}");
-        offlineRewardPanel.SetActive(false);
     }
 }

@@ -27,6 +27,7 @@ public class BackendManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     private void Start()
     {
         if (OfflineRewardSystem.Instance == null)
@@ -77,8 +78,7 @@ public class BackendManager : MonoBehaviour
             FirebaseUser newUser = task.Result.User;
             Debug.Log($"익명 로그인 성공 UID: {newUser.UserId}");
 
-            if (QuestManager.Instance != null)
-                QuestManager.Instance.InitializeAfterLogin();
+            QuestManager.Instance?.InitializeAfterLogin();
         });
     }
 
@@ -145,7 +145,7 @@ public class BackendManager : MonoBehaviour
                     DateTime.TryParse(snapshot.Child("lastLogoutTime").Value.ToString(), out lastLogout);
             }
 
-            // 오프라인 보상 계산 (서버 시간 기준)
+            // 오프라인 보상 계산
             TimeSpan offlineDuration = DateTime.UtcNow - lastLogout;
             offlineDuration = offlineDuration.TotalHours > 8 ? TimeSpan.FromHours(8) : offlineDuration;
 
