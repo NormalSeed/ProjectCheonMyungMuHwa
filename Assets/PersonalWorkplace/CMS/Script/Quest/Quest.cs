@@ -27,26 +27,27 @@ public class Quest
 
     public Quest() { }
 
-    public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal, string rewardId, RewardType rewardType, int rewardCount)
+    public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal,
+             string rewardId, CurrencyType currencyType, int rewardCount)
     {
-    questID = id;
-    questName = name;
-    questType = type;
-    questTarget = target;
-    valueProgress = 0;
-    valueGoal = goal;
-    isComplete = false;
-    isClaimed = false;
-    
-    this.lastUpdated = DateTime.UtcNow;
-    this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
+        questID = id;
+        questName = name;
+        questType = type;
+        questTarget = target;
+        valueProgress = 0;
+        valueGoal = goal;
+        isComplete = false;
+        isClaimed = false;
 
-    rewards.Add(new Reward
-    {
-        rewardID = rewardId,
-        rewardType = rewardType,
-        rewardCount = rewardCount // ← OK (count 아님)
-    });
+        this.lastUpdated = DateTime.UtcNow;
+        this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
+
+        rewards.Add(new Reward
+        {
+            rewardID = rewardId,
+            currencyType = currencyType, 
+            rewardCount = rewardCount
+        });
     }
     public string GetRemainingTimeString()
     {
@@ -135,12 +136,12 @@ public enum RewardType
 [System.Serializable]
 public class Reward
 {
-    public string rewardID;
-    public RewardType rewardType;
-    public int rewardCount;
+    public string rewardID;             // 아이템 고유 ID (있으면 유지)
+    public CurrencyType currencyType;   // 어떤 재화인지
+    public int rewardCount;             // 수량
 
     public string GetDisplayName()
     {
-        return $"{rewardType} {rewardID} x{rewardCount}";
+        return $"{currencyType} {rewardID} x{rewardCount}";
     }
 }

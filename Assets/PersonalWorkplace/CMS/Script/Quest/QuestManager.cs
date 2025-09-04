@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 public class QuestManager : MonoBehaviour
 {
@@ -27,6 +29,8 @@ public class QuestManager : MonoBehaviour
 
     // Firebase 서버 시간 오프셋(ms)
     private long serverTimeOffsetMs = 0;
+
+    [Inject] private ICurrencyModel _currencyModel;
 
     private void Awake()
     {
@@ -285,18 +289,8 @@ public class QuestManager : MonoBehaviour
     // 보상 지급 로직
     private void GrantReward(Reward reward)
     {
-        switch (reward.rewardType)
-        {
-            case RewardType.Currency:
-                // 재화 증가 로직
-                break;
-            case RewardType.Equipment:
-                // 장비 지급 로직
-                break;
-            case RewardType.Item:
-                // 아이템 지급 로직
-                break;
-        }
+        var currencyModel = CurrencyManager.Instance.Model;
+        currencyModel.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
     }
 
     // Firebase 저장
