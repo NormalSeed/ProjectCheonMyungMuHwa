@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour, IDamagable
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     model.modelSO = handle.Result;
+                    // TODO: Firebase에 있는 캐릭터 Level 정보 불러오기
                     model.SetPoints();
 
                     LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);

@@ -11,6 +11,7 @@ public class SummonUI : UIBase
     [SerializeField] private Button summon10thButton;       // 10챠
     [SerializeField] private Button summon50thTimesButton;  // 50챠
     [SerializeField] private Button summonInfo;             // 확률정보
+    [SerializeField] private Button summonResult;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI summonLevelText;   // 소환레벨 텍스트
@@ -35,13 +36,16 @@ public class SummonUI : UIBase
     #endregion
 
     #region Properties
-
+    private int summonCount;
+    private int requireCount;
+    private SummonLevel userSummonLevel;
     #endregion
 
     #region Unity LifeCycle
     private void OnEnable()
     {
         Init();
+
     }
 
     private void OnDisable()
@@ -50,14 +54,23 @@ public class SummonUI : UIBase
         summon10thButton.onClick.RemoveListener(onClickSummon10th);
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
+
+        gachaManager.OnGachaCompleted -= HandleGachaCompleted;
     }
 
     private void Init()
     {
+        ButtonInit();
+        SummonLevelChange();
+        gachaManager.OnGachaCompleted += HandleGachaCompleted;
+    }
+
+    private void ButtonInit()
+    {
+        summonInfo.onClick.AddListener(OnClickShowInfo);
         summonButton.onClick.AddListener(onClickSummon);
         summon10thButton.onClick.AddListener(onClickSummon10th);
         summon50thTimesButton.onClick.AddListener(onClickSummon50th);
-        summonInfo.onClick.AddListener(OnClickShowInfo);
     }
     #endregion
 
@@ -65,14 +78,17 @@ public class SummonUI : UIBase
     private void onClickSummon()
     {
         SummonHeros(1);
+        InterActButtons(false);
     }
     private void onClickSummon10th()
     {
         SummonHeros(10);
+        InterActButtons(false);
     }
     private void onClickSummon50th()
     {
         SummonHeros(50);
+        InterActButtons(false);
     }
     private void OnClickShowInfo()
     {
@@ -80,15 +96,45 @@ public class SummonUI : UIBase
     }
     #endregion
 
-    
+
     #region private
+
+    private void InterActButtons(bool input)
+    {
+        summonButton.interactable = input;
+        summon10thButton.interactable = input;
+        summon50thTimesButton.interactable = input;
+        summonInfo.interactable = input;
+        summonResult.interactable = input;
+    }
+    private async Task SummonLevelChange()
+    {
+        var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
+        summonCount = profile.SummonCount;
+        userSummonLevel = profile.SummonLevel;
+        requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
+
+        summonLevelText.text = "영웅 뽑기 레벨 " + ((int)userSummonLevel).ToString();
+        UpdateSummonSlider();
+    }
+    private void UpdateSummonSlider()
+    {
+        summonSlider.maxValue = requireCount;
+        summonSlider.value = summonCount;
+    }
     private async Task SummonHeros(int times)
     {
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
     }
 
-    private void ChangeButtonText(TextMeshProUGUI text)
+    private void HandleGachaCompleted()
+    {
+        SummonLevelChange();
+        InterActButtons(true);
+    }
+
+    private void ChangeButtonText()
     {
         /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
     }

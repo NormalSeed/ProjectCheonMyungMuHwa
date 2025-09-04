@@ -18,6 +18,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected WaitForSeconds hurtWfs;
     protected Coroutine hurtCo;
 
+    protected Coroutine attackCo;
+
     [SerializeField] protected Image healthBar;
 
     [SerializeField] protected float attackDelay;
@@ -54,10 +56,10 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
         healthBar.fillAmount = 1;
-        treeAgent.SetVariableValue<float>("MoveSpeed", Model.BaseModel.MoveSpeed);
-        treeAgent.SetVariableValue<float>("AttackDistance", Model.BaseModel.AttackDistance);
-        treeAgent.SetVariableValue<float>("AttackDistanceWithClearance", Model.BaseModel.AttackDistanceWithClearance);
-        treeAgent.SetVariableValue<float>("AttackDelay", Model.BaseModel.AttackDelay);
+        treeAgent.SetVariableValue<float>("MoveSpeed", Model.MoveSpeed);
+        treeAgent.SetVariableValue<float>("AttackDistance", Model.AttackDistance);
+        treeAgent.SetVariableValue<float>("AttackDistanceWithClearance", Model.AttackDistanceWithClearance);
+        treeAgent.SetVariableValue<float>("AttackDelay", Model.AttackDelay);
         treeAgent.SetVariableValue<float>("CurrentDistance", float.MaxValue);
         treeAgent.SetVariableValue<MonsterController>("Controller", this);
         treeAgent.Restart();
@@ -93,6 +95,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public virtual void OnDeath()
     {
         InGameManager.Instance.monsterDeathStack.Value--;
+        if (attackCo != null) StopCoroutine(attackCo);
         StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
         //QuestManager.Instance.UpdateQuest("Monster", 1);
