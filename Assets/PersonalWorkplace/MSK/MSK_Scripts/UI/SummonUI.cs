@@ -109,12 +109,12 @@ public class SummonUI : UIBase
     }
     private async Task SummonLevelChange()
     {
-        summonCount = await CurrencyManager.Instance.LoadSummonCountFromFireBase();
-        int levelValue = await CurrencyManager.Instance.LoadSummonLevelFromFireBase();
-        userSummonLevel = (SummonLevel)levelValue;
+        var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
+        summonCount = profile.SummonCount;
+        userSummonLevel = profile.SummonLevel;
         requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
 
-        summonLevelText.text = "영웅 뽑기 레벨 " + levelValue.ToString();
+        summonLevelText.text = "영웅 뽑기 레벨 " + userSummonLevel.ToString();
         UpdateSummonSlider();
     }
     private void UpdateSummonSlider()
