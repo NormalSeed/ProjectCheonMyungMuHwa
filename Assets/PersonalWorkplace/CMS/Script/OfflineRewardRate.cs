@@ -12,7 +12,22 @@ public class OfflineRewardRate
 
 public class OfflineRewardSystem : MonoBehaviour
 {
+    public static OfflineRewardSystem Instance { get; private set; }
+
     [SerializeField] private List<OfflineRewardRate> rewardRates;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public Dictionary<CurrencyType, int> CalculateRewards(TimeSpan offlineTime, int clearedStage)
     {

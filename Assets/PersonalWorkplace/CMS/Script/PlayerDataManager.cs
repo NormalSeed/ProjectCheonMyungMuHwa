@@ -5,7 +5,6 @@ public class PlayerDataManager : MonoBehaviour
     public static PlayerDataManager Instance;
 
     public int ClearedStage { get; private set; } = 1;
-    public double Gold { get; private set; } = 0;
 
     private void Awake()
     {

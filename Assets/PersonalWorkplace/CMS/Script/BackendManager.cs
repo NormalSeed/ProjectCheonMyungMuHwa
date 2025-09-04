@@ -5,6 +5,7 @@ using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BackendManager : MonoBehaviour
 {
@@ -24,6 +25,14 @@ public class BackendManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+    private void Start()
+    {
+        if (OfflineRewardSystem.Instance == null)
+        {
+            var go = new GameObject("OfflineRewardSystem");
+            go.AddComponent<OfflineRewardSystem>();
         }
     }
 
@@ -102,12 +111,11 @@ public class BackendManager : MonoBehaviour
     }
 
     // PlayerData 불러오기
-    public void LoadPlayerData(System.Action<int, double> onLoaded)
+    public void LoadPlayerData(Action<int, double, Dictionary<CurrencyType, int>> onLoaded)
     {
         if (Auth.CurrentUser == null)
         {
-            Debug.LogWarning("로그인된 유저 없음, 데이터 불러오기 실패");
-            onLoaded?.Invoke(1, 0);
+            onLoaded?.Invoke(1, 0, new Dictionary<CurrencyType, int>());
             return;
         }
 
@@ -118,8 +126,7 @@ public class BackendManager : MonoBehaviour
         {
             if (task.IsCanceled || task.IsFaulted)
             {
-                Debug.LogError("데이터 불러오기 실패: " + task.Exception);
-                onLoaded?.Invoke(1, 0);
+                onLoaded?.Invoke(1, 0, new Dictionary<CurrencyType, int>());
                 return;
             }
 
@@ -132,32 +139,27 @@ public class BackendManager : MonoBehaviour
             {
                 if (snapshot.HasChild("clearedStage"))
                     stage = int.Parse(snapshot.Child("clearedStage").Value.ToString());
-
                 if (snapshot.HasChild("gold"))
                     gold = double.Parse(snapshot.Child("gold").Value.ToString());
-
                 if (snapshot.HasChild("lastLogoutTime"))
-                {
-                    string lastLogoutStr = snapshot.Child("lastLogoutTime").Value.ToString();
-                    if (DateTime.TryParse(lastLogoutStr, out DateTime parsedTime))
-                        lastLogout = parsedTime;
-                }
+                    DateTime.TryParse(snapshot.Child("lastLogoutTime").Value.ToString(), out lastLogout);
             }
 
-            // 오프라인 보상 계산
+            // 오프라인 보상 계산 (서버 시간 기준)
             TimeSpan offlineDuration = DateTime.UtcNow - lastLogout;
-            double reward = offlineDuration.TotalSeconds * 1; // 1초당 1골드 예시
-            gold += reward;
+            offlineDuration = offlineDuration.TotalHours > 8 ? TimeSpan.FromHours(8) : offlineDuration;
 
-            Debug.Log($"[오프라인 보상] {offlineDuration.TotalMinutes:F1}분 → {reward} 골드 지급!");
+            var rewards = OfflineRewardSystem.Instance.CalculateRewards(offlineDuration, stage);
+            double totalGold = gold + rewards
+                .Where(r => r.Key == CurrencyType.Gold)
+                .Sum(r => r.Value);
 
-            // PlayerDataManager에 반영
-            PlayerDataManager.Instance.ApplyData(stage, gold);
+            // 서버에 새 데이터 저장
+            UpdatePlayerData(stage, totalGold);
 
-            // 최신 데이터 다시 서버에 저장
-            UpdatePlayerData(stage, gold);
-
-            onLoaded?.Invoke(stage, gold);
+            // 로컬 반영
+            PlayerDataManager.Instance.ApplyData(stage, totalGold);
+            onLoaded?.Invoke(stage, totalGold, rewards);
         });
     }
 
