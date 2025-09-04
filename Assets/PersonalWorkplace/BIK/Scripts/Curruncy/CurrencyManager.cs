@@ -78,7 +78,7 @@ public class CurrencyManager : IStartable, IDisposable
     }
 
     #endregion // mono funcs
-
+    
 
 
 
@@ -348,5 +348,7 @@ public class CurrencyManager : IStartable, IDisposable
         int count = Convert.ToInt32(dataSnapshop.Value);
         return count;
     }
+
+
     #endregion
 }
