@@ -101,15 +101,15 @@ public class QuestUIManager : UIBase
     {
         if (QuestManager.Instance == null) return;
 
-        // 기존 UI 제거
         foreach (Transform child in contentParent)
             Destroy(child.gameObject);
 
-        // 새로운 UI 생성
         var quests = QuestManager.Instance.GetQuestsByCategory(currentCategory);
+        Debug.Log($"[UI] {currentCategory} 퀘스트 {quests.Count}개 로드됨");
 
         foreach (var quest in quests)
         {
+            Debug.Log($"[UI] {currentCategory} 표시: {quest.questID} / {quest.questName}");
             var ui = Instantiate(questUIPrefab, contentParent);
             var ctrl = ui.GetComponent<QuestUIController>();
             if (ctrl != null) ctrl.SetData(quest);

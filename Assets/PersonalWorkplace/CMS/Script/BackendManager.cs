@@ -2,6 +2,8 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BackendManager : MonoBehaviour
@@ -43,8 +45,6 @@ public class BackendManager : MonoBehaviour
                 Database = FirebaseDatabase.DefaultInstance;
 
                 Debug.Log("Firebase 초기화 완료!");
-
-                // Firebase 준비가 끝나면 로그인 시도
                 SignInAnonymously();
             }
             else
@@ -57,12 +57,8 @@ public class BackendManager : MonoBehaviour
     // 익명 로그인
     private void SignInAnonymously()
     {
-        Debug.Log("SignInAnonymously 호출됨");
-
         Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
         {
-            Debug.Log("Firebase SignIn 결과 콜백 도착");
-
             if (task.IsCanceled || task.IsFaulted)
             {
                 Debug.LogError("익명 로그인 실패: " + task.Exception);
@@ -73,14 +69,104 @@ public class BackendManager : MonoBehaviour
             Debug.Log($"익명 로그인 성공 UID: {newUser.UserId}");
 
             if (QuestManager.Instance != null)
-            {
-                Debug.Log("QuestManager.Instance 찾음, 초기화 호출");
                 QuestManager.Instance.InitializeAfterLogin();
-            }
-            else
-            {
-                Debug.LogWarning("QuestManager.Instance 없음");
-            }
         });
+    }
+
+    // PlayerData 저장
+    public void UpdatePlayerData(int clearedStage, double gold)
+    {
+        if (Auth.CurrentUser == null)
+        {
+            Debug.LogWarning("로그인된 유저 없음 → 저장 불가");
+            return;
+        }
+
+        string uid = Auth.CurrentUser.UserId;
+        DatabaseReference userRef = Database.RootReference.Child("players").Child(uid);
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "clearedStage", clearedStage },
+            { "gold", gold },
+            { "lastLogoutTime", System.DateTime.UtcNow.ToString("o") }
+        };
+
+        userRef.UpdateChildrenAsync(updates).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled || task.IsFaulted)
+                Debug.LogError("플레이어 데이터 저장 실패: " + task.Exception);
+            else
+                Debug.Log($"[서버 저장 완료] Stage={clearedStage}, Gold={gold}");
+        });
+    }
+
+    // PlayerData 불러오기
+    public void LoadPlayerData(System.Action<int, double> onLoaded)
+    {
+        if (Auth.CurrentUser == null)
+        {
+            Debug.LogWarning("로그인된 유저 없음, 데이터 불러오기 실패");
+            onLoaded?.Invoke(1, 0);
+            return;
+        }
+
+        string uid = Auth.CurrentUser.UserId;
+        DatabaseReference userRef = Database.RootReference.Child("players").Child(uid);
+
+        userRef.GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled || task.IsFaulted)
+            {
+                Debug.LogError("데이터 불러오기 실패: " + task.Exception);
+                onLoaded?.Invoke(1, 0);
+                return;
+            }
+
+            DataSnapshot snapshot = task.Result;
+            int stage = 1;
+            double gold = 0;
+            DateTime lastLogout = DateTime.UtcNow;
+
+            if (snapshot.Exists)
+            {
+                if (snapshot.HasChild("clearedStage"))
+                    stage = int.Parse(snapshot.Child("clearedStage").Value.ToString());
+
+                if (snapshot.HasChild("gold"))
+                    gold = double.Parse(snapshot.Child("gold").Value.ToString());
+
+                if (snapshot.HasChild("lastLogoutTime"))
+                {
+                    string lastLogoutStr = snapshot.Child("lastLogoutTime").Value.ToString();
+                    if (DateTime.TryParse(lastLogoutStr, out DateTime parsedTime))
+                        lastLogout = parsedTime;
+                }
+            }
+
+            // 오프라인 보상 계산
+            TimeSpan offlineDuration = DateTime.UtcNow - lastLogout;
+            double reward = offlineDuration.TotalSeconds * 1; // 1초당 1골드 예시
+            gold += reward;
+
+            Debug.Log($"[오프라인 보상] {offlineDuration.TotalMinutes:F1}분 → {reward} 골드 지급!");
+
+            // PlayerDataManager에 반영
+            PlayerDataManager.Instance.ApplyData(stage, gold);
+
+            // 최신 데이터 다시 서버에 저장
+            UpdatePlayerData(stage, gold);
+
+            onLoaded?.Invoke(stage, gold);
+        });
+    }
+
+    // 앱 종료 시 저장
+    private void OnApplicationQuit()
+    {
+        if (Auth.CurrentUser != null)
+        {
+            UpdatePlayerData(PlayerDataManager.Instance.ClearedStage, PlayerDataManager.Instance.Gold);
+        }
     }
 }
