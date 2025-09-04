@@ -5,7 +5,7 @@ public class PlayerDataManager : MonoBehaviour
     public static PlayerDataManager Instance;
 
     public int ClearedStage { get; private set; } = 1;
-    public double Gold { get; private set; } = 0;
+    public double Gold { get; private set; } = 0; // 로컬 골드 관리
 
     private void Awake()
     {
@@ -25,23 +25,22 @@ public class PlayerDataManager : MonoBehaviour
     {
         ClearedStage = stage;
         Gold = gold;
-
         Debug.Log($"[데이터 적용 완료] Stage={stage}, Gold={gold}");
     }
 
-    // Stage 업데이트
+    // 골드 추가
+    public void AddGold(double amount)
+    {
+        Gold += amount;
+        Debug.Log($"골드 추가: +{amount}, 현재 골드: {Gold}");
+    }
+
+    // Stage 업데이트, 서버 저장
     public void SetClearedStage(int stage)
     {
         if (stage > ClearedStage)
             ClearedStage = stage;
 
-        BackendManager.Instance.UpdatePlayerData(ClearedStage, Gold);
-    }
-
-    // Gold 업데이트
-    public void AddGold(double amount)
-    {
-        Gold += amount;
         BackendManager.Instance.UpdatePlayerData(ClearedStage, Gold);
     }
 }
