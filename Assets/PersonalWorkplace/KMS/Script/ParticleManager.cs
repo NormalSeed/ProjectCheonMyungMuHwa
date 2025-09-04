@@ -50,7 +50,7 @@ public class ParticleManager : MonoBehaviour
     {
         ParticleSystem part = poolDict[name].Get();
         part.transform.position = pos;
-        part.transform.localScale = new Vector3(scale, scale, scale);
+        part.transform.localScale = scale * Vector3.one;
         part.transform.SetParent(parent);
         if (!part.main.loop)
         {

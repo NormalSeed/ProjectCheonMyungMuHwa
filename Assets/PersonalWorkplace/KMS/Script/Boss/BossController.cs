@@ -20,6 +20,8 @@ public abstract class BossController : MonsterController
     private bool isInvulnerable;
     public System.Action OnSpawnAmimEnd;
 
+    [SerializeField] protected Transform selfEffectTrs;
+
     [Inject]
     public void Construct(Image bossbar)
     {
@@ -30,17 +32,19 @@ public abstract class BossController : MonsterController
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
         healthBar.fillAmount = 1;
         healthBar.transform.parent.gameObject.SetActive(true);
-        treeAgent.SetVariableValue<float>("AttackDelay", Model.BaseModel.AttackDelay);
+        treeAgent.SetVariableValue<float>("AttackDelay", Model.AttackDelay);
         treeAgent.SetVariableValue<BossController>("Controller", this);
         treeAgent.Restart();
     }
     public void OnSpawn()
     {
         isInvulnerable = true;
+        transform.localScale = Vector3.one;
         StartCoroutine(SpawnRoutine());
     }
     public override void OnDeath()
     {
+        if (attackCo != null) StopCoroutine(attackCo);
         InGameManager.Instance.SetNextStage();
         InGameManager.Instance.monsterDeathStack.Value--;
         healthBar.transform.parent.gameObject.SetActive(false);
@@ -63,6 +67,7 @@ public abstract class BossController : MonsterController
     protected override IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return RealAttackDelay;
+        ParticleManager.Instance.GetParticle("NormalBoss_AtkEffect", selfEffectTrs.position, scale: 3);
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject go in players)
         {
