@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -40,7 +41,7 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     }
-    private void OnEnable()
+    private async void OnEnable()
     {
         Init();
     }
@@ -54,10 +55,10 @@ public class HeroInfoSetting : MonoBehaviour
     #endregion
 
     #region Init    
-    private void Init()
+    private async Task Init()
     {
         HeroID = chardata.HeroID;
-        HeroStage = chardata.HeroStage;
+        HeroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(HeroID);
         rarity = chardata.rarity;
         faction = chardata.faction;
 
