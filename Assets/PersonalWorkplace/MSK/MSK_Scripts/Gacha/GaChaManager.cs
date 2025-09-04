@@ -145,11 +145,10 @@ public class GachaManager : MonoBehaviour
                 await LevelUpAsync();
             }
         }
-
+        StartCoroutine(ProcessResultsCoroutine(results));
         await SaveUserSummonCountAsync();
         resultUI.ShowSummonResult(results);
-        StartCoroutine(ProcessResultsCoroutine(results));
-        await SaveGachaHistoryAsync(results);
+        // await SaveGachaHistoryAsync(results); //소환기록 추가
     }
 
     //  소환레벨 업
@@ -198,6 +197,8 @@ public class GachaManager : MonoBehaviour
         };
 
             await historyRef.Child(key).SetValueAsync(data);
+            // 기록 삭제
+            // await historyRef.RemoveValueAsync();
         }
     }
 
