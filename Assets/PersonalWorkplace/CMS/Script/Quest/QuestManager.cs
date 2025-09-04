@@ -84,44 +84,43 @@ public class QuestManager : MonoBehaviour
             {
                 Debug.Log("Firebase 응답 도착");
 
-                if (task.IsFaulted || task.IsCanceled)
+                if (task.IsFaulted || task.IsCanceled || !task.Result.Exists)
                 {
-                    Debug.LogError("서버 퀘스트 로드 실패, CSV 데이터만 사용");
+                    Debug.LogWarning("서버 진행상황 없음 → CSV 기준 초기 저장");
+                    SaveQuests();
                     IsReady = true;
                     OnQuestsUpdated?.Invoke();
                     return;
                 }
 
-                if (task.Result.Exists)
-                {
-                    Debug.Log($"퀘스트 데이터 존재, {task.Result.GetRawJsonValue()}");
+                // 진행상황만 덮어쓰기
+                var wrapper = JsonUtility.FromJson<SerializationWrapper<QuestProgressData>>(task.Result.GetRawJsonValue());
+                var dict = wrapper.ToDictionary();
 
-                    QuestList wrapper = JsonUtility.FromJson<QuestList>(task.Result.GetRawJsonValue());
-                    if (wrapper != null && wrapper.quests != null)
+                foreach (var kvp in dict)
+                {
+                    string questId = kvp.Key;
+                    var progressData = kvp.Value;
+
+                    if (activeQuests.TryGetValue(questId, out var localQuest))
                     {
-                        foreach (var quest in wrapper.quests)
-                        {
-                            if (activeQuests.ContainsKey(quest.questID))
-                                activeQuests[quest.questID] = quest;
-                            else
-                                activeQuests.Add(quest.questID, quest);
-
-                            Debug.Log($"불러온 퀘스트: {quest.questID}, {quest.questName}");
-                        }
+                        // Firebase 진행상황 반영
+                        localQuest.valueProgress = progressData.progress;
+                        localQuest.isComplete = progressData.isComplete;
+                        localQuest.isClaimed = progressData.isClaimed;
+                        localQuest.lastUpdated = new DateTime(progressData.lastUpdated, DateTimeKind.Utc);
+                        localQuest.lastWeek = progressData.lastWeek;
                     }
+                    else
+                    {
+                        Debug.LogWarning($"서버에만 존재하는 퀘스트 발견: {questId}, CSV에 없음, 무시");
+                    }
+                }
 
-                    Debug.Log($"서버 퀘스트 로드 성공, {activeQuests.Count}개 퀘스트 적용됨");
-                    CheckAndResetQuests();
-                    IsReady = true;
-                    OnQuestsUpdated?.Invoke();
-                }
-                else
-                {
-                    Debug.Log("서버 데이터 없음, CSV 데이터 저장");
-                    SaveQuests();
-                    IsReady = true;
-                    OnQuestsUpdated?.Invoke();
-                }
+                Debug.Log($"서버 진행상황 병합 완료: {activeQuests.Count}개 퀘스트 적용됨");
+                CheckAndResetQuests();
+                IsReady = true;
+                OnQuestsUpdated?.Invoke();
             });
     }
 
@@ -248,9 +247,35 @@ public class QuestManager : MonoBehaviour
     private void SaveQuests()
     {
         string userId = BackendManager.Auth.CurrentUser.UserId;
-        QuestList wrapper = new QuestList(activeQuests.Values);
-        string json = JsonUtility.ToJson(wrapper);
+
+        Dictionary<string, QuestProgressData> saveData = new Dictionary<string, QuestProgressData>();
+        foreach (var quest in activeQuests.Values)
+            saveData[quest.questID] = new QuestProgressData(quest);
+
+        string json = JsonUtility.ToJson(new SerializationWrapper<QuestProgressData>(saveData));
         dbRef.Child("users").Child(userId).Child("quests").SetRawJsonValueAsync(json);
+    }
+
+    // JSON 직렬화를 위한 래퍼
+    [System.Serializable]
+    private class SerializationWrapper<T>
+    {
+        public List<string> keys;
+        public List<T> values;
+
+        public SerializationWrapper(Dictionary<string, T> dict)
+        {
+            keys = new List<string>(dict.Keys);
+            values = new List<T>(dict.Values);
+        }
+
+        public Dictionary<string, T> ToDictionary()
+        {
+            var dict = new Dictionary<string, T>();
+            for (int i = 0; i < keys.Count; i++)
+                dict[keys[i]] = values[i];
+            return dict;
+        }
     }
 
     // 주차 계산
@@ -308,4 +333,24 @@ public class QuestManager : MonoBehaviour
         public QuestList(IEnumerable<Quest> quests) =>
             this.quests = new List<Quest>(quests);
     }
+    // 서버에 올릴 진행상황 전용 데이터
+    [System.Serializable]
+    private class QuestProgressData
+    {
+        public int progress;
+        public bool isComplete;
+        public bool isClaimed;
+        public long lastUpdated;
+        public int lastWeek;
+
+        public QuestProgressData(Quest quest)
+        {
+            progress = quest.valueProgress;
+            isComplete = quest.isComplete;
+            isClaimed = quest.isClaimed;
+            lastUpdated = quest.lastUpdated.ToUniversalTime().Ticks;
+            lastWeek = quest.lastWeek;
+        }
+    }
+
 }
