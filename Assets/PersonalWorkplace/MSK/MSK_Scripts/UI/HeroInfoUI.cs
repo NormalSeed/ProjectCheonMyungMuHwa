@@ -151,7 +151,10 @@ public class HeroInfoUI : UIBase
         health.text = HealthPoint.ToString();
         power.text = CountingHeroPower();
         exp.text = RequireLevelUpGold(heroLevel);
-        heroPiece.text = $"{ownerPiece} / {requirePiece}";
+        if (heroStage >= 5)
+            heroPiece.text = "돌파 불가능";
+        else
+            heroPiece.text = $"{requirePiece} / {ownerPiece}";
     }
 
     private void SetCharacter()
@@ -301,9 +304,13 @@ public class HeroInfoUI : UIBase
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroID, heroStage);
         //  조각 사용 후 저장
         CurrencyManager.Instance.SavePieceToFireBase(heroID, ownerPiece);
+
         requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
-        
-        heroPiece.text = $"{ownerPiece} / {requirePiece}";
+
+        if (heroStage >= 5)
+            heroPiece.text = "돌파 불가능";
+        else
+            heroPiece.text = $"{requirePiece} / {ownerPiece}";
         SetStage();
 
         SetRankUpInteractable(stageUPButton);
