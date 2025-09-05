@@ -19,10 +19,10 @@ public class HeroListManager : MonoBehaviour
         StartCoroutine(RefreshHeroList());
     }
     #endregion
-    
+
     private IEnumerator RefreshHeroList()
     {
-        var ownedIds = new List<string>();
+        var ownedIds = new HashSet<string>();
         var charInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
 
         var loadTask = charInfoRef.GetValueAsync();
@@ -30,7 +30,7 @@ public class HeroListManager : MonoBehaviour
 
         if (loadTask.Exception != null)
         {
-            Debug.LogError($"Failed to load hero info: {loadTask.Exception}");
+            Debug.LogError($"[HeroListManager] Firebase 로딩 실패: {loadTask.Exception}");
             yield break;
         }
 
@@ -38,19 +38,20 @@ public class HeroListManager : MonoBehaviour
         foreach (var child in snapshot.Children)
         {
             var hasHero = child.Child("hasHero");
-            if (hasHero.Exists && (bool)hasHero.Value)
+            if (hasHero.Exists && hasHero.Value is bool owned && owned)
                 ownedIds.Add(child.Key);
         }
 
         foreach (Transform cardTransform in parentTransform)
         {
             var infoSetter = cardTransform.GetComponent<HeroInfoSetting>();
-            if (infoSetter == null || infoSetter.chardata == null)
+            if (infoSetter == null || string.IsNullOrEmpty(infoSetter.HeroID))
                 continue;
 
-            string heroId = infoSetter.chardata.HeroID;
-            bool isOwned = ownedIds.Contains(heroId);
+            bool isOwned = ownedIds.Contains(infoSetter.HeroID);
             cardTransform.gameObject.SetActive(isOwned);
         }
+
+        Debug.Log($"[HeroListManager] 보유 영웅 {ownedIds.Count}명 기준으로 카드 활성화 완료");
     }
 }

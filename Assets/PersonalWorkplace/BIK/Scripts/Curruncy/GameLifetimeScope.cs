@@ -31,10 +31,10 @@ public class GameLifetimeScope : LifetimeScope
         // 재화
         builder.Register<CurrencyModel>(Lifetime.Singleton)
                .As<ICurrencyModel>();
-
         builder.RegisterEntryPoint<CurrencyManager>(Lifetime.Singleton);
-
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
+        // 영웅정보
+        builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton);
     }
 }
