@@ -1,6 +1,4 @@
 using Firebase.Database;
-using System;
-using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -11,11 +9,6 @@ using UnityEngine.UI;
 public class HeroInfoUI : UIBase
 {
     #region SerializeField
-    [Header("Hero Info SO")]
-    [SerializeField] private CardInfo chardata;         // 캐릭터 카드 SO
-    [SerializeField] private PlayerModelSO modelInfo;   // 캐릭터 스텟 SO
-    [SerializeField] private SkillSet skillInfo;        // 캐릭터 스킬 SO
-
     [Header("Button")]
     [SerializeField] private Button exitButton;         // 나가기 버튼
     [SerializeField] private Button upgradeButton;      // 레벨업 버튼
@@ -41,17 +34,8 @@ public class HeroInfoUI : UIBase
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     #endregion
 
-    #region CardInfo SO Properties
-    // CardInfo SO 에서 받아오는 정보들
-    private string heroID;              // 캐릭터 ID
-    private int heroStage;              // 돌파정보
-    private HeroRarity rarity;          // 레어도
-    private HeroFaction faction;        // 진영
-    #endregion
-
-    #region PlayerModel SO Properties
-    private string heroName;        // 이름정보
-    private int heroLevel;          // 레벨정보
+    #region SO Properties
+    private HeroData heroData;
     private BigCurrency HealthPoint = new();     // 체력정보
     private BigCurrency FinalPower = new();      // 종합전투
     private BigCurrency InnAtkPoint = new();     // 내공????
@@ -72,8 +56,11 @@ public class HeroInfoUI : UIBase
     #region Unity LiftCycle
     private void OnEnable()
     {
-        Init();
+        exitButton.onClick.AddListener(OnClickExit);
+        upgradeButton.onClick.AddListener(OnClickUpgrade);
+        stageUPButton.onClick.AddListener(OnClickStageUP);
     }
+
     private void OnDisable()
     {
         exitButton.onClick.RemoveListener(OnClickExit);
@@ -85,57 +72,26 @@ public class HeroInfoUI : UIBase
     #region Init 
     private async void Init()
     {
-        // CardInfo 정보
-        CardInfInit();
-        // 버튼 리스너 추가
-        ButtonAddListener();
-        // PlayerModelSO 정보
-        await LoadModelInfo(heroID);
-        // 텍스트정보 추가
-        InfoTextSetting();
-        // 전투력 계산 코드
-        CountingHeroPower();
-        // HeroInfoSetting 에 있는 함수 그대로
-        SetCharacter();         // 이미지세팅
-        SetStage();             // 돌파세팅
-        SetBadge();             // 진영(소속) 세팅
-        SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 상호작용 가능 여부
-        SetRankUpInteractable(stageUPButton);  // 캐릭터 돌파버튼 상호작용 여부
+        ButtonAddListener();                 // 버튼 리스너 연결
+        PrepareHeroStats();                 // 능력치 및 조각 계산
+        InfoTextSetting();                  // 텍스트 UI 세팅
+        await SetCharacter(heroData.PlayerModelSO.SpriteKey); // 이미지 로딩
+        SetStage();                         // 돌파 단계 표시
+        SetBadge();                         // 진영 표시
+        SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 활성화 여부
+        SetRankUpInteractable(stageUPButton);  // 돌파 버튼 활성화 여부
     }
-    private void CardInfInit()
+    private void PrepareHeroStats()
     {
-        heroID = chardata.HeroID;
-        heroStage = chardata.HeroStage;
-        rarity = chardata.rarity;
-        faction = chardata.faction;
-    }
-    private async Task LoadModelInfo(string heroID)
-    {
-        var handle = Addressables.LoadAssetAsync<PlayerModelSO>(heroID + "_model");
-        await handle.Task;
+        HealthPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint);
+        ExtAtkPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.ExtAtkPoint);
+        InnAtkPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.InnAtkPoint);
+        requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
 
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            modelInfo = handle.Result;
-            await ModelInfoInit();
-        }
+        ownerPiece = heroData.heroPiece;
+        requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
     }
-    private async Task ModelInfoInit()
-    {
-        // 레벨 정보 불러오고 진행
-        heroLevel = await CurrencyManager.Instance.LoadCharacterInfoFromFireBase(heroID);
-        HealthPoint = BigCurrency.FromBaseAmount(modelInfo.HealthPoint);
-        ExtAtkPoint = BigCurrency.FromBaseAmount(modelInfo.ExtAtkPoint);
-        InnAtkPoint = BigCurrency.FromBaseAmount(modelInfo.InnAtkPoint);
-        requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
 
-        // 조각정보 불러오기
-        heroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(heroID);
-        ownerPiece = await CurrencyManager.Instance.LoadPieceFromFireBase(heroID);
-        requirePiece = heroStage * (5 - (int)rarity);
-        Debug.Log($"{heroStage} 돌파");
-        heroName = modelInfo.CharName;
-    }
     private void ButtonAddListener()
     {
         exitButton.onClick.AddListener(OnClickExit);
@@ -144,35 +100,31 @@ public class HeroInfoUI : UIBase
     }
     private void InfoTextSetting()
     {
-        charName.text = heroName;
-        level.text = heroLevel.ToString();
-        inPow.text = InnAtkPoint.ToString();
-        outPow.text = ExtAtkPoint.ToString();
-        health.text = HealthPoint.ToString();
+        charName.text = heroData.PlayerModelSO.CharName;
+        level.text = heroData.PlayerModelSO.Level.ToString();
+        health.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint).ToString();
+        outPow.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.ExtAtkPoint).ToString();
+        inPow.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.InnAtkPoint).ToString();
         power.text = CountingHeroPower();
-        exp.text = RequireLevelUpGold(heroLevel);
-        if (heroStage >= 5)
-            heroPiece.text = "돌파 불가능";
-        else
-            heroPiece.text = $"{requirePiece} / {ownerPiece}";
+        exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
+        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
     }
 
-    private void SetCharacter()
+    private async Task SetCharacter(string spriteKey)
     {
-        Addressables.LoadAssetAsync<Sprite>(heroID + "_sprite").Completed += task =>
-        {
-            if (task.Status == AsyncOperationStatus.Succeeded)
-            {
-                characterRoot.sprite = task.Result;
-            }
-        };
+        var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
+        await handle.Task;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+            characterRoot.sprite = handle.Result;
     }
+
     private void SetBadge()
     {
         foreach (Transform child in badgeRoot)
             child.gameObject.SetActive(false);
 
-        Transform target = badgeRoot.Find(faction.ToString());
+        Transform target = badgeRoot.Find(heroData.cardInfo.faction.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
     }
@@ -180,50 +132,30 @@ public class HeroInfoUI : UIBase
     {
         foreach (Transform stage in stageRoot)
         {
-            Transform red = stage.Find("Red");
-            Transform gray = stage.Find("Gray");
-
-            if (red != null) red.gameObject.SetActive(false);
-            if (gray != null) gray.gameObject.SetActive(true);
+            stage.Find("Red")?.gameObject.SetActive(false);
+            stage.Find("Gray")?.gameObject.SetActive(true);
         }
 
-        for (int i = 1; i <= heroStage; i++)
+        for (int i = 1; i <= heroData.stage; i++)
         {
             Transform stage = stageRoot.Find("Stage" + i);
             if (stage != null)
             {
-                Transform red = stage.Find("Red");
-                Transform gray = stage.Find("Gray");
-
-                if (red != null) red.gameObject.SetActive(true);
-                if (gray != null) gray.gameObject.SetActive(false);
+                stage.Find("Red")?.gameObject.SetActive(true);
+                stage.Find("Gray")?.gameObject.SetActive(false);
             }
         }
     }
     // 버튼 설정여부
     private void SetUpgradeInteractable(Button btn)
     {
-        if (CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold)
-        {
-            btn.interactable = true;
-        }
-        else
-        {
-            btn.interactable = false;
-        }
+        btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold;
     }
-    // 버틑 설정여부
+
     private void SetRankUpInteractable(Button btn)
     {
-        if (ownerPiece >= requirePiece)
-        {
-            btn.interactable = true;
-        }
-        else
-        {
-            btn.interactable = false;
-        }
-    }
+        btn.interactable = ownerPiece >= requirePiece;
+    }   
     #endregion
 
     #region OnClick
@@ -248,25 +180,20 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroLevelUpgrade()
     {
-        bool result = CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold);
-
-        if (result)
+        if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
         {
-            heroLevel++;
-            level.text = heroLevel.ToString();
-            exp.text = RequireLevelUpGold(heroLevel);
-            requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
-            CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroID, heroLevel);
+            heroData.PlayerModelSO.Level++;
+            level.text = heroData.PlayerModelSO.Level.ToString();
+            requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
+            exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
+
+            CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
 
             // GameEvents 안의 이벤트 호출
-            GameEvents.HeroLevelChanged(heroLevel);
+            GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
 
-            Debug.Log("[HeroLevelUpgrade] : 골드 소모");
+            SetUpgradeInteractable(upgradeButton);
         }
-        else
-            Debug.Log("[HeroLevelUpgrade] :골드 부족함");
-
-        SetUpgradeInteractable(upgradeButton);
     }
 
     /// <summary>
@@ -275,8 +202,10 @@ public class HeroInfoUI : UIBase
     /// <returns></returns>
     private string CountingHeroPower()
     {
-        //  임시 계산식
-        double power = modelInfo.ExtAtkPoint * modelInfo.HealthPoint * modelInfo.InnAtkPoint * 0.7;
+        double power = heroData.PlayerModelSO.ExtAtkPoint *
+                       heroData.PlayerModelSO.HealthPoint *
+                       heroData.PlayerModelSO.InnAtkPoint * 0.7;
+
         return BigCurrency.FromBaseAmount(power).ToString();
     }
 
@@ -296,41 +225,31 @@ public class HeroInfoUI : UIBase
     /// 캐릭터 돌파 코드입니다.
     /// </summary>
     /// <param name="piece"></param>
-    private void HeroRankUpPiece( )
+    private void HeroRankUpPiece()
     {
         // 5회 아상 돌파방지 코드
-        if (heroStage >= 5)
-            return;
+        if (heroData.stage >= 5) return;
 
         ownerPiece -= requirePiece;
-        heroStage++;
+        heroData.stage++;
+        heroData.heroPiece = ownerPiece;
         //  돌파저장
-        CurrencyManager.Instance.SaveHeroStageToFireBase(heroID, heroStage);
-        //  조각 사용 후 저장
-        CurrencyManager.Instance.SavePieceToFireBase(heroID, ownerPiece);
+        CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
+        CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
 
-        requirePiece = heroStage * (5 - (int)rarity);   // 임시 계산식
+        requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
+        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
 
-        if (heroStage >= 5)
-            heroPiece.text = "돌파 불가능";
-        else
-            heroPiece.text = $"{requirePiece} / {ownerPiece}";
         SetStage();
-
         SetRankUpInteractable(stageUPButton);
     }
     #endregion
 
     #region Public
-
-    /// <summary>
-    /// CardInfo SO 세팅용 코드입니다.
-    /// </summary>
-    /// <param name="Info"></param>
-    public void HeroSOInfoSetting(CardInfo Info)
+    public void SetHeroData(HeroData data)
     {
-        chardata = Info;
-        Debug.Log($"SO {Info}로 세팅됨");
+        heroData = data;
+        Init();
     }
     #endregion
 }

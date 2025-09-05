@@ -40,7 +40,7 @@ public class PlayerModelSO : ScriptableObject
     public double ExtAtkPoint;
     public double InnAtkPoint;
     public double DefPoint;
-    // 위 4개 능력치는 계산식 적용해서 초기화 필요
+    // 위 4개 능력치는 계산식 적용해서 초기화 필요    
     public float AtkSpeed;
     public float MoveSpeed;
     public float AtkRange;

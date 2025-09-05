@@ -9,6 +9,7 @@ using VContainer.Unity;
 
 public class HeroDataManager : IStartable
 {
+    public static HeroDataManager Instance { get; private set; }
 
     private string _uid;
     private DatabaseReference _dbRef;
@@ -20,6 +21,7 @@ public class HeroDataManager : IStartable
     }
     private void Start()
     {
+        Instance = this;    
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
