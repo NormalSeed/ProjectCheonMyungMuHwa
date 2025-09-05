@@ -90,7 +90,6 @@ public class PlayerController : MonoBehaviour, IDamagable
 
                     // Firebase에서 캐릭터 레벨 정보 불러오기
                     string userID = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-                    Debug.Log("현재 유저 아이디 : " + userID);
                     string path = $"users/{userID}/character/charInfo/{charID}";
 
                     FirebaseDatabase.DefaultInstance
@@ -117,8 +116,6 @@ public class PlayerController : MonoBehaviour, IDamagable
                                 int level = int.Parse(snapshot.Child("level").Value.ToString());
                                 int stage = int.Parse(snapshot.Child("stage").Value.ToString());
 
-                                Debug.Log("현재 데이터베이스에 저장된 레벨 : " + level);
-
                                 // 모델에 적용
                                 model.modelSO.Level = level;
                                 model.modelSO.Grade = stage;
@@ -132,7 +129,6 @@ public class PlayerController : MonoBehaviour, IDamagable
                         });
 
                     LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
-                    Debug.Log($"현재 플레이어 레벨 : {model.modelSO.Level}");
                 }
                 else
                 {
