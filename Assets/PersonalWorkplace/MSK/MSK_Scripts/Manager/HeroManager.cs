@@ -1,20 +1,26 @@
 using Firebase.Database;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
-public class HeroManager : MonoBehaviour
+public class HeroDataManager : IStartable
 {
-    public static HeroManager Instance { get; private set; }
-
-    public Dictionary<string, HeroData> ownedHeroes = new Dictionary<string, HeroData>();
 
     private string _uid;
     private DatabaseReference _dbRef;
+    public Dictionary<string, HeroData> ownedHeroes = new();
 
-    public void Start()
+    void IStartable.Start()
     {
+        Start();
+    }
+    private void Start()
+    { 
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
+
+        LoadAllHeroData();
     }
 
     private void LoadAllHeroData()
@@ -24,7 +30,8 @@ public class HeroManager : MonoBehaviour
 
         var heroInfoPath = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
 
-        heroInfoPath.GetValueAsync().ContinueWith(task => {
+        heroInfoPath.GetValueAsync().ContinueWith(task =>
+        {
             if (task.IsFaulted)
             {
                 Debug.LogError("Firebase 데이터 가져오기 실패");
@@ -47,5 +54,8 @@ public class HeroManager : MonoBehaviour
                 Debug.Log($"총 {ownedHeroes.Count}명의 영웅 정보를 불러왔습니다.");
             }
         });
+        Debug.Log($"[HeroManager] LoadAllHeroData.");
     }
+
+
 }
