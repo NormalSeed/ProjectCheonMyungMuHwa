@@ -114,5 +114,9 @@ public class PopupManager : MonoBehaviour
         Debug.Log("[PopupManager] 모든 팝업 닫음");
     }
 
+    public bool TryGetPopup(PopupType popupType, out UIBase popup)
+    {
+        return _popupDict.TryGetValue(popupType, out popup);
+    }
     #endregion // public funcs
 }
