@@ -81,6 +81,10 @@ public class PopupManager : MonoBehaviour
 
         // TODO: popup 내부에 message, 버튼 콜백 전달
     }
+    public bool TryGetPopup(PopupType popupType, out UIBase popup)
+    {
+        return _popupDict.TryGetValue(popupType, out popup);
+    }
 
     public void ClosePopup(PopupType popupType)
     {
