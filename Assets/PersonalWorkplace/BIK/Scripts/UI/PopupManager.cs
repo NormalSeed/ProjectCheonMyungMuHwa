@@ -69,26 +69,42 @@ public class PopupManager : MonoBehaviour
 
     #region public funcs
 
-    public void ShowPopup(PopupType popupType, string message, Action onLeft = null, Action onRight = null)
+    public void ShowTooltip(ItemData item)
     {
-        if (!_popupDict.TryGetValue(popupType, out var popup) || popup == null) {
-            Debug.LogWarning($"[PopupManager] 등록되지 않은 팝업: {popupType}");
+        if (!_popupDict.TryGetValue(PopupType.Tooltip, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Tooltip 팝업이 등록되지 않았습니다.");
             return;
         }
 
-        popup.SetShow();
-        Debug.Log($"[PopupManager] ShowPopup: {popupType}, Message: {message}");
-
-        // TODO: popup 내부에 message, 버튼 콜백 전달
-    }
-
-    public void ClosePopup(PopupType popupType)
-    {
-        if (_popupDict.TryGetValue(popupType, out var popup) && popup != null) {
-            popup.SetHide();
-            Debug.Log($"[PopupManager] ClosePopup: {popupType}");
+        if (uiBase is TootipPanel tooltipPanel) {
+            tooltipPanel.SetShow(item);
+            Debug.Log($"[PopupManager] ShowTooltip: {item.Name}");
+        }
+        else {
+            Debug.LogError("[PopupManager] PopupType.Tooltip 이 TooltipPanel이 아님");
         }
     }
+
+    //public void ShowPopup(PopupType popupType, string message, Action onLeft = null, Action onRight = null)
+    //{
+    //    if (!_popupDict.TryGetValue(popupType, out var popup) || popup == null) {
+    //        Debug.LogWarning($"[PopupManager] 등록되지 않은 팝업: {popupType}");
+    //        return;
+    //    }
+
+    //    popup.SetShow();
+    //    Debug.Log($"[PopupManager] ShowPopup: {popupType}, Message: {message}");
+
+    //    // TODO: popup 내부에 message, 버튼 콜백 전달
+    //}
+
+    //public void ClosePopup(PopupType popupType)
+    //{
+    //    if (_popupDict.TryGetValue(popupType, out var popup) && popup != null) {
+    //        popup.SetHide();
+    //        Debug.Log($"[PopupManager] ClosePopup: {popupType}");
+    //    }
+    //}
 
     public void CloseAllPopups()
     {

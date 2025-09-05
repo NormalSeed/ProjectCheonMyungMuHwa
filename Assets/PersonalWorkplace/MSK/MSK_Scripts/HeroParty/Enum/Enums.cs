@@ -63,4 +63,19 @@ public enum PopupType
 {
     OfflineRewardPopup,
     RewardPopup,
+    Tooltip,
+}
+
+public enum TableType
+{
+    Item,
+}
+
+public enum ItemType
+{
+    None,
+    Currency,
+    Box,
+    Equipment,
+    Etc
 }

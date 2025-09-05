@@ -1,5 +1,10 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
+using VContainer;
 
 public class CurrencyUI : MonoBehaviour
 {
@@ -7,6 +12,8 @@ public class CurrencyUI : MonoBehaviour
 
     [SerializeField] private CurrencyType _targetCurrency;
     [SerializeField] private TMP_Text _currencyText;
+    [SerializeField] private Image _currencyImage;
+    [SerializeField] private CurrencyConfig _config; // CurrencyType ↔ Item_ID 매핑 SO
 
     #endregion // serialize field
 
@@ -17,6 +24,9 @@ public class CurrencyUI : MonoBehaviour
     #region private field
 
     private ICurrencyModel _model;
+    private AsyncOperationHandle<Sprite>? _loadedHandle;
+
+    private TableManager _tableManager; // VContainer 주입
 
     #endregion // private field
 
@@ -24,12 +34,36 @@ public class CurrencyUI : MonoBehaviour
 
 
 
+    #region public events
+
+    public Action<CurrencyType> OnCurrencyClicked;
+
+    #endregion // public events
+
+
+
+
+
+    #region DI
+
+    [Inject]
+    public void Construct(TableManager tableManager)
+    {
+        _tableManager = tableManager;
+    }
+
+    #endregion // DI
+
+
+
+
+
     #region mono funcs
+
     private void OnEnable()
     {
         CurrencyManager.OnInitialized += HandleInitialized;
 
-        // 이미 초기화 끝났다면 즉시 실행
         if (CurrencyManager.Instance != null && CurrencyManager.Instance.IsInitialized) {
             HandleInitialized();
         }
@@ -38,6 +72,11 @@ public class CurrencyUI : MonoBehaviour
     private void OnDisable()
     {
         CurrencyManager.OnInitialized -= HandleInitialized;
+    }
+
+    private void Start()
+    {
+        LoadCurrencyImage(_targetCurrency);
     }
 
     private void HandleInitialized()
@@ -54,9 +93,65 @@ public class CurrencyUI : MonoBehaviour
     {
         if (_model != null)
             _model.OnChanged -= OnCurrencyChanged;
+
+        ReleaseImageHandle();
     }
 
     #endregion // mono funcs
+
+
+
+
+
+    #region public funcs
+
+    public void SetCurrencyType(CurrencyType type)
+    {
+        _targetCurrency = type;
+
+        if (_model != null) {
+            var currentValue = _model.Get(_targetCurrency);
+            _currencyText.text = FormatCurrency(currentValue);
+        }
+
+        LoadCurrencyImage(_targetCurrency);
+    }
+
+    public void OnClick_Currency()
+    {
+        if (_tableManager == null) {
+            Debug.LogWarning("[CurrencyUI] TableManager가 아직 주입되지 않았습니다.");
+            return;
+        }
+
+        int itemId = _config.GetItemId(_targetCurrency);
+        if (itemId == -1) {
+            Debug.LogWarning($"[CurrencyUI] {_targetCurrency} → ItemId 매핑 실패");
+            return;
+        }
+
+        var itemTable = _tableManager.GetTable<TItem>(TableType.Item);
+        if (itemTable == null || !itemTable.IsInitialized) {
+            Debug.LogWarning("[CurrencyUI] ItemTable이 초기화되지 않았습니다.");
+            return;
+        }
+
+        var itemData = itemTable.GetItem(itemId);
+        if (itemData == null) {
+            Debug.LogWarning($"[CurrencyUI] ItemId {itemId}에 해당하는 데이터가 없습니다.");
+            return;
+        }
+
+        // Tooltip 표시
+        PopupManager.Instance.ShowTooltip(itemData);
+    }
+
+    public void OnClick_Text()
+    {
+        OnCurrencyClicked?.Invoke(_targetCurrency);
+    }
+
+    #endregion // public funcs
 
 
 
@@ -76,19 +171,39 @@ public class CurrencyUI : MonoBehaviour
         return currency.ToString();
     }
 
-    #endregion // private funcs
-
-
-
-
-
-    #region test code
-
-    public void OnClick_Currency() // TODO : 삭제하기
+    private void LoadCurrencyImage(CurrencyType type)
     {
-        CurrencyManager.Instance.Add(_targetCurrency, new BigCurrency(50, 0));
-        //CurrencyManager.Instance.TrySpend(_targetCurrency, new BigCurrency(50, 0));
+        ReleaseImageHandle();
+
+        int itemId = _config.GetItemId(type);
+        if (itemId == -1) return;
+
+        var itemTable = _tableManager.GetTable<TItem>(TableType.Item);
+        if (itemTable == null || !itemTable.IsInitialized) return;
+
+        var itemData = itemTable.GetItem(itemId);
+        if (itemData == null) return;
+
+        string key = itemData.ImageKey;
+
+        _loadedHandle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<Sprite>(key);
+        _loadedHandle.Value.Completed += handle => {
+            if (handle.Status == AsyncOperationStatus.Succeeded) {
+                _currencyImage.sprite = handle.Result;
+            }
+            else {
+                Debug.LogWarning($"[CurrencyUI] Failed to load sprite: {key}");
+            }
+        };
     }
 
-    #endregion // test code
+    private void ReleaseImageHandle()
+    {
+        if (_loadedHandle.HasValue) {
+            UnityEngine.AddressableAssets.Addressables.Release(_loadedHandle.Value);
+            _loadedHandle = null;
+        }
+    }
+
+    #endregion // private funcs
 }

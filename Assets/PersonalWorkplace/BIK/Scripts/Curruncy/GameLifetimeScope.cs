@@ -10,10 +10,8 @@ public class GameLifetimeScope : LifetimeScope
     protected override void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.Result == DependencyStatus.Available)
-            {
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
+            if (task.Result == DependencyStatus.Available) {
                 FirebaseApp app = FirebaseApp.DefaultInstance;
                 app.Options.DatabaseUrl = new System.Uri("https://cheonmyungmuhwa-d3fc4-default-rtdb.asia-southeast1.firebasedatabase.app");
 
@@ -36,5 +34,8 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
         // 영웅정보
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton);
+
+        // 테이블
+        builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
     }
 }

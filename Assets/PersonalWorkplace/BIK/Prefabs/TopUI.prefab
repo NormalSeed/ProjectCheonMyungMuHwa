@@ -109,6 +109,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 6
   _currencyText: {fileID: 5042027493629573105}
+  _currencyImage: {fileID: 9051874854515886737}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &464712478814450213
 GameObject:
   m_ObjectHideFlags: 0
@@ -761,6 +763,7 @@ GameObject:
   - component: {fileID: 4791394501966129902}
   - component: {fileID: 1754481688967133956}
   - component: {fileID: 6485461281852348696}
+  - component: {fileID: 8403305012358606765}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -826,6 +829,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8403305012358606765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2723327195965761850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 6485461281852348696}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7303393126783584792}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2908323745915169168
 GameObject:
   m_ObjectHideFlags: 0
@@ -981,6 +1040,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 1
   _currencyText: {fileID: 3936506251767617231}
+  _currencyImage: {fileID: 8318393783267739606}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &3890747297849953689
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,6 +1226,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 2
   _currencyText: {fileID: 5664616565524833682}
+  _currencyImage: {fileID: 3762523676592224587}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &4097130418553378670
 GameObject:
   m_ObjectHideFlags: 0
@@ -1176,6 +1239,7 @@ GameObject:
   - component: {fileID: 2157000259123707658}
   - component: {fileID: 6246897179839347580}
   - component: {fileID: 6674252597217138646}
+  - component: {fileID: 4797736764738532685}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -1241,6 +1305,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4797736764738532685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4097130418553378670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 6674252597217138646}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3539434270374106791}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4175365151280735716
 GameObject:
   m_ObjectHideFlags: 0
@@ -1368,6 +1488,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 4
   _currencyText: {fileID: 1845915974261543735}
+  _currencyImage: {fileID: 8001349066838206102}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &4375646360757997330
 GameObject:
   m_ObjectHideFlags: 0
@@ -1627,6 +1749,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 5
   _currencyText: {fileID: 4490853111426955886}
+  _currencyImage: {fileID: 879497323430296162}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &4769206159570165502
 GameObject:
   m_ObjectHideFlags: 0
@@ -2677,6 +2801,7 @@ GameObject:
   - component: {fileID: 5006578545717369813}
   - component: {fileID: 4841699673579013543}
   - component: {fileID: 8259617862004158173}
+  - component: {fileID: 6710301786257021023}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -2742,6 +2867,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6710301786257021023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5312244826931846732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 8259617862004158173}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6647093527054995799}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5328234054447996456
 GameObject:
   m_ObjectHideFlags: 0
@@ -3307,6 +3488,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1677628793927017819}
+  - component: {fileID: 9067329749202442100}
   m_Layer: 0
   m_Name: CurrencyThings
   m_TagString: Untagged
@@ -3338,6 +3520,27 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &9067329749202442100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6334979326745193676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39a45514a102dcd4eb8466ddb05cdcf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mainCurrencyUI: {fileID: 3919477292755741890}
+  _currencyUIs:
+  - {fileID: 1721254465491227792}
+  - {fileID: 3539434270374106791}
+  - {fileID: 6407661359025214935}
+  - {fileID: 5525705047801058154}
+  - {fileID: 6278990923921296548}
+  - {fileID: 7303393126783584792}
+  - {fileID: 6647093527054995799}
 --- !u!1 &7068000322023119030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3390,6 +3593,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 3
   _currencyText: {fileID: 1168057881546644804}
+  _currencyImage: {fileID: 3633802033199223440}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &7938998599932427266
 GameObject:
   m_ObjectHideFlags: 0
@@ -3401,6 +3606,7 @@ GameObject:
   - component: {fileID: 8082603510101728958}
   - component: {fileID: 3331602541153036469}
   - component: {fileID: 2872680593135333420}
+  - component: {fileID: 4410557323271656991}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -3466,6 +3672,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4410557323271656991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7938998599932427266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2872680593135333420}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6407661359025214935}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8043515786864283347
 GameObject:
   m_ObjectHideFlags: 0
@@ -3613,6 +3875,7 @@ GameObject:
   - component: {fileID: 7616053969835629773}
   - component: {fileID: 4023963796401256904}
   - component: {fileID: 2672856912405111464}
+  - component: {fileID: 1698505291191933779}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -3678,6 +3941,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1698505291191933779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8346369124028679238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2672856912405111464}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6278990923921296548}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8362482146093272234
 GameObject:
   m_ObjectHideFlags: 0
@@ -3825,6 +4144,7 @@ GameObject:
   - component: {fileID: 5157669611928410463}
   - component: {fileID: 2017749687566800022}
   - component: {fileID: 2851764664297696854}
+  - component: {fileID: 1624121554929827442}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -3890,6 +4210,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1624121554929827442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8481052273105916329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2851764664297696854}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5525705047801058154}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8556070651778923844
 GameObject:
   m_ObjectHideFlags: 0
@@ -4281,6 +4657,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetCurrency: 0
   _currencyText: {fileID: 2478189609922832400}
+  _currencyImage: {fileID: 206145348351104396}
+  _config: {fileID: 11400000, guid: 5911fb78ac549a54aba804cb3cc8dd53, type: 2}
 --- !u!1 &8983488058188709853
 GameObject:
   m_ObjectHideFlags: 0
@@ -4292,6 +4670,7 @@ GameObject:
   - component: {fileID: 6759085580081175715}
   - component: {fileID: 4407669561628378034}
   - component: {fileID: 4149332140590080268}
+  - component: {fileID: 2113465114714061567}
   m_Layer: 5
   m_Name: Image CurrencyBG
   m_TagString: Untagged
@@ -4357,6 +4736,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2113465114714061567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8983488058188709853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 4149332140590080268}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1721254465491227792}
+        m_TargetAssemblyTypeName: CurrencyUI, Assembly-CSharp
+        m_MethodName: OnClick_Text
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &7322889309825936500
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4572,6 +5007,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
+--- !u!114 &3919477292755741890 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4666603121812603371, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
+  m_PrefabInstance: {fileID: 8550045428391144745}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfa30eba3e4c344ca5fa7082a4e9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &4363047201983523077 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5344494386590352428, guid: 57fde5bcc9a3614498a628848223f084, type: 3}
