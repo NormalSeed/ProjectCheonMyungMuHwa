@@ -55,12 +55,15 @@ public class PlayerController : MonoBehaviour, IDamagable
                 BGagent.enabled = true;
             }
         };
+
+        GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
     }
 
     private void OnDisable()
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+        GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
 
     /// <summary>
@@ -259,5 +262,11 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         model.CurHealth.Value -= amount;
         Debug.Log($"현재 체력 : {model.CurHealth.Value}");
+    }
+
+    private void HandleHeroLevelChanged(int newLevel)
+    {
+        model.modelSO.Level = newLevel;
+        model.SetPoints();
     }
 }
