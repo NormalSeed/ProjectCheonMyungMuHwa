@@ -5,14 +5,14 @@ using UnityEngine;
 public class MonsterModelBaseSO : ScriptableObject
 {
   public double baseMaxHealth;
-
-  public double baseDefense;
-
   public double baseAttackPower;
+  public double baseOuterDefense;
+  public double baseInnerDefense;
 
   public double finalMaxHealth;
-  public double finalDefense;
   public double finalAttackPower;
+  public double finalOuterDefense;
+  public double finalInnerDefense;
 
   public int GoldQuant;
   public int SpiritBackQuant;
@@ -27,7 +27,6 @@ public class MonsterModelBaseSO : ScriptableObject
   public void SetFinal(int stage)
   {
     finalMaxHealth = baseMaxHealth;
-    finalDefense = baseDefense;
     finalAttackPower = baseAttackPower;
     for (int i = 2; i <= stage; i++)
     {
@@ -46,10 +45,6 @@ public class MonsterModelBaseSO : ScriptableObject
       }
       finalAttackPower *= 1.009;
     }
-    if (stage >= 201)
-    {
-      finalDefense = 300 * stage;
-    }
 
     GoldQuant = stage;
     SpiritBackQuant = stage;
@@ -57,7 +52,7 @@ public class MonsterModelBaseSO : ScriptableObject
     NormalChestDropChance = 1;
     RareChestDropChance = 1;
   }
-  //다음 스테이지에 맞게 업데이트
+  //다음 스테이지에 맞게 업데이트 (계산 부담 줄이는 용도)
   public void UpdateFinal(int stage)
   {
     int last = stage % 100;
@@ -75,25 +70,50 @@ public class MonsterModelBaseSO : ScriptableObject
     }
     finalAttackPower *= 1.009;
 
-    if (stage >= 201)
-    {
-      finalDefense = 300 * stage;
-    }
-
   }
   // 보스의 경우 이것을 이용
   public void SetFinalBoss(int stage, MonsterModelBaseSO model)
   {
+    finalOuterDefense = baseOuterDefense;
+    finalInnerDefense = baseInnerDefense;
     if (stage == 50 || stage == 100)
     {
       finalMaxHealth = model.finalMaxHealth * 7.5;
     }
     else
     {
-      finalMaxHealth = model.finalMaxHealth * 2000;
+      finalMaxHealth = model.finalMaxHealth * 5;
     }
     finalAttackPower = model.finalAttackPower * 3;
-    finalDefense = stage * baseDefense;
+
+    if (stage >= 101)
+    {
+      finalOuterDefense -= 14700;
+      finalInnerDefense -= 14850;
+    }
+    if (stage >= 102)
+    {
+      int count = Mathf.Min(stage - 101, 99);
+      finalOuterDefense += count * 300;
+      finalInnerDefense += count * 150;
+    }
+    if (stage >= 201)
+    {
+      finalOuterDefense -= 14850;
+      finalInnerDefense -= 14850;
+    }
+    if (stage >= 202)
+    {
+      int count = Mathf.Min(stage - 201, 99);
+      finalOuterDefense += count * 150;
+      finalInnerDefense += count * 150;
+    }
+    if (stage >= 301)
+    {
+      int count = Mathf.Min(stage - 300, 99);
+      finalOuterDefense += count * 300;
+      finalInnerDefense += count * 300;
+    }
 
 
   }

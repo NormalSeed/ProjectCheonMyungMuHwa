@@ -8,12 +8,31 @@ public class MonsterModel : MonoBehaviour
   [SerializeField] protected MonsterTextures tex;
   [SerializeField] protected SpriteRenderer[] renderers;
 
+  private SpriteRenderer[] allRenderers;
+
+  private List<Color> allColors;
+
   [SerializeField] public float AttackDistance; //공격하기 위해 멈추는 사정거리
   public float AttackDistanceWithClearance => AttackDistance + 0.5f; //공격 중에 벗어날 경우 다시 추적하기 위한 사정거리 (Attackdistance보다 약간 높게)
   [SerializeField] public float AttackDelay; //공격 쿨타임
   [SerializeField] public float MoveSpeed; //이동속도
 
   public MonsterModelBaseSO BaseModel { get; set; }
+
+  void Awake()
+  {
+    allColors = new();
+    allRenderers = GetComponentsInChildren<SpriteRenderer>();
+    ColorInit();
+  }
+  protected void ColorInit()
+  {
+    allColors.Clear();
+    foreach (SpriteRenderer sr in allRenderers)
+    {
+      allColors.Add(sr.color);
+    }
+  }
   public virtual void InitSprite(int stage)
   {
 
@@ -46,9 +65,20 @@ public class MonsterModel : MonoBehaviour
 
   public virtual void SetSpriteColor(Color color)
   {
-    foreach (SpriteRenderer sr in renderers)
+    if (color == Color.white) //원래 색으로 복원
     {
-      sr.color = color;
+      for (int i = 0; i < allRenderers.Length; i++)
+      {
+        allRenderers[i].color = allColors[i];
+      }
     }
+    else
+    {
+      foreach (SpriteRenderer sr in allRenderers)
+      {
+        sr.color = color;
+      }
+    }
+
   }
 }

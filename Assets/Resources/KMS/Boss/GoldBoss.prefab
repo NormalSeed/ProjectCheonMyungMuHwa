@@ -1636,6 +1636,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3543985617947885409}
+  - {fileID: 8983865427164074599}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4640,7 +4641,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -4650,7 +4651,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 2.23}
   m_EdgeRadius: 0
 --- !u!114 &2222502755787114059
 MonoBehaviour:
@@ -4696,8 +4697,8 @@ MonoBehaviour:
   Model: {fileID: 0}
   NavAgent: {fileID: 0}
   healthBar: {fileID: 0}
-  attackDelay: 0
-  selfEffectTrs: {fileID: 0}
+  attackDelay: 0.4
+  selfEffectTrs: {fileID: 8983865427164074599}
 --- !u!114 &1909719527740581063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4710,10 +4711,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e8dbf8c4a6f954da75b2240f74fb40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tex: {fileID: 0}
-  renderers: []
+  tex: {fileID: 11400000, guid: ec64d9e55ef62814481318bad7c961e7, type: 2}
+  renderers:
+  - {fileID: 407956025538588837}
+  - {fileID: 7779638249264059979}
+  - {fileID: 4983184094589942584}
+  - {fileID: 5167039933675145866}
+  - {fileID: 5764277345647121834}
+  - {fileID: 4681481896666404959}
   AttackDistance: 0
-  AttackDelay: 0
+  AttackDelay: 1.5
   MoveSpeed: 0
 --- !u!1 &1424247721698296092
 GameObject:
@@ -5346,8 +5353,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3.5, y: 3.5, z: 3.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 196994725440747722}
   - {fileID: 5902057890449247794}
@@ -5729,6 +5736,41 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4082025659282866308
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8983865427164074599}
+  m_Layer: 5
+  m_Name: effectpos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8983865427164074599
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4082025659282866308}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1201891082323606514}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.53, y: 0.55}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4139831661994500277
 GameObject:
   m_ObjectHideFlags: 0
