@@ -36,17 +36,17 @@ public class GameLifetimeScope : LifetimeScope
         // 재화
         builder.Register<CurrencyModel>(Lifetime.Singleton)
                .As<ICurrencyModel>();
-
         builder.RegisterEntryPoint<CurrencyManager>(Lifetime.Singleton);
-
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
-
         // 장비
         builder.RegisterInstance(equipmentTemplates);
         builder.Register<EquipmentManager>(Lifetime.Singleton)
                .WithParameter("allTemplates", equipmentTemplates);
         // 장비 획득, 장착, 강화, 필터링을 담당하는 EquipmentService 구현 후 등록 필요
         // UI와 데이터를 연결하는 EquipmentView 구현 후 등록 필요
+        
+        // 영웅정보
+        builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton);
     }
 }

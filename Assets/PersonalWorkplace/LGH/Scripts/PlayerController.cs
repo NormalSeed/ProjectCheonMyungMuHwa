@@ -89,7 +89,8 @@ public class PlayerController : MonoBehaviour, IDamagable
                     model.modelSO = handle.Result;
 
                     // Firebase에서 캐릭터 레벨 정보 불러오기
-                    string userID = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+                    string userID = CurrencyManager.Instance.UserID;
+                    Debug.Log("현재 유저 아이디 : " + userID);
                     string path = $"users/{userID}/character/charInfo/{charID}";
 
                     FirebaseDatabase.DefaultInstance

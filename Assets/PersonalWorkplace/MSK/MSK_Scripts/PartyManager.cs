@@ -54,6 +54,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
             // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+
             int listOrder = partyMembers.Count - 1;
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];

@@ -7,13 +7,10 @@ using UnityEngine.UI;
 
 public class HeroInfoSetting : MonoBehaviour
 {
-    [Header("SO")]
-    [SerializeField] public CardInfo chardata;
-
-    public string HeroID { get; private set; }
-    public int HeroStage { get; private set; }
-    private HeroRarity rarity;
-    private HeroFaction faction;
+    [Header("Hero ID")]
+    [SerializeField] private string heroID;
+    public string HeroID => heroID;
+    public CardInfo chardata;
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
@@ -26,24 +23,20 @@ public class HeroInfoSetting : MonoBehaviour
     [SerializeField] private Button CardButton;             // 캐릭터 카드
     [SerializeField] private TextMeshProUGUI PartyNum;      // 배치 순서
 
-
-
-
-    // UI관리자에게 캐릭터 정보 판넬에 대한 정보를 받아와서 열어야 할 듯
     [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
     [SerializeField] private HeroUI heroUI;
 
+    private HeroData heroData;
     #region Unity LifeCycle
 
-    public void PostStart()
-    {
-        Debug.Log("PostStart 실행됨");
-
-
-    }
     private async void OnEnable()
     {
-        Init();
+        if (HeroDataManager.Instance.ownedHeroes.TryGetValue(heroID, out var data))
+        {
+            heroData = data;
+            chardata = data.cardInfo;
+            await Init();
+        }
     }
 
     private void OnDisable()
@@ -57,13 +50,8 @@ public class HeroInfoSetting : MonoBehaviour
     #region Init    
     private async Task Init()
     {
-        HeroID = chardata.HeroID;
-        HeroStage = await CurrencyManager.Instance.LoadHeroStageFromFireBase(HeroID);
-        rarity = chardata.rarity;
-        faction = chardata.faction;
-
         SetBackground();
-        SetCharacter();
+        await SetCharacter(heroData.PlayerModelSO.SpriteKey);
         SetStage();
         SetBadge();
 
@@ -75,27 +63,25 @@ public class HeroInfoSetting : MonoBehaviour
         foreach (Transform child in cardBackgroundRoot)
             child.gameObject.SetActive(false);
 
-        Transform target = cardBackgroundRoot.Find(rarity.ToString());
+        Transform target = cardBackgroundRoot.Find(heroData.cardInfo.rarity.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
     }
-    private void SetCharacter()
-    {
-        Addressables.LoadAssetAsync<Sprite>(HeroID + "_sprite").Completed += task =>
-        {
-            if (task.Status == AsyncOperationStatus.Succeeded)
-            {
-                characterRoot.sprite = task.Result;
-            }
-        };
 
+    private async Task SetCharacter(string spriteKey)
+    {
+        var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
+        await handle.Task;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+            characterRoot.sprite = handle.Result;
     }
     private void SetBadge()
     {
         foreach (Transform child in badgeRoot)
             child.gameObject.SetActive(false);
 
-        Transform target = badgeRoot.Find(faction.ToString());
+        Transform target = badgeRoot.Find(heroData.cardInfo.faction.ToString());
         if (target != null)
             target.gameObject.SetActive(true);
     }
@@ -104,23 +90,17 @@ public class HeroInfoSetting : MonoBehaviour
     {
         foreach (Transform stage in stageRoot)
         {
-            Transform red = stage.Find("Stage_Red");
-            Transform gray = stage.Find("Stage_gray");
-
-            if (red != null) red.gameObject.SetActive(false);
-            if (gray != null) gray.gameObject.SetActive(true);
+            stage.Find("Stage_Red")?.gameObject.SetActive(false);
+            stage.Find("Stage_gray")?.gameObject.SetActive(true);
         }
 
-        for (int i = 1; i <= HeroStage; i++)
+        for (int i = 1; i <= heroData.stage; i++)
         {
             Transform stage = stageRoot.Find("Stage" + i);
             if (stage != null)
             {
-                Transform red = stage.Find("Stage_Red");
-                Transform gray = stage.Find("Stage_gray");
-
-                if (red != null) red.gameObject.SetActive(true);
-                if (gray != null) gray.gameObject.SetActive(false);
+                stage.Find("Stage_Red")?.gameObject.SetActive(true);
+                stage.Find("Stage_gray")?.gameObject.SetActive(false);
             }
         }
     }
@@ -136,20 +116,21 @@ public class HeroInfoSetting : MonoBehaviour
             if (!PartyManager.Instance.partyMembers.Contains(gameObject))
             {
                 PartyManager.Instance.AddMember(gameObject);
-                PartyManager.Instance.AddMemberID(HeroID);
+                PartyManager.Instance.AddMemberID(heroID);
                 selectRoot.gameObject.SetActive(true);
             }
             else
             {
                 PartyManager.Instance.RemoveMember(gameObject);
-                PartyManager.Instance.RemoveMemberID(HeroID);
+                PartyManager.Instance.RemoveMemberID(heroID);
                 selectRoot.gameObject.SetActive(false);
             }
         }
-        else 
+        else
         {
-            HeroUIActive();
-        }
+            heroInfoUI.SetHeroData(heroData);
+            heroInfoUI.gameObject.SetActive(true);
+        }   
     }
     #endregion
 
@@ -161,14 +142,6 @@ public class HeroInfoSetting : MonoBehaviour
     private void HeroSetting()
     {
         selectRoot.gameObject.SetActive(false);
-    }
-    /// <summary>
-    /// 캐릭터 정보 UI로 연결하는 스크립트
-    /// </summary>
-    private void HeroUIActive()
-    {
-        heroInfoUI.HeroSOInfoSetting(chardata);
-        heroInfoUI.gameObject.SetActive(true);
     }
     #endregion
 }

@@ -117,7 +117,7 @@ public class PoolManager : MonoBehaviour
         switch (last)
         {
             case 0: case 5: str = "BigBoss"; break;
-            case 1: case 6: str = "SpiritBoss"; break;
+            case 1: case 6: str = "GoldBoss"; break;
             case 2: case 7: str = "StickBoss"; break;
             case 3: case 8: str = "CaneBoss"; break;
             case 4: case 9: str = "BowBoss"; break;
@@ -126,9 +126,18 @@ public class PoolManager : MonoBehaviour
         }
         MonsterController bosscon = bosses[str];
         bosscon.transform.position = pos;
-        bosscon.Model.InitSprite(currentstage);
+        if (str != "SpiritBoss" && str != "HonbaegBoss" && str != "GoldBoss") bosscon.Model.InitSprite(currentstage);
         bosscon.Model.BaseModel = bossModel;
         bosscon.gameObject.SetActive(true);
+    }
+    private void SpawnBoss(string str, Vector2 pos)
+    {
+        MonsterController bosscon = bosses[str];
+        bosscon.transform.position = pos;
+        if (str != "SpiritBoss") bosscon.Model.InitSprite(currentstage);
+        bosscon.Model.BaseModel = bossModel;
+        bosscon.gameObject.SetActive(true);
+
     }
     public void ActiveBoss(int dummy) //컴파일 오류 방지용 오버로딩
     {
