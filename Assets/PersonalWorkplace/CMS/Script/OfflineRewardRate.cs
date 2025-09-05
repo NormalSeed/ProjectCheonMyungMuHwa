@@ -29,18 +29,24 @@ public class OfflineRewardSystem : MonoBehaviour
         }
     }
 
-    public Dictionary<CurrencyType, int> CalculateRewards(TimeSpan offlineTime, int clearedStage)
+    public Dictionary<CurrencyType, BigCurrency> CalculateRewards(TimeSpan offlineTime, int clearedStage)
     {
-        Dictionary<CurrencyType, int> rewards = new();
+        var rewards = new Dictionary<CurrencyType, BigCurrency>();
 
         double seconds = Math.Min(offlineTime.TotalSeconds, 8 * 3600);
+
         foreach (var rate in rewardRates)
         {
-            double amount = rate.baseRatePerSecond * seconds;
-            amount *= (1 + (clearedStage * 0.05));
-            amount *= rate.rarityMultiplier;
+            double raw = rate.baseRatePerSecond * seconds;
 
-            rewards[rate.currencyType] = (int)Math.Floor(amount);
+            // 스테이지 난이도 보정
+            raw *= (1 + clearedStage * 0.05);
+
+            // 희귀도 보정
+            raw *= rate.rarityMultiplier;
+
+            // BigCurrency 변환
+            rewards[rate.currencyType] = new BigCurrency(raw, 0);
         }
 
         return rewards;

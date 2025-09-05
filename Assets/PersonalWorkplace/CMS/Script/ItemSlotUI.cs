@@ -4,14 +4,15 @@ using TMPro;
 
 public class ItemSlotUI : MonoBehaviour
 {
-    public Image itemImage;
-    public TMP_Text amountText;
+    [Header("UI Elements")]
+    [SerializeField] private TMP_Text amountText;  // 아이템 수량 표시
+    [SerializeField] private Image itemImage;      // 아이콘 표시
 
-    // typeName은 나중에 아이템 타입 관리용
-    public void SetSlot(string typeName, int amount, Sprite icon = null)
+    public void SetSlot(string typeName, string amount, Sprite icon = null)
     {
-        amountText.text = $"x{amount}";
-        if (icon != null)
+        if (amountText != null)
+            amountText.text = $"x{amount}";
+        if (icon != null && itemImage != null)
             itemImage.sprite = icon;
     }
 }

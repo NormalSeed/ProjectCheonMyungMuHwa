@@ -1,11 +1,10 @@
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using Firebase.Extensions;
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using Firebase.Extensions;
 
 public class BackendManager : MonoBehaviour
 {
@@ -13,6 +12,8 @@ public class BackendManager : MonoBehaviour
     public static FirebaseApp FirebaseApp { get; private set; }
     public static FirebaseAuth Auth { get; private set; }
     public static FirebaseDatabase Database { get; private set; }
+
+    private float autoSaveInterval = 30f; // 30초마다 자동 저장
 
     private void Awake()
     {
@@ -35,6 +36,32 @@ public class BackendManager : MonoBehaviour
             var go = new GameObject("OfflineRewardSystem");
             go.AddComponent<OfflineRewardSystem>();
         }
+
+        // 주기적 자동 저장 시작
+        StartCoroutine(AutoSaveRoutine());
+    }
+
+    private IEnumerator AutoSaveRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(autoSaveInterval);
+            SafeSave();
+        }
+    }
+
+    // 안전한 저장 메서드
+    private void SafeSave()
+    {
+        if (Auth == null || Auth.CurrentUser == null) return;
+        if (PlayerDataManager.Instance == null || CurrencyManager.Instance == null) return;
+
+        UpdatePlayerData(
+            PlayerDataManager.Instance.ClearedStage,
+            CurrencyManager.Instance.Get(CurrencyType.Gold)
+        );
+
+        Debug.Log("[자동 저장 완료]");
     }
 
     private void InitializeFirebase()
@@ -64,7 +91,6 @@ public class BackendManager : MonoBehaviour
         });
     }
 
-    // 익명 로그인
     private void SignInAnonymously()
     {
         Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
@@ -78,12 +104,18 @@ public class BackendManager : MonoBehaviour
             FirebaseUser newUser = task.Result.User;
             Debug.Log($"익명 로그인 성공 UID: {newUser.UserId}");
 
+            // CurrencyManager 강제 초기화
+            if (CurrencyManager.Instance == null)
+            {
+                var model = new CurrencyModel(); // ICurrencyModel 구현체
+                new CurrencyManager(model).Start();
+            }
+
             QuestManager.Instance?.InitializeAfterLogin();
         });
     }
 
-    // PlayerData 저장
-    public void UpdatePlayerData(int clearedStage, double gold)
+    public void UpdatePlayerData(int clearedStage, BigCurrency gold)
     {
         if (Auth.CurrentUser == null)
         {
@@ -97,7 +129,7 @@ public class BackendManager : MonoBehaviour
         Dictionary<string, object> updates = new Dictionary<string, object>
         {
             { "clearedStage", clearedStage },
-            { "gold", gold },
+            { "gold", gold.ToString() },
             { "lastLogoutTime", System.DateTime.UtcNow.ToString("o") }
         };
 
@@ -110,65 +142,9 @@ public class BackendManager : MonoBehaviour
         });
     }
 
-    // PlayerData 불러오기
-    public void LoadPlayerData(Action<int, double, Dictionary<CurrencyType, int>> onLoaded)
-    {
-        if (Auth.CurrentUser == null)
-        {
-            onLoaded?.Invoke(1, 0, new Dictionary<CurrencyType, int>());
-            return;
-        }
-
-        string uid = Auth.CurrentUser.UserId;
-        DatabaseReference userRef = Database.RootReference.Child("players").Child(uid);
-
-        userRef.GetValueAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled || task.IsFaulted)
-            {
-                onLoaded?.Invoke(1, 0, new Dictionary<CurrencyType, int>());
-                return;
-            }
-
-            DataSnapshot snapshot = task.Result;
-            int stage = 1;
-            double gold = 0;
-            DateTime lastLogout = DateTime.UtcNow;
-
-            if (snapshot.Exists)
-            {
-                if (snapshot.HasChild("clearedStage"))
-                    stage = int.Parse(snapshot.Child("clearedStage").Value.ToString());
-                if (snapshot.HasChild("gold"))
-                    gold = double.Parse(snapshot.Child("gold").Value.ToString());
-                if (snapshot.HasChild("lastLogoutTime"))
-                    DateTime.TryParse(snapshot.Child("lastLogoutTime").Value.ToString(), out lastLogout);
-            }
-
-            // 오프라인 보상 계산
-            TimeSpan offlineDuration = DateTime.UtcNow - lastLogout;
-            offlineDuration = offlineDuration.TotalHours > 8 ? TimeSpan.FromHours(8) : offlineDuration;
-
-            var rewards = OfflineRewardSystem.Instance.CalculateRewards(offlineDuration, stage);
-            double totalGold = gold + rewards
-                .Where(r => r.Key == CurrencyType.Gold)
-                .Sum(r => r.Value);
-
-            // 서버에 새 데이터 저장
-            UpdatePlayerData(stage, totalGold);
-
-            // 로컬 반영
-            PlayerDataManager.Instance.ApplyData(stage, totalGold);
-            onLoaded?.Invoke(stage, totalGold, rewards);
-        });
-    }
-
-    // 앱 종료 시 저장
+    // 앱 종료 시에도 안전하게 시도
     private void OnApplicationQuit()
     {
-        if (Auth.CurrentUser != null)
-        {
-            UpdatePlayerData(PlayerDataManager.Instance.ClearedStage, PlayerDataManager.Instance.Gold);
-        }
+        SafeSave();
     }
 }
