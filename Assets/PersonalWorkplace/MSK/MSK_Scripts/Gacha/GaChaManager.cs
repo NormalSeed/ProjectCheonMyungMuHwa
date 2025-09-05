@@ -17,8 +17,6 @@ public class GachaManager : MonoBehaviour
 
     private Dictionary<string, List<string>> rarityHeroList = new();
 
-    public event Action OnGachaCompleted;
-
     #region FireBase Properties
     private string _uid;
     private DatabaseReference _dbRef;
@@ -160,7 +158,16 @@ public class GachaManager : MonoBehaviour
         }
         var results = (await Task.WhenAll(tasks)).ToList();
 
-        await Task.WhenAll(results.Select(card => ProcessGachaResultAsync(card)));
+        var groupedResults = results.GroupBy(card => card.HeroID)
+            .Select(group => new{
+                HeroID = group.Key,
+                Count = group.Count(),
+                CardInfo = group.First()
+            });
+        foreach (var group in groupedResults)
+        {
+            await ProcessGachaResultAsync(group.CardInfo, group.Count);
+        }
         await SaveUserSummonCountAsync();
         resultUI.ShowSummonResult(results);
         // await SaveGachaHistoryAsync(results); //소환기록 추가
@@ -219,36 +226,31 @@ public class GachaManager : MonoBehaviour
     }
 
     // 영웅정보를 업로드하는 코드
-    private async Task ProcessGachaResultAsync(CardInfo card)
+    private async Task ProcessGachaResultAsync(CardInfo card, int count)
     {
         var charRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(card.HeroID);
+        var snapshot = await charRef.GetValueAsync();
 
-        // 보유 여부 확인
-        var hasHeroSnap = await charRef.Child("hasHero").GetValueAsync();
-        bool hasHero = hasHeroSnap.Exists && Convert.ToBoolean(hasHeroSnap.Value);
+        bool hasHero = snapshot.Child("hasHero").Exists && Convert.ToBoolean(snapshot.Child("hasHero").Value);
+        int currentPiece = snapshot.Child("heroPiece").Exists ? Convert.ToInt32(snapshot.Child("heroPiece").Value) : 0;
 
+        // 영웅 최초 획득 처리
         if (!hasHero)
         {
-            Debug.Log("영웅 최초 처리");
-            // 캐릭터 최초 획득 시 정보 등록
             var newHeroData = new Dictionary<string, object>
             {
                 { "hasHero", true },
-                { "heroPiece", 0 }, // 조각은 0부터 시작
+                { "heroPiece", 0 },
                 { "stage", 1 },
                 { "rarity", card.rarity.ToString() }
             };
-
             await charRef.UpdateChildrenAsync(newHeroData);
         }
-        else
-        {
-            // 중복 획득: 조각 추가
-            var pieceSnap = await charRef.Child("heroPiece").GetValueAsync();
-            int currentPiece = pieceSnap.Exists ? Convert.ToInt32(pieceSnap.Value) : 0;
-            int addedPiece = GetPieceAmountByRarity(card.rarity); // 레어도에 따라 조각 수 결정
-            await charRef.Child("heroPiece").SetValueAsync(currentPiece + addedPiece);
-        }
+        int addedPiece = GetPieceAmountByRarity(card.rarity) * count;
+        int newPieceAmount = currentPiece + addedPiece;
+
+        await charRef.Child("heroPiece").SetValueAsync(newPieceAmount);
+        HeroDataManager.Instance?.UpdateHeroPiece(card.HeroID, newPieceAmount);
     }
     #endregion
 }

@@ -238,6 +238,8 @@ public class HeroInfoUI : UIBase
         //  돌파저장
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
+        
+        HeroDataManager.Instance?.UpdateHeroPiece(heroData.cardInfo.HeroID, ownerPiece);
 
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
         SetStage();

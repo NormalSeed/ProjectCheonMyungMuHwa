@@ -14,11 +14,13 @@ public class HeroDataManager : IStartable
     private string _uid;
     private DatabaseReference _dbRef;
     public Dictionary<string, HeroData> ownedHeroes = new();
-
+    
+    #region Unity Monobehavior
     void IStartable.Start()
     {
         Start();
     }
+
     private void Start()
     {
         Instance = this;    
@@ -28,6 +30,9 @@ public class HeroDataManager : IStartable
         LoadAllHeroData();
     }
 
+    #endregion
+
+    #region Init
     private async void LoadAllHeroData()
     {
         if (string.IsNullOrEmpty(_uid))
@@ -146,4 +151,21 @@ public class HeroDataManager : IStartable
         await LoadSkillSOAsync(hero);
         Debug.Log($"[{heroId}]의 정보를 설정했습니다.");
     }
+    #endregion
+
+    #region Public
+    public void UpdateHeroPiece(string heroId, int newPiece)
+    {
+        if (ownedHeroes.TryGetValue(heroId, out var hero))
+        {
+            hero.heroPiece = newPiece;
+            Debug.Log($"[HeroDataManager] {heroId}의 조각 수가 {newPiece}로 갱신되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning($"[HeroDataManager] {heroId}가 ownedHeroes에 존재하지 않아 조각 갱신 실패");
+        }
+    }
+    #endregion
+
 }
