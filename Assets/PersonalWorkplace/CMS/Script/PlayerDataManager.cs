@@ -5,7 +5,7 @@ public class PlayerDataManager : MonoBehaviour
     public static PlayerDataManager Instance;
 
     public int ClearedStage { get; private set; } = 1;
-    public double Gold { get; private set; } = 0; // 로컬 골드 관리
+    public BigCurrency Gold => CurrencyManager.Instance.Get(CurrencyType.Gold);
 
     private void Awake()
     {
@@ -21,18 +21,18 @@ public class PlayerDataManager : MonoBehaviour
     }
 
     // 서버에서 불러온 값 반영
-    public void ApplyData(int stage, double gold)
+    public void ApplyData(int stage, BigCurrency gold)
     {
         ClearedStage = stage;
-        Gold = gold;
+        CurrencyManager.Instance.Set(CurrencyType.Gold, gold);
         Debug.Log($"[데이터 적용 완료] Stage={stage}, Gold={gold}");
     }
 
     // 골드 추가
-    public void AddGold(double amount)
+    public void AddGold(BigCurrency amount)
     {
-        Gold += amount;
-        Debug.Log($"골드 추가: +{amount}, 현재 골드: {Gold}");
+        CurrencyManager.Instance.Add(CurrencyType.Gold, amount);
+        BackendManager.Instance.UpdatePlayerData(ClearedStage, Gold); // 이제 BigCurrency
     }
 
     // Stage 업데이트, 서버 저장
@@ -41,6 +41,6 @@ public class PlayerDataManager : MonoBehaviour
         if (stage > ClearedStage)
             ClearedStage = stage;
 
-        BackendManager.Instance.UpdatePlayerData(ClearedStage, Gold);
+        BackendManager.Instance.UpdatePlayerData(ClearedStage, Gold); // double 대신 BigCurrency
     }
 }

@@ -75,7 +75,7 @@ public class PopupManager : MonoBehaviour
             Debug.LogWarning("[PopupManager] Tooltip 팝업이 등록되지 않았습니다.");
             return;
         }
-
+        
         if (uiBase is TootipPanel tooltipPanel) {
             tooltipPanel.SetShow(item);
             Debug.Log($"[PopupManager] ShowTooltip: {item.Name}");
