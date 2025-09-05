@@ -13,8 +13,8 @@ public class HeroListManager : MonoBehaviour
     #region Unity
     private void OnEnable()
     {
-        _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
+        _uid = CurrencyManager.Instance.UserID;
 
         StartCoroutine(RefreshHeroList());
     }

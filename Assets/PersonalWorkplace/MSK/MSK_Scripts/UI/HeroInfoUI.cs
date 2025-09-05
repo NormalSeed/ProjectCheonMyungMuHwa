@@ -98,6 +98,7 @@ public class HeroInfoUI : UIBase
         upgradeButton.onClick.AddListener(OnClickUpgrade);
         stageUPButton.onClick.AddListener(OnClickStageUP);
     }
+
     private void InfoTextSetting()
     {
         charName.text = heroData.PlayerModelSO.CharName;
@@ -191,7 +192,8 @@ public class HeroInfoUI : UIBase
 
             // GameEvents 안의 이벤트 호출
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-
+            PrepareHeroStats();
+            InfoTextSetting();
             SetUpgradeInteractable(upgradeButton);
         }
     }
@@ -238,9 +240,9 @@ public class HeroInfoUI : UIBase
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
 
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
-        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
-
         SetStage();
+        PrepareHeroStats();
+        InfoTextSetting();
         SetRankUpInteractable(stageUPButton);
     }
     #endregion

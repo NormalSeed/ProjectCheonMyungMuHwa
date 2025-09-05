@@ -14,6 +14,9 @@ public class GachaManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private SummonResultUI resultUI;
 
+
+    private Dictionary<string, List<string>> rarityHeroList = new();
+
     public event Action OnGachaCompleted;
 
     #region FireBase Properties
@@ -62,6 +65,7 @@ public class GachaManager : MonoBehaviour
 
         await LoadUserDataAsync();
         await LoadSummonConfigAsync();
+        await LoadHeroListAsync();
     }
     private void OnDisable() { }
     #endregion
@@ -96,26 +100,47 @@ public class GachaManager : MonoBehaviour
         return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
     }
 
-    // 카드 정보 표기
-    private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
+    // 레어도에서 확률 나눠가지기
+    private string DrawHeroByRarity(string rarity)
     {
-        string addressKey = rarity switch
-        {
-            "Normal" => "C001CardInfo",
-            "Rare" => "C002CardInfo",
-            "Unique" => "C003CardInfo",
-            "Epic" => "C004CardInfo",
-        };
+        var list = rarityHeroList[rarity];
+        int index = UnityEngine.Random.Range(0, list.Count);
+        string selected = list[index];
+        return selected;
+    }
 
+
+    // 레어도 풀 별 영웅 리스트 불러오기
+    private async Task LoadHeroListAsync()
+    {
+        var snapshot = await _dbRef.Child("summon").Child("heroList").GetValueAsync();
+        rarityHeroList.Clear();
+
+        foreach (var rarity in new[] { "normal", "rare", "unique", "epic" })
+        {
+            var raritySnap = snapshot.Child(rarity);
+            var heroList = new List<string>();
+
+            foreach (var child in raritySnap.Children)
+            {
+                heroList.Add(child.Key);
+            }
+            rarityHeroList[rarity] = heroList;
+        }
+    }
+
+    // 카드 정보 가져오기
+    private async Task<CardInfo> LoadCardInfoByID(string heroID)
+    {
+        string addressKey = $"{heroID}CardInfo"; // 예: "C101CardInfo"
         var handle = Addressables.LoadAssetAsync<CardInfo>(addressKey);
 
         await handle.Task;
         if (handle.Status == AsyncOperationStatus.Succeeded)
             return handle.Result;
-
-        Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {addressKey} 로드 실패");
         return null;
     }
+
 
     // 실제 소환 코드
     public async Task Summon(int times)
@@ -126,15 +151,16 @@ public class GachaManager : MonoBehaviour
             await LevelUpAsync();
         }
 
-        var results = new List<CardInfo>();
+        var tasks = new List<Task<CardInfo>>();
         for (int i = 0; i < times; i++)
         {
             string rarityKey = DrawOne();
-            CardInfo info = await LoadCardInfoByRarity(rarityKey);
-            results.Add(info);
+            string heroID = DrawHeroByRarity(rarityKey);
+            tasks.Add(LoadCardInfoByID(heroID));
         }
+        var results = (await Task.WhenAll(tasks)).ToList();
 
-        StartCoroutine(ProcessResultsCoroutine(results));
+        await Task.WhenAll(results.Select(card => ProcessGachaResultAsync(card)));
         await SaveUserSummonCountAsync();
         resultUI.ShowSummonResult(results);
         // await SaveGachaHistoryAsync(results); //소환기록 추가
@@ -163,10 +189,11 @@ public class GachaManager : MonoBehaviour
 
         foreach (var keyValue in weightPool)
         {
-            if (random <= keyValue.Value) return keyValue.Key;
+            if (random <= keyValue.Value) return keyValue.Key.ToLower();
             random -= keyValue.Value;
         }
-        return weightPool.Keys.Last();
+        return weightPool.Keys.Last().ToLower();
+
     }
 
     //  소환기록 저장하기
@@ -220,25 +247,8 @@ public class GachaManager : MonoBehaviour
             var pieceSnap = await charRef.Child("heroPiece").GetValueAsync();
             int currentPiece = pieceSnap.Exists ? Convert.ToInt32(pieceSnap.Value) : 0;
             int addedPiece = GetPieceAmountByRarity(card.rarity); // 레어도에 따라 조각 수 결정
-
-            Debug.Log($"[조각 추가] {card.HeroID} → 기존: {currentPiece}, 추가: {addedPiece}, 최종: {currentPiece + addedPiece}");
-           
             await charRef.Child("heroPiece").SetValueAsync(currentPiece + addedPiece);
         }
-    }
-    // 영웅 조각 정보를 업로드하는 코루틴
-    private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
-    {
-        foreach (var info in results)
-        {
-            var task = ProcessGachaResultAsync(info);
-            while (!task.IsCompleted)
-                yield return null;
-            if (task.IsFaulted)
-                Debug.LogError($"ProcessGachaResultAsync 실패: {task.Exception}");
-        }
-        Debug.Log("모든 결과 처리 완료");
-        OnGachaCompleted?.Invoke();
     }
     #endregion
 }

@@ -33,6 +33,8 @@ public class SummonUI : UIBase
     [Header("Slider")]
     [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
 
+    [Header("Pool")]
+    [SerializeField] private GachaCardPoolManager cardPoolManager;
     #endregion
 
     #region Properties
@@ -55,14 +57,14 @@ public class SummonUI : UIBase
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
 
-        gachaManager.OnGachaCompleted -= HandleGachaCompleted;
+        summonResultUI.OnGachaCompleted -= HandleGachaCompleted;
     }
 
     private void Init()
     {
         ButtonInit();
         SummonLevelChange();
-        gachaManager.OnGachaCompleted += HandleGachaCompleted;
+        summonResultUI.OnGachaCompleted += HandleGachaCompleted;
     }
 
     private void ButtonInit()
@@ -77,16 +79,19 @@ public class SummonUI : UIBase
     #region Button OnClick
     private void onClickSummon()
     {
+        cardPoolManager.ReturnAll();
         SummonHeros(1);
         InterActButtons(false);
     }
     private void onClickSummon10th()
     {
+        cardPoolManager.ReturnAll();
         SummonHeros(10);
         InterActButtons(false);
     }
     private void onClickSummon50th()
     {
+        cardPoolManager.ReturnAll();
         SummonHeros(50);
         InterActButtons(false);
     }

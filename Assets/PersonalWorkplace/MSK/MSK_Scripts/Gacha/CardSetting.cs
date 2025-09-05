@@ -18,10 +18,6 @@ public class CardSetting : MonoBehaviour
     [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
 
     #region Unity LifeCycle
-    public void PostStart()
-    {
-        Debug.Log("PostStart 실행됨");
-    }
     private void OnEnable()
     {
         Init();
@@ -46,6 +42,12 @@ public class CardSetting : MonoBehaviour
     {
         foreach (Transform child in cardBackgroundRoot)
             child.gameObject.SetActive(false);
+
+        if (chardata == null)
+        {
+            Debug.LogError("[Init] chardata가 null입니다.");
+            return;
+        }
 
         Transform target = cardBackgroundRoot.Find(rarity.ToString());
         if (target != null)

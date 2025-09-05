@@ -145,6 +145,5 @@ public class HeroDataManager : IStartable
         await LoadPlayerModelSOAsync(heroId, hero);
         await LoadSkillSOAsync(hero);
         Debug.Log($"[{heroId}]의 정보를 설정했습니다.");
-        Debug.Log(JsonUtility.ToJson(hero, true));
     }
 }

@@ -16,6 +16,7 @@ public class SummonResultUI : UIBase
     [SerializeField] private GachaCardPoolManager poolManager;
     private CardInfo cardInfo;
 
+    public event Action OnGachaCompleted;
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -45,7 +46,7 @@ public class SummonResultUI : UIBase
     /// 소환 결과를 보여줍니다.
     /// </summary>
     /// <param name="times"></param>
-    public async void ShowSummonResult(List<CardInfo> results)
+    public async Task ShowSummonResult(List<CardInfo> results)
     {
         gameObject.SetActive(true);
         poolManager.ReturnAll();
@@ -63,6 +64,8 @@ public class SummonResultUI : UIBase
             // 연출 간격 조정
             await Task.Delay(100);
         }
+
+        OnGachaCompleted?.Invoke();
     }
     #endregion
 }

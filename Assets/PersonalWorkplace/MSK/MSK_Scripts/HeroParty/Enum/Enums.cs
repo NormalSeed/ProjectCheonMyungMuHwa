@@ -10,9 +10,9 @@ public enum HeroRarity
 
 public enum HeroFaction
 {
-    J,  // 정파
-    M,  // 마교
-    S,  // 사파
+    J = 1,  // 정파
+    S = 2,  // 마교
+    M = 3,  // 사파
 }
 
 public enum CurrencyType
