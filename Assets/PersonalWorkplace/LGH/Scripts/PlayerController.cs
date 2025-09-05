@@ -1,3 +1,6 @@
+using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Extensions;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -52,12 +55,15 @@ public class PlayerController : MonoBehaviour, IDamagable
                 BGagent.enabled = true;
             }
         };
+
+        GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
     }
 
     private void OnDisable()
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+        GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
 
     /// <summary>
@@ -81,14 +87,55 @@ public class PlayerController : MonoBehaviour, IDamagable
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     model.modelSO = handle.Result;
-                    // TODO: Firebase에 있는 캐릭터 Level 정보 불러오기
-                    model.SetPoints();
+
+                    // Firebase에서 캐릭터 레벨 정보 불러오기
+                    string userID = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+                    Debug.Log("현재 유저 아이디 : " + userID);
+                    string path = $"users/{userID}/character/charInfo/{charID}";
+
+                    FirebaseDatabase.DefaultInstance
+                        .GetReference(path)
+                        .GetValueAsync()
+                        .ContinueWithOnMainThread(task =>
+                        {
+                            if (task.IsFaulted)
+                            {
+                                Debug.LogError("Firebase 요청 실패: " + task.Exception);
+                                return;
+                            }
+
+                            if (task.IsCanceled)
+                            {
+                                Debug.LogWarning("Firebase 요청이 취소됨");
+                                return;
+                            }
+
+                            if (task.IsCompleted && task.Result.Exists)
+                            {
+                                DataSnapshot snapshot = task.Result;
+
+                                int level = int.Parse(snapshot.Child("level").Value.ToString());
+                                int stage = int.Parse(snapshot.Child("stage").Value.ToString());
+
+                                Debug.Log("현재 데이터베이스에 저장된 레벨 : " + level);
+
+                                // 모델에 적용
+                                model.modelSO.Level = level;
+                                model.modelSO.Grade = stage;
+
+                                model.SetPoints(); // 능력치 계산
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"Firebase에서 '{charID}' 캐릭터 데이터를 찾을 수 없습니다.");
+                            }
+                        });
 
                     LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
+                    Debug.Log($"현재 플레이어 레벨 : {model.modelSO.Level}");
                 }
                 else
                 {
-                    // 실패하면 비활성화
                     gameObject.SetActive(false);
                     Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
                 }
@@ -215,5 +262,11 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         model.CurHealth.Value -= amount;
         Debug.Log($"현재 체력 : {model.CurHealth.Value}");
+    }
+
+    private void HandleHeroLevelChanged(int newLevel)
+    {
+        model.modelSO.Level = newLevel;
+        model.SetPoints();
     }
 }

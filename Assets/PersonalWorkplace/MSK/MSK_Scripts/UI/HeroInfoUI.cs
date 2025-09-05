@@ -257,6 +257,10 @@ public class HeroInfoUI : UIBase
             exp.text = RequireLevelUpGold(heroLevel);
             requireGold = BigCurrency.FromBaseAmount(heroLevel * 500);
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroID, heroLevel);
+
+            // GameEvents 안의 이벤트 호출
+            GameEvents.HeroLevelChanged(heroLevel);
+
             Debug.Log("[HeroLevelUpgrade] : 골드 소모");
         }
         else
