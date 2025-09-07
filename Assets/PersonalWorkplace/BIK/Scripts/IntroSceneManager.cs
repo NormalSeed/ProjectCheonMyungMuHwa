@@ -34,6 +34,13 @@ public class IntroSceneManager : MonoBehaviour
             Debug.Log("[IntroScene] 모든 테이블 로딩 완료!");
         }
 
+        if (scope != null){
+            var equipmentManager = scope.Container.Resolve<EquipmentManager>();
+
+            // Initialize가 실행될 때까지 기다리기
+            yield return new WaitUntil(() => equipmentManager.IsInitialized);
+        }
+
         SceneManager.LoadScene(_mainSceneName);
     }
 }

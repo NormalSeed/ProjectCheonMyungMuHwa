@@ -9,8 +9,7 @@ public class GameLifetimeScope : LifetimeScope
 {
     private bool _firebaseInitialized = false;
 
-    [SerializeField]
-    private List<EquipmentSO> equipmentTemplates;
+    [SerializeField] private List<EquipmentSO> allTemplates;
 
     protected override void Awake()
     {
@@ -23,6 +22,7 @@ public class GameLifetimeScope : LifetimeScope
                 _firebaseInitialized = true;
 
                 // Firebase 초기화가 끝났으니 DI 컨테이너 빌드
+
                 Build(); // 이게 핵심!
             }
         });
@@ -37,13 +37,16 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<CurrencyManager>(Lifetime.Singleton);
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
-        // 장비
-        builder.RegisterInstance(equipmentTemplates);
-        builder.Register<EquipmentManager>(Lifetime.Singleton)
-               .WithParameter("allTemplates", equipmentTemplates);
-        // 장비 획득, 장착, 강화, 필터링을 담당하는 EquipmentService 구현 후 등록 필요
-        // UI와 데이터를 연결하는 EquipmentView 구현 후 등록 필요
-        
+
+        Debug.Log("[GameLifetimeScope] EquipmentManager 등록 시도");
+        // 장비 매니저에 등록할 장비 템플릿
+        builder.RegisterInstance(allTemplates);
+        // 장비 매니저
+        builder.RegisterEntryPoint<EquipmentManager>(Lifetime.Singleton)
+            .WithParameter("allTemplates", allTemplates)
+            .AsSelf();
+        Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
+
         // 영웅정보
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton);
 

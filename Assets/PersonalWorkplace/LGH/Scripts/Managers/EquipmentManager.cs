@@ -1,6 +1,9 @@
+using Firebase.Auth;
+using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -22,16 +25,35 @@ public class EquipmentSaveList
     public List<EquipmentSaveData> equipments = new();
 }
 
-public class EquipmentManager : IInitializable
+// Firebase 저장용 클래스
+[Serializable]
+public class EquipmentFirebaseData
 {
+    public string templateID;
+    public string rarity;
+    public int level;
+    public bool isEquipped;
+}
+
+
+public class EquipmentManager : IStartable
+{
+    public bool IsInitialized { get; private set; }
+
     public List<EquipmentInstance> allEquipments = new();
     public List<EquipmentSO> allTemplates = new();
 
     private readonly string savePath = Path.Combine(Application.persistentDataPath, "equipment_save.json");
 
-    public void Initialize()
+    public EquipmentManager(List<EquipmentSO> allTemplates)
+    {
+        this.allTemplates = allTemplates;
+    }
+
+    public void Start()
     {
         LoadFromJson(); // 게임 시작 시 자동 로딩
+        IsInitialized = true;
     }
 
     public void SaveToJson()
@@ -54,7 +76,43 @@ public class EquipmentManager : IInitializable
         string json = JsonUtility.ToJson(saveList, true);
         File.WriteAllText(savePath, json);
         Debug.Log($"장비 데이터 저장 완료: {savePath}");
+
+        SaveToFirebase();
     }
+
+    private void SaveToFirebase()
+    {
+        var db = Firebase.Database.FirebaseDatabase.DefaultInstance;
+        string uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        if (string.IsNullOrEmpty(uid))
+        {
+            Debug.LogWarning("Firebase 사용자 인증이 되어 있지 않습니다.");
+            return;
+        }
+        var equipmentRef = db.GetReference($"users/{uid}/equipments");
+
+        Dictionary<string, object> equipmentData = new();
+
+        foreach (var instance in allEquipments)
+        {
+            equipmentData[instance.instanceID] = new Dictionary<string, object>
+            {
+                { "templateID", instance.templateID },
+                { "level", instance.level },
+                { "rarity", instance.rarity.ToString() },
+                { "isEquipped", instance.isEquipped }
+            };
+        }
+
+        equipmentRef.SetValueAsync(equipmentData).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+                Debug.Log("Firebase에 장비 데이터 업로드 완료");
+            else
+                Debug.LogWarning("Firebase 업로드 실패: " + task.Exception?.Message);
+        });
+    }
+
 
     private void LoadFromJson()
     {

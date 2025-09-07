@@ -39,6 +39,7 @@ public class EquipmentInstance
 {
     public string instanceID;
     public string templateID;
+    public string charID;
     public EquipmentType equipmentType;
     public RarityType rarity;
     public int level;
