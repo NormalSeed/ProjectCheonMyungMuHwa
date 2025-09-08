@@ -98,12 +98,12 @@ public class CharacterEquipment : MonoBehaviour
                 stats.DefPoint += increasedDefensePoint;
                 break;
             case StatType.CritRate:
-                increasedCritRate = value / 100;
-                stats.CritRate += increasedCritRate;
-                break;
-            case StatType.CritDamage:
                 increasedCritDamage = value / 100;
                 stats.CritDamage += increasedCritDamage;
+                break;
+            case StatType.CritDamage:
+                increasedCritRate = value / 100;
+                stats.CritRate += increasedCritRate;
                 break;
             default:
                 Debug.LogWarning($"알 수 없는 StatType: {instance.statType}");

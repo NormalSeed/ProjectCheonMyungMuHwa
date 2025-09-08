@@ -5,7 +5,7 @@ public enum EquipClass { 검호 = 1, 호법 = 2, 도사 = 3, 살수 = 4 }
 public enum EquipmentType { Weapon, Armor, Gloves, Boots }
 public enum RarityType { Common = 1, Rare = 2, Epic = 3, Legendary = 4 }
 
-public enum StatType { Attack, Defense, CritRate, CritDamage }
+public enum StatType { Attack, Defense, CritDamage, CritRate }
 
 public static class EquipmentStatTable
 {
@@ -19,10 +19,10 @@ public static class EquipmentStatTable
             { (EquipmentType.Weapon, RarityType.Epic),      (46f, 4f) },
             { (EquipmentType.Weapon, RarityType.Legendary), (65f, 5f) },
             // 갑옷 : 방어력
-            { (EquipmentType.Armor, RarityType.Common),    (15f, 2f) },
-            { (EquipmentType.Armor, RarityType.Rare),      (30f, 3f) },
-            { (EquipmentType.Armor, RarityType.Epic),      (45f, 4f) },
-            { (EquipmentType.Armor, RarityType.Legendary), (60f, 5f) },
+            { (EquipmentType.Armor, RarityType.Common),    (18f, 2f) },
+            { (EquipmentType.Armor, RarityType.Rare),      (32f, 3f) },
+            { (EquipmentType.Armor, RarityType.Epic),      (46f, 4f) },
+            { (EquipmentType.Armor, RarityType.Legendary), (65f, 5f) },
             // 장갑 : 치명타 데미지
             { (EquipmentType.Gloves, RarityType.Common),    (5f, 0.01f) },
             { (EquipmentType.Gloves, RarityType.Rare),      (8f, 0.02f) },
