@@ -14,8 +14,6 @@ public class GachaManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private SummonResultUI resultUI;
 
-    public event Action OnGachaCompleted;
-
     #region FireBase Properties
     private string _uid;
     private DatabaseReference _dbRef;
@@ -189,8 +187,7 @@ public class GachaManager : MonoBehaviour
         HeroDataManager.Instance.SaveAllHeroDataToFirebase();
 
         yield return null;
-        Debug.Log("모든 결과 처리 완료");
-        OnGachaCompleted?.Invoke();
+        Debug.Log("모든 결과 처리 완료"); 
     }
     #endregion
 }
