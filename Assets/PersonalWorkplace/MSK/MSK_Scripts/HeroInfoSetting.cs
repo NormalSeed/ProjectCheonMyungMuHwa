@@ -34,7 +34,21 @@ public class HeroInfoSetting : MonoBehaviour
         if (HeroDataManager.Instance.ownedHeroes.TryGetValue(heroID, out var data))
         {
             heroData = data;
-            chardata = data.cardInfo;
+            string cardInfoKey = $"{heroID}CardInfo";
+            var handle = Addressables.LoadAssetAsync<CardInfo>(cardInfoKey);
+            await handle.Task;
+
+            string modelKey = $"{heroID}_model";
+            var modelHandle = Addressables.LoadAssetAsync<PlayerModelSO>(modelKey);
+            await modelHandle.Task;
+
+            // modelHandle handle 둘 다 완료시 
+            if (handle.Status == AsyncOperationStatus.Succeeded && modelHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                chardata = handle.Result;
+                heroData.cardInfo = chardata;
+                heroData.PlayerModelSO = modelHandle.Result;
+            }
             await Init();
         }
     }

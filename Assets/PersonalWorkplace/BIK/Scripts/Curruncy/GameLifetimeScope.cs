@@ -10,6 +10,7 @@ public class GameLifetimeScope : LifetimeScope
     private bool _firebaseInitialized = false;
 
     [SerializeField] private List<EquipmentSO> allTemplates;
+    [SerializeField] private List<HeroData> allHeroTemplates;
 
     protected override void Awake()
     {
@@ -38,6 +39,12 @@ public class GameLifetimeScope : LifetimeScope
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
 
+
+        builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton)
+               .WithParameter("values", allHeroTemplates)
+               .AsSelf();
+        Debug.Log("[GameLifetimeScope] HeroDataManager 등록 완료");
+
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 시도");
         // 장비 매니저에 등록할 장비 템플릿
         builder.RegisterInstance(allTemplates);
@@ -46,10 +53,6 @@ public class GameLifetimeScope : LifetimeScope
             .WithParameter("allTemplates", allTemplates)
             .AsSelf();
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
-
-        // 영웅정보
-        builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton);
-
         // 테이블
         builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
     }

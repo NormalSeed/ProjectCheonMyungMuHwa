@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class GachaManager : MonoBehaviour
+public class EquipGachaManager : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private SummonResultUI resultUI;

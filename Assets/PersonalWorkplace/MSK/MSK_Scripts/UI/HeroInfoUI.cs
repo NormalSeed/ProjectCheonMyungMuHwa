@@ -54,12 +54,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Unity LiftCycle
-    private void OnEnable()
-    {
-        exitButton.onClick.AddListener(OnClickExit);
-        upgradeButton.onClick.AddListener(OnClickUpgrade);
-        stageUPButton.onClick.AddListener(OnClickStageUP);
-    }
+    private void OnEnable()  { }
 
     private void OnDisable()
     {

@@ -6,41 +6,22 @@ using UnityEngine;
 public class HeroListManager : MonoBehaviour
 {
     [SerializeField] private Transform parentTransform;
-
-    private DatabaseReference _dbRef;
-    private string _uid;
-
+    
     #region Unity
     private void OnEnable()
     {
-        _uid = CurrencyManager.Instance.UserID;
-        _dbRef = CurrencyManager.Instance.DbRef;
+        if (!HeroDataManager.Instance.IsInitialized)
+        {
+            Debug.LogWarning("[HeroListManager] HeroDataManager 초기화가 완료되지 않았습니다.");
+            return;
+        }
 
-        StartCoroutine(RefreshHeroList());
+        RefreshHeroList();
     }
     #endregion
-
-    private IEnumerator RefreshHeroList()
+    private void RefreshHeroList()
     {
-        var ownedIds = new HashSet<string>();
-        var charInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
-
-        var loadTask = charInfoRef.GetValueAsync();
-        yield return new WaitUntil(() => loadTask.IsCompleted);
-
-        if (loadTask.Exception != null)
-        {
-            Debug.LogError($"[HeroListManager] Firebase 로딩 실패: {loadTask.Exception}");
-            yield break;
-        }
-
-        DataSnapshot snapshot = loadTask.Result;
-        foreach (var child in snapshot.Children)
-        {
-            var hasHero = child.Child("hasHero");
-            if (hasHero.Exists && hasHero.Value is bool owned && owned)
-                ownedIds.Add(child.Key);
-        }
+        var ownedHeroes = HeroDataManager.Instance.ownedHeroes;
 
         foreach (Transform cardTransform in parentTransform)
         {
@@ -48,10 +29,10 @@ public class HeroListManager : MonoBehaviour
             if (infoSetter == null || string.IsNullOrEmpty(infoSetter.HeroID))
                 continue;
 
-            bool isOwned = ownedIds.Contains(infoSetter.HeroID);
+            bool isOwned = ownedHeroes.ContainsKey(infoSetter.HeroID);
             cardTransform.gameObject.SetActive(isOwned);
         }
 
-        Debug.Log($"[HeroListManager] 보유 영웅 {ownedIds.Count}명 기준으로 카드 활성화 완료");
+        Debug.Log($"[HeroListManager] 보유 영웅 {ownedHeroes.Count}명 기준으로 카드 활성화 완료");
     }
 }
