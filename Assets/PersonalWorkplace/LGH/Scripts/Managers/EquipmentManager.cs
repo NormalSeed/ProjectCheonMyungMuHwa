@@ -12,6 +12,7 @@ public class EquipmentSaveData
 {
     public string instanceID;
     public string templateID;
+    public string charID;
     public string equipmentType; // enum → string
     public string rarity;        // enum → string
     public int level;
@@ -66,6 +67,7 @@ public class EquipmentManager : IStartable
             {
                 instanceID = instance.instanceID,
                 templateID = instance.templateID,
+                charID = instance.charID,
                 equipmentType = instance.equipmentType.ToString(),
                 rarity = instance.rarity.ToString(),
                 level = instance.level,
@@ -99,6 +101,7 @@ public class EquipmentManager : IStartable
             equipmentData[instance.instanceID] = new Dictionary<string, object>
             {
                 { "templateID", instance.templateID },
+                { "charID", instance.charID },
                 { "level", instance.level },
                 { "rarity", instance.rarity.ToString() },
                 { "isEquipped", instance.isEquipped }
@@ -146,6 +149,7 @@ public class EquipmentManager : IStartable
             {
                 instanceID = data.instanceID,
                 templateID = data.templateID,
+                charID = data.charID,
                 equipmentType = type,
                 rarity = rarity,
                 level = data.level,

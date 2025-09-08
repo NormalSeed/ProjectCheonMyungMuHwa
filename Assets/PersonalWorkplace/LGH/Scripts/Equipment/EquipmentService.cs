@@ -49,11 +49,29 @@ public class EquipmentService
             return null;
         }
 
+        var instance = CreateInstance(template, rarity, level);
+
+        equipmentManager.allEquipments.Add(instance);
+        equipmentManager.SaveToJson();
+
+        return instance;
+    }
+
+    /// <summary>
+    /// 장비 생성 메서드. 장비 획득 메서드에서 사용
+    /// </summary>
+    /// <param name="template"></param>
+    /// <param name="rarity"></param>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    private EquipmentInstance CreateInstance(EquipmentSO template, RarityType rarity, int level)
+    {
         var instance = new EquipmentInstance
         {
             instanceID = System.Guid.NewGuid().ToString(),
-            templateID = templateID,
+            templateID = template.templateID,
             equipmentType = template.equipmentType,
+            statType = template.statType,
             rarity = rarity,
             level = level,
             isEquipped = false,
@@ -61,11 +79,9 @@ public class EquipmentService
         };
 
         instance.InitializeStats();
-        equipmentManager.allEquipments.Add(instance);
-        equipmentManager.SaveToJson();
-
         return instance;
     }
+
 
     /// <summary>
     /// CharacterEquipment의 슬롯에 장비를 장착시키는 메서드
@@ -92,11 +108,51 @@ public class EquipmentService
 
         if (slot.equippedItem != null)
         {
-            slot.equippedItem.isEquipped = false;
+            UnequipFromCharacter(slot.equippedItem.charID, slot.equippedItem.equipmentType);
         }
 
         slot.equippedItem = item;
+        item.charID = charID;
+        character.ApplyStats(item);
         item.isEquipped = true;
+
+        equipmentManager.SaveToJson();
+        return true;
+    }
+
+    /// <summary>
+    /// CharacterEquipment의 슬롯에서 장비를 해제하는 메서드
+    /// </summary>
+    /// <param name="charID">해제 대상 캐릭터 ID</param>
+    /// <param name="equipmentType">해제할 슬롯 타입</param>
+    /// <returns>해제 성공 여부</returns>
+    public bool UnequipFromCharacter(string charID, EquipmentType equipmentType)
+    {
+        var character = GetCharacter(charID);
+        if (character == null)
+        {
+            Debug.LogWarning("캐릭터가 존재하지 않습니다.");
+            return false;
+        }
+
+        if (!character.slots.TryGetValue(equipmentType, out var slot))
+        {
+            Debug.LogWarning($"해당 슬롯({equipmentType})이 존재하지 않습니다.");
+            return false;
+        }
+
+        if (slot.equippedItem == null)
+        {
+            Debug.LogWarning("해당 슬롯에 장착된 장비가 없습니다.");
+            return false;
+        }
+
+        var item = slot.equippedItem;
+
+        character.RemoveStats(item);
+        item.charID = null;
+        item.isEquipped = false;
+        slot.equippedItem = null;
 
         equipmentManager.SaveToJson();
         return true;
