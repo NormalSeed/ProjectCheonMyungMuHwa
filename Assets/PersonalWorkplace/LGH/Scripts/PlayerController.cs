@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviour, IDamagable
             {
                 BGagent.enabled = true;
             }
+            PartyManager.Instance.CheckSynergy();
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
@@ -164,6 +165,13 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void LoadPlayerSkillData(string skillSetID)
     {
+        // 기존 skillSet 제거
+        if (skillSet != null)
+        {
+            Destroy(skillSet);
+            skillSet = null;
+        }
+
         Addressables.LoadAssetAsync<GameObject>(skillSetID)
         .Completed += handle =>
         {
@@ -200,6 +208,14 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void LoadPlayerSPUMAsset(string charID, string skillSetID)
     {
+        // 기존 SPUMAsset 제거
+        if (SPUMAsset != null)
+        {
+            Destroy(SPUMAsset);
+            SPUMAsset = null;
+            spumController = null;
+        }
+
         Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
         .Completed += handle =>
         {
