@@ -5,6 +5,8 @@ public enum EquipClass { Front, Middle, Back }
 public enum EquipmentType { Weapon, Armor, Gloves, Boots }
 public enum RarityType { Common = 1, Rare = 2, Epic = 3, Legendary = 4 }
 
+public enum StatType { Attack, Defense, CritRate, CritDamage }
+
 public static class EquipmentStatTable
 {
     public static readonly Dictionary<(EquipmentType, RarityType), (float baseStat, float statIncrease)> table =
@@ -42,12 +44,14 @@ public class EquipmentInstance
     public string charID;
     public EquipmentType equipmentType;
     public RarityType rarity;
+    public StatType statType;
     public int level;
     public bool isEquipped;
     // public bool isLocked; // 장비 잠금 기능이 있다면
 
     public float baseStat;
     public float statIncrease;
+    public float appliedStatValue;
 
     [System.NonSerialized]
     public EquipmentSO template;

@@ -6,14 +6,19 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AI;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using VContainer;
 
 public class PlayerController : MonoBehaviour, IDamagable
 {
+    [Inject]
+    private EquipmentManager equipmentManager;
+
     public PlayerModel model;
     public PlayerView view;
     public GameObject skillSet;
     public GameObject SPUMAsset;
     public SPUM_Prefabs spumController;
+    public CharacterEquipment equipment;
 
     public int partyNum;
 
@@ -35,6 +40,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
+        equipment = GetComponent<CharacterEquipment>();
 
         NMagent = GetComponent<NavMeshAgent>();
         BGagent = GetComponent<BehaviorGraphAgent>();
@@ -122,6 +128,7 @@ public class PlayerController : MonoBehaviour, IDamagable
                                 model.modelSO.Grade = stage;
 
                                 model.SetPoints(); // 능력치 계산
+                                equipment.InitializeEquippedSlotsFromManager(equipmentManager.allEquipments);
                             }
                             else
                             {
