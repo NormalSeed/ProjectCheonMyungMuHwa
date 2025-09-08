@@ -25,8 +25,11 @@ public class GachaManager : MonoBehaviour
     private SummonLevel userSummonLevel;    // 소환 레벨
     private int userSummonCount;            // 유저의 소환 레벨업 수치 
     private int requireSummonCount;         // 소환 레벨업 요구량
-    #endregion
 
+    private Dictionary<string, List<string>> rarityHeroMap = new(); // 레어도 별 영웅 리스트
+    #endregion
+    
+    private Dictionary<string, CardInfo> cardInfoCache = new(); // 캐싱용 딕셔너리
     // 가중치 풀
     private Dictionary<string, float> GetWeightPool()
     {
@@ -57,13 +60,26 @@ public class GachaManager : MonoBehaviour
     //  소환 레벨 별 확률정보 로딩
     private async Task LoadSummonConfigAsync()
     {
-        var snapshot = await _dbRef.Child("summon").Child(userSummonLevel.ToString()).GetValueAsync();
+        var summonSnap = await _dbRef.Child("summon").GetValueAsync();
 
-        summonNormal = Convert.ToSingle(snapshot.Child("normal").Value);
-        summonRare = Convert.ToSingle(snapshot.Child("rare").Value);
-        summonUnique = Convert.ToSingle(snapshot.Child("unique").Value);
-        summonEpic = Convert.ToSingle(snapshot.Child("epic").Value);
-        requireSummonCount = Convert.ToInt32(snapshot.Child("count").Value);
+        // 확률 및 요구 수치 로딩
+        var configSnap = summonSnap.Child(userSummonLevel.ToString());
+        summonNormal = Convert.ToSingle(configSnap.Child("normal").Value);
+        summonRare = Convert.ToSingle(configSnap.Child("rare").Value);
+        summonUnique = Convert.ToSingle(configSnap.Child("unique").Value);
+        summonEpic = Convert.ToSingle(configSnap.Child("epic").Value);
+        requireSummonCount = Convert.ToInt32(configSnap.Child("count").Value);
+
+        // 영웅 리스트 로딩
+        var heroListSnap = summonSnap.Child("heroList");
+        rarityHeroMap.Clear();
+
+        foreach (var rarityNode in heroListSnap.Children)
+        {
+            rarityHeroMap[rarityNode.Key.ToLower()] = rarityNode.Children
+                .Select(hero => hero.Key)
+                .ToList();
+        }
     }
     // 유저 뽑기정보 로딩
     private async Task LoadUserDataAsync()
@@ -83,25 +99,38 @@ public class GachaManager : MonoBehaviour
     }
 
     // 카드 정보 표기
-    private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
+    private async Task<CardInfo> LoadCardInfoByCode(string heroCode)
     {
-        string addressKey = rarity switch
-        {
-            "Normal" => "C001CardInfo",
-            "Rare" => "C002CardInfo",
-            "Unique" => "C003CardInfo",
-            "Epic" => "C004CardInfo",
-        };
+        if (cardInfoCache.TryGetValue(heroCode, out var cached))
+            return cached;
 
+        string addressKey = $"{heroCode}CardInfo";
         var handle = Addressables.LoadAssetAsync<CardInfo>(addressKey);
-
         await handle.Task;
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            return handle.Result;
 
-        Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {addressKey} 로드 실패");
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+        {
+            cardInfoCache[heroCode] = handle.Result;
+            return handle.Result;
+        }
+
+        Debug.LogError($"[{nameof(LoadCardInfoByCode)}] {addressKey} 로드 실패");
         return null;
     }
+
+    private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
+    {
+        string key = rarity.ToLower();
+        if (!rarityHeroMap.TryGetValue(key, out var heroList) || heroList.Count == 0)
+        {
+            Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {rarity}에 해당하는 영웅 리스트 없음");
+            return null;
+        }
+
+        string selectedCode = heroList[UnityEngine.Random.Range(0, heroList.Count)];
+        return await LoadCardInfoByCode(selectedCode);
+    }
+
 
     // 실제 소환 코드
     public async Task Summon(int times)
@@ -115,7 +144,7 @@ public class GachaManager : MonoBehaviour
         var results = new List<CardInfo>();
         for (int i = 0; i < times; i++)
         {
-            string rarityKey = DrawOne();
+            string rarityKey = DrawRarity();
             CardInfo info = await LoadCardInfoByRarity(rarityKey);
             results.Add(info);
         }
@@ -141,7 +170,7 @@ public class GachaManager : MonoBehaviour
     }
 
     //  소환 확률 결정
-    private string DrawOne()
+    private string DrawRarity()
     {
         var weightPool = GetWeightPool();
         float sum = weightPool.Values.Sum();
@@ -179,15 +208,15 @@ public class GachaManager : MonoBehaviour
     // 영웅 조각 정보를 업로드하는 코루틴
     private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
     {
-        // 🆕 HeroDataManager에 결과 반영
+        // HeroDataManager에 결과 반영
         HeroDataManager.Instance.ApplyGachaResults(results);
 
-        // 🆕 한번에 저장
+        // 한번에 저장
         HeroDataManager.Instance.SaveHeroDataToCache();
         HeroDataManager.Instance.SaveAllHeroDataToFirebase();
 
         yield return null;
-        Debug.Log("모든 결과 처리 완료"); 
+        Debug.Log("영웅 뽑기 결과 처리 완료"); 
     }
     #endregion
 }
