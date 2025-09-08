@@ -15,6 +15,7 @@ public class SummonResultUI : UIBase
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager poolManager;
     private CardInfo cardInfo;
+    public event Action OnGachaCompleted;
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -63,6 +64,7 @@ public class SummonResultUI : UIBase
             // 연출 간격 조정
             await Task.Delay(100);
         }
+        OnGachaCompleted?.Invoke();
     }
     #endregion
 }

@@ -55,14 +55,14 @@ public class SummonUI : UIBase
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
 
-        gachaManager.OnGachaCompleted -= HandleGachaCompleted;
+        summonResultUI.OnGachaCompleted -= HandleGachaCompleted;
     }
 
     private void Init()
     {
         ButtonInit();
         SummonLevelChange();
-        gachaManager.OnGachaCompleted += HandleGachaCompleted;
+        summonResultUI.OnGachaCompleted += HandleGachaCompleted;
     }
 
     private void ButtonInit()
@@ -95,7 +95,6 @@ public class SummonUI : UIBase
         summonInfoPanel.SetActive(true);
     }
     #endregion
-
 
     #region private
 

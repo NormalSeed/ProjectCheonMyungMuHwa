@@ -41,18 +41,6 @@ public class GachaManager : MonoBehaviour
         };
     }
 
-    // 영웅 조각 반환 매칭용
-    private int GetPieceAmountByRarity(HeroRarity rarity)
-    {
-        switch (rarity)
-        {
-            case HeroRarity.Normal: return 1;
-            case HeroRarity.Rare: return 3;
-            case HeroRarity.Epic: return 5;
-            case HeroRarity.Unique: return 10;
-            default: return 0;
-        }
-    }
     #region Unity LifeCycle
 
     private async void OnEnable()
@@ -190,53 +178,17 @@ public class GachaManager : MonoBehaviour
             // await historyRef.RemoveValueAsync();
         }
     }
-
-    // 영웅정보를 업로드하는 코드
-    private async Task ProcessGachaResultAsync(CardInfo card)
-    {
-        var charRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(card.HeroID);
-
-        // 보유 여부 확인
-        var hasHeroSnap = await charRef.Child("hasHero").GetValueAsync();
-        bool hasHero = hasHeroSnap.Exists && Convert.ToBoolean(hasHeroSnap.Value);
-
-        if (!hasHero)
-        {
-            Debug.Log("영웅 최초 처리");
-            // 캐릭터 최초 획득 시 정보 등록
-            var newHeroData = new Dictionary<string, object>
-            {
-                { "hasHero", true },
-                { "heroPiece", 0 }, // 조각은 0부터 시작
-                { "stage", 1 },
-                { "rarity", card.rarity.ToString() }
-            };
-
-            await charRef.UpdateChildrenAsync(newHeroData);
-        }
-        else
-        {
-            // 중복 획득: 조각 추가
-            var pieceSnap = await charRef.Child("heroPiece").GetValueAsync();
-            int currentPiece = pieceSnap.Exists ? Convert.ToInt32(pieceSnap.Value) : 0;
-            int addedPiece = GetPieceAmountByRarity(card.rarity); // 레어도에 따라 조각 수 결정
-
-            Debug.Log($"[조각 추가] {card.HeroID} → 기존: {currentPiece}, 추가: {addedPiece}, 최종: {currentPiece + addedPiece}");
-           
-            await charRef.Child("heroPiece").SetValueAsync(currentPiece + addedPiece);
-        }
-    }
     // 영웅 조각 정보를 업로드하는 코루틴
     private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
     {
-        foreach (var info in results)
-        {
-            var task = ProcessGachaResultAsync(info);
-            while (!task.IsCompleted)
-                yield return null;
-            if (task.IsFaulted)
-                Debug.LogError($"ProcessGachaResultAsync 실패: {task.Exception}");
-        }
+        // 🆕 HeroDataManager에 결과 반영
+        HeroDataManager.Instance.ApplyGachaResults(results);
+
+        // 🆕 한번에 저장
+        HeroDataManager.Instance.SaveHeroDataToCache();
+        HeroDataManager.Instance.SaveAllHeroDataToFirebase();
+
+        yield return null;
         Debug.Log("모든 결과 처리 완료");
         OnGachaCompleted?.Invoke();
     }

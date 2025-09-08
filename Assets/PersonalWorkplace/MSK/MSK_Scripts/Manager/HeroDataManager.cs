@@ -1,150 +1,213 @@
 using Firebase.Database;
+using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using VContainer.Unity;
+
+#region Serializable
+[Serializable]
+public class HeroSaveList
+{
+    public List<HeroSaveData> heroes = new();
+}
+
+[Serializable]
+public class HeroSaveData
+{
+    public string heroId;
+    public string json; // HeroData를 그대로 JSON으로 저장
+}
+#endregion
+
 
 public class HeroDataManager : IStartable
 {
     public static HeroDataManager Instance { get; private set; }
+    public bool IsInitialized { get; private set; }
+
+    public Dictionary<string, HeroData> ownedHeroes = new();
+    public List<HeroData> allTemplates = new();
 
     private string _uid;
     private DatabaseReference _dbRef;
-    public Dictionary<string, HeroData> ownedHeroes = new();
 
-    void IStartable.Start()
+    private readonly string savePath = Path.Combine(Application.persistentDataPath, "hero_cache.json");
+
+    private Dictionary<string, object> ConvertHeroToDict(HeroData hero)
     {
-        Start();
+        return new Dictionary<string, object>
+        {
+            { "hasHero", hero.hasHero },
+            { "heroPiece", hero.heroPiece },
+            { "level", hero.level },
+            { "rarity", hero.rarity },
+            { "stage", hero.stage },
+            { "cardInfo", JsonUtility.ToJson(hero.cardInfo) }
+        };
     }
-    private void Start()
+    public int GetPieceAmountByRarity(HeroRarity rarity)
     {
-        Instance = this;    
+        return rarity switch
+        {
+            HeroRarity.Normal => 1,
+            HeroRarity.Rare => 3,
+            HeroRarity.Epic => 5,
+            HeroRarity.Unique => 10,
+            _ => 0
+        };
+    }
+    public void AddNewHero(CardInfo card)
+    {
+        var heroData = new HeroData
+        {
+            hasHero = true,
+            heroPiece = 0,
+            stage = 1,
+            rarity = card.rarity.ToString(),
+            heroId = card.HeroID,
+            cardInfo = card
+        };
+
+        ownedHeroes[card.HeroID] = heroData;
+    }
+
+    public HeroDataManager(List<HeroData> values)
+    {
+        this.allTemplates = values;
+    }
+
+
+    #region Unity
+    public async void Start()
+    {
+        Instance = this;
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
-        LoadAllHeroData();
+        LoadHeroDataFromCache();
+        await LoadHeroDataFromFirebase();
+        SaveHeroDataToCache();
+
+        IsInitialized = true;
+    }
+    #endregion
+
+    #region Private
+    private async Task LoadHeroDataFromFirebase()
+    {
+        var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
+        var snapshot = await heroRef.GetValueAsync();
+
+        ownedHeroes.Clear();
+
+        foreach (var child in snapshot.Children)
+        {
+            string heroId = child.Key;
+            string json = child.GetRawJsonValue();
+
+            HeroData hero = JsonUtility.FromJson<HeroData>(json);
+            ownedHeroes[heroId] = hero;
+        }
+
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
+    }
+    #endregion
+
+
+    public void LoadHeroDataFromCache()
+    {
+        if (!File.Exists(savePath))
+        {
+            Debug.LogWarning("영웅 캐시 파일이 존재하지 않습니다.");
+            return;
+        }
+
+        string jsonText = File.ReadAllText(savePath);
+        var saveList = JsonUtility.FromJson<HeroSaveList>(jsonText);
+
+        foreach (var data in saveList.heroes)
+        {
+            HeroData hero = JsonUtility.FromJson<HeroData>(data.json);
+            ownedHeroes[data.heroId] = hero;
+        }
     }
 
-    private async void LoadAllHeroData()
+    public void SaveHeroData(string heroId)
+    {
+        SaveHeroDataToCache();
+        SaveHeroDataToFirebase(heroId);
+    }
+
+    public void SaveHeroDataToCache()
+    {
+        var saveList = new HeroSaveList();
+
+        foreach (var kvp in ownedHeroes)
+        {
+            string json = JsonUtility.ToJson(kvp.Value);
+            saveList.heroes.Add(new HeroSaveData
+            {
+                heroId = kvp.Key,
+                json = json
+            });
+        }
+
+        string jsonText = JsonUtility.ToJson(saveList, true);
+        File.WriteAllText(savePath, jsonText);
+    }
+
+    public void SaveHeroDataToFirebase(string heroId)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
 
-        var heroInfoPath = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
-
-        try
-        {
-            DataSnapshot snapshot = await heroInfoPath.GetValueAsync();
-            ownedHeroes.Clear();
-
-            foreach (var child in snapshot.Children)
-            {
-                string heroId = child.Key;
-                string json = child.GetRawJsonValue();
-
-                HeroData hero = JsonUtility.FromJson<HeroData>(json);
-                ownedHeroes[heroId] = hero;
-
-                await LoadSOAssetsAsync(heroId, hero);
-            }
-
-            Debug.Log($"총 {ownedHeroes.Count}명의 영웅 정보를 불러왔습니다.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Firebase 데이터 로딩 중 오류 발생: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// CardInfo를 불러오는 코드입니다.
-    /// </summary>
-    /// <param name="heroId"></param>
-    /// <param name="hero"></param>
-    private async Task LoadCardInfoAsync(string heroId, HeroData hero)
-    {
-        string cardInfoKey = heroId + "CardInfo";
-        var handle = Addressables.LoadAssetAsync<CardInfo>(cardInfoKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            hero.cardInfo = handle.Result;
-
-            hero.cardInfo.HeroStage = handle.Result.HeroStage;
-        }
-        else
-        {
-            Debug.LogWarning($"CardInfo 로드 실패: {cardInfoKey}");
-        }
-    }
-    /// <summary>
-    /// PlayerModeSO를 설정하는 코드입니다.
-    /// </summary>
-    /// <param name="heroId"></param>
-    /// <param name="hero"></param>
-    /// <returns></returns>
-    private async Task LoadPlayerModelSOAsync(string heroId, HeroData hero)
-    {
-        string modelKey = heroId + "_model";
-        var handle = Addressables.LoadAssetAsync<PlayerModelSO>(modelKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            hero.PlayerModelSO = handle.Result;
-            hero.PlayerModelSO.Level = handle.Result.Level;
-        }
-        else
-        {
-            Debug.LogWarning($"PlayerModelSO 로드 실패: {modelKey}");
-        }
-    }
-    /// <summary>
-    /// SKill정보를 설정하는 코드입니다.
-    /// </summary>
-    /// <param name="hero"></param>
-    /// <returns></returns>
-    private async Task LoadSkillSOAsync(HeroData hero)
-    {
-        /*
-        if (hero.PlayerModelSO == null)
-        {
-            Debug.LogWarning("PlayerModelSO가 null이므로 SkillSO를 로드할 수 없습니다.");
+        if (!ownedHeroes.TryGetValue(heroId, out var hero))
             return;
-        }
 
-        string skillKey = hero.PlayerModelSO.SkillSetID;
-        Debug.Log($"[Addressables] 스킬 키: {skillKey}");
-
-        var handle = Addressables.LoadAssetAsync<PlayerSkillSO>(skillKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
+        var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo").Child(heroId);
+        var heroDict = ConvertHeroToDict(hero);
+        heroRef.SetValueAsync(heroDict).ContinueWithOnMainThread(task =>
         {
-            hero.PlayerSkillSO = handle.Result;
-        }
-        else
-        {
-            Debug.LogWarning($"PlayerSkillSO 로드 실패: {skillKey}");
-        }
-        */
+            if (task.IsCompleted)
+                Debug.Log($"[HeroDataManager] '{heroId}' Firebase 저장 완료");
+        });
     }
-    /// <summary>
-    /// 영웅정보를 설정하는 코드입니다.
-    /// </summary>
-    /// <param name="heroId"></param>
-    /// <param name="hero"></param>
-    /// <returns></returns>
-    private async Task LoadSOAssetsAsync(string heroId, HeroData hero)
+
+    public void SaveAllHeroDataToFirebase()
     {
-        await LoadCardInfoAsync(heroId, hero);
-        await LoadPlayerModelSOAsync(heroId, hero);
-        await LoadSkillSOAsync(hero);
-        Debug.Log($"[{heroId}]의 정보를 설정했습니다.");
-        Debug.Log(JsonUtility.ToJson(hero, true));
+        if (string.IsNullOrEmpty(_uid))
+            return;
+        var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
+
+        Dictionary<string, object> heroData = new();
+        foreach (var kvp in ownedHeroes)
+        {
+            heroData[kvp.Key] = ConvertHeroToDict(kvp.Value);
+        }
+        heroRef.SetValueAsync(heroData).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+                Debug.Log("[HeroDataManager] 전체 영웅 Firebase 저장 완료");
+        });
+    }
+    public void AddHeroPiece(string heroId, int amount)
+    {
+        if (ownedHeroes.TryGetValue(heroId, out var hero))
+        {
+            hero.heroPiece += amount;
+        }
+    }
+    public void ApplyGachaResults(List<CardInfo> results)
+    {
+        foreach (var card in results)
+        {
+            if (!ownedHeroes.ContainsKey(card.HeroID))
+                AddNewHero(card);
+            else
+                AddHeroPiece(card.HeroID, GetPieceAmountByRarity(card.rarity));
+        }
     }
 }
