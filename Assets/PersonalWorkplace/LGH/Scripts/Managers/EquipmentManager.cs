@@ -14,6 +14,7 @@ public class EquipmentSaveData
     public string templateID;
     public string charID;
     public string equipmentType; // enum → string
+    public string statType;
     public string rarity;        // enum → string
     public int level;
     public bool isEquipped;
@@ -69,6 +70,7 @@ public class EquipmentManager : IStartable
                 templateID = instance.templateID,
                 charID = instance.charID,
                 equipmentType = instance.equipmentType.ToString(),
+                statType = instance.statType.ToString(),
                 rarity = instance.rarity.ToString(),
                 level = instance.level,
                 isEquipped = instance.isEquipped,
@@ -139,7 +141,8 @@ public class EquipmentManager : IStartable
             }
 
             if (!Enum.TryParse(data.equipmentType, out EquipmentType type) ||
-                !Enum.TryParse(data.rarity, out RarityType rarity))
+                !Enum.TryParse(data.rarity, out RarityType rarity) ||
+                !Enum.TryParse(data.statType, out StatType sType))
             {
                 Debug.LogWarning($"장비 타입 또는 희귀도 파싱 실패: {data.equipmentType}, {data.rarity}");
                 continue;
@@ -151,6 +154,7 @@ public class EquipmentManager : IStartable
                 templateID = data.templateID,
                 charID = data.charID,
                 equipmentType = type,
+                statType = sType,
                 rarity = rarity,
                 level = data.level,
                 isEquipped = data.isEquipped,
@@ -163,6 +167,40 @@ public class EquipmentManager : IStartable
         }
 
         Debug.Log($"장비 데이터 로딩 완료: {allEquipments.Count}개");
+    }
+
+    /// <summary>
+    /// 테스트용 장비 초기화 메서드
+    /// </summary>
+    public void DeleteAllEquipments()
+    {
+        // 장비 리스트 초기화
+        allEquipments.Clear();
+
+        // JSON 파일 초기화
+        SaveToJson();
+
+        // 파이어베이스에서 장비 데이터 삭제
+        DeleteEquipmentsFromFirebase();
+
+    }
+
+    private void DeleteEquipmentsFromFirebase()
+    {
+        var reference = Firebase.Database.FirebaseDatabase.DefaultInstance
+            .GetReference("equipments");
+
+        reference.RemoveValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("파이어베이스 장비 데이터 삭제 완료");
+            }
+            else
+            {
+                Debug.LogWarning("파이어베이스 장비 데이터 삭제 실패: " + task.Exception);
+            }
+        });
     }
 }
 

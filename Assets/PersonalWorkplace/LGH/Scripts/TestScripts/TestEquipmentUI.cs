@@ -7,6 +7,7 @@ using VContainer;
 public class TestEquipmentUI : MonoBehaviour
 {
     [SerializeField] private List<Button> equipmentButtons;
+    [SerializeField] private Button deleteButton;
 
     [Inject]
     private EquipmentManager manager;
@@ -17,6 +18,7 @@ public class TestEquipmentUI : MonoBehaviour
             StartCoroutine(WaitForManager());
         else
             Debug.LogWarning("EquipmentManager가 아직 주입되지 않았습니다.");
+        deleteButton.onClick.AddListener(manager.DeleteAllEquipments);
     }
 
     private IEnumerator WaitForManager()

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EquipClass { Front, Middle, Back }
+public enum EquipClass { 검호 = 1, 호법 = 2, 도사 = 3, 살수 = 4 }
 public enum EquipmentType { Weapon, Armor, Gloves, Boots }
 public enum RarityType { Common = 1, Rare = 2, Epic = 3, Legendary = 4 }
 

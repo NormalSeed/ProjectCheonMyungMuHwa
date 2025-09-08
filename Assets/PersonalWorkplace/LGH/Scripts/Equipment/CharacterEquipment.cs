@@ -46,16 +46,18 @@ public class CharacterEquipment : MonoBehaviour
 
     private EquipClass GetEquipClass()
     {
-        switch (controller.model.modelSO.Position)
+        switch (controller.model.modelSO.Role)
         {
-            case 1:
-                return EquipClass.Front;
-            case 2:
-                return EquipClass.Middle;
-            case 3:
-                return EquipClass.Back;
+            case "검호":
+                return EquipClass.검호;
+            case "호법":
+                return EquipClass.호법;
+            case "도사":
+                return EquipClass.도사;
+            case "살수":
+                return EquipClass.살수;
             default:
-                return EquipClass.Front;
+                return EquipClass.검호;
         }
     }
 
@@ -127,11 +129,11 @@ public class CharacterEquipment : MonoBehaviour
                 increasedDefensePoint = 0;
                 break;
             case StatType.CritRate:
-                stats.CritRate += increasedCritRate;
+                stats.CritRate -= increasedCritRate;
                 increasedCritRate = 0;
                 break;
             case StatType.CritDamage:
-                stats.CritDamage += increasedCritDamage;
+                stats.CritDamage -= increasedCritDamage;
                 increasedCritDamage = 0;
                 break;
             default:
