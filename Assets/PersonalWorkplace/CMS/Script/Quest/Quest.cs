@@ -25,6 +25,16 @@ public class Quest
     public DateTime lastUpdated; //마지막 갱신
     public int lastWeek; //마지막 갱신 주차 
 
+    public QuestState state = QuestState.Locked; // 기본 상태 = 잠금
+
+    public int requiredStage = 0;    // 특정 스테이지 조건
+    public int requiredLevel = 0;    // 특정 계정 레벨 조건
+
+    public string nextQuestID; // 다음 퀘스트 이어가기
+
+    public bool UnlockCondition;
+
+    public bool IsUnlocked => UnlockCondition && state != QuestState.Locked;
     public Quest() { }
 
     public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal,
@@ -80,17 +90,24 @@ public class Quest
     //진행도 추가
     public void AddProgress(int amount)
     {
-        if (isComplete) return;
+        if (state != QuestState.InProgress) return;
 
         valueProgress += amount;
         if (valueProgress >= valueGoal)
         {
             valueProgress = valueGoal;
-            isComplete = true;
+            state = QuestState.Completed; // 완료 상태 전환
         }
         lastUpdated = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
     }
 
+    public void ClaimReward()
+    {
+        if (state != QuestState.Completed) return;
+
+        isClaimed = true;
+        state = QuestState.Disabled; // 보상 수령 이후 비활성화
+    }
 
     //퀘스트 리셋
     public void ResetProgress()
@@ -112,7 +129,7 @@ public enum QuestCategory
     Daily = 1,
     Weekly = 2,
     Repeat = 3,
-    Objective = 4
+    Mission = 4
 }
 
 public enum QuestTargetType
@@ -131,6 +148,14 @@ public enum RewardType
     Currency = 1, // 재화
     Equipment = 2, // 장비
     Item = 3 // 아이템 (확장용)
+}
+public enum QuestState
+{
+    Locked,      // 잠금 (조건 미충족)
+    InProgress,  // 진행중
+    Completed,   // 완료됨
+    RewardReady, // 보상 대기 (완료 후 수령 대기)
+    Disabled     // 비활성화 (보상 수령 이후 or 조건 미충족 재진입 불가)
 }
 
 [System.Serializable]
