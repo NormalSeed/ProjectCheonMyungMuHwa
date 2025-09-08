@@ -7,6 +7,7 @@ public static class QuestDatabase
     public static readonly List<Quest> DailyQuests = new List<Quest>();
     public static readonly List<Quest> WeeklyQuests = new List<Quest>();
     public static readonly List<Quest> RepeatQuests = new List<Quest>();
+    public static List<Quest> MissionQuests = new List<Quest>();
 
     public static void LoadAll()
     {
@@ -15,6 +16,7 @@ public static class QuestDatabase
         LoadFromCSV("QuestTable_Day", QuestCategory.Daily, DailyQuests);
         LoadFromCSV("QuestTable_Week", QuestCategory.Weekly, WeeklyQuests);
         LoadFromCSV("QuestTable_Repeat", QuestCategory.Repeat, RepeatQuests);
+        LoadFromCSV("QuestTable_Tutorial", QuestCategory.Mission, MissionQuests);
 
         Debug.Log($"로드 완료: Daily={DailyQuests.Count}, Weekly={WeeklyQuests.Count}, Repeat={RepeatQuests.Count}");
     }

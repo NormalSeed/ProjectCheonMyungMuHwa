@@ -424,5 +424,25 @@ public class QuestManager : MonoBehaviour
             lastWeek = quest.lastWeek;
         }
     }
+    public List<Quest> GetActiveQuestsForHUD()
+    {
+        return activeQuests.Values
+            .Where(q => q.IsUnlocked && !q.isClaimed)  // 해금 + 미보상
+            .OrderBy(q => GetQuestPriority(q.questType)) // 우선순위 정렬
+            .Take(1) // HUD에 한 개만 보여주고 싶다면
+            .ToList();
+    }
+
+    private int GetQuestPriority(QuestCategory category)
+    {
+        return category switch
+        {
+            QuestCategory.Mission => 0,  // 최우선
+            QuestCategory.Daily => 1,
+            QuestCategory.Weekly => 2,
+            QuestCategory.Repeat => 3,
+            _ => 99
+        };
+    }
 
 }
