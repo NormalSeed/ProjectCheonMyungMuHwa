@@ -93,6 +93,7 @@ public class EquipmentManager : IStartable
 
         Dictionary<string, object> equipmentData = new();
 
+        // 파이어베이스에 저장할 때는 Dictionary 등으로 저장 가능한 형식으로 지정해야 함
         foreach (var instance in allEquipments)
         {
             equipmentData[instance.instanceID] = new Dictionary<string, object>
