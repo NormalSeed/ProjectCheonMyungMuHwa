@@ -149,13 +149,81 @@ public class PartyManager : MonoBehaviour, IStartable
     #endregion
 
     #region Private
-    private void CheakSynergy()
+    private void CheckSynergy()
+    {
+        Dictionary<HeroFaction, int> factionCounts = new();
+        foreach (var member in partyMembers)
+        {
+            var cardInfo = member.GetComponent<CardInfo>();
+            if (cardInfo == null)
+                continue;
+
+            HeroFaction faction = cardInfo.faction;
+
+            if (!factionCounts.ContainsKey(faction))
+                factionCounts[faction] = 0;
+
+            factionCounts[faction]++;
+        }
+
+        foreach (var kvp in factionCounts)
+        {
+            if (kvp.Value >= 1 && kvp.Key == HeroFaction.M)
+            {
+                
+            }
+            else if (kvp.Value >= 2 && kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S)
+            {
+
+            }
+            else if (kvp.Value >= 4 && kvp.Key == HeroFaction.M)
+            {
+                
+            }
+            else if (kvp.Value == 5 && kvp.Key != HeroFaction.M)
+            {
+
+            }
+        }
+    }
+
+    private void ActiveSynergy(HeroFaction faction)
     {
         foreach (var member in partyMembers)
         {
+            var cardInfo = member.GetComponent<CardInfo>();
+            if (cardInfo == null)
+                continue;
 
+            string targetCharID = cardInfo.HeroID;
+
+            // players 리스트에서 해당 charID를 가진 PlayerController 찾기
+            var player = players.Find(p => p.charID.Value == targetCharID);
+            if (player == null || player.model?.modelSO == null)
+                continue;
+
+            var stats = player.model.modelSO;
+
+            switch (faction)
+            {
+                case HeroFaction.J:
+                    stats.DefPoint += 10;
+                    Debug.Log($"정파 시너지: {targetCharID} 외공과 내공 모두 증가");
+                    break;
+                case HeroFaction.S:
+                    stats.CritRate += 0.05f;
+                    Debug.Log($"사파 시너지: {targetCharID} 보스에게 주는 피해량 증가");
+                    break;
+                case HeroFaction.M:
+                    stats.ExtAtkPoint += 15;
+                    Debug.Log($"마교 시너지: {targetCharID} 스킬로 주는 피해량 증가");
+                    break;
+            }
         }
     }
+
+
+
     private void HandleCurrencyReady()
     {
         PartyLoadData();
