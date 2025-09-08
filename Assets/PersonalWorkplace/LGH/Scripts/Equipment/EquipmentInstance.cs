@@ -29,10 +29,10 @@ public static class EquipmentStatTable
             { (EquipmentType.Gloves, RarityType.Epic),      (12f, 0.05f) },
             { (EquipmentType.Gloves, RarityType.Legendary), (20f, 0.1f) },
             // 신발 : 치명타 확률
-            { (EquipmentType.Boots, RarityType.Common),    (2.5f, 0.005f) },
-            { (EquipmentType.Boots, RarityType.Rare),      (4f, 0.01f) },
-            { (EquipmentType.Boots, RarityType.Epic),      (6f, 0.025f) },
-            { (EquipmentType.Boots, RarityType.Legendary), (10f, 0.05f) },
+            { (EquipmentType.Boots, RarityType.Common),    (1f, 0.01f) },
+            { (EquipmentType.Boots, RarityType.Rare),      (2f, 0.02f) },
+            { (EquipmentType.Boots, RarityType.Epic),      (4f, 0.04f) },
+            { (EquipmentType.Boots, RarityType.Legendary), (8f, 0.08f) },
         };
 }
 

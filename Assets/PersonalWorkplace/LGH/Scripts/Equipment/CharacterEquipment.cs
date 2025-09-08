@@ -97,11 +97,11 @@ public class CharacterEquipment : MonoBehaviour
                 increasedDefensePoint = (float)stats.DefPoint * value / 100;
                 stats.DefPoint += increasedDefensePoint;
                 break;
-            case StatType.CritRate:
+            case StatType.CritDamage:
                 increasedCritDamage = value / 100;
                 stats.CritDamage += increasedCritDamage;
                 break;
-            case StatType.CritDamage:
+            case StatType.CritRate:
                 increasedCritRate = value / 100;
                 stats.CritRate += increasedCritRate;
                 break;
