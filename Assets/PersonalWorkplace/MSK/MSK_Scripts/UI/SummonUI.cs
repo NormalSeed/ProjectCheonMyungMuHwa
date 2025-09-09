@@ -22,6 +22,10 @@ public class SummonUI : UIBase
 
     private void OnDisable()
     {
+        heroSummon.SetActive(true);
+        equipSummon.SetActive(false);
+        petSummon.SetActive(false);
+
         heroBtn.onClick.RemoveListener(onClickHeroButton);
         equipBtn.onClick.RemoveListener(onClickEquipButton);
         petBtn.onClick.RemoveListener(onClickPetButton);

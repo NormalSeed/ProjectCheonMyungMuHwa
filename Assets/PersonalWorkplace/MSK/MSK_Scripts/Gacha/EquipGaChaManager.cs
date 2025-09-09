@@ -6,133 +6,68 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using VContainer;
 
 public class EquipGachaManager : MonoBehaviour
 {
+    [Inject] private EquipmentService equipmentService;
+    [Inject] private EquipmentManager equipmentManager;
+
     [Header("UI")]
     [SerializeField] private SummonResultUI resultUI;
 
-    #region FireBase Properties
+    #region Firebase Properties
     private string _uid;
     private DatabaseReference _dbRef;
 
-    private float summonNormal;             // 노말 소환확률           
-    private float summonRare;               // 레어 소환확률
-    private float summonUnique;             // 유니트 소환확률
-    private float summonEpic;               // 에픽 소환확률
-    private SummonLevel userSummonLevel;    // 소환 레벨
-    private int userSummonCount;            // 유저의 소환 레벨업 수치 
-    private int requireSummonCount;         // 소환 레벨업 요구량
+    private float summonNormal;
+    private float summonRare;
+    private float summonUnique;
+    private float summonEpic;
 
-    private Dictionary<string, List<string>> rarityHeroMap = new(); // 레어도 별 영웅 리스트
+    private SummonLevel userSummonLevel;
+    private int userSummonCount;
+    private int requireSummonCount;
+
+    private List<string> allTemplateIDs = new();
     #endregion
-    
-    private Dictionary<string, CardInfo> cardInfoCache = new(); // 캐싱용 딕셔너리
-    // 가중치 풀
-    private Dictionary<string, float> GetWeightPool()
-    {
-        return new Dictionary<string, float>
-        {
-            { "Normal", summonNormal },
-            { "Rare", summonRare },
-            { "Unique", summonUnique },
-            { "Epic", summonEpic }
-        };
-    }
 
     #region Unity LifeCycle
-
     private async void OnEnable()
     {
+
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
-        await LoadUserDataAsync();
-        await LoadSummonConfigAsync();
+        await LoadSummonDataAsync();
     }
-    private void OnDisable() { }
     #endregion
 
-    #region Private
-
-    //  소환 레벨 별 확률정보 로딩
-    private async Task LoadSummonConfigAsync()
+    #region Data Loading
+    private async Task LoadSummonDataAsync()
     {
-        var summonSnap = await _dbRef.Child("summon").GetValueAsync();
+        var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
+        userSummonLevel = profile.EquipSummonLevel;
+        userSummonCount = profile.EquipSummonCount;
 
-        // 확률 및 요구 수치 로딩
+        var summonSnap = await _dbRef.Child("summon").GetValueAsync();
         var configSnap = summonSnap.Child(userSummonLevel.ToString());
+
         summonNormal = Convert.ToSingle(configSnap.Child("normal").Value);
         summonRare = Convert.ToSingle(configSnap.Child("rare").Value);
         summonUnique = Convert.ToSingle(configSnap.Child("unique").Value);
         summonEpic = Convert.ToSingle(configSnap.Child("epic").Value);
         requireSummonCount = Convert.ToInt32(configSnap.Child("count").Value);
 
-        // 영웅 리스트 로딩
-        var heroListSnap = summonSnap.Child("heroList");
-        rarityHeroMap.Clear();
-
-        foreach (var rarityNode in heroListSnap.Children)
-        {
-            rarityHeroMap[rarityNode.Key.ToLower()] = rarityNode.Children
-                .Select(hero => hero.Key)
-                .ToList();
-        }
+        var listSnap = summonSnap.Child("equipmentList");
+        allTemplateIDs = listSnap.Children
+            .Select(item => item.Key)
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ToList();
     }
-    // 유저 뽑기정보 로딩
-    private async Task LoadUserDataAsync()
-    {
-        var snapProfile = await CurrencyManager.Instance.LoadUserProfileAsync();
-        userSummonLevel = snapProfile.SummonLevel;
-        userSummonCount = snapProfile.SummonCount;
-    }
-    private Task SaveUserSummonLevelAsync()
-    {
-        return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").SetValueAsync((int)userSummonLevel);
-    }
+    #endregion
 
-    private Task SaveUserSummonCountAsync()
-    {
-        return _dbRef.Child("users").Child(_uid).Child("profile").Child("summonCount").SetValueAsync(userSummonCount);
-    }
-
-    // 카드 정보 표기
-    private async Task<CardInfo> LoadCardInfoByCode(string heroCode)
-    {
-        if (cardInfoCache.TryGetValue(heroCode, out var cached))
-            return cached;
-
-        string addressKey = $"{heroCode}CardInfo";
-        var handle = Addressables.LoadAssetAsync<CardInfo>(addressKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            cardInfoCache[heroCode] = handle.Result;
-            return handle.Result;
-        }
-
-        Debug.LogError($"[{nameof(LoadCardInfoByCode)}] {addressKey} 로드 실패");
-        return null;
-    }
-
-    private async Task<CardInfo> LoadCardInfoByRarity(string rarity)
-    {
-        string key = rarity.ToLower();
-        if (!rarityHeroMap.TryGetValue(key, out var heroList) || heroList.Count == 0)
-        {
-            Debug.LogError($"[{nameof(LoadCardInfoByRarity)}] {rarity}에 해당하는 영웅 리스트 없음");
-            return null;
-        }
-
-        string selectedCode = heroList[UnityEngine.Random.Range(0, heroList.Count)];
-        return await LoadCardInfoByCode(selectedCode);
-    }
-
-
-    // 실제 소환 코드
+    #region Summon Logic
     public async Task Summon(int times)
     {
         userSummonCount += times;
@@ -141,86 +76,116 @@ public class EquipGachaManager : MonoBehaviour
             await LevelUpAsync();
         }
 
-        var results = new List<CardInfo>();
-        for (int i = 0; i < times; i++)
-        {
-            string rarityKey = DrawRarity();
-            CardInfo info = await LoadCardInfoByRarity(rarityKey);
-            results.Add(info);
-        }
-
-        StartCoroutine(ProcessResultsCoroutine(results));
+        var results = GenerateSummonResults(times);
+        // 장비 일괄 저장 코루틴
+        // StartCoroutine(ProcessEquipmentResultsCoroutine(results));
         await SaveUserSummonCountAsync();
+        Debug.Log($"[Summon] resultUI 상태: {(resultUI == null ? "NULL" : "OK")}");
         resultUI.ShowSummonResult(results);
-        // await SaveGachaHistoryAsync(results); //소환기록 추가
     }
 
-    //  소환레벨 업
+    private List<EquipmentInstance> GenerateSummonResults(int times)
+    {
+        if (equipmentService == null)
+        {
+            Debug.LogWarning("equipmentService가 null입니다.");
+            return null;
+        }
+
+        var results = new List<EquipmentInstance>();
+
+        for (int i = 0; i < times; i++)
+        {
+            RarityType rarity = GetRandomRarity();
+            string templateID = GetRandomTemplateID();
+
+            var template = equipmentManager.allTemplates.Find(t => t.templateID == templateID);
+            if (template == null)
+            {
+                Debug.LogWarning($"[EquipGachaManager] 템플릿 없음: {templateID}");
+                continue;
+            }
+            var equipment = equipmentService.AcquireEquipment(templateID, rarity);
+            results.Add(equipment);
+        }
+        Debug.Log($"[EquipGachaManager] GenerateSummonResults 완료 - 생성된 장비 수: {results.Count}");
+        return results;
+    }
+
+    private RarityType GetRandomRarity()
+    {
+        var pool = new Dictionary<RarityType, float>
+        {
+            { RarityType.Normal, summonNormal },
+            { RarityType.Rare, summonRare },
+            { RarityType.Unique, summonUnique },
+            { RarityType.Epic, summonEpic }
+        };
+
+        float total = pool.Values.Sum();
+        float rand = UnityEngine.Random.Range(0f, total);
+
+        foreach (var kvp in pool)
+        {
+            if (rand <= kvp.Value) return kvp.Key;
+            rand -= kvp.Value;
+        }
+
+        return pool.Keys.Last();
+    }
+
+    private string GetRandomTemplateID()
+    {
+        if (allTemplateIDs.Count == 0)
+        {
+            Debug.LogWarning("템플릿 리스트가 비어있습니다.");
+            return "";
+        }
+
+        int index = UnityEngine.Random.Range(0, allTemplateIDs.Count);
+        return allTemplateIDs[index];
+    }
+
     private async Task LevelUpAsync()
     {
-        // 1~9까지만 처리
         if (userSummonLevel < SummonLevel.level10)
         {
             userSummonLevel = (SummonLevel)((int)userSummonLevel + 1);
             userSummonCount = 0;
 
             await SaveUserSummonLevelAsync();
-            await LoadSummonConfigAsync();
+            await LoadSummonDataAsync();
         }
     }
 
-    //  소환 확률 결정
-    private string DrawRarity()
+    private Task SaveUserSummonLevelAsync()
     {
-        var weightPool = GetWeightPool();
-        float sum = weightPool.Values.Sum();
-        float random = UnityEngine.Random.Range(0f, sum);
-
-        foreach (var keyValue in weightPool)
-        {
-            if (random <= keyValue.Value) return keyValue.Key;
-            random -= keyValue.Value;
-        }
-        return weightPool.Keys.Last();
+        return _dbRef.Child("users").Child(_uid).Child("profile").Child("equipsummonLevel")
+            .SetValueAsync((int)userSummonLevel);
     }
 
-    //  소환기록 저장하기
-    private async Task SaveGachaHistoryAsync(List<CardInfo> results)
+    private Task SaveUserSummonCountAsync()
     {
-        var historyRef = _dbRef.Child("users").Child(_uid).Child("summonHistory");
-
-        foreach (var card in results)
-        {
-            string key = historyRef.Push().Key;
-
-            var data = new Dictionary<string, object>
-        {
-            { "timestamp", ServerValue.Timestamp },
-            { "heroID", card.HeroID },
-
-        };
-
-            await historyRef.Child(key).SetValueAsync(data);
-            // 기록 삭제
-            // await historyRef.RemoveValueAsync();
-        }
+        return _dbRef.Child("users").Child(_uid).Child("profile").Child("equipsummonCount")
+            .SetValueAsync(userSummonCount);
     }
-    // 영웅 조각 정보를 업로드하는 코루틴
-    private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
+    #endregion
+
+    #region Result Handling
+
+    //  장비 일괄 저장 코루틴
+    private IEnumerator ProcessEquipmentResultsCoroutine(List<EquipmentInstance> results)
     {
-        // HeroDataManager에 결과 반영
-        HeroDataManager.Instance.ApplyGachaResults(results);
+        Debug.Log("[EquipGachaManager] 결과 처리 시작");
 
-        // 한번에 저장
-        HeroDataManager.Instance.SaveHeroDataToCache();
-        HeroDataManager.Instance.SaveAllHeroDataToFirebase();
+        foreach (var equip in results)
+        {
+            Debug.Log($"[EquipGachaManager] 획득 장비: {equip.templateID} / {equip.rarity} / Lv.{equip.level}");
+        }
 
+        equipmentManager.SaveToJson();
+        Debug.Log("[EquipGachaManager] 장비 저장 완료");
         yield return null;
-        Debug.Log("영웅 뽑기 결과 처리 완료"); 
     }
     #endregion
 }
-/*
-    TODO : 뽑기 해야할 일 목록
-        영웅 뽑기 확률, 리스트 풀 수정하기
- */

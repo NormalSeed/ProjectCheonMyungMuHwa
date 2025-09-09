@@ -19,12 +19,6 @@ public class SummonHeroUI : UIBase
     [SerializeField] private TextMeshProUGUI button10Text;      // 10챠 버튼 텍스트
     [SerializeField] private TextMeshProUGUI button50Text;      // 50챠 버튼 텍스트
 
-    [Header("Hero Image")]
-    [SerializeField] private Transform Hero1;               // 영웅 이미지
-    [SerializeField] private Transform Hero2;               // 영웅 이미지
-    [SerializeField] private Transform Hero3;               // 영웅 이미지
-    [SerializeField] private Transform Hero4;               // 영웅 이미지
-
     [Header("Panel")]
     [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
     [SerializeField] private GachaManager gachaManager;     // 가챠 메니저
@@ -54,15 +48,12 @@ public class SummonHeroUI : UIBase
         summon10thButton.onClick.RemoveListener(onClickSummon10th);
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
-
-        summonResultUI.OnGachaCompleted -= HandleGachaCompleted;
     }
 
     private void Init()
     {
         ButtonInit();
         SummonLevelChange();
-        summonResultUI.OnGachaCompleted += HandleGachaCompleted;
     }
 
     private void ButtonInit()
@@ -127,15 +118,17 @@ public class SummonHeroUI : UIBase
         await gachaManager.Summon(times);
     }
 
-    private void HandleGachaCompleted()
-    {
-        SummonLevelChange();
-        InterActButtons(true);
-    }
-
     private void ChangeButtonText()
     {
         /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
+    }
+    #endregion
+
+    #region 
+    public void HandleGachaCompleted()
+    {
+        SummonLevelChange();
+        InterActButtons(true);
     }
     #endregion
 }

@@ -14,8 +14,11 @@ public class SummonResultUI : UIBase
     
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager poolManager;
-    private CardInfo cardInfo;
-    public event Action OnGachaCompleted;
+
+    [Header("Panel")]
+    [SerializeField] private SummonEquipUI SummonEquipUI;
+    [SerializeField] private SummonHeroUI SummonHeroUI;
+    [SerializeField] private SummonPetUI SummonPetUI;
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -64,7 +67,46 @@ public class SummonResultUI : UIBase
             // 연출 간격 조정
             await Task.Delay(100);
         }
-        OnGachaCompleted?.Invoke();
+        SummonHeroUI.HandleGachaCompleted();
+    }
+
+    /// <summary>
+    /// 장비 소환 결과를 보여줍니다.
+    /// </summary>
+    /// <param name="results">소환된 장비 리스트</param>
+    public async void ShowSummonResult(List<EquipmentInstance> results)
+    {
+        Debug.Log($"[ShowSummonResult] 장비 결과 표시 시작 - 총 {results.Count}개");
+        gameObject.SetActive(true);
+        poolManager.ReturnAll();
+        Debug.Log("[ShowSummonResult] 카드 풀 초기화 완료");
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            var equip = results[i];
+            Debug.Log($"[ShowSummonResult] 카드 생성 시작 - {i + 1}/{results.Count}, 장비: {equip.templateID}, 레어도: {equip.rarity}, Lv.{equip.level}");
+
+            var card = poolManager.GetCard();
+            var display = card.GetComponent<EquipmentCardDisplay>();
+
+            if (display != null)
+            {
+                display.SetData(equip);
+                Debug.Log($"[ShowSummonResult] 카드 데이터 설정 완료 - {equip.templateID}");
+            }
+            else
+            {
+                Debug.LogWarning($"[ShowSummonResult] 카드에 EquipmentCardDisplay가 없습니다 - 카드 인덱스: {i}");
+            }
+
+            card.transform.SetAsLastSibling();
+            card.SetActive(true);
+            Debug.Log($"[ShowSummonResult] 카드 활성화 완료 - {card.name}");
+
+            await Task.Delay(100);
+        }
+        SummonEquipUI.HandleGachaCompleted();
+        Debug.Log("[ShowSummonResult] 모든 카드 표시 완료 - Gacha 처리 종료");
     }
     #endregion
 }
