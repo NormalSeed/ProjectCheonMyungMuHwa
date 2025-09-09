@@ -14,8 +14,11 @@ public class SummonResultUI : UIBase
     
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager poolManager;
-    private CardInfo cardInfo;
-    public event Action OnGachaCompleted;
+
+    [Header("Panel")]
+    [SerializeField] private SummonEquipUI SummonEquipUI;
+    [SerializeField] private SummonHeroUI SummonHeroUI;
+    [SerializeField] private SummonPetUI SummonPetUI;
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -64,7 +67,31 @@ public class SummonResultUI : UIBase
             // 연출 간격 조정
             await Task.Delay(100);
         }
-        OnGachaCompleted?.Invoke();
+        SummonHeroUI.HandleGachaCompleted();
+    }
+    /// <summary>
+    /// 장비 소환 결과를 보여줍니다.
+    /// </summary>
+    /// <param name="results">소환된 장비 리스트</param>
+    public async void ShowSummonResult(List<EquipmentInstance> results)
+    {
+        gameObject.SetActive(true);
+        poolManager.ReturnAll();
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            var equip = results[i];
+            var card = poolManager.GetCard();
+            //var setting = card.GetComponent<EquipmentCardSetting>();
+
+            //setting.SetData(equip); // 장비 데이터 설정
+            card.transform.SetAsLastSibling();
+            card.SetActive(true);
+
+            await Task.Delay(100); // 연출 간격
+        }
+
+        SummonEquipUI.HandleGachaCompleted();
     }
     #endregion
 }

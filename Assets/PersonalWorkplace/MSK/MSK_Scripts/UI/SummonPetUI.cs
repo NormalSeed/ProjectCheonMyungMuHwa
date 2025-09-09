@@ -19,12 +19,6 @@ public class SummonPetUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI button10Text;      // 10챠 버튼 텍스트
     [SerializeField] private TextMeshProUGUI button50Text;      // 50챠 버튼 텍스트
 
-    [Header("Hero Image")]
-    [SerializeField] private Transform Hero1;                   // 영웅 이미지
-    [SerializeField] private Transform Hero2;                   // 영웅 이미지
-    [SerializeField] private Transform Machine;                 // 뽑기 이미지
-    [SerializeField] private Transform Equipment;               // 장비 이미지
-
     [Header("Panel")]
     [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
     [SerializeField] private GachaManager gachaManager;     // 가챠 메니저
@@ -54,15 +48,12 @@ public class SummonPetUI : MonoBehaviour
         summon10thButton.onClick.RemoveListener(onClickSummon10th);
         summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
-
-        summonResultUI.OnGachaCompleted -= HandleGachaCompleted;
     }
 
     private void Init()
     {
         ButtonInit();
         SummonLevelChange();
-        summonResultUI.OnGachaCompleted += HandleGachaCompleted;
     }
 
     private void ButtonInit()
@@ -126,16 +117,17 @@ public class SummonPetUI : MonoBehaviour
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
     }
-
-    private void HandleGachaCompleted()
-    {
-        SummonLevelChange();
-        InterActButtons(true);
-    }
-
     private void ChangeButtonText()
     {
         /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
+    }
+    #endregion
+
+    #region Public
+    public void HandleGachaCompleted()
+    {
+        SummonLevelChange();
+        InterActButtons(true);
     }
     #endregion
 }
