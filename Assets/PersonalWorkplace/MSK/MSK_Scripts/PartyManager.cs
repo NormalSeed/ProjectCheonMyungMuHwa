@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -45,29 +46,43 @@ public class PartyManager : MonoBehaviour, IStartable
     #region Public 
     public void AddMember(GameObject member)
     {
-        if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
+        int activeCount = partyMembers.Count(m => m != null);
+
+        if (activeCount < MaxPartySize && !partyMembers.Contains(member))
         {
-            partyMembers.Add(member);
+            // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+            int listOrder = 0;
+
+            int emptyIndex = partyMembers.FindIndex(m => m == null);
+            if (emptyIndex >= 0)
+            {
+                partyMembers[emptyIndex] = member;
+                listOrder = emptyIndex;
+            }
+            else
+            {
+                partyMembers.Add(member);
+                listOrder = partyMembers.Count - 1;
+            }
             InGameManager.Instance.playerCount++;
 
             partySixe++;
 
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+            
 
-            int listOrder = partyMembers.Count - 1;
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
-            controller.gameObject.SetActive(true);
 
             if (controller != null)
             {
+                controller.gameObject.SetActive(true);
                 controller.charID.Value = heroInfo.HeroID;
             }
             // 그 후 해당 PlayerController 안의 partyNum을 변경시킨다.
             if (heroInfo != null)
             {
-                controller.partyNum = partyMembers.Count - 1;
+                controller.partyNum = listOrder;
                 Debug.Log($"추가된 멤버 {controller.name}의 partyNum 설정됨: {controller.partyNum}");
             }
 
@@ -84,7 +99,7 @@ public class PartyManager : MonoBehaviour, IStartable
         {
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
             // 현재 제거될 멤버가 List의 몇번째에 있는지 체크해서
-            int listOrder = partyMembers.Count - 1;
+            int listOrder = partyMembers.IndexOf(member);
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
             controller.gameObject.SetActive(false);
@@ -94,7 +109,7 @@ public class PartyManager : MonoBehaviour, IStartable
                 controller.charID.Value = string.Empty;
             }
 
-            partyMembers.Remove(member);
+            partyMembers[listOrder] = null;
             InGameManager.Instance.playerCount--;
             partySixe--;
         }

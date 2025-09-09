@@ -169,6 +169,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         if (skillSet != null)
         {
             Destroy(skillSet);
+            Addressables.ReleaseInstance(skillSet);
             skillSet = null;
         }
 
@@ -212,6 +213,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         if (SPUMAsset != null)
         {
             Destroy(SPUMAsset);
+            Addressables.ReleaseInstance(SPUMAsset);
             SPUMAsset = null;
             spumController = null;
         }
