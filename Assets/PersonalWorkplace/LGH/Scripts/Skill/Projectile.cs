@@ -52,8 +52,8 @@ public class Projectile : PooledObject
             if (damagable != null)
             {
                 damagable.TakeDamage(
-                controller.model.modelSO.ExtAtkPoint * skillData.ExtSkillDmg +
-                controller.model.modelSO.InnAtkPoint * skillData.InnSkillDmg);
+                controller.model.ExtAtk * skillData.ExtSkillDmg +
+                controller.model.InnAtk * skillData.InnSkillDmg);
                 //ReturnPool();
             }
             else

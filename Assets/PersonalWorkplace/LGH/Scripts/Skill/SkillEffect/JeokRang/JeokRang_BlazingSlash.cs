@@ -18,8 +18,8 @@ public class JeokRang_BlazingSlash : SkillEffect
             if (damagable != null)
             {
                 damagable.TakeDamage(
-                controller.model.modelSO.ExtAtkPoint * skill2Data.ExtSkillDmg +
-                controller.model.modelSO.InnAtkPoint * skill2Data.InnSkillDmg);
+                controller.model.ExtAtk * skill2Data.ExtSkillDmg +
+                controller.model.InnAtk * skill2Data.InnSkillDmg);
             }
             else
             {
