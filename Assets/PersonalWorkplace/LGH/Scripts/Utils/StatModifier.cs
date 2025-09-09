@@ -167,10 +167,10 @@ public static class StatModifierManager
     {
         string charID = model.modelSO.CharID;
 
-        model.Health = model.modelSO.HealthPoint + GetTotalModifier(charID, StatType.Health, model.modelSO.HealthPoint);
-        model.ExtAtk = model.modelSO.ExtAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.ExtAtkPoint) + GetTotalModifier(charID, StatType.ExtAtk, model.modelSO.ExtAtkPoint);
-        model.InnAtk = model.modelSO.InnAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.InnAtkPoint) + GetTotalModifier(charID, StatType.InnAtk, model.modelSO.InnAtkPoint);
-        model.Def = model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint);
+        model.Health = (float)(model.modelSO.HealthPoint + GetTotalModifier(charID, StatType.Health, model.modelSO.HealthPoint));
+        model.ExtAtk = (float)(model.modelSO.ExtAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.ExtAtkPoint) + GetTotalModifier(charID, StatType.ExtAtk, model.modelSO.ExtAtkPoint));
+        model.InnAtk = (float)(model.modelSO.InnAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.InnAtkPoint) + GetTotalModifier(charID, StatType.InnAtk, model.modelSO.InnAtkPoint));
+        model.Def = (float)(model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint));
         model.CritRate = (float)(model.modelSO.CritRate + GetTotalModifier(charID, StatType.CritRate, model.modelSO.CritRate));
         model.CritDamage = (float)(model.modelSO.CritDamage + GetTotalModifier(charID, StatType.CritDamage, model.modelSO.CritDamage));
         model.bossDamageBonus = (float)(model.bossDamageBonus + GetTotalModifier(charID, StatType.BDamage, 1));
