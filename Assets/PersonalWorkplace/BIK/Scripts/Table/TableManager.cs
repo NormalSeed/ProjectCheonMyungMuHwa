@@ -57,6 +57,7 @@ public class TableManager : IStartable
     {
         return type switch {
             TableType.Item => new TItem(), // 여기에 새로운 테이블 타입이 추가될 때마다 case를 추가
+            TableType.Level => new TLevel(),
             _ => null
         };
     }

@@ -16,7 +16,7 @@ public class StickOrcController : MonsterController
         if (target != null)
         {
             target.TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem((target as PlayerController).transform.position);
+            DamageText text = DamageTextManager.Instance.Get((target as PlayerController).transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
 

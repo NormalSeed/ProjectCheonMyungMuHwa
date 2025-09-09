@@ -16,8 +16,6 @@ public class PoolManager : MonoBehaviour
     public DefaultPool<MonsterProjectile> ArrowPool;
     public DefaultPool<MonsterProjectile> MagicPool;
 
-    public DefaultPool<DamageText> DamagePool;
-
     public DefaultPool<DroppedItem> ItemPool;
 
     [SerializeField] private Transform[] spawnPoints;
@@ -57,7 +55,6 @@ public class PoolManager : MonoBehaviour
         BowPool = new DefaultPool<MonsterController>("Bow", 3, false);
         ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8);
         MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8);
-        DamagePool = new DefaultPool<DamageText>("DamageText", 15);
         ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 60);
 
         GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/Boss");

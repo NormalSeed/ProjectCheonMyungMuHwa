@@ -17,7 +17,7 @@ public class SpiritBossController : BossController
         {
             ParticleManager.Instance.GetParticle("SpiritBoss_Effect", go.transform.position, scale: 1);
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
+            DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
         yield return new WaitForSeconds(1f);
@@ -26,7 +26,7 @@ public class SpiritBossController : BossController
             if (!go.activeSelf) continue;
             ParticleManager.Instance.GetParticle("SpiritBoss_Effect2", go.transform.position, scale: 1);
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
+            DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
     }
