@@ -44,7 +44,7 @@ public class MonsterProjectile : MonoBehaviour, IPooled<MonsterProjectile>
             if (damagable != null)
             {
                 damagable.TakeDamage(Damage);
-                DamageText text = PoolManager.Instance.DamagePool.GetItem(TargetPos);
+                DamageText text = DamageTextManager.Instance.Get(TargetPos);
                 text.SetText(BigCurrency.FromBaseAmount(Damage).ToString());
 
             }

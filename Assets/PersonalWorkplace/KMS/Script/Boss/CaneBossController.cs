@@ -16,7 +16,7 @@ public class CaneBossController : BossController
         foreach (GameObject go in players)
         {
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
+            DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
     }

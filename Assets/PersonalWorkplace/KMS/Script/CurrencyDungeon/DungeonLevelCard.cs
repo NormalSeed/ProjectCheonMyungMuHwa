@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class DungeonLevelCard : MonoBehaviour
 {
@@ -42,11 +43,15 @@ public class DungeonLevelCard : MonoBehaviour
         startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {KMS_Util.DungeonTypeToName[type]} {data.Reward}개 획득</color>"));
 
     }
-    public void SetStageAvailable()
+    public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
         ButtonText.text = "입장";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => SceneManager.LoadSceneAsync("CurrencyDungeonScene"));
+        startButton.onClick.AddListener(() =>
+        {
+            act.Invoke(data, type);
+            SceneManager.LoadSceneAsync("CurrencyDungeonScene");
+        });
 
     }
     public void SetStageLocked()
