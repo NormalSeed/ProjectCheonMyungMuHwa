@@ -301,7 +301,7 @@ public class PartyManager : MonoBehaviour, IStartable
                     else if (stage == 2)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.SkillDamage, 0.7, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.SkillDamage, 0.5, ModifierSource.Synergy, synergyID));
                     }
                     else if (stage == 3)
                     {
