@@ -100,8 +100,8 @@ public class SummonEquipUI : MonoBehaviour
     private async Task SummonLevelChange()
     {
         var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
-        summonCount = profile.SummonCount;
-        userSummonLevel = profile.SummonLevel;
+        summonCount = profile.EquipSummonCount;
+        userSummonLevel = profile.EquipSummonLevel;
         requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
 
         summonLevelText.text = "장비 뽑기 레벨 " + ((int)userSummonLevel).ToString();
