@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class NanGong_QiEmission : SkillEffect
 {
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Monster"))

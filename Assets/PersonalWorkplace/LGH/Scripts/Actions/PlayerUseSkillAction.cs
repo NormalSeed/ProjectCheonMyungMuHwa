@@ -60,8 +60,6 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
-        // 스킬 사용시에는 이동 멈춤
-        NMagent.ResetPath();
         if (!skillExecuted)
         {
             if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
@@ -84,6 +82,7 @@ public partial class PlayerUseSkillAction : Action
                     // 스킬 실행(데미지는 스킬 내부에서 가함)
                     if (controller.isSkill1Ready)
                     {
+                        NMagent.ResetPath();
                         skillSet.Skill1(Target.Value.transform);
                         // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
                         controller.curCool = skillSet.skills[0].CoolTime;
@@ -92,6 +91,7 @@ public partial class PlayerUseSkillAction : Action
                     }
                     else if (controller.isSkill2Ready)
                     {
+                        NMagent.ResetPath();
                         skillSet.Skill2(Target.Value.transform);
                         // 스킬 카운트 초기화
                         controller.skill2Count = 5;
@@ -106,7 +106,7 @@ public partial class PlayerUseSkillAction : Action
             }
         }
 
-        if (skillExecuted && !skillSet.isSkill1Playing && !skillSet.isSkill2Playing)
+        if (!skillSet.isSkillPlaying)
         {
             return Status.Success;
         }

@@ -25,7 +25,7 @@ public class AS02_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
-        isSkill1Playing = true;
+        isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
@@ -49,12 +49,12 @@ public class AS02_SkillSet : SkillSet
         timed.SetParent(this.transform);
         effect1.SetActive(true);
         effect1.transform.SetParent(null);
-        isSkill1Playing = false;
+        isSkillPlaying = false;
     }
 
     public override void Skill2(Transform target)
     {
-        isSkill2Playing = true;
+        isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.ATTACK, 3);
         StartCoroutine(Skill2Routine(target));
     }
@@ -90,6 +90,6 @@ public class AS02_SkillSet : SkillSet
             // 방어력 원상복구
             controller.model.Def -= buffAmount;
         }
-        isSkill2Playing = false;
+        isSkillPlaying = false;
     }
 }

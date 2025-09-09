@@ -12,8 +12,7 @@ public class SkillSet : MonoBehaviour
     protected Transform parentTransform;
     protected SPUM_Prefabs spumC;
 
-    public bool isSkill1Playing = false;
-    public bool isSkill2Playing = false;
+    public bool isSkillPlaying = false;
 
     public void Init(PlayerController controller)
     {
