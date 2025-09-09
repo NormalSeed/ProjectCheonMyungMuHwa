@@ -5,10 +5,10 @@ public class PlayerModel : MonoBehaviour
     public PlayerModelSO modelSO;
 
     // 최종 능력치
-    public double Health;
-    public double ExtAtk;
-    public double InnAtk;
-    public double Def;
+    public float Health;
+    public float ExtAtk;
+    public float InnAtk;
+    public float Def;
     public float CritRate;
     public float CritDamage;
 
@@ -27,9 +27,9 @@ public class PlayerModel : MonoBehaviour
     /// </summary>
     public void SetPoints()
     {
-        modelSO.HealthPoint = (modelSO.Vital * (modelSO.Level * modelSO.Vital_Increase)) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Grade));
-        modelSO.ExtAtkPoint = (modelSO.ExtPow * (modelSO.Level * modelSO.ExtPow_Increase)) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
-        modelSO.InnAtkPoint = (modelSO.InnPow * (modelSO.Level * modelSO.InnPow_Increase)) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
+        modelSO.HealthPoint = (modelSO.Vital * (modelSO.Level * (1 + modelSO.Vital_Increase))) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Grade));
+        modelSO.ExtAtkPoint = (modelSO.ExtPow * (modelSO.Level * (1 + modelSO.ExtPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
+        modelSO.InnAtkPoint = (modelSO.InnPow * (modelSO.Level * (1 + modelSO.InnPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
         modelSO.DefPoint = (modelSO.ExtPow + modelSO.InnPow) * (modelSO.DefRatio + (modelSO.DefRatio_Increase * modelSO.Grade));
         // 전투력에 들어갈 공격력이 어떻게 계산되어야 할지 물어봐야 함
 

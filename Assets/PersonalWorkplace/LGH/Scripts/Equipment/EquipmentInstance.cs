@@ -5,7 +5,7 @@ public enum EquipClass { 검호 = 1, 호법 = 2, 도사 = 3, 살수 = 4 }
 public enum EquipmentType { Weapon, Armor, Gloves, Boots }
 public enum RarityType { Normal = 1, Rare = 2, Epic = 3, Unique = 4 }
 
-public enum StatType { Attack, Defense, CritDamage, CritRate, Health, BDamage, NDamage, SkillDamage }
+public enum StatType { Attack, ExtAtk, InnAtk, Defense, CritDamage, CritRate, Health, BDamage, NDamage, SkillDamage }
 
 public static class EquipmentStatTable
 {

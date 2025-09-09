@@ -17,6 +17,8 @@ public partial class PlayerUseSkillAction : Action
     private BehaviorGraphAgent BGagent;
     private SkillSet skillSet;
 
+    private bool skillExecuted = false;
+
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
@@ -60,7 +62,7 @@ public partial class PlayerUseSkillAction : Action
             return Status.Failure;
         }
 
-        if (Target.Value != null && IsSkillReady.Value == true)
+        if (!skillExecuted && Target.Value != null && IsSkillReady.Value == true)
         {
             Debug.Log("스킬 공격 실행");
             IDamagable target = Target.Value.GetComponent<IDamagable>();
@@ -78,14 +80,17 @@ public partial class PlayerUseSkillAction : Action
                     skillSet.Skill1(Target.Value.transform);
                     // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
                     controller.curCool = skillSet.skills[0].CoolTime;
+                    skillExecuted = true;
+                    return Status.Running;
                 }
                 else if (controller.isSkill2Ready)
                 {
                     skillSet.Skill2(Target.Value.transform);
                     // 스킬 카운트 초기화
                     controller.skill2Count = 5;
+                    skillExecuted = true;
+                    return Status.Running;
                 }
-                    
             }
             else
             {
@@ -93,12 +98,17 @@ public partial class PlayerUseSkillAction : Action
             }
         }
 
-        return Status.Success;
+        if (skillExecuted && !skillSet.isSkill1Playing && !skillSet.isSkill2Playing)
+        {
+            return Status.Success;
+        }
+
+        return Status.Running;
     }
 
     protected override void OnEnd()
     {
-        
+        skillExecuted = false;
 
         // 타겟 재탐지
         Target.Value = GetTarget();
