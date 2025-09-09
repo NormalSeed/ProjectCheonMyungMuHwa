@@ -38,6 +38,20 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void Awake()
     {
+        //model = GetComponent<PlayerModel>();
+        //view = GetComponent<PlayerView>();
+        //equipment = GetComponent<CharacterEquipment>();
+
+        //NMagent = GetComponent<NavMeshAgent>();
+        //BGagent = GetComponent<BehaviorGraphAgent>();
+        //BGagent.enabled = false;
+
+        //NMagent.updateRotation = false;
+        //NMagent.updateUpAxis = false;
+    }
+
+    private void OnEnable()
+    {
         model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
         equipment = GetComponent<CharacterEquipment>();
@@ -48,10 +62,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
-    }
 
-    private void OnEnable()
-    {
         charID.Subscribe(LoadPlayerData);
 
         OnModelLoaded += () =>

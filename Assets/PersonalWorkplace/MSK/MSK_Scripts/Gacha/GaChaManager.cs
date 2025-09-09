@@ -206,7 +206,7 @@ public class GachaManager : MonoBehaviour
         }
     }
     // 영웅 조각 정보를 업로드하는 코루틴
-    private IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
+    public IEnumerator ProcessResultsCoroutine(List<CardInfo> results)
     {
         // HeroDataManager에 결과 반영
         HeroDataManager.Instance.ApplyGachaResults(results);

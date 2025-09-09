@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public enum ModifierSource
 {
@@ -17,6 +19,7 @@ public class StatModifier
     public ModifierSource source;   //Modifier의 출처(장비, 시너지 등)
     public string originID;         // 장비 ID, 시너지 이름 등
     public bool isPercent;          // 비율 기반 처리 여부
+    public float duration;
 
     /// <summary>
     /// StatModifier 생성자
@@ -26,20 +29,22 @@ public class StatModifier
     /// <param name="source">장비, 시너지 등 Modifier 출처</param>
     /// <param name="originID">장비 ID, 시너지 이름 등 구별 가능한 값</param>
     /// <param name="isPercent">비율 기반 처리 여부</param>
-    public StatModifier(StatType statType, double value, ModifierSource source, string originID = "", bool isPercent = false)
+    /// <param name="duration">버프 지속시간</param>
+    public StatModifier(StatType statType, double value, ModifierSource source, string originID = "", bool isPercent = false, float duration = 0f)
     {
         this.statType = statType;
         this.value = value;
         this.source = source;
         this.originID = originID;
         this.isPercent = isPercent;
+        this.duration = duration;
     }
 }
 
 public static class StatModifierManager
 {
     private static Dictionary<string, List<StatModifier>> modifierCache = new();    // charID를 키로 해서 각 캐릭터의 Modifier 리스트를 저장. 캐릭터별로 어떤 Modifier가 적용됐는지 추적 가능
-    
+
     /// <summary>
     /// Modifier 중복 방지를 위한 메서드
     /// </summary>
@@ -78,6 +83,28 @@ public static class StatModifierManager
         }
 
         modifierCache[charID].Add(modifier);
+    }
+
+    /// <summary>
+    /// 지속시간이 있는 Modifier를 적용시키기 위한 메서드 일정 시간이 지나면 제거됨
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <param name="modifier"></param>
+    /// <param name="context"></param>
+    public static void ApplyModifierWithDuration(string charID, StatModifier modifier, MonoBehaviour context)
+    {
+        ApplyModifier(charID, modifier);
+
+        if (modifier.duration > 0)
+        {
+            context.StartCoroutine(RemoveAfterDuration(charID, modifier.originID, modifier.duration));
+        }
+    }
+
+    private static IEnumerator RemoveAfterDuration(string charID, string originID, double duration)
+    {
+        yield return new WaitForSeconds((float)duration);
+        RemoveModifiersByOrigin(charID, originID);
     }
 
     /// <summary>
@@ -140,10 +167,10 @@ public static class StatModifierManager
     {
         string charID = model.modelSO.CharID;
 
-        model.Health = model.modelSO.HealthPoint + GetTotalModifier(charID, StatType.Health, model.modelSO.HealthPoint);
-        model.ExtAtk = model.modelSO.ExtAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.ExtAtkPoint);
-        model.InnAtk = model.modelSO.InnAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.InnAtkPoint);
-        model.Def = model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint);
+        model.Health = (float)(model.modelSO.HealthPoint + GetTotalModifier(charID, StatType.Health, model.modelSO.HealthPoint));
+        model.ExtAtk = (float)(model.modelSO.ExtAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.ExtAtkPoint) + GetTotalModifier(charID, StatType.ExtAtk, model.modelSO.ExtAtkPoint));
+        model.InnAtk = (float)(model.modelSO.InnAtkPoint + GetTotalModifier(charID, StatType.Attack, model.modelSO.InnAtkPoint) + GetTotalModifier(charID, StatType.InnAtk, model.modelSO.InnAtkPoint));
+        model.Def = (float)(model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint));
         model.CritRate = (float)(model.modelSO.CritRate + GetTotalModifier(charID, StatType.CritRate, model.modelSO.CritRate));
         model.CritDamage = (float)(model.modelSO.CritDamage + GetTotalModifier(charID, StatType.CritDamage, model.modelSO.CritDamage));
         model.bossDamageBonus = (float)(model.bossDamageBonus + GetTotalModifier(charID, StatType.BDamage, 1));

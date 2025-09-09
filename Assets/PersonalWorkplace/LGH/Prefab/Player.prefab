@@ -93,6 +93,7 @@ MonoBehaviour:
   skillSet: {fileID: 1292851195521690489, guid: 8c3154d7ae3a9514e902feb50223c763, type: 3}
   SPUMAsset: {fileID: 0}
   spumController: {fileID: 0}
+  equipment: {fileID: 0}
   partyNum: 0
   isSkillReady: 1
   isSkill1Ready: 1
@@ -124,6 +125,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   modelSO: {fileID: 0}
+  Health: 0
+  ExtAtk: 0
+  InnAtk: 0
+  Def: 0
+  CritRate: 0
+  CritDamage: 0
+  bossDamageBonus: 1
+  normalDamageBonus: 1
+  skillDamageBonus: 1
   combatPower: 0
 --- !u!114 &6226948538390679533
 MonoBehaviour:
@@ -137,6 +147,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db28de8ff595a6a49b6d3145f617277a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  charID: 
+  equipClass: 0
+  increasedExtAttackPoint: 0
+  increasedInnAttackPoint: 0
+  increasedDefensePoint: 0
+  increasedCritRate: 0
+  increasedCritDamage: 0
 --- !u!50 &1666091133234881422
 Rigidbody2D:
   serializedVersion: 5
@@ -216,7 +233,7 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

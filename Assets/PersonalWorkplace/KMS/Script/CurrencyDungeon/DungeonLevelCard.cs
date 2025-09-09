@@ -40,7 +40,7 @@ public class DungeonLevelCard : MonoBehaviour
     {
         ButtonText.text = "소탕";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {KMS_Util.DungeonTypeToName[type]} {data.Reward}개 획득</color>"));
+        startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>")); //{KMS_Util.DungeonTypeToName[type]}
 
     }
     public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
