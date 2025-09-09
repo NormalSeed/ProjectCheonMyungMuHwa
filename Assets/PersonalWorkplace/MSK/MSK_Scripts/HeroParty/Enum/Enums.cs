@@ -69,6 +69,7 @@ public enum PopupType
 public enum TableType
 {
     Item,
+    Level,
 }
 
 public enum ItemType
