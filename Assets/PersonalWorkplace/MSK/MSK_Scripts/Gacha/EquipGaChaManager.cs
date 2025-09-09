@@ -108,27 +108,9 @@ public class EquipGachaManager : MonoBehaviour
     // 카드 정보 표기
     private EquipmentInstance LoadEquipmentByCode(string templateID, RarityType rarity)
     {
-        if (string.IsNullOrEmpty(templateID))
-        {
-            Debug.LogWarning("템플릿 ID가 비어있습니다.");
-            return null;
-        }
-
-        // 캐싱된 인스턴스가 있다면 반환
-        if (InfoCache.TryGetValue(templateID, out var cached))
-            return cached;
-
         int level = 1;
         var equipment = equipmentService.AcquireEquipment(templateID, rarity, level);
-
-        if (equipment != null)
-        {
-            InfoCache[templateID] = equipment;
-            return equipment;
-        }
-
-        Debug.LogError($"장비 생성 실패: {templateID}");
-        return null;
+        return equipment;
     }
 
     private string GetRandomTemplateIDByRarity(string rarityKey)

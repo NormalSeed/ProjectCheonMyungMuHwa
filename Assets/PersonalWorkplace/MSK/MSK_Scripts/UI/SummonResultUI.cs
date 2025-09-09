@@ -69,6 +69,7 @@ public class SummonResultUI : UIBase
         }
         SummonHeroUI.HandleGachaCompleted();
     }
+
     /// <summary>
     /// 장비 소환 결과를 보여줍니다.
     /// </summary>
@@ -80,11 +81,19 @@ public class SummonResultUI : UIBase
 
         for (int i = 0; i < results.Count; i++)
         {
-            var equip = results[i];
+            var equip = results[i]; // 리스트에서 장비 하나 꺼냄
             var card = poolManager.GetCard();
-            //var setting = card.GetComponent<EquipmentCardSetting>();
+            var display = card.GetComponent<EquipmentCardDisplay>();
 
-            //setting.SetData(equip); // 장비 데이터 설정
+            if (display != null)
+            {
+                display.SetData(equip); // 장비 데이터 설정
+            }
+            else
+            {
+                Debug.LogWarning("EquipmentCardDisplay 컴포넌트를 찾을 수 없습니다.");
+            }
+
             card.transform.SetAsLastSibling();
             card.SetActive(true);
 
