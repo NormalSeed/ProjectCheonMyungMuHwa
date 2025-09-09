@@ -78,7 +78,7 @@ public partial class PlayerAttackAction : Action
             {
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
-                target.TakeDamage(10.0f);
+                target.TakeDamage(model.ExtAtk);
                 attackDelay = 1f / model.modelSO.AtkSpeed;
                 controller.skill2Count--;
             }
