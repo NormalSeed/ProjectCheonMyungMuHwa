@@ -35,13 +35,11 @@ public class EquipGachaManager : MonoBehaviour
     #region Unity LifeCycle
     private async void OnEnable()
     {
-        Debug.Log("[EquipGachaManager] 초기화 시작");
 
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
         await LoadSummonDataAsync();
-        Debug.Log("[EquipGachaManager] 초기화 완료");
     }
     #endregion
 
@@ -66,26 +64,23 @@ public class EquipGachaManager : MonoBehaviour
             .Select(item => item.Key)
             .Where(id => !string.IsNullOrEmpty(id))
             .ToList();
-        Debug.Log($"[EquipGachaManager] 소환 데이터 로딩 완료 - 레벨: {userSummonLevel}, 현재 수치: {userSummonCount}, 요구량: {requireSummonCount}, 템플릿 수: {allTemplateIDs.Count}");
     }
     #endregion
 
     #region Summon Logic
     public async Task Summon(int times)
     {
-        Debug.Log($"[EquipGachaManager] 소환 시작 - 횟수: {times}");
         userSummonCount += times;
         if (userSummonCount >= requireSummonCount)
         {
-            Debug.Log("[EquipGachaManager] 소환 레벨업 조건 충족");
             await LevelUpAsync();
         }
 
         var results = GenerateSummonResults(times);
-        Debug.Log($"[EquipGachaManager] 소환 완료 - 결과 수: {results.Count}");
-
-        StartCoroutine(ProcessEquipmentResultsCoroutine(results));
+        // 장비 일괄 저장 코루틴
+        // StartCoroutine(ProcessEquipmentResultsCoroutine(results));
         await SaveUserSummonCountAsync();
+        Debug.Log($"[Summon] resultUI 상태: {(resultUI == null ? "NULL" : "OK")}");
         resultUI.ShowSummonResult(results);
     }
 
@@ -97,8 +92,6 @@ public class EquipGachaManager : MonoBehaviour
             return null;
         }
 
-        Debug.Log($"[EquipGachaManager] GenerateSummonResults 시작 - 요청 횟수: {times}");
-        Debug.Log($"[EquipGachaManager] 현재 템플릿 수: {allTemplateIDs.Count}");
         var results = new List<EquipmentInstance>();
 
         for (int i = 0; i < times; i++)
@@ -106,16 +99,13 @@ public class EquipGachaManager : MonoBehaviour
             RarityType rarity = GetRandomRarity();
             string templateID = GetRandomTemplateID();
 
-            Debug.Log($"[EquipGachaManager] [{i + 1}/{times}] 선택된 템플릿 ID: {templateID}, 레어도: {rarity}");
             var template = equipmentManager.allTemplates.Find(t => t.templateID == templateID);
             if (template == null)
             {
                 Debug.LogWarning($"[EquipGachaManager] 템플릿 없음: {templateID}");
                 continue;
             }
-            int level = 1;
             var equipment = equipmentService.AcquireEquipment(templateID, rarity);
-            Debug.Log($"[EquipGachaManager] 생성된 장비 - {templateID}, 레어도: {rarity}, 레벨: {level}");
             results.Add(equipment);
         }
         Debug.Log($"[EquipGachaManager] GenerateSummonResults 완료 - 생성된 장비 수: {results.Count}");
@@ -182,6 +172,8 @@ public class EquipGachaManager : MonoBehaviour
     #endregion
 
     #region Result Handling
+
+    //  장비 일괄 저장 코루틴
     private IEnumerator ProcessEquipmentResultsCoroutine(List<EquipmentInstance> results)
     {
         Debug.Log("[EquipGachaManager] 결과 처리 시작");
