@@ -47,8 +47,8 @@ public class EquipGachaManager : MonoBehaviour
     private async Task LoadSummonDataAsync()
     {
         var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
-        userSummonLevel = profile.SummonLevel;
-        userSummonCount = profile.SummonCount;
+        userSummonLevel = profile.EquipSummonLevel;
+        userSummonCount = profile.EquipSummonCount;
 
         var summonSnap = await _dbRef.Child("summon").GetValueAsync();
         var configSnap = summonSnap.Child(userSummonLevel.ToString());
