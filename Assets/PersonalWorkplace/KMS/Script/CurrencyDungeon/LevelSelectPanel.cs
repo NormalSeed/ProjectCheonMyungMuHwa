@@ -11,6 +11,8 @@ public class LevelSelectPanel : MonoBehaviour
 
     [SerializeField] CurrencyDungeonDict dict;
 
+    [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
+
 
     // 데이터 베이스에서 불러올 값들 (몇단계까지 클리어 했는지)
     private int goldclear = 5;
@@ -50,7 +52,7 @@ public class LevelSelectPanel : MonoBehaviour
                 }
                 else if (j == clearVal)
                 {
-                    allCards[i].SetStageAvailable();
+                    allCards[i].SetStageAvailable(SetSceneData);
                 }
                 else
                 {
@@ -58,11 +60,18 @@ public class LevelSelectPanel : MonoBehaviour
                 }
 
             }
-            else 
+            else
             {
                 allCards[i].gameObject.SetActive(false);
             }
         }
         scrollbar.value = (float)clearVal / countVal;
+    }
+
+    public void SetSceneData(CurrencyDungeonData data, CurrencyDungeonType type)
+    {
+        sceneData.data = data;
+        sceneData.type = type;
+        sceneData.FadeIn = false;
     }
 }
