@@ -5,6 +5,7 @@ using VContainer;
 using UnityEngine.UI;
 using VContainer.Unity;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 public class PoolManager : MonoBehaviour
 {
     public static PoolManager Instance;
@@ -15,18 +16,12 @@ public class PoolManager : MonoBehaviour
 
     public DefaultPool<MonsterProjectile> ArrowPool;
     public DefaultPool<MonsterProjectile> MagicPool;
-
     public DefaultPool<DroppedItem> ItemPool;
-
-    [SerializeField] private Transform[] spawnPoints;
-    [SerializeField] private Transform bossPoint;
 
     int currentstage;
 
     [SerializeField] private MonsterModelBaseSO normalOrcModel;
     [SerializeField] private MonsterModelBaseSO bossModel;
-
-    [SerializeField] private RectTransform mainCanvasRect;
     [SerializeField] private RectTransform goldRect;
 
     private Dictionary<string, MonsterController> bosses;
@@ -49,13 +44,13 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         droppedItems = new();
         bosses = new();
-        PunchPool = new DefaultPool<MonsterController>("Punch", 3, false);
-        StickPool = new DefaultPool<MonsterController>("Stick", 3, false);
-        CanePool = new DefaultPool<MonsterController>("Cane", 3, false);
-        BowPool = new DefaultPool<MonsterController>("Bow", 3, false);
-        ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8);
-        MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8);
-        ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 60);
+        PunchPool = new DefaultPool<MonsterController>("Punch", 3, active: false);
+        StickPool = new DefaultPool<MonsterController>("Stick", 3, active: false);
+        CanePool = new DefaultPool<MonsterController>("Cane", 3, active: false);
+        BowPool = new DefaultPool<MonsterController>("Bow", 3, active: false);
+        ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8, exceed: true, warmup: false, parent: gameObject.transform);
+        MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8, exceed: true, warmup: false, parent: gameObject.transform);
+        ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 60, exceed: true, warmup: false, parent: gameObject.transform);
 
         GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/Boss");
         foreach (GameObject go in loadedbosses)
@@ -78,6 +73,7 @@ public class PoolManager : MonoBehaviour
     //지정된 위치에 몬스터 소환
     public void SpawnMonster(Vector2 pos, MonsterType type)
     {
+        Debug.Log($"<color=green> 소환 시도 </color>");
         if (type == MonsterType.Punch)
         {
             ActiveMonster(PunchPool, pos);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -5,6 +6,8 @@ using UnityEngine;
 public class CurrencyDungeonPoint : MonoBehaviour
 {
     [SerializeField] CurrencyDungeonType type;
+    [SerializeField] AlignPoint alignPoint;
     public CurrencyDungeonType Type => type;
     public Vector2 Pos => transform.position;
+    public List<GameObject> points => alignPoint.alignPoints;
 }

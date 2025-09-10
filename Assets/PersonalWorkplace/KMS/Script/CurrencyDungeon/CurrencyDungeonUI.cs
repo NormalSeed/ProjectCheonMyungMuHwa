@@ -7,7 +7,6 @@ public class CurrencyDungeonUI : UIBase
     [SerializeField] DungeonSelectPanel dungeonPanel;
     [SerializeField] LevelSelectPanel levelPanel;
 
-
     public override void SetShow()
     {
         gameObject.SetActive(true);
@@ -26,6 +25,17 @@ public class CurrencyDungeonUI : UIBase
         levelPanel.gameObject.SetActive(true);
         dungeonPanel.gameObject.SetActive(false);
         levelPanel.Setting(type);
+    }
+    public void Toggle()
+    {
+        if (gameObject.activeSelf)
+        {
+            SetHide();
+        }
+        else
+        {
+            SetShow();
+        }
     }
 
 }

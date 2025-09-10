@@ -50,6 +50,7 @@ public class DungeonLevelCard : MonoBehaviour
         startButton.onClick.AddListener(() =>
         {
             act.Invoke(data, type);
+            //AudioManager.Instance.StopAllSounds();
             SceneManager.LoadSceneAsync("CurrencyDungeonScene");
         });
 
