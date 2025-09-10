@@ -57,7 +57,7 @@ public class SynergySlot : MonoBehaviour
         }
 
         int index = Mathf.Clamp(stage - 1, 0, iconList.Count - 1);
-        img.sprite = iconList[index] as Sprite;
+        img.sprite = iconList[index];
 
         slotCount.text = count.ToString();
     }
