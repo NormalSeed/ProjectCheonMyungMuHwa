@@ -10,5 +10,7 @@ public class InGameLifetimeScope : LifetimeScope
         builder.Register<EquipmentService>(Lifetime.Singleton);
         builder.RegisterComponentInHierarchy<TestEquipmentCreator>();
         builder.RegisterComponentInHierarchy<EquipGachaManager>();
+        builder.RegisterComponentInHierarchy<HeroInfoUI>();
+
     }
 }

@@ -1,13 +1,19 @@
 using Firebase.Database;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
+using VContainer;
 
 public class HeroInfoUI : UIBase
 {
+    [Inject] private EquipmentService equipmentService;
+    [Inject] private EquipmentManager equipmentManager;
+
     #region SerializeField
     [Header("Button")]
     [SerializeField] private Button exitButton;         // 나가기 버튼
@@ -30,6 +36,12 @@ public class HeroInfoUI : UIBase
     [SerializeField] private Transform badgeRoot;          // 팩션,소속
     [SerializeField] private Transform SkillRoot;          // 스킬정보
 
+    [Header("Equipment")]
+    [SerializeField] private InfoEquipButton weapone;      // 무기
+    [SerializeField] private InfoEquipButton armor;        // 방어구
+    [SerializeField] private InfoEquipButton boots;        // 부츠
+    [SerializeField] private InfoEquipButton gloves;       // 글러브
+
     [Header("Panel")]
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     #endregion
@@ -48,6 +60,10 @@ public class HeroInfoUI : UIBase
     private int ownerPiece;                      // 보유중인 영웅 조각
     #endregion
 
+    #region Equip
+    private Dictionary<string, EquipmentInstance> equips = new();
+
+    #endregion
     #region FireBase
     private string _uid;
     private DatabaseReference _dbRef;
@@ -75,7 +91,20 @@ public class HeroInfoUI : UIBase
         SetBadge();                         // 진영 표시
         SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 활성화 여부
         SetRankUpInteractable(stageUPButton);  // 돌파 버튼 활성화 여부
+        SetEquipment();                        // 장착 중 장비 설정
     }
+    private void SetEquipment()
+    {
+        Debug.Log("[SetEquipment] : 불러오는 중 Weapon");
+        GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Weapon);
+        Debug.Log("[SetEquipment] : 불러오는 중Armor");
+        //armor.GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Armor);
+        Debug.Log("[SetEquipment] : 불러오는 중 Gloves");
+        GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Gloves);
+        Debug.Log("[SetEquipment] : 불러오는 중Boots");
+        //boots.GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Boots);
+    }
+
     private void PrepareHeroStats()
     {
         HealthPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint);
@@ -241,6 +270,43 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Public
+    public void GetEquipment(string charID, EquipmentType type)
+    {
+        EquipmentInstance EquipmentInstance;
+
+        Debug.Log("[GetEquipment] 진입 ");
+        foreach (var istance in equipmentManager.allEquipments)
+        {
+            if (istance.charID == charID && istance.equipmentType == type)
+            {
+                switch (type)
+                {
+                    case (EquipmentType.Weapon):
+                        {
+                            weapone.HeroEquipSet(istance);
+                            break;
+                        }
+                    case (EquipmentType.Armor):
+                        {
+                            armor.HeroEquipSet(istance);
+                            break;
+                        }
+                    case (EquipmentType.Boots):
+                        {
+                            boots.HeroEquipSet(istance);
+                            break;
+                        }
+                    case (EquipmentType.Gloves):
+                        {
+                            gloves.HeroEquipSet(istance);
+                            break;
+                        }
+                }
+                break;
+            }
+        }
+    }
+
     public void SetHeroData(HeroData data)
     {
         heroData = data;

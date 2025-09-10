@@ -8,34 +8,7 @@ public class EquipmentCardDisplay : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Image iconImage;
 
-    [Header("Button")]
-    [SerializeField] private Button button;
-
-    [Header("Panel")]
-    [SerializeField] private GameObject infoPanel;
     private EquipmentInstance equipment;
-
-    #region Unity
-    private void OnEnable()
-    {
-        if (button == null)
-            return;
-        button.onClick.AddListener(buttonOnClick);
-    }
-    private void OnDisable()
-    {
-        if (button == null)
-            return;
-        button.onClick.RemoveListener(buttonOnClick);
-    }
-    #endregion
-
-    #region Button Click
-    private void buttonOnClick()
-    {
-        infoPanel.gameObject.SetActive(true);
-    }
-    #endregion
 
     #region Private
     private void LoadIcon(string key)
