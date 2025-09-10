@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         charID.Subscribe(LoadPlayerData);
 
+        // 플레이어 모델이 로드된 후 실행될 이벤트
         OnModelLoaded += () =>
         {
             if (BGagent != null)
@@ -72,6 +73,12 @@ public class PlayerController : MonoBehaviour, IDamagable
                 BGagent.enabled = true;
             }
             PartyManager.Instance.CheckSynergy();
+            // 훈련 데이터가 이미 로딩됐으면 바로 Modifier 적용
+            if (TrainingManager.Instance.IsTrainingDataLoaded)
+            {
+                TrainingManager.Instance.ApplyTrainingModifiersToPlayer(this);
+            }
+            Debug.Log("모델 로드됨");
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
