@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SynergySlot : MonoBehaviour
 {
+    public TextMeshProUGUI slotCount;
+
     [SerializeField] public List<Sprite> jIcons;
     [SerializeField] public List<Sprite> sIcons;
     [SerializeField] public List<Sprite> mIcons;
@@ -39,7 +42,7 @@ public class SynergySlot : MonoBehaviour
         Debug.Log($"최종 등록된 키: {string.Join(", ", synergyIconMap.Keys)}, 슬롯이름 : {this.name}");
     }
 
-    public void SetData(string synergyKey, int stage)
+    public void SetData(string synergyKey, int stage, int count)
     {
         List<Sprite> iconList = synergyIconMap.TryGetValue(synergyKey, out var list) ? list : null;
 
@@ -55,5 +58,7 @@ public class SynergySlot : MonoBehaviour
 
         int index = Mathf.Clamp(stage - 1, 0, iconList.Count - 1);
         img.sprite = iconList[index] as Sprite;
+
+        slotCount.text = count.ToString();
     }
 }

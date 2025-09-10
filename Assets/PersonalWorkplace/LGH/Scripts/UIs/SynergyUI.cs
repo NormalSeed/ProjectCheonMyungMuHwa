@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class SynergyUI : MonoBehaviour
@@ -21,7 +22,7 @@ public class SynergyUI : MonoBehaviour
         for (int i = 0; i < synergyInfos.Count; i++)
         {
             var info = synergyInfos[i];
-            slots[i].SetData(info.faction.ToString(), info.stage);
+            slots[i].SetData(info.faction.ToString(), info.stage, info.count);
             slots[i].gameObject.SetActive(true);
         }
     }

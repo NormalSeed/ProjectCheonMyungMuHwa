@@ -213,7 +213,7 @@ public class PartyManager : MonoBehaviour, IStartable
             if (stage > 0)
             {
                 ActiveSynergy(kvp.Key, stage);
-                activeSynergies.Add(new SynergyInfo(kvp.Key, stage)); // UI용 데이터 저장
+                activeSynergies.Add(new SynergyInfo(kvp.Key, stage, kvp.Value)); // UI용 데이터 저장
             }
 
             synergyUI.UpdateSynergyUI(activeSynergies); // UI에 전달
