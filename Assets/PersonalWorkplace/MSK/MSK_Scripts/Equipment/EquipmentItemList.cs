@@ -10,13 +10,13 @@ public class EquipmentItemList : MonoBehaviour
     [Header("Pool")]
     [SerializeField] GachaCardPoolManager cardPoolManager;
 
-    public void ShowEquipmentListByType(EquipmentType type)
+    public void ShowEquipmentListByTemplateID(string templateID)
     {
         cardPoolManager.ReturnAll(); // 기존 카드 초기화
 
-        var filtered = equipmentManager.allEquipments.FindAll(e => e.equipmentType == type);
+        var filtered = equipmentManager.allEquipments.FindAll(e => e.templateID == templateID);
 
-        Debug.Log($"[ShowEquipmentListByType] {type} 장비 {filtered.Count}개 표시");
+        Debug.Log($"[ShowEquipmentListByTemplateID] templateID: {templateID}, 장비 수: {filtered.Count}");
 
         foreach (var equip in filtered)
         {
@@ -29,11 +29,12 @@ public class EquipmentItemList : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[ShowEquipmentListByType] 카드에 EquipmentCardDisplay가 없습니다 - {equip.templateID}");
+                Debug.LogWarning($"[ShowEquipmentListByTemplateID] 카드에 EquipmentCardDisplay가 없습니다 - {equip.templateID}");
             }
 
             card.transform.SetAsLastSibling();
             card.SetActive(true);
         }
     }
+
 }

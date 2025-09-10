@@ -27,7 +27,7 @@ public class InfoEquipButton : MonoBehaviour
     #region OnClick
     private void OnClickEquipment()
     {
-        equipmentList.ShowEquipmentListByType(EquipmentInstance.equipmentType);
+        equipmentList.ShowEquipmentListByTemplateID(EquipmentInstance.templateID);
         equipmentList.gameObject.SetActive(true);
     }
     #endregion
