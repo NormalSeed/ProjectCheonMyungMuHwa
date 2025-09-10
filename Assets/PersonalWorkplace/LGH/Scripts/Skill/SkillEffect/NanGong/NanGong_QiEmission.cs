@@ -41,7 +41,7 @@ public class NanGong_QiEmission : SkillEffect
                         duration: 5f
                     );
 
-                    StatModifierManager.ApplyModifierWithDuration(charID, buff, this);
+                    StatModifierManager.ApplyModifierWithDuration(charID, buff, model);
                     StatModifierManager.ApplyToModel(model);
 
                     Debug.Log($"<color=green>{model.name}에게 5초간 InnAtk +30% QiEmission 버프 적용됨</color>");

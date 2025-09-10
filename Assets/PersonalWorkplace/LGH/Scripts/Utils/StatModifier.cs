@@ -92,20 +92,26 @@ public static class StatModifierManager
     /// <param name="charID"></param>
     /// <param name="modifier"></param>
     /// <param name="context"></param>
-    public static void ApplyModifierWithDuration(string charID, StatModifier modifier, MonoBehaviour context)
+    public static void ApplyModifierWithDuration(string charID, StatModifier modifier, PlayerModel model)
     {
         ApplyModifier(charID, modifier);
 
         if (modifier.duration > 0)
         {
-            context.StartCoroutine(RemoveAfterDuration(charID, modifier.originID, modifier.duration));
+            BuffRunner.Instance.StartCoroutine(RemoveAfterDuration(charID, modifier.originID, modifier.duration, model));
         }
     }
 
-    private static IEnumerator RemoveAfterDuration(string charID, string originID, double duration)
+    private static IEnumerator RemoveAfterDuration(string charID, string originID, float duration, PlayerModel model)
     {
-        yield return new WaitForSeconds((float)duration);
+        Debug.Log("버프 제거 코루틴 실행됨");
+        Debug.Log($"[코루틴 시작] modifierCache.Keys: {string.Join(", ", modifierCache.Keys)}, 지속시간 : {duration}초");
+        yield return new WaitForSeconds(duration);
+        Debug.Log($"[코루틴 끝] modifierCache.Keys: {string.Join(", ", modifierCache.Keys)}");
         RemoveModifiersByOrigin(charID, originID);
+        Debug.Log("버프 제거됨.");
+        
+        ApplyToModel(model);
     }
 
     /// <summary>
@@ -116,7 +122,10 @@ public static class StatModifierManager
     public static void RemoveModifiersByOrigin(string charID, string originID)
     {
         if (!modifierCache.ContainsKey(charID))
+        { 
+            Debug.Log("charID가 없는디요?");
             return;
+        }
 
         modifierCache[charID].RemoveAll(m => m.originID == originID);
     }
@@ -174,8 +183,8 @@ public static class StatModifierManager
         model.Def = (float)(model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint));
         model.CritRate = (float)(model.modelSO.CritRate + GetTotalModifier(charID, StatType.CritRate, model.modelSO.CritRate));
         model.CritDamage = (float)(model.modelSO.CritDamage + GetTotalModifier(charID, StatType.CritDamage, model.modelSO.CritDamage));
-        model.bossDamageBonus = (float)(model.bossDamageBonus + GetTotalModifier(charID, StatType.BDamage, 1));
-        model.normalDamageBonus = (float)(model.normalDamageBonus + GetTotalModifier(charID, StatType.NDamage, 1));
-        model.skillDamageBonus = (float)(model.skillDamageBonus + GetTotalModifier(charID, StatType.SkillDamage, 1));
+        model.bossDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.BDamage, 1));
+        model.normalDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.NDamage, 1));
+        model.skillDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.SkillDamage, 1));
     }
 }
