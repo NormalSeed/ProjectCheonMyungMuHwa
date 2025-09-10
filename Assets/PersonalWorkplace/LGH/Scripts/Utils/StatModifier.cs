@@ -9,7 +9,8 @@ public enum ModifierSource
     Synergy,
     Buff,
     Debuff,
-    Passive
+    Passive,
+    Training,
 }
 
 public class StatModifier
