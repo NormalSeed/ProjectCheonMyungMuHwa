@@ -4,6 +4,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Pool;
 using System;
 using UnityEditor;
+using Unity.Android.Gradle;
 
 public interface IPooled<T>
 {
@@ -23,8 +24,11 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private bool activeOnGet;
     private bool canExceedMaxCount;
     private bool useWarmUp;
+    private Transform parent;
 
-    public DefaultPool(string id, int max, bool active = true, bool exceed = false, bool warmup = true)
+    //private List<IPooled<T>> pooledItems;
+
+    public DefaultPool(string id, int max, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
     {
         assetID = id;
         //targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
@@ -33,20 +37,23 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
         activeOnGet = active;
         canExceedMaxCount = exceed;
         useWarmUp = warmup;
+        this.parent = parent;
         Init();
     }
-    public DefaultPool(GameObject go, int max, bool active = true, bool exceed = false, bool warmup = true)
+    public DefaultPool(GameObject obj, int maxCount, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
     {
-        targetObj = go;
-        maxCount = max;
+        targetObj = obj;
+        this.maxCount = maxCount;
         activeOnGet = active;
         canExceedMaxCount = exceed;
         useWarmUp = warmup;
+        this.parent = parent;
         Init();
     }
 
     private void Init()
     {
+        //pooledItems = new();
         pool = new ObjectPool<IPooled<T>>(
             createFunc: () => Create(),
             actionOnGet: obj => Active(obj),
@@ -61,6 +68,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private IPooled<T> Create()
     {
         IPooled<T> obj = UnityEngine.Object.Instantiate(targetObj).GetComponent<IPooled<T>>();
+        (obj as MonoBehaviour).transform.parent = parent;
         obj.OnLifeEnded = null;
         obj.OnLifeEnded += ReleaseItem;
         if (!activeOnGet)
@@ -99,10 +107,19 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     {
         if (!canExceedMaxCount && pool.CountActive >= maxCount)
         {
-            Debug.LogError("최대 개수 초과");
+            Debug.LogError($"<color=red>최대 개수 초과{pool.CountActive}</color>");
             return null;
         }
+        //pooledItems.Add(pooled);
         return pool.Get();
+    }
+
+    public void ReleaseAllItes()
+    {
+        //for (int i = pooledItems.Count - 1; i >= 0; i--)
+        //{
+        //    ReleaseItem(pooledItems[i]);
+        //}
     }
 
     public T GetItem()
@@ -121,6 +138,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     public void ReleaseItem(IPooled<T> pooled)
     {
         if (pool.CountActive <= 0) return;
+        //pooledItems.Remove(pooled);
         pool.Release(pooled);
     }
 }

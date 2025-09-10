@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -9,7 +10,7 @@ public class HeroInfoSetting : MonoBehaviour
 {
     [Header("Hero ID")]
     [SerializeField] private string heroID;
-    public string HeroID => heroID;
+    public string HeroID { get => heroID; set => heroID = value; }
     public CardInfo chardata;
 
     [Header("Root References")]
@@ -56,7 +57,7 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
-        heroUI.partySetFin -= HeroSetting;
+         if (heroUI != null) heroUI.partySetFin -= HeroSetting;
         this.gameObject.SetActive(false);
     }
     #endregion
@@ -70,7 +71,7 @@ public class HeroInfoSetting : MonoBehaviour
         SetBadge();
 
         CardButton.onClick.AddListener(OnClickCard);
-        heroUI.partySetFin += HeroSetting;
+         if (heroUI != null) heroUI.partySetFin += HeroSetting;
     }
     private void SetBackground()
     {

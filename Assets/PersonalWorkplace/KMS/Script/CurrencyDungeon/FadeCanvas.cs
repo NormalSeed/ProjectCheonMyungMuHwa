@@ -9,6 +9,8 @@ public class FadeCanvas : MonoBehaviour
 
     [SerializeField] Image image;
 
+    [SerializeField] UIBase currencyDungeonUI;
+
     private void FadeIn()
     {
         image.DOFade(0f, 1.5f);
@@ -21,10 +23,12 @@ public class FadeCanvas : MonoBehaviour
 
     void Awake()
     {
-        if (data.FadeIn)
+        if (data.BackToMain)
         {
             image.color = new Color(0, 0, 0, 1);
             FadeIn();
+            currencyDungeonUI?.SetShow();
+            data.BackToMain = false;
         }
         else
         {
@@ -35,7 +39,8 @@ public class FadeCanvas : MonoBehaviour
 
     public void FadeOutAndLoadMainScene()
     {
-        data.FadeIn = true;
+        AudioManager.Instance.StopAllSounds();
+        data.BackToMain = true;
         Sequence seq = DOTween.Sequence();
         seq.Append(image.DOFade(1f, 1.5f));
         seq.OnComplete(() =>

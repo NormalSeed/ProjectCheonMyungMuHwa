@@ -13,6 +13,8 @@ public class LevelSelectPanel : MonoBehaviour
 
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
 
+    [SerializeField] CurrencyDungeonPlayerDataSO playerData;
+
 
     // 데이터 베이스에서 불러올 값들 (몇단계까지 클리어 했는지)
     private int goldclear = 5;
@@ -72,6 +74,18 @@ public class LevelSelectPanel : MonoBehaviour
     {
         sceneData.data = data;
         sceneData.type = type;
-        sceneData.FadeIn = false;
+        GetCurrentPlayerDatas();
+    }
+
+    public void GetCurrentPlayerDatas()
+    {
+        playerData.currentPlayerDataList.Clear();
+        foreach (GameObject member in PartyManager.Instance.partyMembers)
+        {
+            HeroInfoSetting info = member.GetComponent<HeroInfoSetting>();
+            string id = info.HeroID;
+            CardInfo card = info.chardata;
+            playerData.currentPlayerDataList.Add((id, card));
+        }
     }
 }

@@ -11,6 +11,8 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     [SerializeField] CurrencyDungeonPoint[] bossPoints;
     [SerializeField] CurrencyBossModelBaseSO model;
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
+    [SerializeField] UIBase clearUI;
+
 
     private Dictionary<CurrencyDungeonType, MonsterController> bosses;
 
@@ -22,8 +24,7 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     {
         this.container = container;
     }
-
-    void Awake()
+    public void InitBoss()
     {
         bosses = new();
         GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/CurrencyBoss");
@@ -31,7 +32,11 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
         {
             GameObject boss = container.Instantiate(go);
             MonsterController con = boss.GetComponent<MonsterController>();
-            con.OnLifeEnded += a => con.gameObject.SetActive(false);
+            con.OnLifeEnded += a =>
+            {
+                if (clearUI != null) clearUI.SetShow();
+                con.gameObject.SetActive(false);
+            };
             boss.SetActive(false);
             switch (go.name)
             {
@@ -40,19 +45,7 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
                 case "SpiritBoss": bosses.Add(CurrencyDungeonType.Spirit, con); break;
             }
         }
-    }
-
-    void Start()
-    {
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            SetModel();
-            SpawnBoss();
-        }
+        SetModel();
     }
 
     private void SetModel()
@@ -60,7 +53,7 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
         int level = sceneData.data.Level;
         model.SetCurrencyBossFinalState(level);
     }
-    private void SpawnBoss()
+    public void SpawnBoss()
     {
         CurrencyDungeonType type = sceneData.type;
         foreach (CurrencyDungeonPoint point in bossPoints)
@@ -79,10 +72,5 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
         bosscon.transform.position = pos;
         bosscon.Model.BaseModel = model;
         bosscon.gameObject.SetActive(true);
-    }
-
-    public void GotoMain()
-    {
-        SceneManager.LoadSceneAsync("Demo_GameScene");
     }
 }

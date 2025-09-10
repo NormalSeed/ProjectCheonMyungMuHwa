@@ -9,7 +9,7 @@ public class DamageTextManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        DamagePool = new DefaultPool<DamageText>("DamageText", 15);
+        DamagePool = new DefaultPool<DamageText>("DamageText", 30, exceed:true, warmup:false, parent:gameObject.transform);
     }
 
     public DamageText Get(Vector2 pos)
