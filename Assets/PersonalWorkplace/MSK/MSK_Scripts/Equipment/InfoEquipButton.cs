@@ -10,7 +10,30 @@ public class InfoEquipButton : MonoBehaviour
     [SerializeField] private EquipmentCardDisplay EquipmentCardDisplay;
     private EquipmentInstance EquipmentInstance;
 
+    [Header("Panel")]
+    [SerializeField] private EquipmentItemList equipmentList;
+
+    #region 
+    private void OnEnable()
+    {
+        Button.onClick.AddListener(OnClickEquipment);
+    }
+    private void OnDisable()
+    {
+        Button.onClick.RemoveListener(OnClickEquipment);
+    }
+    #endregion
+    
+    #region OnClick
+    private void OnClickEquipment()
+    {
+        equipmentList.ShowEquipmentListByType(EquipmentInstance.equipmentType);
+        equipmentList.gameObject.SetActive(true);
+    }
+    #endregion
+
     #region Private
+
     #endregion
 
     #region Public
