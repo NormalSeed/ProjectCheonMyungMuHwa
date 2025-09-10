@@ -28,7 +28,8 @@ public class NS002_SkillSet : SkillSet
 
     private IEnumerator Skill1Routine(Transform target)
     {
-        skill1Effect.transform.position = this.gameObject.transform.position;
+        
+        skill1Effect.transform.position = this.gameObject.transform.position + offset;
         skill1Effect.SetActive(true);
 
         yield return skill1Duration;
