@@ -1,29 +1,43 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
 
 public class EquipmentCardDisplay : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private Image iconImage;
 
+    [Header("Button")]
+    [SerializeField] private Button button;
+
+    [Header("Panel")]
+    [SerializeField] private GameObject infoPanel;
     private EquipmentInstance equipment;
 
-    public void SetData(EquipmentInstance equip)
+    #region Unity
+    private void OnEnable()
     {
-        equipment = equip;
-
-        if (equipment == null || string.IsNullOrEmpty(equipment.templateID))
-        {
-            Debug.LogWarning("장비 데이터가 유효하지 않습니다.");
+        if (button == null)
             return;
-        }
-
-        string addressKey = $"{equipment.templateID}_{equipment.rarity}";
-        LoadIcon(addressKey);
+        button.onClick.AddListener(buttonOnClick);
     }
+    private void OnDisable()
+    {
+        if (button == null)
+            return;
+        button.onClick.RemoveListener(buttonOnClick);
+    }
+    #endregion
 
+    #region Button Click
+    private void buttonOnClick()
+    {
+        infoPanel.gameObject.SetActive(true);
+    }
+    #endregion
+
+    #region Private
     private void LoadIcon(string key)
     {
         Addressables.LoadAssetAsync<Sprite>(key).Completed += handle =>
@@ -38,4 +52,21 @@ public class EquipmentCardDisplay : MonoBehaviour
             }
         };
     }
+    #endregion
+
+    #region Public 
+    public void SetData(EquipmentInstance equip)
+    {
+        equipment = equip;
+
+        if (equipment == null || string.IsNullOrEmpty(equipment.templateID))
+        {
+            Debug.LogWarning("장비 데이터가 유효하지 않습니다.");
+            return;
+        }
+
+        string addressKey = $"{equipment.templateID}_{equipment.rarity}";
+        LoadIcon(addressKey);
+    }
+    #endregion
 }
