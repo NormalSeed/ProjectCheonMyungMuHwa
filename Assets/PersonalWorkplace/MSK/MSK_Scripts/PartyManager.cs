@@ -32,6 +32,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public List<SynergyInfo> activeSynergies = new();           // 현재 활성화된 시너지 정보
     public SynergyUI synergyUI;
+    public SynergyExplainUI explainUI;
 
     #region Unity LifeCycle
     private void Awake() { }
@@ -179,20 +180,24 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         ClearSynergy();
         activeSynergies.Clear(); // UI용 리스트 초기화
+        Debug.LogError($"activeSynergies 카운트 수: {activeSynergies.Count}");
 
         Dictionary<HeroFaction, int> factionCounts = new();
         foreach (var member in partyMembers)
         {
-            var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            if (cardInfo == null)
-                continue;
+            if (member != null)
+            {
+                var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
+                if (cardInfo == null)
+                    continue;
 
-            HeroFaction faction = cardInfo.faction;
+                HeroFaction faction = cardInfo.faction;
 
-            if (!factionCounts.ContainsKey(faction))
-                factionCounts[faction] = 0;
+                if (!factionCounts.ContainsKey(faction))
+                    factionCounts[faction] = 0;
 
-            factionCounts[faction]++;
+                factionCounts[faction]++;
+            }
         }
 
         foreach (var kvp in factionCounts)
@@ -215,9 +220,9 @@ public class PartyManager : MonoBehaviour, IStartable
                 ActiveSynergy(kvp.Key, stage);
                 activeSynergies.Add(new SynergyInfo(kvp.Key, stage, kvp.Value)); // UI용 데이터 저장
             }
-
-            synergyUI.UpdateSynergyUI(activeSynergies); // UI에 전달
         }
+        synergyUI.UpdateSynergyUI(activeSynergies);
+        explainUI.UpdateExplainUI(activeSynergies);
     }
     
     /// <summary>
@@ -227,8 +232,12 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         foreach (var member in partyMembers)
         {
+            if (member == null)
+                continue;
+
             var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            if (cardInfo == null) continue;
+            if (cardInfo == null)
+                continue;
 
             string charID = cardInfo.HeroID;
             StatModifierManager.RemoveModifiers(charID, ModifierSource.Synergy);
