@@ -23,6 +23,8 @@ public class US002_SkillSet : SkillSet
 
     private IEnumerator Skill1Routine()
     {
+        Transform origin = controller.transform;
+        skill1Effect.transform.position = origin.position + offset;
         skill1Effect.SetActive(true);
         yield return new WaitForSeconds(0.7f);
         skill1Effect.SetActive(false);
