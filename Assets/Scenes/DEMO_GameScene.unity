@@ -9507,6 +9507,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1491796991}
   m_CullTransparentMesh: 1
+--- !u!1 &1501046802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1501046804}
+  - component: {fileID: 1501046803}
+  m_Layer: 0
+  m_Name: QuestUHDController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1501046803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501046802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14677c0216c8a741abad8a497e9c39f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questHUD: {fileID: 1635242417}
+--- !u!4 &1501046804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501046802}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1124.9932, y: 1047.0737, z: -25.400984}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1501635563
 GameObject:
   m_ObjectHideFlags: 0
@@ -10763,6 +10808,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3187612916737215853, guid: b03adfc3c332be54089efff2ead606d1, type: 3}
   m_PrefabInstance: {fileID: 1635242414}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1635242417 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3760996710479221503, guid: b03adfc3c332be54089efff2ead606d1, type: 3}
+  m_PrefabInstance: {fileID: 1635242414}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85506f32af5d9f4493d8c5823a951e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1676215273
 GameObject:
   m_ObjectHideFlags: 0
@@ -15296,3 +15352,4 @@ SceneRoots:
   - {fileID: 193623929}
   - {fileID: 1882031892}
   - {fileID: 1527496588}
+  - {fileID: 1501046804}
