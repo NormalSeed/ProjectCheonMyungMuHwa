@@ -28,8 +28,6 @@ public class CharacterEquipment : MonoBehaviour
     private void Start()
     {
         controller = GetComponent<PlayerController>();
-        charID = controller.model.modelSO.CharID;
-        equipClass = GetEquipClass();
 
         // 슬롯 4개(Weapon, Armor, Gloves, Boots) 만들어 두기
         foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
@@ -42,6 +40,13 @@ public class CharacterEquipment : MonoBehaviour
     {
         // 장착 상태 초기화
         equipmentService.RegisterCharacter(this);
+    }
+
+    public void SetCharID()
+    {
+        if (controller.model.modelSO == null) return;
+        charID = controller.model.modelSO.CharID;
+        equipClass = GetEquipClass();
     }
 
     private EquipClass GetEquipClass()

@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
-    private NavMeshAgent NMagent;
+    public NavMeshAgent NMagent;
     private BehaviorGraphAgent BGagent;
 
     [Header("스킬 관련 필드")]
@@ -79,6 +79,9 @@ public class PlayerController : MonoBehaviour, IDamagable
             {
                 BGagent.enabled = true;
             }
+
+            equipment.SetCharID();
+
             PartyManager.Instance.CheckSynergy();
             // 훈련 데이터가 이미 로딩됐으면 바로 Modifier 적용
             if (TrainingManager.Instance.IsTrainingDataLoaded)
