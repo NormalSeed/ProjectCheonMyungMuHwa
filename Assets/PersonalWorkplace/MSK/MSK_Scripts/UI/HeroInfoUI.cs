@@ -64,7 +64,10 @@ public class HeroInfoUI : UIBase
 
     #region Equip
     private Dictionary<string, EquipmentInstance> equips = new();
-
+    public string weaponID;
+    public string armorID;
+    public string bootsID;
+    public string glovesID;
     #endregion
     #region FireBase
     private string _uid;
@@ -282,7 +285,7 @@ public class HeroInfoUI : UIBase
 
     #region Public
     /// <summary>
-    /// 장착한 장비를 반환하는 코드입니다.
+    /// 장착한 장비를 설정하는 코드입니다.
     /// </summary>
     /// <param name="charID"></param>
     /// <param name="type"></param>
@@ -291,12 +294,12 @@ public class HeroInfoUI : UIBase
         Debug.Log("[GetEquipment] 진입");
 
         var equipButtons = new Dictionary<EquipmentType, InfoEquipButton>
-        {
-            { EquipmentType.Weapon, weapone },
-            { EquipmentType.Armor, armor },
-            { EquipmentType.Boots, boots },
-            { EquipmentType.Gloves, gloves }
-        };
+    {
+        { EquipmentType.Weapon, weapone },
+        { EquipmentType.Armor, armor },
+        { EquipmentType.Boots, boots },
+        { EquipmentType.Gloves, gloves }
+    };
 
         if (!equipButtons.TryGetValue(type, out var button))
         {
@@ -306,17 +309,50 @@ public class HeroInfoUI : UIBase
 
         var instance = equipmentManager.allEquipments
             .FirstOrDefault(e => e.charID == charID && e.equipmentType == type);
-
+        
         if (instance != null)
         {
             button.HeroEquipSet(instance);
+            switch (type)
+            {
+                case EquipmentType.Weapon:
+                    weaponID = instance.instanceID;
+                    Debug.Log($"[GetEquipment] : 무기 ID = {weaponID}");
+                    break;
+                case EquipmentType.Armor:
+                    armorID = instance.instanceID;
+                    break;
+                case EquipmentType.Boots:
+                    bootsID = instance.instanceID;
+                    break;
+                case EquipmentType.Gloves:
+                    glovesID = instance.instanceID;
+                    break;
+            }
         }
         else
         {
             Debug.LogWarning($"[GetEquipment] 장비 없음: {charID}, {type}");
-            button.EquipReset(); // 장비 없을 경우 UI 초기화
+            button.EquipReset();
+
+            switch (type)
+            {
+                case EquipmentType.Weapon:
+                    weaponID = null;
+                    break;
+                case EquipmentType.Armor:
+                    armorID = null;
+                    break;
+                case EquipmentType.Boots:
+                    bootsID = null;
+                    break;
+                case EquipmentType.Gloves:
+                    glovesID = null;
+                    break;
+            }
         }
     }
+
 
     public void SetHeroData(HeroData data)
     {

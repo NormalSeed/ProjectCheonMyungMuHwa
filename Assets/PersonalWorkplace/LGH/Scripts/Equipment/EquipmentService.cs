@@ -128,12 +128,19 @@ public class EquipmentService
     public bool EquipToUnactivatedCharacter(string charID, EquipmentInstance item)
     {
         item.charID = charID;
+        item.isEquipped = true;
+
+        equipmentManager.SaveToJson();
+        return true;
+    }
+    public bool UnequipFromUnactivatedCharacter(string charID, EquipmentInstance item)
+    {
+        item.charID = null;
         item.isEquipped = false;
 
         equipmentManager.SaveToJson();
         return true;
     }
-
 
     /// <summary>
     /// CharacterEquipment의 슬롯에서 장비를 해제하는 메서드

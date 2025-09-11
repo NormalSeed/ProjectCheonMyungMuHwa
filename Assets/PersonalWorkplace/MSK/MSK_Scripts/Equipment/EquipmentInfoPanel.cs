@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using Unity.Android.Gradle.Manifest;
 using Unity.VisualScripting;
@@ -38,17 +39,20 @@ public class EquipmentInfoPanel : MonoBehaviour
     [Header("Instance")]
     [SerializeField] private HeroInfoUI HeroInfo;
 
-    private EquipmentInstance instance;
+    private EquipmentInstance instance;     // 판넬의 장비
+    private EquipmentInstance oldinstance;  // 장착중인 장비
     private int level;                      // 장비 레벨
     private int effectRate;                 // 증가량
     private int nextEffectRate;             // 다음 레벨 증가량
-    private string charId;
+    private string charId;                  // 영웅 ID
+    private string instanceID;              // 장비 ID
 
     #region Unity
     private void OnEnable()
     {
         Init();
         GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
+        SetInstanceIDFromHeroData();
         SetButtonAddListener();
     }
     private void OnDisable()
@@ -62,6 +66,20 @@ public class EquipmentInfoPanel : MonoBehaviour
     {
         imageEquipment.SetData(instance);
         SetPanelText();
+    }
+    private void SetInstanceIDFromHeroData()
+    {
+        var type = instance.equipmentType;
+        var heroData = HeroInfo.heroData;
+
+        instanceID = type switch
+        {
+            EquipmentType.Weapon => heroData.weapone,
+            EquipmentType.Armor => heroData.armor,
+            EquipmentType.Gloves => heroData.gloves,
+            EquipmentType.Boots => heroData.boots,
+            _ => null
+        };
     }
     private void SetPanelText()
     {
@@ -127,13 +145,82 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     private void OnClickEquip()
     {
+        var heroData = HeroInfo.heroData;
+        var type = instance.equipmentType;
+
+        // 현재 슬롯에 장착된 장비 ID 가져오기
+        SetInstanceIDFromHeroData();
+        var currentEquippedId = instanceID;
+
+        // 현재 슬롯에 장착된 장비 인스턴스 가져오기
+        EquipmentInstance oldInstance = null;
+        if (!string.IsNullOrEmpty(currentEquippedId))
+        {
+            oldInstance = equipmentManager.allEquipments
+                .FirstOrDefault(e => e.instanceID == currentEquippedId);
+        }
+
+        // 1. 해제: 현재 장비가 장착되어 있고, 슬롯에 자신이 들어있을 경우
+        if (currentEquippedId == instance.instanceID && instance.isEquipped)
+        {
+            SetHeroEquipmentSlot(null);
+            instance.isEquipped = false;
+            instance.charID = null;
+            equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
+            Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
+        }
+        else
+        {
+            // 2. 교체: 슬롯에 다른 장비가 이미 장착되어 있을 경우
+            if (oldInstance != null && oldInstance != instance)
+            {
+                oldInstance.isEquipped = false;
+                oldInstance.charID = null;
+                equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
+                Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
+            }
+
+            // 3. 장착: 새 장비를 슬롯에 등록
+            SetHeroEquipmentSlot(instance.instanceID);
+            instance.isEquipped = true;
+            instance.charID = heroData.heroId;
+            equipmentService.EquipToUnactivatedCharacter(charId, instance);
+            Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 장착됨");
+        }
+
+        // 저장 및 UI 갱신
+        if (!string.IsNullOrEmpty(heroData.heroId))
+        {
+            HeroDataManager.Instance.SaveHeroData(heroData.heroId);
+        }
+        else
+        {
+            Debug.LogError("[OnClickEquip] heroData.heroId가 null입니다. 저장 실패");
+        }
 
         SetPanelText();
         HeroInfo.Init();
     }
+
+
+
     #endregion
 
     #region Private
+    private void SetHeroEquipmentSlot(string itemId)
+    {
+        var type = instance.equipmentType;
+        var heroData = HeroInfo.heroData;
+
+        switch (type)
+        {
+            case EquipmentType.Weapon: heroData.weapone = itemId; break;
+            case EquipmentType.Armor: heroData.armor = itemId; break;
+            case EquipmentType.Gloves: heroData.gloves = itemId; break;
+            case EquipmentType.Boots: heroData.boots = itemId; break;
+        }
+    }
+        
     #endregion
 
     #region Public
@@ -144,7 +231,28 @@ public class EquipmentInfoPanel : MonoBehaviour
     public void GetCharID(string input)
     {
         charId = input;
-        Debug.Log($"[GetCharID] : 캐릭터 {charId} 설정됨");
+        var type = instance.equipmentType;
+
+        string oldInstanceID = null;
+
+        switch (type)
+        {
+            case EquipmentType.Weapon:
+                oldInstanceID = HeroInfo.weaponID;
+                break;
+            case EquipmentType.Armor:
+                oldInstanceID = HeroInfo.armorID;
+                break;
+            case EquipmentType.Boots:
+                oldInstanceID = HeroInfo.bootsID;
+                break;
+            case EquipmentType.Gloves:
+                oldInstanceID = HeroInfo.glovesID;
+                break;
+        }
+
+        Debug.Log($"[GetCharID] : 캐릭터 {charId} 설정됨, 기존 장비 ID: {oldInstanceID}");
     }
+
     #endregion
 }
