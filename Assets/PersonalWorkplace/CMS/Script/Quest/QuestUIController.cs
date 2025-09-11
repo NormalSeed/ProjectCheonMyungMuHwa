@@ -12,37 +12,35 @@ public class QuestUIController : UIBase
     public TextMeshProUGUI progressText;
     public Button claimButton; // 보상 받기 버튼
 
-    private string questId;
+    private Quest currentQuest; 
 
     public void SetData(Quest quest)
     {
-        questId = quest.questID;
+        this.currentQuest = quest;
 
-        questNameText.text = quest.questName;
+        questNameText.text = currentQuest.questName;
 
-        progressFill.fillAmount = (float)quest.valueProgress / quest.valueGoal;
-        progressText.text = $"{quest.valueProgress}/{quest.valueGoal}";
+        progressFill.fillAmount = (float)currentQuest.valueProgress / currentQuest.valueGoal;
+        progressText.text = $"{currentQuest.valueProgress}/{currentQuest.valueGoal}";
 
-        // 보상 받기 버튼 설정
         claimButton.onClick.RemoveAllListeners();
         claimButton.onClick.AddListener(OnClickClaim);
 
-        // 완료 상태에 따라 버튼 활성화
-        claimButton.interactable = quest.isComplete && !quest.isClaimed;
-
+        claimButton.interactable = currentQuest.state == QuestState.RewardReady;
     }
 
     private void OnClickClaim()
     {
-        QuestManager.Instance.ClaimReward(questId);
-        RefreshUI();
+        if (currentQuest == null) return;
+
+        QuestManager.Instance.ClaimReward(currentQuest);
     }
 
     public override void RefreshUI()
     {
-        if (QuestManager.Instance.activeQuests.TryGetValue(questId, out Quest quest))
+        if (currentQuest != null && QuestManager.Instance.activeQuests.TryGetValue(currentQuest.questID, out Quest updatedQuest))
         {
-            SetData(quest);
+            SetData(updatedQuest);
         }
     }
 }
