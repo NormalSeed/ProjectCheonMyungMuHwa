@@ -48,6 +48,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     private void OnEnable()
     {
         Init();
+        GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
         SetButtonAddListener();
     }
     private void OnDisable()
@@ -59,7 +60,6 @@ public class EquipmentInfoPanel : MonoBehaviour
     #region Init
     private void Init()
     {
-        charId = HeroInfo.heroData.heroId;
         imageEquipment.SetData(instance);
         SetPanelText();
     }
@@ -68,15 +68,18 @@ public class EquipmentInfoPanel : MonoBehaviour
         textEquipmentName.text = instance.template.equipmentName;
         textEquipmentEffect.text = instance.template.description;
         //textEffectRate.text =
+        //textPresentEffectRate
+        //textPresentEff.text
+
+
         //textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
         //textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
 
         textEquipLevel.text = instance.level.ToString();
         textNextLevel.text = instance.level + 1.ToString();
-        //textPresentEff.text
-        //textNextEff.text
-        //textPresentEffectRate
 
+        //textNextEff.text
+        
         //textNextEffectRate
         if (instance.isEquipped)
         {
@@ -94,6 +97,7 @@ public class EquipmentInfoPanel : MonoBehaviour
             textEquip.text = "장비하기";
         }
     }
+
     private void SetButtonAddListener()
     {
         exitButton.onClick.AddListener(OnClickExit);
@@ -123,27 +127,7 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     private void OnClickEquip()
     {
-        var character = equipmentService.GetCharacter(charId);
-        if (character == null)
-        {
-            Debug.LogWarning($"캐릭터 {charId}를 찾을 수 없습니다.");
-            return;
-        }
 
-        var slot = character.slots[instance.equipmentType];
-
-        // 이미 해당 슬롯에 이 장비가 장착되어 있다면 해제
-        if (slot.equippedItem == instance && instance.isEquipped)
-        {
-            equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
-            Debug.Log($"장비 {instance.templateID} 해제됨");
-        }
-        else
-        {
-            // 다른 장비가 장착되어 있거나 비어 있다면 장착
-            equipmentService.EquipToCharacter(charId, instance);
-            Debug.Log($"장비 {instance.templateID} 장착됨");
-        }
         SetPanelText();
         HeroInfo.Init();
     }
@@ -156,6 +140,11 @@ public class EquipmentInfoPanel : MonoBehaviour
     public void GetEquipmentInstance(EquipmentInstance input)
     {
         instance = input;
+    }
+    public void GetCharID(string input)
+    {
+        charId = input;
+        Debug.Log($"[GetCharID] : 캐릭터 {charId} 설정됨");
     }
     #endregion
 }

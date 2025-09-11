@@ -52,8 +52,8 @@ public class HeroInfoUI : UIBase
     public HeroData heroData;
     private BigCurrency HealthPoint = new();     // 체력정보
     private BigCurrency FinalPower = new();      // 종합전투
-    private BigCurrency InnAtkPoint = new();     // 내공????
-    private BigCurrency ExtAtkPoint = new();     // 외곻????
+    private BigCurrency InnAtkPoint = new();     // 내공
+    private BigCurrency ExtAtkPoint = new();     // 외곻
     #endregion
 
     #region Goods Properties
@@ -237,9 +237,9 @@ public class HeroInfoUI : UIBase
     /// <returns></returns>
     private string CountingHeroPower()
     {
-        double power = heroData.PlayerModelSO.ExtAtkPoint *
+        float power = heroData.PlayerModelSO.ExtAtkPoint *
                        heroData.PlayerModelSO.HealthPoint *
-                       heroData.PlayerModelSO.InnAtkPoint * 0.7;
+                       heroData.PlayerModelSO.InnAtkPoint * 0.7f;
 
         return BigCurrency.FromBaseAmount(power).ToString();
     }

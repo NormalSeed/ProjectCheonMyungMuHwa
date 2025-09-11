@@ -29,11 +29,11 @@ public class InfoEquipButton : MonoBehaviour
     }
     #endregion
     
-    #region OnClick
+    #region OnClick 
     private void OnClickEquipment()
     {
-        equipmentList.ShowEquipmentListByTemplateID(templateID);
         equipmentList.gameObject.SetActive(true);
+        equipmentList.ShowEquipmentListByTemplateID(templateID);
     }
     #endregion
 
