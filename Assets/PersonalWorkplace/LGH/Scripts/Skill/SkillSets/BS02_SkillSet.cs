@@ -56,7 +56,7 @@ public class BS02_SkillSet : SkillSet
         if (damagable != null)
         {
             damagable.TakeDamage(
-            controller.model.modelSO.ExtAtkPoint * skills[0].ExtSkillDmg);
+            controller.model.ExtAtk * skills[0].ExtSkillDmg);
         }
         else
         {
@@ -78,7 +78,7 @@ public class BS02_SkillSet : SkillSet
             if (damagable != null)
             {
                 damagable.TakeDamage(
-                    controller.model.modelSO.InnAtkPoint * skills[0].InnSkillDmg);
+                    controller.model.InnAtk * skills[0].InnSkillDmg);
             }
 
             yield return new WaitForSeconds(interval);

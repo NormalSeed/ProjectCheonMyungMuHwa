@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     private NavMeshAgent NMagent;
     private BehaviorGraphAgent BGagent;
 
+    [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
     public bool isSkill1Ready = true;
     public bool isSkill2Ready = false;
@@ -34,9 +35,29 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
+    [Header("보호막 관련 필드")]
+    private float shieldAmount = 0f;
+    private float shieldDuration = 0f;
+    private float shieldElapsed = 0f;
+    public bool isShieldActive = false;
+
     public event System.Action OnModelLoaded;
 
     private void Awake()
+    {
+        //model = GetComponent<PlayerModel>();
+        //view = GetComponent<PlayerView>();
+        //equipment = GetComponent<CharacterEquipment>();
+
+        //NMagent = GetComponent<NavMeshAgent>();
+        //BGagent = GetComponent<BehaviorGraphAgent>();
+        //BGagent.enabled = false;
+
+        //NMagent.updateRotation = false;
+        //NMagent.updateUpAxis = false;
+    }
+
+    private void OnEnable()
     {
         model = GetComponent<PlayerModel>();
         view = GetComponent<PlayerView>();
@@ -48,18 +69,23 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
-    }
 
-    private void OnEnable()
-    {
         charID.Subscribe(LoadPlayerData);
 
+        // 플레이어 모델이 로드된 후 실행될 이벤트
         OnModelLoaded += () =>
         {
             if (BGagent != null)
             {
                 BGagent.enabled = true;
             }
+            PartyManager.Instance.CheckSynergy();
+            // 훈련 데이터가 이미 로딩됐으면 바로 Modifier 적용
+            if (TrainingManager.Instance.IsTrainingDataLoaded)
+            {
+                TrainingManager.Instance.ApplyTrainingModifiersToPlayer(this);
+            }
+            Debug.Log("모델 로드됨");
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
@@ -164,6 +190,14 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void LoadPlayerSkillData(string skillSetID)
     {
+        // 기존 skillSet 제거
+        if (skillSet != null)
+        {
+            Destroy(skillSet);
+            Addressables.ReleaseInstance(skillSet);
+            skillSet = null;
+        }
+
         Addressables.LoadAssetAsync<GameObject>(skillSetID)
         .Completed += handle =>
         {
@@ -200,6 +234,15 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private void LoadPlayerSPUMAsset(string charID, string skillSetID)
     {
+        // 기존 SPUMAsset 제거
+        if (SPUMAsset != null)
+        {
+            Destroy(SPUMAsset);
+            Addressables.ReleaseInstance(SPUMAsset);
+            SPUMAsset = null;
+            spumController = null;
+        }
+
         Addressables.LoadAssetAsync<GameObject>(charID + "_SPUM")
         .Completed += handle =>
         {
@@ -260,12 +303,60 @@ public class PlayerController : MonoBehaviour, IDamagable
             isSkillReady = true;
             isSkill2Ready = true;
         }
+
+        // 보호막 지속시간 처리
+        if (isShieldActive)
+        {
+            shieldElapsed += Time.deltaTime;
+            if (shieldElapsed >= shieldDuration)
+            {
+                isShieldActive = false;
+                shieldAmount = 0f;
+                Debug.Log("보호막 지속시간 종료");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 보호막 버프가 들어왔을 때 보호막을 적용시키는 메서드
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <param name="duration"></param>
+    public void ApplyShield(float amount, float duration)
+    {
+        shieldAmount = amount;
+        shieldDuration = duration;
+        shieldElapsed = 0f;
+        isShieldActive = true;
+
+        Debug.Log($"보호막 적용됨: {amount} / {duration}s");
     }
 
     public void TakeDamage(double amount)
     {
-        model.CurHealth.Value -= amount;
-        Debug.Log($"현재 체력 : {model.CurHealth.Value}");
+        if (isShieldActive)
+        {
+            shieldAmount -= (float)amount;
+
+            if (shieldAmount <= 0f)
+            {
+                float leftoverDamage = -shieldAmount;
+                shieldAmount = 0f;
+                isShieldActive = false;
+
+                model.CurHealth.Value -= leftoverDamage;
+                Debug.Log("보호막이 깨졌습니다. 남은 피해 적용됨.");
+            }
+            else
+            {
+                Debug.Log($"보호막으로 피해 흡수됨. 남은 보호막: {shieldAmount}");
+            }
+        }
+        else
+        {
+            model.CurHealth.Value -= amount;
+            Debug.Log($"현재 체력 : {model.CurHealth.Value}");
+        }
     }
 
     private void HandleHeroLevelChanged(int newLevel)

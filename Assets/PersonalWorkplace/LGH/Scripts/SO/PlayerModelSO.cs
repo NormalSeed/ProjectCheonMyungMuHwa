@@ -36,10 +36,10 @@ public class PlayerModelSO : ScriptableObject
     public float DefRatio_Increase;
 
     [Header("최종 능력치")]
-    public double HealthPoint;
-    public double ExtAtkPoint;
-    public double InnAtkPoint;
-    public double DefPoint;
+    public float HealthPoint;
+    public float ExtAtkPoint;
+    public float InnAtkPoint;
+    public float DefPoint;
     // 위 4개 능력치는 계산식 적용해서 초기화 필요    
     public float AtkSpeed;
     public float MoveSpeed;

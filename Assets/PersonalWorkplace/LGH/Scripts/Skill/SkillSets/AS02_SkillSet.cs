@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class AS02_SkillSet : SkillSet
 {
@@ -26,6 +25,7 @@ public class AS02_SkillSet : SkillSet
 
     public override void Skill1(Transform target)
     {
+        isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
@@ -49,10 +49,12 @@ public class AS02_SkillSet : SkillSet
         timed.SetParent(this.transform);
         effect1.SetActive(true);
         effect1.transform.SetParent(null);
+        isSkillPlaying = false;
     }
 
     public override void Skill2(Transform target)
     {
+        isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.ATTACK, 3);
         StartCoroutine(Skill2Routine(target));
     }
@@ -79,14 +81,15 @@ public class AS02_SkillSet : SkillSet
         // 10% 확률로 방어력 증가
         if (Random.value <= 0.1f)
         {
-            double originalDef = controller.model.modelSO.DefPoint;
-            double buffAmount = originalDef * 0.3f;
-            controller.model.modelSO.DefPoint += buffAmount;
+            float originalDef = controller.model.modelSO.DefPoint;
+            float buffAmount = originalDef * 0.3f;
+            controller.model.Def += buffAmount;
 
             yield return new WaitForSeconds(skill2Duration);
 
             // 방어력 원상복구
-            controller.model.modelSO.DefPoint -= buffAmount;
+            controller.model.Def -= buffAmount;
         }
+        isSkillPlaying = false;
     }
 }

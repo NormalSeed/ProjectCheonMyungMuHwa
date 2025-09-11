@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -29,6 +30,10 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public event Action<Dictionary<string, CardInfo>> partySet;
 
+    public List<SynergyInfo> activeSynergies = new();           // 현재 활성화된 시너지 정보
+    public SynergyUI synergyUI;
+    public SynergyExplainUI explainUI;
+
     #region Unity LifeCycle
     private void Awake() { }
 
@@ -45,30 +50,49 @@ public class PartyManager : MonoBehaviour, IStartable
     #region Public 
     public void AddMember(GameObject member)
     {
-        if (partyMembers.Count < MaxPartySize && !partyMembers.Contains(member))
+        int activeCount = partyMembers.Count(m => m != null);
+
+        if (activeCount < MaxPartySize && !partyMembers.Contains(member))
         {
-            partyMembers.Add(member);
+            // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+            int listOrder = 0;
+
+            int emptyIndex = partyMembers.FindIndex(m => m == null);
+            if (emptyIndex >= 0)
+            {
+                partyMembers[emptyIndex] = member;
+                listOrder = emptyIndex;
+            }
+            else
+            {
+                partyMembers.Add(member);
+                listOrder = partyMembers.Count - 1;
+            }
             InGameManager.Instance.playerCount++;
 
             partySixe++;
 
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
+            
 
-            int listOrder = partyMembers.Count - 1;
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
-            controller.gameObject.SetActive(true);
 
             if (controller != null)
             {
+                controller.gameObject.SetActive(true);
                 controller.charID.Value = heroInfo.HeroID;
             }
             // 그 후 해당 PlayerController 안의 partyNum을 변경시킨다.
             if (heroInfo != null)
             {
-                controller.partyNum = partyMembers.Count - 1;
+                controller.partyNum = listOrder;
                 Debug.Log($"추가된 멤버 {controller.name}의 partyNum 설정됨: {controller.partyNum}");
+            }
+
+            if (controller.model != null && controller.model.modelSO != null)
+            {
+                CheckSynergy();
             }
         }
     }
@@ -79,20 +103,21 @@ public class PartyManager : MonoBehaviour, IStartable
         {
             var heroInfo = member.GetComponent<HeroInfoSetting>().chardata;
             // 현재 제거될 멤버가 List의 몇번째에 있는지 체크해서
-            int listOrder = partyMembers.Count - 1;
+            int listOrder = partyMembers.IndexOf(member);
             // players 리스트 안에 동일한 순서에 있는 PlayerController 안의 charID를 HeroID로 변경시킴
             PlayerController controller = players[listOrder];
-            controller.gameObject.SetActive(true);
+            controller.gameObject.SetActive(false);
 
             if (controller != null)
             {
-                controller.charID.Value = null;
+                controller.charID.Value = string.Empty;
             }
 
-            partyMembers.Remove(member);
+            partyMembers[listOrder] = null;
             InGameManager.Instance.playerCount--;
             partySixe--;
         }
+        CheckSynergy();
     }
     public void PartyInit()
     {
@@ -144,85 +169,168 @@ public class PartyManager : MonoBehaviour, IStartable
     /// </summary>
     public void AutoPartySetting()
     {
-
+        // 시너지 체크 위에 로직을 짜주세요
+        CheckSynergy();
     }
     #endregion
 
     #region Private
-    private void CheckSynergy()
+    #region Synergy
+    public void CheckSynergy()
     {
+        ClearSynergy();
+        activeSynergies.Clear(); // UI용 리스트 초기화
+
         Dictionary<HeroFaction, int> factionCounts = new();
         foreach (var member in partyMembers)
         {
-            var cardInfo = member.GetComponent<CardInfo>();
-            if (cardInfo == null)
-                continue;
+            if (member != null)
+            {
+                var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
+                if (cardInfo == null)
+                    continue;
 
-            HeroFaction faction = cardInfo.faction;
+                HeroFaction faction = cardInfo.faction;
 
-            if (!factionCounts.ContainsKey(faction))
-                factionCounts[faction] = 0;
+                if (!factionCounts.ContainsKey(faction))
+                    factionCounts[faction] = 0;
 
-            factionCounts[faction]++;
+                factionCounts[faction]++;
+            }
         }
 
         foreach (var kvp in factionCounts)
         {
-            if (kvp.Value >= 1 && kvp.Key == HeroFaction.M)
-            {
-                
-            }
-            else if (kvp.Value >= 2 && kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S)
-            {
+            int stage = 0;
 
-            }
+            if (kvp.Value == 5 && kvp.Key != HeroFaction.M)
+                stage = 3;
             else if (kvp.Value >= 4 && kvp.Key == HeroFaction.M)
-            {
-                
-            }
-            else if (kvp.Value == 5 && kvp.Key != HeroFaction.M)
-            {
+                stage = 2;
+            else if (kvp.Value >= 3 && (kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S))
+                stage = 2;
+            else if (kvp.Value >= 2 && (kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S))
+                stage = 1;
+            else if (kvp.Value >= 1 && kvp.Key == HeroFaction.M)
+                stage = 1;
 
+            if (stage > 0)
+            {
+                ActiveSynergy(kvp.Key, stage);
+                activeSynergies.Add(new SynergyInfo(kvp.Key, stage, kvp.Value)); // UI용 데이터 저장
             }
         }
+        synergyUI.UpdateSynergyUI(activeSynergies);
+        explainUI.UpdateExplainUI(activeSynergies);
     }
-
-    private void ActiveSynergy(HeroFaction faction)
+    
+    /// <summary>
+    /// 적용중인 시너지 초기화 메서드
+    /// </summary>
+    private void ClearSynergy()
     {
         foreach (var member in partyMembers)
         {
-            var cardInfo = member.GetComponent<CardInfo>();
+            if (member == null)
+                continue;
+
+            var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
+            if (cardInfo == null)
+                continue;
+
+            string charID = cardInfo.HeroID;
+            StatModifierManager.RemoveModifiers(charID, ModifierSource.Synergy);
+            var player = players.Find(p => p.charID.Value == charID);
+            if (player != null)
+                StatModifierManager.ApplyToModel(player.model);
+        }
+    }
+
+    /// <summary>
+    /// 시너지 활성화 메서드
+    /// </summary>
+    /// <param name="faction">문파</param>
+    /// <param name="stage">시너지 단계</param>
+    private void ActiveSynergy(HeroFaction faction, int stage)
+    {
+        foreach (var member in partyMembers)
+        {
+            if (member == null) continue;
+
+            var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
             if (cardInfo == null)
                 continue;
 
             string targetCharID = cardInfo.HeroID;
 
-            // players 리스트에서 해당 charID를 가진 PlayerController 찾기
             var player = players.Find(p => p.charID.Value == targetCharID);
             if (player == null || player.model?.modelSO == null)
                 continue;
 
-            var stats = player.model.modelSO;
+            // 시너지 이름을 originID로 사용
+            string synergyID = $"{faction}_Synergy_Stage{stage}";
 
             switch (faction)
             {
                 case HeroFaction.J:
-                    stats.DefPoint += 10;
-                    Debug.Log($"정파 시너지: {targetCharID} 외공과 내공 모두 증가");
+                    if (stage == 1)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.Attack, 0.2, ModifierSource.Synergy, synergyID, true));
+                    }
+                    else if (stage == 2)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.Attack, 0.4, ModifierSource.Synergy, synergyID, true));
+                    }
+                    else if (stage == 3)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.Attack, 0.7, ModifierSource.Synergy, synergyID, true));
+                    }
                     break;
+
                 case HeroFaction.S:
-                    stats.CritRate += 0.05f;
-                    Debug.Log($"사파 시너지: {targetCharID} 보스에게 주는 피해량 증가");
+                    if (stage == 1)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.BDamage, 0.2, ModifierSource.Synergy, synergyID));
+                    }
+                    else if (stage == 2)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.BDamage, 0.4, ModifierSource.Synergy, synergyID));
+                    }
+                    else if (stage == 3)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.BDamage, 0.7, ModifierSource.Synergy, synergyID));
+                    }
                     break;
+
                 case HeroFaction.M:
-                    stats.ExtAtkPoint += 15;
-                    Debug.Log($"마교 시너지: {targetCharID} 스킬로 주는 피해량 증가");
+                    if (stage == 1)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.SkillDamage, 0.15, ModifierSource.Synergy, synergyID));
+                    }
+                    else if (stage == 2)
+                    {
+                        StatModifierManager.ApplyModifier(targetCharID,
+                            new StatModifier(StatType.SkillDamage, 0.5, ModifierSource.Synergy, synergyID));
+                    }
+                    else if (stage == 3)
+                    {
+                        Debug.Log($"마교는 3단계 시너지가 없습니다.");
+                    }
                     break;
             }
+
+            // Modifier 적용 후 최종 능력치 갱신
+            StatModifierManager.ApplyToModel(player.model);
+            Debug.Log($"시너지 적용 완료: {faction} {targetCharID} (단계 {stage})");
         }
     }
-
-
 
     private void HandleCurrencyReady()
     {
@@ -240,6 +348,7 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
     }
+    #endregion
     #endregion
 }
 

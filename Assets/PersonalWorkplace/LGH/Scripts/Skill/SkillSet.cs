@@ -12,6 +12,10 @@ public class SkillSet : MonoBehaviour
     protected Transform parentTransform;
     protected SPUM_Prefabs spumC;
 
+    public bool isSkillPlaying = false;
+
+    protected Vector3 offset = new Vector3(0, 0.4f, 0);
+
     public void Init(PlayerController controller)
     {
         pController = GetComponent<ProjectileController>();

@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class DungeonLevelCard : MonoBehaviour
 {
@@ -39,14 +40,29 @@ public class DungeonLevelCard : MonoBehaviour
     {
         ButtonText.text = "소탕";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {KMS_Util.DungeonTypeToName[type]} {data.Reward}개 획득</color>"));
+        startButton.onClick.AddListener(() =>
+        {
+            Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>");
+            BigCurrency reward = new BigCurrency(data.Reward);
+            switch (type)
+            {
+                case CurrencyDungeonType.Gold: CurrencyManager.Instance.Add(CurrencyType.Gold, reward); break;
+                case CurrencyDungeonType.Honbaeg: CurrencyManager.Instance.Add(CurrencyType.Soul, reward); break;
+                case CurrencyDungeonType.Spirit: CurrencyManager.Instance.Add(CurrencyType.SpiritStone, reward); break;
+            }
+        }); //{KMS_Util.DungeonTypeToName[type]}
 
     }
-    public void SetStageAvailable()
+    public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
         ButtonText.text = "입장";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => SceneManager.LoadSceneAsync("CurrencyDungeonScene"));
+        startButton.onClick.AddListener(() =>
+        {
+            act.Invoke(data, type);
+            //AudioManager.Instance.StopAllSounds();
+            SceneManager.LoadSceneAsync("CurrencyDungeonScene");
+        });
 
     }
     public void SetStageLocked()

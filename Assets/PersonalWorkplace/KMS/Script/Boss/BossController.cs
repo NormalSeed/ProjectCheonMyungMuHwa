@@ -44,9 +44,10 @@ public abstract class BossController : MonsterController
     }
     public override void OnDeath()
     {
+        onDeath?.Invoke();
         if (attackCo != null) StopCoroutine(attackCo);
-        InGameManager.Instance.SetNextStage();
-        InGameManager.Instance.monsterDeathStack.Value--;
+        InGameManager.Instance?.SetNextStage();
+        if (InGameManager.Instance != null) InGameManager.Instance.monsterDeathStack.Value--;
         healthBar.transform.parent.gameObject.SetActive(false);
         AudioManager.Instance.PlaySound("Monster_Dead");
         StartCoroutine(DeathRoutine());
@@ -72,7 +73,7 @@ public abstract class BossController : MonsterController
         foreach (GameObject go in players)
         {
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
-            DamageText text = PoolManager.Instance.DamagePool.GetItem(go.transform.position);
+            DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
     }

@@ -81,64 +81,79 @@ public class CharacterEquipment : MonoBehaviour
 
     public void ApplyStats(EquipmentInstance instance)
     {
-        var value = instance.GetStat();
+        //var value = instance.GetStat();
 
-        var stats = controller.model.modelSO;
+        //var stats = controller.model.modelSO;
+
+        //switch (instance.statType)
+        //{
+        //    case StatType.Attack:
+        //        increasedExtAttackPoint = stats.ExtPow * value / 100;
+        //        increasedInnAttackPoint = stats.InnPow * value / 100;
+        //        stats.ExtAtkPoint += increasedExtAttackPoint;
+        //        stats.InnAtkPoint += increasedInnAttackPoint;
+        //        break;
+        //    case StatType.Defense:
+        //        increasedDefensePoint = (float)stats.DefPoint * value / 100;
+        //        stats.DefPoint += increasedDefensePoint;
+        //        break;
+        //    case StatType.CritDamage:
+        //        increasedCritDamage = value / 100;
+        //        stats.CritDamage += increasedCritDamage;
+        //        break;
+        //    case StatType.CritRate:
+        //        increasedCritRate = value / 100;
+        //        stats.CritRate += increasedCritRate;
+        //        break;
+        //    default:
+        //        Debug.LogWarning($"알 수 없는 StatType: {instance.statType}");
+        //        break;
+        //}
+        var value = instance.GetStat();
+        string originID = $"Equip_{instance.instanceID}"; // 고유 식별자
+
+        if (controller?.model?.modelSO == null)
+            return;
 
         switch (instance.statType)
         {
             case StatType.Attack:
-                increasedExtAttackPoint = stats.ExtPow * value / 100;
-                increasedInnAttackPoint = stats.InnPow * value / 100;
-                stats.ExtAtkPoint += increasedExtAttackPoint;
-                stats.InnAtkPoint += increasedInnAttackPoint;
+                StatModifierManager.ApplyModifier(charID,
+                    new StatModifier(StatType.Attack, value / 100f, ModifierSource.Equipment, originID, true));
+                StatModifierManager.ApplyModifier(charID,
+                    new StatModifier(StatType.Attack, value / 100f, ModifierSource.Equipment, originID, true));
                 break;
+
             case StatType.Defense:
-                increasedDefensePoint = (float)stats.DefPoint * value / 100;
-                stats.DefPoint += increasedDefensePoint;
+                StatModifierManager.ApplyModifier(charID,
+                    new StatModifier(StatType.Defense, value / 100f, ModifierSource.Equipment, originID, true));
                 break;
-            case StatType.CritDamage:
-                increasedCritDamage = value / 100;
-                stats.CritDamage += increasedCritDamage;
-                break;
+
             case StatType.CritRate:
-                increasedCritRate = value / 100;
-                stats.CritRate += increasedCritRate;
+                StatModifierManager.ApplyModifier(charID,
+                    new StatModifier(StatType.CritRate, value / 100f, ModifierSource.Equipment, originID));
                 break;
+
+            case StatType.CritDamage:
+                StatModifierManager.ApplyModifier(charID,
+                    new StatModifier(StatType.CritDamage, value / 100f, ModifierSource.Equipment, originID));
+                break;
+
             default:
                 Debug.LogWarning($"알 수 없는 StatType: {instance.statType}");
                 break;
         }
+
+        StatModifierManager.ApplyToModel(controller.model);
     }
     public void RemoveStats(EquipmentInstance instance)
     {
-        var value = instance.GetStat();
+        string originID = $"Equip_{instance.instanceID}";
 
-        var stats = controller.model.modelSO;
+        if (controller?.model?.modelSO == null)
+            return;
 
-        switch (instance.statType)
-        {
-            case StatType.Attack:
-                stats.ExtAtkPoint -= increasedExtAttackPoint;
-                stats.InnAtkPoint -= increasedInnAttackPoint;
-                increasedExtAttackPoint = 0;
-                increasedInnAttackPoint = 0;
-                break;
-            case StatType.Defense:
-                stats.DefPoint -= increasedDefensePoint;
-                increasedDefensePoint = 0;
-                break;
-            case StatType.CritRate:
-                stats.CritRate -= increasedCritRate;
-                increasedCritRate = 0;
-                break;
-            case StatType.CritDamage:
-                stats.CritDamage -= increasedCritDamage;
-                increasedCritDamage = 0;
-                break;
-            default:
-                Debug.LogWarning($"알 수 없는 StatType: {instance.statType}");
-                break;
-        }
+        StatModifierManager.RemoveModifiersByOrigin(charID, originID);
+        StatModifierManager.ApplyToModel(controller.model);
     }
 }

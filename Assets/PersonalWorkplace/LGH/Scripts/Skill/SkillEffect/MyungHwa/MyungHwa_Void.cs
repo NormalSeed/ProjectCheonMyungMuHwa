@@ -30,8 +30,8 @@ public class MyungHwa_Void : SkillEffect
             if (damagable != null)
             {
                 damagable.TakeDamage(
-                controller.model.modelSO.ExtAtkPoint * skill1Data.ExtSkillDmg +
-                controller.model.modelSO.InnAtkPoint * skill1Data.InnSkillDmg);
+                controller.model.ExtAtk * skill1Data.ExtSkillDmg +
+                controller.model.InnAtk * skill1Data.InnSkillDmg);
             }
             else
             {

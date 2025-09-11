@@ -4,6 +4,7 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using Unity.VisualScripting;
+using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady] and [isInSkillRange]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
@@ -15,12 +16,16 @@ public partial class PlayerUseSkillAction : Action
     [SerializeReference] public BlackboardVariable<bool> IsInSkillRange;
     private PlayerController controller;
     private BehaviorGraphAgent BGagent;
+    private NavMeshAgent NMagent;
     private SkillSet skillSet;
+
+    private bool skillExecuted = false;
 
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
+        NMagent = Self.Value.GetComponent<NavMeshAgent>();
         skillSet = controller.skillSet.GetComponent<SkillSet>();
 
         Target.Value = GetTarget();
@@ -55,50 +60,63 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
-        if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
+        if (!skillExecuted)
         {
-            return Status.Failure;
+            if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
+            {
+                return Status.Failure;
+            }
+
+            if (Target.Value != null && IsSkillReady.Value == true)
+            {
+                Debug.Log("스킬 공격 실행");
+                IDamagable target = Target.Value.GetComponent<IDamagable>();
+                if (target != null)
+                {
+                    if (skillSet == null)
+                    {
+                        Debug.Log("스킬셋 로드 안됨");
+                        return Status.Success;
+                    }
+
+                    // 스킬 실행(데미지는 스킬 내부에서 가함)
+                    if (controller.isSkill1Ready)
+                    {
+                        NMagent.ResetPath();
+                        skillSet.Skill1(Target.Value.transform);
+                        // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
+                        controller.curCool = skillSet.skills[0].CoolTime;
+                        skillExecuted = true;
+                        return Status.Running;
+                    }
+                    else if (controller.isSkill2Ready)
+                    {
+                        NMagent.ResetPath();
+                        skillSet.Skill2(Target.Value.transform);
+                        // 스킬 카운트 초기화
+                        controller.skill2Count = 5;
+                        skillExecuted = true;
+                        return Status.Running;
+                    }
+                }
+                else
+                {
+                    Debug.Log("데미지를 입힐 수 없는 상대입니다.");
+                }
+            }
         }
 
-        if (Target.Value != null && IsSkillReady.Value == true)
+        if (!skillSet.isSkillPlaying)
         {
-            Debug.Log("스킬 공격 실행");
-            IDamagable target = Target.Value.GetComponent<IDamagable>();
-            if (target != null)
-            {
-                if (skillSet == null)
-                {
-                    Debug.Log("스킬셋 로드 안됨");
-                    return Status.Success;
-                }
-
-                // 스킬 실행(데미지는 스킬 내부에서 가함)
-                if (controller.isSkill1Ready)
-                {
-                    skillSet.Skill1(Target.Value.transform);
-                    // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
-                    controller.curCool = skillSet.skills[0].CoolTime;
-                }
-                else if (controller.isSkill2Ready)
-                {
-                    skillSet.Skill2(Target.Value.transform);
-                    // 스킬 카운트 초기화
-                    controller.skill2Count = 5;
-                }
-                    
-            }
-            else
-            {
-                Debug.Log("데미지를 입힐 수 없는 상대입니다.");
-            }
+            return Status.Success;
         }
 
-        return Status.Success;
+        return Status.Running;
     }
 
     protected override void OnEnd()
     {
-        
+        skillExecuted = false;
 
         // 타겟 재탐지
         Target.Value = GetTarget();
