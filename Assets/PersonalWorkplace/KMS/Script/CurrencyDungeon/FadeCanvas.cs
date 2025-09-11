@@ -23,7 +23,7 @@ public class FadeCanvas : MonoBehaviour
     }
     private IEnumerator TestRoutine()
     {
-        yield return new WaitForSeconds(1);
+        yield return null;
         mainSceneUI.ShowUI(UIType.Dungeon);
     }
 
