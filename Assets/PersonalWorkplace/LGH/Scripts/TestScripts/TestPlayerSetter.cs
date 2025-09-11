@@ -10,11 +10,12 @@ public class TestPlayerSetter : MonoBehaviour
     [SerializeField] private GachaManager gachaManager;
     [SerializeField] private List<CardInfo> cards;
 
-    private Button getAllCharactersButton;
+    [SerializeField] private Button getAllCharactersButton;
 
     private void Start()
     {
         inputField.onEndEdit.AddListener(OnInputSubmitted);
+        getAllCharactersButton.onClick.AddListener(GetAllCharacters);
     }
 
     private void OnInputSubmitted(string input)
