@@ -8,7 +8,12 @@ public class InfoEquipButton : MonoBehaviour
 
     [Header("EquipDisplay")]
     [SerializeField] private EquipmentCardDisplay EquipmentCardDisplay;
+    [SerializeField] private EquipmentType equipType;
+
     private EquipmentInstance EquipmentInstance;
+
+    private EquipClass equipClass;
+    private string templateID;
 
     [Header("Panel")]
     [SerializeField] private EquipmentItemList equipmentList;
@@ -27,7 +32,7 @@ public class InfoEquipButton : MonoBehaviour
     #region OnClick
     private void OnClickEquipment()
     {
-        equipmentList.ShowEquipmentListByTemplateID(EquipmentInstance.templateID);
+        equipmentList.ShowEquipmentListByTemplateID(templateID);
         equipmentList.gameObject.SetActive(true);
     }
     #endregion
@@ -41,6 +46,12 @@ public class InfoEquipButton : MonoBehaviour
     {
         EquipmentInstance = instance;
         EquipmentCardDisplay.SetData(EquipmentInstance);
+    }
+
+    public void EquipmentSettingLoad(EquipClass input)
+    {
+        equipClass = input;
+        templateID = $"{(int)equipClass}" + "_" + $"{equipType}";
     }
     #endregion
 }
