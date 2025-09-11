@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
 
 public class EquipmentCardDisplay : MonoBehaviour
 {
@@ -10,20 +10,7 @@ public class EquipmentCardDisplay : MonoBehaviour
 
     private EquipmentInstance equipment;
 
-    public void SetData(EquipmentInstance equip)
-    {
-        equipment = equip;
-
-        if (equipment == null || string.IsNullOrEmpty(equipment.templateID))
-        {
-            Debug.LogWarning("장비 데이터가 유효하지 않습니다.");
-            return;
-        }
-
-        string addressKey = $"{equipment.templateID}_{equipment.rarity}";
-        LoadIcon(addressKey);
-    }
-
+    #region Private
     private void LoadIcon(string key)
     {
         Addressables.LoadAssetAsync<Sprite>(key).Completed += handle =>
@@ -38,4 +25,21 @@ public class EquipmentCardDisplay : MonoBehaviour
             }
         };
     }
+    #endregion
+
+    #region Public 
+    public void SetData(EquipmentInstance equip)
+    {
+        equipment = equip;
+
+        if (equipment == null || string.IsNullOrEmpty(equipment.templateID))
+        {
+            Debug.LogWarning("장비 데이터가 유효하지 않습니다.");
+            return;
+        }
+
+        string addressKey = $"{equipment.templateID}_{equipment.rarity}";
+        LoadIcon(addressKey);
+    }
+    #endregion
 }

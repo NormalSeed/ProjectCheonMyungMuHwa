@@ -1,4 +1,3 @@
-using Firebase.Auth;
 using Firebase.Database;
 using System;
 using System.Linq;
@@ -35,7 +34,6 @@ public class EquipGachaManager : MonoBehaviour
     #region Unity LifeCycle
     private async void OnEnable()
     {
-
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
