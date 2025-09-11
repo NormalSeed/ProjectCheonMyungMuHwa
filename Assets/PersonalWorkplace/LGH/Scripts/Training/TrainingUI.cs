@@ -34,6 +34,8 @@ public class TrainingUI : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnTrainingDataLoaded += UpdateUI;
+
+        UpdateUI();
     }
 
     private void OnClickLevelUp(TrainingType type)

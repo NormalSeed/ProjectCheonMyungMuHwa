@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TestPlayerSetter : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class TestPlayerSetter : MonoBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private GachaManager gachaManager;
     [SerializeField] private List<CardInfo> cards;
+
+    private Button getAllCharactersButton;
 
     private void Start()
     {
@@ -36,4 +39,8 @@ public class TestPlayerSetter : MonoBehaviour
         }
     }
 
+    public void GetAllCharacters()
+    {
+        StartCoroutine(gachaManager.ProcessResultsCoroutine(cards));
+    }
 }
