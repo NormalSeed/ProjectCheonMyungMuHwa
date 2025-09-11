@@ -40,7 +40,17 @@ public class DungeonLevelCard : MonoBehaviour
     {
         ButtonText.text = "소탕";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>")); //{KMS_Util.DungeonTypeToName[type]}
+        startButton.onClick.AddListener(() =>
+        {
+            Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>");
+            BigCurrency reward = new BigCurrency(data.Reward);
+            switch (type)
+            {
+                case CurrencyDungeonType.Gold: CurrencyManager.Instance.Add(CurrencyType.Gold, reward); break;
+                case CurrencyDungeonType.Honbaeg: CurrencyManager.Instance.Add(CurrencyType.Soul, reward); break;
+                case CurrencyDungeonType.Spirit: CurrencyManager.Instance.Add(CurrencyType.SpiritStone, reward); break;
+            }
+        }); //{KMS_Util.DungeonTypeToName[type]}
 
     }
     public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
