@@ -8,6 +8,7 @@ public class CurrencyDungeonSceneLoadDataSO : ScriptableObject
 {
   public CurrencyDungeonData data;
   public CurrencyDungeonType type;
+  public CurrencyDungeonClearData clearData;
 
   //재화 던전에서 메인으로 돌아왔는지에 대한 여부
   public bool BackToMain;

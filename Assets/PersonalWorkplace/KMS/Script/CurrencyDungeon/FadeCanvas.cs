@@ -9,7 +9,7 @@ public class FadeCanvas : MonoBehaviour
 
     [SerializeField] Image image;
 
-    [SerializeField] UIBase currencyDungeonUI;
+    [SerializeField] CurrencyDungeonUI currencyDungeonUI;
 
     private void FadeIn()
     {
@@ -27,7 +27,7 @@ public class FadeCanvas : MonoBehaviour
         {
             image.color = new Color(0, 0, 0, 1);
             FadeIn();
-            currencyDungeonUI?.SetShow();
+            Show();
             data.BackToMain = false;
         }
         else
@@ -48,6 +48,12 @@ public class FadeCanvas : MonoBehaviour
             SceneManager.LoadSceneAsync("Demo_GameScene");
         });
 
+    }
+
+    private async void Show()
+    {
+        await currencyDungeonUI.LoadFromFirebase();
+        currencyDungeonUI.OpenLevelPanel(data.type);
     }
 
 }
