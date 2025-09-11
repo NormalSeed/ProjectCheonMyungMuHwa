@@ -16,7 +16,11 @@ public class CurrencyDungeonManage : MonoBehaviour
     {
         bossSpawner.SpawnBoss();
         playerSet.SpawnPlayer();
-        CurrencyManager.Instance.Add(CurrencyType.Gold, new BigCurrency(1));
+    }
+
+    public void DisableBoss()
+    {
+        bossSpawner.SpawnedBoss.SetActive(false);
     }
 
 }
