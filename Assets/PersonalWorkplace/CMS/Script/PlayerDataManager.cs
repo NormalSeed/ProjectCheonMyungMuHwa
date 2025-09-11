@@ -7,6 +7,8 @@ public class PlayerDataManager : MonoBehaviour
     public int ClearedStage { get; private set; } = 1;
     public BigCurrency Gold => CurrencyManager.Instance.Get(CurrencyType.Gold);
 
+    public int Level { get; set; } = 1; // 임시, 나중에 경험치 시스템 나오면 수정
+
     private void Awake()
     {
         if (Instance == null)

@@ -1,12 +1,10 @@
+using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using UnityEngine;
-using GooglePlayGames;
-using UnityEngine.SocialPlatforms;
-using System.Threading.Tasks;
 
 public class GPGSTester : MonoBehaviour
 {
-    void Start()
+    public void GPGSTest()
     {
         PlayGamesPlatform.Instance.Authenticate(OnAuthenticated);
     }
@@ -15,11 +13,17 @@ public class GPGSTester : MonoBehaviour
     {
         if (status == SignInStatus.Success)
         {
-            Debug.Log("GPGS 자동 로그인 성공!");
+            Debug.Log("GPGS 로그인 성공");
+
+            PlayGamesPlatform.Instance.RequestServerSideAccess(true, (authCode) =>
+            {
+                Debug.Log("ServerAuthCode: " + authCode);
+                // 여기서 Firebase Auth 연동
+            });
         }
         else
         {
-            Debug.Log("GPGS 로그인 실패");
+            Debug.LogError("GPGS 로그인 실패");
         }
     }
 }

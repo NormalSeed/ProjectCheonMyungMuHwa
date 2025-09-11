@@ -90,7 +90,7 @@ public class QuestManager : MonoBehaviour
             {
                 if (quest.lastUpdated.Date < now.Date)
                 {
-                    // 오늘은 아직 로그인 보상 미처리 → 카운트 증가
+                    // 오늘은 아직 로그인 보상 미처리, 카운트 증가
                     ReportEvent(QuestTargetType.Onlogin);
                     quest.lastUpdated = now; // 오늘 처리한 걸로 갱신
                     SaveQuests();
@@ -275,19 +275,28 @@ public class QuestManager : MonoBehaviour
     public void ClaimReward(string questId)
     {
         if (!activeQuests.TryGetValue(questId, out Quest quest)) return;
-        if (!quest.isComplete || quest.isClaimed) return;
+        if (quest.state != QuestState.RewardReady) return;
 
-        foreach (var reward in quest.rewards)
+        quest.ClaimReward();
+        Debug.Log($"퀘스트 보상 수령 완료: {quest.questName}");
+
+        // 체인 연결된 다음 퀘스트 해금
+        if (!string.IsNullOrEmpty(quest.nextQuestID) &&
+            activeQuests.TryGetValue(quest.nextQuestID, out Quest nextQuest))
         {
-            GrantReward(reward);
+            if (CheckUnlockCondition(nextQuest))
+            {
+                nextQuest.state = QuestState.InProgress;
+                Debug.Log($"다음 퀘스트 해금: {nextQuest.questName}");
+            }
         }
 
-        quest.isClaimed = true;
-        Debug.Log($"퀘스트 보상 수령 완료: {quest.questName}");
+        SaveQuests();
+        OnQuestsUpdated?.Invoke();
     }
 
     // 보상 지급 로직
-    private void GrantReward(Reward reward)
+    public void GrantReward(Reward reward)
     {
         var currencyModel = CurrencyManager.Instance.Model;
         currencyModel.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
@@ -427,9 +436,9 @@ public class QuestManager : MonoBehaviour
     public List<Quest> GetActiveQuestsForHUD()
     {
         return activeQuests.Values
-            .Where(q => q.IsUnlocked && !q.isClaimed)  // 해금 + 미보상
-            .OrderBy(q => GetQuestPriority(q.questType)) // 우선순위 정렬
-            .Take(1) // HUD에 한 개만 보여주고 싶다면
+            .Where(q => q.state == QuestState.InProgress || q.state == QuestState.RewardReady)
+            .OrderBy(q => GetQuestPriority(q.questType))
+            .Take(1)
             .ToList();
     }
 
@@ -443,6 +452,20 @@ public class QuestManager : MonoBehaviour
             QuestCategory.Repeat => 3,
             _ => 99
         };
+    }
+    public bool CheckUnlockCondition(Quest quest)
+    {
+        if (quest.state == QuestState.Disabled) return false;
+
+        // 스테이지 조건
+        if (quest.requiredStage > 0 && PlayerDataManager.Instance.ClearedStage < quest.requiredStage)
+            return false;
+
+        // 계정 레벨 조건
+        if (quest.requiredLevel > 0 && PlayerDataManager.Instance.Level < quest.requiredLevel)
+            return false;
+
+        return true;
     }
 
 }
