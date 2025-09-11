@@ -49,7 +49,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region SO Properties
-    private HeroData heroData;
+    public HeroData heroData;
     private BigCurrency HealthPoint = new();     // 체력정보
     private BigCurrency FinalPower = new();      // 종합전투
     private BigCurrency InnAtkPoint = new();     // 내공????
@@ -84,7 +84,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Init 
-    private async void Init()
+    public async void Init()
     {
         ButtonAddListener();                 // 버튼 리스너 연결
         PrepareHeroStats();                 // 능력치 및 조각 계산
@@ -298,12 +298,23 @@ public class HeroInfoUI : UIBase
             { EquipmentType.Gloves, gloves }
         };
 
+        if (!equipButtons.TryGetValue(type, out var button))
+        {
+            Debug.LogWarning($"[GetEquipment] 버튼 매핑 실패: {type}");
+            return;
+        }
+
         var instance = equipmentManager.allEquipments
             .FirstOrDefault(e => e.charID == charID && e.equipmentType == type);
 
-        if (instance != null && equipButtons.TryGetValue(type, out var button))
+        if (instance != null)
         {
             button.HeroEquipSet(instance);
+        }
+        else
+        {
+            Debug.LogWarning($"[GetEquipment] 장비 없음: {charID}, {type}");
+            button.EquipReset(); // 장비 없을 경우 UI 초기화
         }
     }
 

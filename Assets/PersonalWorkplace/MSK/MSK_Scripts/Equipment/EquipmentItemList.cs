@@ -9,7 +9,7 @@ public class EquipmentItemList : MonoBehaviour
     [Inject] private EquipmentManager equipmentManager;
 
     [Header("Panel")]
-    [SerializeField] public GameObject equipPanel;
+    [SerializeField] public EquipmentInfoPanel equipPanel;
 
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager cardPoolManager;
@@ -25,7 +25,7 @@ public class EquipmentItemList : MonoBehaviour
     private void OnDisable()
     {
         button.onClick.RemoveListener(OnClickExitButton);
-        equipPanel.SetActive(false);
+        equipPanel.gameObject.SetActive(false);
     }
     #endregion
 

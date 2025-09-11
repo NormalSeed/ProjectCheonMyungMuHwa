@@ -5,7 +5,7 @@ public class InventoryEquipButton : MonoBehaviour
 {
     [SerializeField] Button button;
 
-    private GameObject panel;
+    private EquipmentInfoPanel panel;
     private EquipmentInstance equipmentInstance;
 
     #region Unity
@@ -22,12 +22,13 @@ public class InventoryEquipButton : MonoBehaviour
     #region OnClick
     private void OnClickEquipButton()
     {
-        panel.SetActive(true);
+        panel.GetEquipmentInstance(equipmentInstance);
+        panel.gameObject.SetActive(true);
     }
     #endregion
 
     #region Public 
-    public void Init(GameObject input, EquipmentInstance equip)
+    public void Init(EquipmentInfoPanel input, EquipmentInstance equip)
     {
         panel = input;
         equipmentInstance = equip;

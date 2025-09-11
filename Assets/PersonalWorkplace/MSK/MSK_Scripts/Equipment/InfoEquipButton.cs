@@ -54,5 +54,10 @@ public class InfoEquipButton : MonoBehaviour
         equipClass = input;
         templateID = $"{(int)equipClass}" + "_" + $"{equipType}";
     }
+    public void EquipReset()
+    {
+        EquipmentInstance = null;
+        EquipmentCardDisplay.SetData(EquipmentInstance);
+    }
     #endregion
 }
