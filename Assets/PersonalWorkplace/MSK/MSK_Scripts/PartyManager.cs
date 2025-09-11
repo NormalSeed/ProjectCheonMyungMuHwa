@@ -30,6 +30,10 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public event Action<Dictionary<string, CardInfo>> partySet;
 
+    public List<SynergyInfo> activeSynergies = new();           // 현재 활성화된 시너지 정보
+    public SynergyUI synergyUI;
+    public SynergyExplainUI explainUI;
+
     #region Unity LifeCycle
     private void Awake() { }
 
@@ -171,47 +175,54 @@ public class PartyManager : MonoBehaviour, IStartable
     #endregion
 
     #region Private
+    #region Synergy
     public void CheckSynergy()
     {
         ClearSynergy();
+        activeSynergies.Clear(); // UI용 리스트 초기화
+        Debug.LogError($"activeSynergies 카운트 수: {activeSynergies.Count}");
+
         Dictionary<HeroFaction, int> factionCounts = new();
         foreach (var member in partyMembers)
         {
-            var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            if (cardInfo == null)
-                continue;
+            if (member != null)
+            {
+                var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
+                if (cardInfo == null)
+                    continue;
 
-            HeroFaction faction = cardInfo.faction;
+                HeroFaction faction = cardInfo.faction;
 
-            if (!factionCounts.ContainsKey(faction))
-                factionCounts[faction] = 0;
+                if (!factionCounts.ContainsKey(faction))
+                    factionCounts[faction] = 0;
 
-            factionCounts[faction]++;
+                factionCounts[faction]++;
+            }
         }
 
         foreach (var kvp in factionCounts)
         {
+            int stage = 0;
+
             if (kvp.Value == 5 && kvp.Key != HeroFaction.M)
-            {
-                ActiveSynergy(kvp.Key, 3);
-            }
+                stage = 3;
             else if (kvp.Value >= 4 && kvp.Key == HeroFaction.M)
-            {
-                ActiveSynergy(kvp.Key, 2);
-            }
+                stage = 2;
             else if (kvp.Value >= 3 && (kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S))
-            {
-                ActiveSynergy(kvp.Key, 2);
-            }
+                stage = 2;
             else if (kvp.Value >= 2 && (kvp.Key == HeroFaction.J || kvp.Key == HeroFaction.S))
-            {
-                ActiveSynergy(kvp.Key, 1);
-            }
+                stage = 1;
             else if (kvp.Value >= 1 && kvp.Key == HeroFaction.M)
+                stage = 1;
+
+            if (stage > 0)
             {
-                ActiveSynergy(kvp.Key, 1);
+                ActiveSynergy(kvp.Key, stage);
+                activeSynergies.Add(new SynergyInfo(kvp.Key, stage, kvp.Value)); // UI용 데이터 저장
             }
         }
+        synergyUI.UpdateSynergyUI(activeSynergies);
+        explainUI.UpdateExplainUI(activeSynergies);
     }
     
     /// <summary>
@@ -221,8 +232,12 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         foreach (var member in partyMembers)
         {
+            if (member == null)
+                continue;
+
             var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
-            if (cardInfo == null) continue;
+            if (cardInfo == null)
+                continue;
 
             string charID = cardInfo.HeroID;
             StatModifierManager.RemoveModifiers(charID, ModifierSource.Synergy);
@@ -332,6 +347,7 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
     }
+    #endregion
     #endregion
 }
 
