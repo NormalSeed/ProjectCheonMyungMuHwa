@@ -36,7 +36,7 @@ public class MissionQuestManager : MonoBehaviour
         {
             CurrentMission.state = QuestState.InProgress;
             Debug.Log($"미션 활성화됨: {CurrentMission.questName}");
-        }
+        }   
     }
 
     public void ReportProgress(QuestTargetType target, int amount = 1)
@@ -51,13 +51,12 @@ public class MissionQuestManager : MonoBehaviour
         if (CurrentMission == null || CurrentMission.state != QuestState.Completed) return;
 
         foreach (var reward in CurrentMission.rewards)
-        {
             CurrencyManager.Instance.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
-        }
 
         CurrentMission.ClaimReward();
         Debug.Log($"보상 수령: {CurrentMission.questName}");
 
+        // 다음 미션 진행
         if (!string.IsNullOrEmpty(CurrentMission.nextQuestID) &&
             missionQuests.TryGetValue(CurrentMission.nextQuestID, out var next))
         {
@@ -69,5 +68,8 @@ public class MissionQuestManager : MonoBehaviour
             Debug.Log("모든 미션 퀘스트 완료!");
             CurrentMission = null;
         }
+
+        //  HUD 새로고침 신호
+        FindObjectOfType<QuestHUD>()?.ShowQuest(CurrentMission);
     }
 }

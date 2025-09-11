@@ -16,7 +16,7 @@ public static class QuestDatabase
         LoadFromCSV("QuestTable_Day", QuestCategory.Daily, DailyQuests);
         LoadFromCSV("QuestTable_Week", QuestCategory.Weekly, WeeklyQuests);
         LoadFromCSV("QuestTable_Repeat", QuestCategory.Repeat, RepeatQuests);
-        LoadFromCSV("QuestTable_Tutorial", QuestCategory.Mission, MissionQuests);
+        LoadFromCSV("QuestTable_Mission", QuestCategory.Mission, MissionQuests);
 
         Debug.Log($"로드 완료: Daily={DailyQuests.Count}, Weekly={WeeklyQuests.Count}, Repeat={RepeatQuests.Count}");
     }

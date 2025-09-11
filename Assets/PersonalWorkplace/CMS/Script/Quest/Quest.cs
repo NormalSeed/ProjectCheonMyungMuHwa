@@ -27,14 +27,13 @@ public class Quest
 
     public QuestState state = QuestState.Locked; // 기본 상태 = 잠금
 
-    public int requiredStage = 0;    // 특정 스테이지 조건
-    public int requiredLevel = 0;    // 특정 계정 레벨 조건
+    // 해금 조건
+    public int requiredStage = 0;
+    public int requiredLevel = 0;
+    public string nextQuestID;
+    public string unlockCondition; // CSV 관리용 (예: "Stage:2", "Level:5")
+    public bool IsUnlocked => state != QuestState.Locked && state != QuestState.Disabled;
 
-    public string nextQuestID; // 다음 퀘스트 이어가기
-
-    public bool UnlockCondition;
-
-    public bool IsUnlocked => UnlockCondition && state != QuestState.Locked;
     public Quest() { }
 
     public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal,
@@ -96,27 +95,31 @@ public class Quest
         if (valueProgress >= valueGoal)
         {
             valueProgress = valueGoal;
-            state = QuestState.Completed; // 완료 상태 전환
+            state = QuestState.RewardReady; // 바로 보상 대기 상태
         }
-        lastUpdated = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+        lastUpdated = QuestManager.Instance?.NowUtc() ?? DateTime.UtcNow;
     }
+
 
     public void ClaimReward()
     {
-        if (state != QuestState.Completed) return;
+        if (state != QuestState.RewardReady) return;
 
-        isClaimed = true;
-        state = QuestState.Disabled; // 보상 수령 이후 비활성화
+        foreach (var reward in rewards)
+            QuestManager.Instance.GrantReward(reward);
+
+        state = QuestState.Disabled; // 다시는 활성화되지 않음
     }
+
 
     //퀘스트 리셋
     public void ResetProgress()
     {
         valueProgress = 0;
-        isComplete = false;
-        isClaimed = false;
-        lastUpdated = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+        state = QuestState.InProgress;
+        lastUpdated = QuestManager.Instance?.NowUtc() ?? DateTime.UtcNow;
     }
+
     // 주차 계산 (주간 퀘스트 체크용)
     private int GetCurrentWeek(DateTime time)
     {
