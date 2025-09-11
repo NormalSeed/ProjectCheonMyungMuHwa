@@ -45,6 +45,7 @@ public class HeroInfoUI : UIBase
 
     [Header("Panel")]
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
+    [SerializeField] private GameObject equipPanel;
     #endregion
 
     #region SO Properties
@@ -75,6 +76,7 @@ public class HeroInfoUI : UIBase
 
     private void OnDisable()
     {
+        equipPanel.SetActive(false);
         exitButton.onClick.RemoveListener(OnClickExit);
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
         stageUPButton.onClick.RemoveListener(OnClickStageUP);
