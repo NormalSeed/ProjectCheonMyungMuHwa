@@ -15,11 +15,7 @@ public class LevelSelectPanel : MonoBehaviour
 
     [SerializeField] CurrencyDungeonPlayerDataSO playerData;
 
-
-    // 데이터 베이스에서 불러올 값들 (몇단계까지 클리어 했는지)
-    private int goldclear = 5;
-    private int honbaegclear = 6;
-    private int spiritclear = 12;
+    public CurrencyDungeonClearData ClearData { get; set;}
 
 
     public void Setting(CurrencyDungeonType type)
@@ -29,13 +25,13 @@ public class LevelSelectPanel : MonoBehaviour
         switch (type)
         {
             case CurrencyDungeonType.Gold:
-                clearVal = goldclear;
+                clearVal = ClearData.goldClearLevel;
                 break;
             case CurrencyDungeonType.Honbaeg:
-                clearVal = honbaegclear;
+                clearVal = ClearData.HonbaegClearLevel;
                 break;
             case CurrencyDungeonType.Spirit:
-                clearVal = spiritclear;
+                clearVal = ClearData.SpiritClearLevel;
                 break;
         }
         for (int i = 0; i < allCards.Length; i++)
@@ -47,12 +43,12 @@ public class LevelSelectPanel : MonoBehaviour
                 allCards[i].SetValues(dict.DungeonTables[type].Table[i]);
                 allCards[i].SetSprite(dict.DungeonSprites[type]);
                 allCards[i].SetType(type);
-                if (j < clearVal)
+                if (j <= clearVal)
                 {
                     allCards[i].SetStageCleared();
 
                 }
-                else if (j == clearVal)
+                else if (j == clearVal + 1)
                 {
                     allCards[i].SetStageAvailable(SetSceneData);
                 }
@@ -74,6 +70,7 @@ public class LevelSelectPanel : MonoBehaviour
     {
         sceneData.data = data;
         sceneData.type = type;
+        sceneData.clearData = this.ClearData;
         GetCurrentPlayerDatas();
     }
 

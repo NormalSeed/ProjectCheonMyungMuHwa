@@ -13,6 +13,9 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
     [SerializeField] UIBase clearUI;
 
+    private MonsterController bosscon;
+    public GameObject SpawnedBoss => bosscon.gameObject;
+
 
     private Dictionary<CurrencyDungeonType, MonsterController> bosses;
 
@@ -68,9 +71,18 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     {
         ParticleManager.Instance.GetParticle("Boss_1_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
-        MonsterController bosscon = bosses[type];
+        bosscon = bosses[type];
         bosscon.transform.position = pos;
         bosscon.Model.BaseModel = model;
         bosscon.gameObject.SetActive(true);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            clearUI.SetShow();
+        }
+
     }
 }
