@@ -38,6 +38,15 @@ public class QuestHUD : MonoBehaviour
 
     public void ShowQuest(Quest quest)
     {
+        if (quest == null)
+        {
+            questTitleText.text = "퀘스트 없음";
+            progressText.text = "";
+            rewardIcon.sprite = null;
+            rewardAmount.text = "";
+            return;
+        }
+
         currentQuest = quest;
         if (currentQuest == null)
         {

@@ -24,7 +24,10 @@ public class MissionQuestManager : MonoBehaviour
 
         CurrentMission = missions.FirstOrDefault();
         if (CurrentMission != null)
+        {
             Debug.Log($"첫 미션 퀘스트 시작: {CurrentMission.questName}");
+            FindObjectOfType<QuestHUD>()?.ShowQuest(CurrentMission); // 바로 HUD에 표시
+        }
     }
 
     public void TryActivateMission(int stage, int accountLevel)
