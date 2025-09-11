@@ -54,8 +54,8 @@ public class HeroDataManager : IStartable
         {
             HeroRarity.Normal => 1,
             HeroRarity.Rare => 3,
-            HeroRarity.Epic => 5,
-            HeroRarity.Unique => 10,
+            HeroRarity.Unique => 5,
+            HeroRarity.Legend => 10,
             _ => 0
         };
     }
