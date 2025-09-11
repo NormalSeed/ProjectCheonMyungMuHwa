@@ -48,7 +48,8 @@ public class InfoEquipButton : MonoBehaviour
         EquipmentCardDisplay.SetData(EquipmentInstance);
     }
 
-    public void EquipmentSettingLoad(EquipClass input)
+    public void EquipmentSettingLoad
+        (EquipClass input)
     {
         equipClass = input;
         templateID = $"{(int)equipClass}" + "_" + $"{equipType}";

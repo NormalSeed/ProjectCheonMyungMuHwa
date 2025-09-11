@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 public class EquipmentItemList : MonoBehaviour
@@ -12,7 +13,28 @@ public class EquipmentItemList : MonoBehaviour
 
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager cardPoolManager;
+    [Header("Button")]
+    [SerializeField] private Button button;
 
+    #region Unity
+    private void OnEnable()
+    {
+        button.onClick.AddListener(OnClickExitButton);
+    }
+
+    private void OnDisable()
+    {
+        button.onClick.RemoveListener(OnClickExitButton);
+        equipPanel.SetActive(false);
+    }
+    #endregion
+
+    #region OnClick
+    private void OnClickExitButton()
+    {
+        this.gameObject.SetActive(false);
+    }
+    #endregion
     public void ShowEquipmentListByTemplateID(string templateID)
     {
         cardPoolManager.ReturnAll(); // 기존 카드 초기화
