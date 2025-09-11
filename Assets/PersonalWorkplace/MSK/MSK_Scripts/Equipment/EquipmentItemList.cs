@@ -7,8 +7,11 @@ public class EquipmentItemList : MonoBehaviour
     [Inject] private EquipmentService equipmentService;
     [Inject] private EquipmentManager equipmentManager;
 
+    [Header("Panel")]
+    [SerializeField] public GameObject equipPanel;
+
     [Header("Pool")]
-    [SerializeField] GachaCardPoolManager cardPoolManager;
+    [SerializeField] private GachaCardPoolManager cardPoolManager;
 
     public void ShowEquipmentListByTemplateID(string templateID)
     {
@@ -22,6 +25,7 @@ public class EquipmentItemList : MonoBehaviour
         {
             var card = cardPoolManager.GetCard();
             var display = card.GetComponent<EquipmentCardDisplay>();
+            var button = card.GetComponent<InventoryEquipButton>();
 
             if (display != null)
             {
@@ -33,6 +37,7 @@ public class EquipmentItemList : MonoBehaviour
             }
 
             card.transform.SetAsLastSibling();
+            button.Init(equipPanel, equip);
             card.SetActive(true);
         }
     }
