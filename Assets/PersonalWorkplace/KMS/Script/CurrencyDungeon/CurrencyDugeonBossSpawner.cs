@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VContainer.Unity;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using System;
 
 public class CurrencyDugeonBossSpawner : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     {
         this.container = container;
     }
-    public void InitBoss()
+    public void InitBoss(Action act)
     {
         bosses = new();
         GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/CurrencyBoss");
@@ -35,9 +36,13 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
         {
             GameObject boss = container.Instantiate(go);
             MonsterController con = boss.GetComponent<MonsterController>();
+            con.onDeath += () =>
+            {
+                clearUI?.SetShow();
+                act.Invoke();
+            };
             con.OnLifeEnded += a =>
             {
-                if (clearUI != null) clearUI.SetShow();
                 con.gameObject.SetActive(false);
             };
             boss.SetActive(false);

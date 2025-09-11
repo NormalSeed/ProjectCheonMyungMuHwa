@@ -1,3 +1,5 @@
+using System;
+using NUnit.Framework.Interfaces;
 using TMPro;
 using UnityEngine;
 
@@ -9,17 +11,25 @@ public class CurrencyDungeonTimer : MonoBehaviour
 
     private float currentTime;
 
+    private bool isStopped;
+
+    public Action OnTimeOver;
+
+
     void Start()
     {
+        isStopped = false;
         currentTime = startTime;
         timeText.text = GetTimeFormet();
     }
 
     void Update()
     {
+        if (isStopped) return;
         if (currentTime <= 0)
         {
             timeText.text = "타임 오버";
+            OnTimeOver?.Invoke();
             return;
         }
         currentTime -= Time.deltaTime;
@@ -33,6 +43,11 @@ public class CurrencyDungeonTimer : MonoBehaviour
         string form = $"{min.ToString("D2")}:{sec.ToString("00.00")}";
         return form;
 
+    }
+
+    public void Stop()
+    {
+        isStopped = true;
     }
 
 }
