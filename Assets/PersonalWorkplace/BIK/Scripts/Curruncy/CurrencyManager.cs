@@ -83,7 +83,7 @@ public class CurrencyManager : IStartable, IDisposable
     }
 
     #endregion // mono funcs
-    
+
 
 
 
@@ -138,7 +138,9 @@ public class CurrencyManager : IStartable, IDisposable
         _model.Set(CurrencyType.SpiritStone, new BigCurrency(0, 0));
         _model.Set(CurrencyType.SummonTicket, new BigCurrency(0, 0));
         _model.Set(CurrencyType.InvitationTicket, new BigCurrency(0, 0));
-        _model.Set(CurrencyType.ChallengeTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyType.GoldChallengeTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyType.SoulChallengeTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyType.SpiritStoneChallengeTicket, new BigCurrency(0, 0));
     }
 
     #endregion // private funcs
@@ -325,65 +327,52 @@ public class CurrencyManager : IStartable, IDisposable
         var result = new UserProfileData();
 
         //  데이터 존재 확인
-        if (snapshot != null && snapshot.Exists)
-        {
+        if (snapshot != null && snapshot.Exists) {
             // 일반 소환 데이터
-            if (snapshot.HasChild("summonLevel"))
-            {
+            if (snapshot.HasChild("summonLevel")) {
                 int levelValue = Convert.ToInt32(snapshot.Child("summonLevel").Value);
                 result.SummonLevel = (SummonLevel)levelValue;
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] summonLevel이 DB에 없습니다. 기본값 사용");
             }
 
-            if (snapshot.HasChild("summonCount"))
-            {
+            if (snapshot.HasChild("summonCount")) {
                 result.SummonCount = Convert.ToInt32(snapshot.Child("summonCount").Value);
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] summonCount가 DB에 없습니다. 기본값 사용");
             }
 
             // 장비 소환 데이터
-            if (snapshot.HasChild("equipsummonLevel"))
-            {
+            if (snapshot.HasChild("equipsummonLevel")) {
                 int equipLevelValue = Convert.ToInt32(snapshot.Child("equipsummonLevel").Value);
                 result.EquipSummonLevel = (SummonLevel)equipLevelValue;
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] equipsummonLevel이 DB에 없습니다. 기본값 사용");
             }
 
-            if (snapshot.HasChild("equipsummonCount"))
-            {
+            if (snapshot.HasChild("equipsummonCount")) {
                 result.EquipSummonCount = Convert.ToInt32(snapshot.Child("equipsummonCount").Value);
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] equipsummonCount가 DB에 없습니다. 기본값 사용");
             }
 
             // 영물 소환 데이터
-            if (snapshot.HasChild("petsummonLevel"))
-            {
+            if (snapshot.HasChild("petsummonLevel")) {
                 int petLevelValue = Convert.ToInt32(snapshot.Child("petsummonLevel").Value);
                 result.PetSummonLevel = (SummonLevel)petLevelValue;
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] petsummonLevel이 DB에 없습니다. 기본값 사용");
             }
 
-            if (snapshot.HasChild("petsummonCount"))
-            {
+            if (snapshot.HasChild("petsummonCount")) {
                 result.PetSummonCount = Convert.ToInt32(snapshot.Child("petsummonCount").Value);
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[LoadUserProfileAsync] petsummonCount가 DB에 없습니다. 기본값 사용");
             }
         }

@@ -17,13 +17,15 @@ public enum HeroFaction
 
 public enum CurrencyType
 {
-    Jewel,            // 용옥(다이아)
-    Gold,             // 금화
-    Soul,             // 혼백(경험치)
-    SpiritStone,      // 영석(보물 강화)
-    SummonTicket,     // 등용패(뽑기권)
-    InvitationTicket, // 초대장(입장권)
-    ChallengeTicket   // 도전장(입장권)
+    Jewel,                      // 용옥(다이아)
+    Gold,                       // 금화
+    Soul,                       // 혼백(경험치)
+    SpiritStone,                // 영석(보물 강화)
+    SummonTicket,               // 등용패(뽑기권)
+    InvitationTicket,           // 초대장(입장권)
+    GoldChallengeTicket,        // 도전장(입장권)
+    SoulChallengeTicket,        // 혼백도전장(입장권)
+    SpiritStoneChallengeTicket, // 영석도전장(입장권)
 }
 
 public enum UIType
@@ -64,6 +66,7 @@ public enum PopupType
     OfflineRewardPopup,
     RewardPopup,
     Tooltip,
+    Alert,
 }
 
 public enum TableType
