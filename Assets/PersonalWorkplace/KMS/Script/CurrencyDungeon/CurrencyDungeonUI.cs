@@ -9,6 +9,8 @@ public class CurrencyDungeonUI : UIBase
 {
     [SerializeField] DungeonSelectPanel dungeonPanel;
     [SerializeField] LevelSelectPanel levelPanel;
+
+    [SerializeField] CurrencyDungeonSceneLoadDataSO data;
     CurrencyDungeonClearData clearData;
 
     public override void SetShow()
@@ -56,9 +58,17 @@ public class CurrencyDungeonUI : UIBase
         }
         json = snapshot.GetRawJsonValue();
         clearData = JsonUtility.FromJson<CurrencyDungeonClearData>(json);
-        Debug.Log($"{clearData.goldClearLevel} {clearData.HonbaegClearLevel} {clearData.SpiritClearLevel}");
         gameObject.SetActive(true);
-        OpenDungeonPanel();
+        if (data.BackToMain)
+        {
+            OpenLevelPanel(data.type);
+            data.BackToMain = false;
+
+        }
+        else
+        {
+            OpenDungeonPanel();
+        }
     }
 }
 

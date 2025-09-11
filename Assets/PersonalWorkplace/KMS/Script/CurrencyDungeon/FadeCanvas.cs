@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class FadeCanvas : MonoBehaviour
 {
@@ -9,32 +10,32 @@ public class FadeCanvas : MonoBehaviour
 
     [SerializeField] Image image;
 
-    [SerializeField] CurrencyDungeonUI currencyDungeonUI;
+    [SerializeField] MainSceneUIController mainSceneUI;
+    CurrencyDungeonClearData clearData;
 
-    private void FadeIn()
-    {
-        image.DOFade(0f, 1.5f);
-    }
-    private void FadeOut()
-    {
-        image.DOFade(1f, 1.5f);
-    }
-
-
-    void Awake()
+    void Start()
     {
         if (data.BackToMain)
         {
-            image.color = new Color(0, 0, 0, 1);
             FadeIn();
-            Show();
-            data.BackToMain = false;
+            StartCoroutine(TestRoutine());
         }
-        else
-        {
-            image.color = new Color(0, 0, 0, 0);
-        }
+    }
+    private IEnumerator TestRoutine()
+    {
+        yield return new WaitForSeconds(1);
+        mainSceneUI.ShowUI(UIType.Dungeon);
+    }
 
+    public void FadeIn()
+    {
+        image.color = new Color(0, 0, 0, 1);
+        image.DOFade(0f, 1.5f);
+    }
+    public void FadeOut()
+    {
+        image.color = new Color(0, 0, 0, 0);
+        image.DOFade(1f, 1.5f);
     }
 
     public void FadeOutAndLoadMainScene()
@@ -48,12 +49,6 @@ public class FadeCanvas : MonoBehaviour
             SceneManager.LoadSceneAsync("Demo_GameScene");
         });
 
-    }
-
-    private async void Show()
-    {
-        await currencyDungeonUI.LoadFromFirebase();
-        currencyDungeonUI.OpenLevelPanel(data.type);
     }
 
 }
