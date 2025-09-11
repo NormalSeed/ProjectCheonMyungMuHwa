@@ -180,7 +180,6 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         ClearSynergy();
         activeSynergies.Clear(); // UI용 리스트 초기화
-        Debug.LogError($"activeSynergies 카운트 수: {activeSynergies.Count}");
 
         Dictionary<HeroFaction, int> factionCounts = new();
         foreach (var member in partyMembers)
@@ -256,6 +255,8 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         foreach (var member in partyMembers)
         {
+            if (member == null) continue;
+
             var cardInfo = member.GetComponent<HeroInfoSetting>().chardata;
             if (cardInfo == null)
                 continue;
