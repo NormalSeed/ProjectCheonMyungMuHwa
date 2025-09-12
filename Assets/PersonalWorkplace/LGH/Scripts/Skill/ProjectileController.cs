@@ -42,5 +42,4 @@ public class ProjectileController : MonoBehaviour
 
         return projectile;
     }
-
 }

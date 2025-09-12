@@ -35,8 +35,6 @@ public class QuestUIManager : UIBase
 
         // 닫기 버튼
         exitButton.onClick.AddListener(ClosePanel);
-
-        SetActiveCategory(QuestCategory.Daily);
     }
 
     private void OnEnable()
@@ -66,11 +64,12 @@ public class QuestUIManager : UIBase
         while (QuestManager.Instance == null)
             yield return null;
 
-        while (!QuestManager.Instance.IsReady)
+        while (!QuestManager.Instance.IsReady) // IsReady가 true가 될 때까지 확실하게 기다립니다.
             yield return null;
 
         QuestManager.Instance.OnQuestsUpdated += RefreshQuestUI;
-        RefreshQuestUI();
+
+        SetActiveCategory(QuestCategory.Daily);
     }
 
     private void Update()

@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using Unity.Behavior;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
@@ -25,6 +23,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     [SerializeField] protected float attackDelay;
 
     protected WaitForSeconds RealAttackDelay;
+
+    public System.Action onDeath;
 
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
@@ -94,6 +94,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public virtual void OnDeath()
     {
+        onDeath?.Invoke();
         InGameManager.Instance.monsterDeathStack.Value--;
         if (attackCo != null) StopCoroutine(attackCo);
         StartCoroutine(DeathRoutine());
@@ -129,10 +130,10 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
         i3.Init(DroppedItemType.SoulStone, Model.BaseModel.SoulStoneQuant);
         i1.Shot(); i2.Shot(); i3.Shot();
-        
+
         DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
         i4.Init(DroppedItemType.NormalChest, 1);
-         i4.Shot();
+        i4.Shot();
 
 
     }

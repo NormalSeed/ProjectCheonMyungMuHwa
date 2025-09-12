@@ -5,11 +5,18 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDugeonBossSpawner bossSpawner;
     [SerializeField] CurrencyDungeonPlayerSet playerSet;
 
+    [SerializeField] CurrencyDungeonTimer timer;
+
+    [SerializeField] UIBase failUI;
+
 
     void Awake()
     {
-        bossSpawner.InitBoss();
+        bossSpawner.InitBoss(() => timer.Stop());
         playerSet.InitPlayer();
+
+        timer.OnTimeOver += DisableBoss;
+        timer.OnTimeOver += failUI.SetShow;
     }
 
     void Start()
@@ -18,7 +25,7 @@ public class CurrencyDungeonManage : MonoBehaviour
         playerSet.SpawnPlayer();
     }
 
-    public void DisableBoss()
+    private void DisableBoss()
     {
         bossSpawner.SpawnedBoss.SetActive(false);
     }

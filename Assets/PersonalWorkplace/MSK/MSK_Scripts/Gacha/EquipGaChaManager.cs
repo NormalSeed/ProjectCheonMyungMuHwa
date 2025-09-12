@@ -29,6 +29,7 @@ public class EquipGachaManager : MonoBehaviour
     private int requireSummonCount;
 
     private List<string> allTemplateIDs = new();
+    public int allEquipCount;
     #endregion
 
     #region Unity LifeCycle
@@ -44,13 +45,15 @@ public class EquipGachaManager : MonoBehaviour
     #region Data Loading
     private async Task LoadSummonDataAsync()
     {
+        allEquipCount = equipmentManager.allEquipments.Count;
+
         var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
         userSummonLevel = profile.EquipSummonLevel;
         userSummonCount = profile.EquipSummonCount;
 
         var summonSnap = await _dbRef.Child("summon").GetValueAsync();
         var configSnap = summonSnap.Child(userSummonLevel.ToString());
-
+        
         summonNormal = Convert.ToSingle(configSnap.Child("normal").Value);
         summonRare = Convert.ToSingle(configSnap.Child("rare").Value);
         summonUnique = Convert.ToSingle(configSnap.Child("unique").Value);

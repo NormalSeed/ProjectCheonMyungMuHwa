@@ -8,6 +8,8 @@ public class DungeonSelectPanel : MonoBehaviour
 
     [SerializeField] DungeonSelectButton[] selectButtons;
 
+    
+
     public void RegisteButtons(UnityAction<CurrencyDungeonType> act)
     {
         foreach (DungeonSelectButton btn in selectButtons)

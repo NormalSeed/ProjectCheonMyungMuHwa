@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
@@ -9,6 +10,8 @@ public class CurrencyDungeonUI : UIBase
 {
     [SerializeField] DungeonSelectPanel dungeonPanel;
     [SerializeField] LevelSelectPanel levelPanel;
+
+    [SerializeField] CurrencyDungeonSceneLoadDataSO data;
     CurrencyDungeonClearData clearData;
 
     public override void SetShow()
@@ -30,17 +33,6 @@ public class CurrencyDungeonUI : UIBase
         levelPanel.ClearData = this.clearData;
         levelPanel.Setting(type);
     }
-    public void Toggle()
-    {
-        if (gameObject.activeSelf)
-        {
-            SetHide();
-        }
-        else
-        {
-            SetShow();
-        }
-    }
 
     public async Task LoadFromFirebase()
     {
@@ -56,9 +48,16 @@ public class CurrencyDungeonUI : UIBase
         }
         json = snapshot.GetRawJsonValue();
         clearData = JsonUtility.FromJson<CurrencyDungeonClearData>(json);
-        Debug.Log($"{clearData.goldClearLevel} {clearData.HonbaegClearLevel} {clearData.SpiritClearLevel}");
         gameObject.SetActive(true);
-        OpenDungeonPanel();
+        if (data.BackToMain)
+        {
+            OpenLevelPanel(data.type);
+            data.BackToMain = false;
+        }
+        else
+        {
+            OpenDungeonPanel();
+        }
     }
 }
 

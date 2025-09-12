@@ -17,25 +17,31 @@ public class MissionQuestManager : MonoBehaviour
 
     public void LoadMissions()
     {
-        var missions = QuestDatabase.MissionQuests;
+        var missions = QuestManager.Instance.GetQuestsByCategory(QuestCategory.Mission);
         missionQuests.Clear();
         foreach (var q in missions)
             missionQuests[q.questID] = q;
 
-        CurrentMission = missions.FirstOrDefault();
+        CurrentMission = missions.FirstOrDefault(q => q.state == QuestState.InProgress || q.state == QuestState.RewardReady);
         if (CurrentMission != null)
-            Debug.Log($"첫 미션 퀘스트 시작: {CurrentMission.questName}");
+        {
+            Debug.Log($"현재 미션 퀘스트: {CurrentMission.questName}");
+        }
+        QuestManager.Instance?.NotifyQuestsUpdated();
     }
 
-    public void TryActivateMission(int stage, int accountLevel)
+    public void TryActivateMission(int stage)
     {
         if (CurrentMission == null) return;
+
         if (CurrentMission.state == QuestState.Locked &&
-            stage >= CurrentMission.requiredStage &&
-            accountLevel >= CurrentMission.requiredLevel)
+            stage >= CurrentMission.requiredStage) // Stage만 조건 체크
         {
             CurrentMission.state = QuestState.InProgress;
             Debug.Log($"미션 활성화됨: {CurrentMission.questName}");
+
+            // QuestManager에 갱신 이벤트 알리기
+            QuestManager.Instance?.NotifyQuestsUpdated();
         }
     }
 
@@ -51,13 +57,12 @@ public class MissionQuestManager : MonoBehaviour
         if (CurrentMission == null || CurrentMission.state != QuestState.Completed) return;
 
         foreach (var reward in CurrentMission.rewards)
-        {
             CurrencyManager.Instance.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
-        }
 
         CurrentMission.ClaimReward();
         Debug.Log($"보상 수령: {CurrentMission.questName}");
 
+        // 다음 미션 진행
         if (!string.IsNullOrEmpty(CurrentMission.nextQuestID) &&
             missionQuests.TryGetValue(CurrentMission.nextQuestID, out var next))
         {
@@ -69,5 +74,7 @@ public class MissionQuestManager : MonoBehaviour
             Debug.Log("모든 미션 퀘스트 완료!");
             CurrentMission = null;
         }
+
+        QuestManager.Instance?.NotifyQuestsUpdated();
     }
 }

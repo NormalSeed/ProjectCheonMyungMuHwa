@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum TrainingType
 {
@@ -20,6 +21,10 @@ public class TrainingManager : MonoBehaviour
     public int MaxLevelPerTier => trainingTier * 200;
 
     public bool IsTrainingDataLoaded { get; private set; } = false;
+
+    [Header("테스트용 UI 버튼 설정")]
+    public Button TestUIPopUpButton;
+    public GameObject TestUI;
 
     private void Awake()
     {
@@ -38,6 +43,8 @@ public class TrainingManager : MonoBehaviour
             if (!trainingLevels.ContainsKey(type))
                 trainingLevels[type] = 0;
         }
+
+        TestUIPopUpButton.onClick.AddListener(PopUpTestUI);
     }
 
 
@@ -237,5 +244,10 @@ public class TrainingManager : MonoBehaviour
     {
         int level = trainingLevels.GetValueOrDefault(type, 0);
         return GetTrainingBonus(type, level);
+    }
+
+    public void PopUpTestUI()
+    {
+        TestUI.SetActive(!TestUI.activeSelf);
     }
 }

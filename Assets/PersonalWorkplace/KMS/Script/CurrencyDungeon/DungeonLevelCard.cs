@@ -36,11 +36,14 @@ public class DungeonLevelCard : MonoBehaviour
     {
         currencyImage.sprite = spr;
     }
-    public void SetStageCleared()
+    public void SetStageCleared(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
         ButtonText.text = "소탕";
         locker.SetActive(false);
-        startButton.onClick.AddListener(() => Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>")); //{KMS_Util.DungeonTypeToName[type]}
+        startButton.onClick.AddListener(() =>
+        {
+            act.Invoke(data, type);
+        }); //{KMS_Util.DungeonTypeToName[type]}
 
     }
     public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)

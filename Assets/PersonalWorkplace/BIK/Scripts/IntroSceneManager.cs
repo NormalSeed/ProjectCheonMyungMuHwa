@@ -12,14 +12,6 @@ public class IntroSceneManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
-        yield return new WaitUntil(() => dependencyTask.IsCompleted);
-
-        if (dependencyTask.Result != DependencyStatus.Available) {
-            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
-            yield break;
-        }
-
         var scope = FindObjectOfType<GameLifetimeScope>();
         if (scope != null) {
             yield return new WaitUntil(() => scope.Container != null);
@@ -39,6 +31,15 @@ public class IntroSceneManager : MonoBehaviour
 
             // Initialize가 실행될 때까지 기다리기
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
+        }
+
+        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+
+        if (dependencyTask.Result != DependencyStatus.Available)
+        {
+            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
+            yield break;
         }
 
         SceneManager.LoadScene(_mainSceneName);
