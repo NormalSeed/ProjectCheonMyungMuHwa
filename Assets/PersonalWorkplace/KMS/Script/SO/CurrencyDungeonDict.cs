@@ -14,10 +14,19 @@ public class CurrencyDungeonDict : ScriptableObject
   [SerializeField] CurrencyDungeonDataTableSO honbaegTable;
   [SerializeField] CurrencyDungeonDataTableSO spiritTable;
 
+
+  [SerializeField] Sprite gold;
+  [SerializeField] Sprite soul;
+  [SerializeField] Sprite spirit;
+  [SerializeField] Sprite goldTicket;
+  [SerializeField] Sprite soulTicket;
+  [SerializeField] Sprite spiritTicket;
+
   public Dictionary<CurrencyDungeonType, int> DungeonCounts;
   public Dictionary<CurrencyDungeonType, CurrencyDungeonDataTableSO> DungeonTables;
 
   public Dictionary<CurrencyDungeonType, Sprite> DungeonSprites;
+  public Dictionary<CurrencyDungeonType, Sprite> TicketSprites;
 
 
   void OnEnable()
@@ -34,8 +43,18 @@ public class CurrencyDungeonDict : ScriptableObject
       {CurrencyDungeonType.Honbaeg, honbaegTable},
       {CurrencyDungeonType.Spirit, spiritTable},
     };
-    DungeonSprites = new();
-    InitSprites();
+    TicketSprites = new Dictionary<CurrencyDungeonType, Sprite>()
+    {
+      {CurrencyDungeonType.Gold, goldTicket},
+      {CurrencyDungeonType.Honbaeg, soulTicket},
+      {CurrencyDungeonType.Spirit, spiritTicket},
+    };
+    DungeonSprites = new Dictionary<CurrencyDungeonType, Sprite>()
+    {
+      {CurrencyDungeonType.Gold, gold},
+      {CurrencyDungeonType.Honbaeg, soul},
+      {CurrencyDungeonType.Spirit, spirit},
+    };
 
 
   }
