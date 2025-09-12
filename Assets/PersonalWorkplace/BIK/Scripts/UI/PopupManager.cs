@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 [Serializable]
 public class PopupEntry
@@ -75,7 +78,7 @@ public class PopupManager : MonoBehaviour
             Debug.LogWarning("[PopupManager] Tooltip 팝업이 등록되지 않았습니다.");
             return;
         }
-        
+
         if (uiBase is TootipPanel tooltipPanel) {
             tooltipPanel.SetShow(item);
             Debug.Log($"[PopupManager] ShowTooltip: {item.Name}");
@@ -105,6 +108,96 @@ public class PopupManager : MonoBehaviour
     //        Debug.Log($"[PopupManager] ClosePopup: {popupType}");
     //    }
     //}
+
+    public void ShowLevelUpPopup(int lastLevel, int currLevel)
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.Level, lastLevel.ToString(), currLevel.ToString());
+        }
+        else {
+
+        }
+    }
+
+    public void ShowBossStagePopup(int stage)
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.Boss, stage.ToString());
+        }
+        else {
+
+        }
+    }
+
+    public void ShowPowerUpPanel(BigCurrency currPower, BigCurrency changePower)
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.PowerUp, currPower.ToString(), changePower.ToString());
+        }
+        else {
+
+        }
+    }
+
+    public void ShowPowerDownPanel(BigCurrency currPower, BigCurrency changePower)
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.PowerDown, currPower.ToString(), changePower.ToString());
+        }
+        else {
+
+        }
+    }
+
+    public void ShowMissionClearPanel(string missionClearText)
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.MissionClear, missionClearText);
+        }
+        else {
+
+        }
+    }
+
+    public void ShowStageClearPopup()
+    {
+        if (!_popupDict.TryGetValue(PopupType.Alert, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Alert 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is AlertPanel tooltipPanel) {
+            tooltipPanel.SetShow(AlertType.ClearStage);
+        }
+        else {
+
+        }
+    }
 
     public void CloseAllPopups()
     {

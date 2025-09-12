@@ -83,3 +83,13 @@ public enum ItemType
     Equipment,
     Etc
 }
+
+public enum AlertType
+{
+    Level,
+    Boss,
+    PowerUp,
+    PowerDown,
+    MissionClear,
+    ClearStage,
+}
