@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class LevelSelectPanel : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class LevelSelectPanel : MonoBehaviour
     [SerializeField] CurrencyDungeonPlayerDataSO playerData;
 
     [SerializeField] TMP_Text countText;
+
+    [SerializeField] TMP_Text titleText;
     [SerializeField] UnityEngine.UI.Image ticketImage;
 
     public CurrencyDungeonClearData ClearData { get; set; }
@@ -34,14 +37,17 @@ public class LevelSelectPanel : MonoBehaviour
             case CurrencyDungeonType.Gold:
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.GoldChallengeTicket).Value;
                 clearVal = ClearData.goldClearLevel;
+                titleText.text = "금화던전";
                 break;
             case CurrencyDungeonType.Honbaeg:
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.SoulChallengeTicket).Value;
                 clearVal = ClearData.HonbaegClearLevel;
+                titleText.text = "혼백던전";
                 break;
             case CurrencyDungeonType.Spirit:
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.SpiritStoneChallengeTicket).Value;
                 clearVal = ClearData.SpiritClearLevel;
+                titleText.text = "영석던전";
                 break;
         }
         countText.text = $"{ticketCount} / 3";
@@ -79,6 +85,11 @@ public class LevelSelectPanel : MonoBehaviour
 
     public void SetSceneData(CurrencyDungeonData data, CurrencyDungeonType type)
     {
+        if (ticketCount < 1)
+        {
+            Debug.Log("티켓 부족");
+            return;
+        }
         sceneData.data = data;
         sceneData.type = type;
         sceneData.clearData = this.ClearData;
@@ -95,6 +106,7 @@ public class LevelSelectPanel : MonoBehaviour
             CardInfo card = info.chardata;
             playerData.currentPlayerDataList.Add((id, card));
         }
+        SceneManager.LoadSceneAsync("CurrencyDungeonScene");
     }
 
     public void ClearedDungeon(CurrencyDungeonData data, CurrencyDungeonType type)

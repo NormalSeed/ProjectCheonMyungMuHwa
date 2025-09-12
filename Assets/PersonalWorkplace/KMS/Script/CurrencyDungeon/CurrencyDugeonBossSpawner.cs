@@ -12,7 +12,6 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     [SerializeField] CurrencyDungeonPoint[] bossPoints;
     [SerializeField] CurrencyBossModelBaseSO model;
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
-    [SerializeField] UIBase clearUI;
 
     private MonsterController bosscon;
     public GameObject SpawnedBoss => bosscon.gameObject;
@@ -38,7 +37,6 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
             MonsterController con = boss.GetComponent<MonsterController>();
             con.onDeath += () =>
             {
-                clearUI?.SetShow();
                 act.Invoke();
             };
             con.OnLifeEnded += a =>
@@ -80,14 +78,5 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
         bosscon.transform.position = pos;
         bosscon.Model.BaseModel = model;
         bosscon.gameObject.SetActive(true);
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Home))
-        {
-            clearUI.SetShow();
-        }
-
     }
 }

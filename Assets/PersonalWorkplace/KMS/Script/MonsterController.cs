@@ -126,9 +126,9 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
         i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
         DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i2.Init(DroppedItemType.SpiritBack, Model.BaseModel.SpiritBackQuant);
+        i2.Init(DroppedItemType.Honbaeg, Model.BaseModel.SpiritBackQuant);
         DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i3.Init(DroppedItemType.SoulStone, Model.BaseModel.SoulStoneQuant);
+        i3.Init(DroppedItemType.SpiritStone, Model.BaseModel.SoulStoneQuant);
         i1.Shot(); i2.Shot(); i3.Shot();
 
         DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
