@@ -87,13 +87,22 @@ public class LevelSelectPanel : MonoBehaviour
 
     public void GetCurrentPlayerDatas()
     {
+        /*  기존 코드입니다. 
+           playerData.currentPlayerDataList.Clear();
+           foreach (GameObject member in PartyManager.Instance.partyMembers)
+           {
+               HeroInfoSetting info = member.GetComponent<HeroInfoSetting>();
+               string id = info.HeroID;
+               CardInfo card = info.chardata;
+               playerData.currentPlayerDataList.Add((id, card));
+           }
+        */
+
         playerData.currentPlayerDataList.Clear();
-        foreach (GameObject member in PartyManager.Instance.partyMembers)
+        foreach (CardInfo member in PartyManager.Instance.partyMembers)
         {
-            HeroInfoSetting info = member.GetComponent<HeroInfoSetting>();
-            string id = info.HeroID;
-            CardInfo card = info.chardata;
-            playerData.currentPlayerDataList.Add((id, card));
+            string id = member.HeroID;
+            playerData.currentPlayerDataList.Add((id, member));
         }
     }
 

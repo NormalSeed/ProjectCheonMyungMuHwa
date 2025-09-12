@@ -20,7 +20,8 @@ public class HeroUI : UIBase
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
-    public event Action partySetFin;
+    public event Action partySetFin;                    // 파티 편성 시작 알림
+    public event Action partySetStart;                  // 파티 편성 종료 알림
 
     #region Unity LifeCycle
 
@@ -75,6 +76,8 @@ public class HeroUI : UIBase
         heroSetSave.onClick.AddListener(OnClickHeroSetSave);
         heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
         autoSet.onClick.AddListener(OnClickAutoSet);
+        
+        partySetStart?.Invoke();
     }
 
 
@@ -91,7 +94,6 @@ public class HeroUI : UIBase
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
         PartyManager.Instance.EndPartySetting();    // 편성 종료
-        PartyManager.Instance.PartyInit();
 
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
