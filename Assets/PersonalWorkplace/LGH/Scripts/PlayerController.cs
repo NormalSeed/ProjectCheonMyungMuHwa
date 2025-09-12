@@ -362,6 +362,16 @@ public class PlayerController : MonoBehaviour, IDamagable
         }
     }
 
+    public void Heal(float amount)
+    {
+        if (model.CurHealth.Value + amount > model.Health)
+        {
+            model.CurHealth.Value = model.Health;
+        }
+
+        model.CurHealth.Value += amount;
+    }
+
     private void HandleHeroLevelChanged(int newLevel)
     {
         model.modelSO.Level = newLevel;

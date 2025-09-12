@@ -7,6 +7,7 @@ public class SkillSet : MonoBehaviour
     [SerializeField] public List<PlayerSkillSO> skills;
 
     protected ProjectileController pController;
+    protected InstantAttatchmentController aController;
 
     protected PlayerController controller;
     protected Transform parentTransform;
@@ -22,6 +23,12 @@ public class SkillSet : MonoBehaviour
         if (pController != null)
         {
             pController.Init();
+        }
+
+        aController = GetComponent<InstantAttatchmentController>();
+        if (aController != null)
+        {
+            aController.Init();
         }
         
         this.controller = controller;
