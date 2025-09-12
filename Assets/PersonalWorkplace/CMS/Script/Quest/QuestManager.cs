@@ -37,8 +37,11 @@ public class QuestManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
-     private void Update()
+    private void Update()
     {
+        // 아직 초기화 전이면 아무것도 하지 않음
+        if (!IsReady) return;
+
         // --- Playtime 진행도 누적 ---
         playtimeBuffer += Time.deltaTime;
         if (playtimeBuffer >= 1f)
@@ -130,58 +133,64 @@ public class QuestManager : MonoBehaviour
         QuestDatabase.LoadAll();
 
         activeQuests.Clear();
-        foreach (var quest in QuestDatabase.DailyQuests.Concat(QuestDatabase.WeeklyQuests).Concat(QuestDatabase.RepeatQuests))
+        foreach (var quest in QuestDatabase.DailyQuests
+            .Concat(QuestDatabase.WeeklyQuests)
+            .Concat(QuestDatabase.RepeatQuests)
+            .Concat(QuestDatabase.MissionQuests))
+        {
             activeQuests[quest.questID] = quest;
-        Debug.Log($"[로드 직후] activeQuests = {activeQuests.Count}개 " +
-            $"(Daily={activeQuests.Values.Count(q => q.questType == QuestCategory.Daily)}, " +
-            $"Weekly={activeQuests.Values.Count(q => q.questType == QuestCategory.Weekly)}, " +
-            $"Repeat={activeQuests.Values.Count(q => q.questType == QuestCategory.Repeat)})");
+        }
+
+        Debug.Log($"[로드 직후] activeQuests = {activeQuests.Count}개");
 
         string userId = BackendManager.Auth.CurrentUser.UserId;
         dbRef.Child("users").Child(userId).Child("quests")
-            .GetValueAsync().ContinueWithOnMainThread(task =>
+        .GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            Debug.Log("Firebase 응답 도착");
+
+            if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log("Firebase 응답 도착");
-
-                if (task.IsFaulted || task.IsCanceled || !task.Result.Exists)
-                {
-                    Debug.LogWarning("서버 진행상황 없음 → CSV 기준 초기 저장");
-                    SaveQuests();
-                    IsReady = true;
-                    OnQuestsUpdated?.Invoke();
-                    return;
-                }
-
-                // 진행상황만 덮어쓰기
-                var wrapper = JsonUtility.FromJson<SerializationWrapper<QuestProgressData>>(task.Result.GetRawJsonValue());
-                var dict = wrapper.ToDictionary();
-
-                foreach (var kvp in dict)
-                {
-                    string questId = kvp.Key;
-                    var progress = kvp.Value;
-
-                    if (activeQuests.TryGetValue(questId, out var localQuest))
-                    {
-                        localQuest.valueProgress = progress.progress;
-                        localQuest.isComplete = progress.isComplete;
-                        localQuest.isClaimed = progress.isClaimed;
-                        localQuest.lastUpdated = new DateTime(progress.lastUpdated, DateTimeKind.Utc);
-                        localQuest.lastWeek = progress.lastWeek;
-
-                        Debug.Log($"[병합] {questId} 진행도 {progress.progress}, 완료={progress.isComplete}, 보상={progress.isClaimed}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"CSV에 없는 퀘스트 발견: {questId}, Firebase 데이터 추가");
-                    }
-                }
-
-                Debug.Log($"서버 진행상황 병합 완료: {activeQuests.Count}개 퀘스트 적용됨");
-                CheckAndResetQuests();
+                Debug.LogWarning("서버 진행상황 불러오기 실패, CSV 기준으로 사용");
                 IsReady = true;
                 OnQuestsUpdated?.Invoke();
-            });
+                return;
+            }
+
+            if (!task.Result.Exists)
+            {
+                Debug.Log("서버 진행상황 없음, CSV 기준 초기 저장");
+                SaveQuests(); // 여기서만 서버에 올림
+                IsReady = true;
+                OnQuestsUpdated?.Invoke();
+                return;
+            }
+
+            // 서버 진행상황 반영
+            var wrapper = JsonUtility.FromJson<SerializationWrapper<QuestProgressData>>(task.Result.GetRawJsonValue());
+            var dict = wrapper.ToDictionary();
+
+            foreach (var kvp in dict)
+            {
+                if (activeQuests.TryGetValue(kvp.Key, out var localQuest))
+                {
+                    var progress = kvp.Value;
+                    localQuest.valueProgress = progress.progress;
+                    localQuest.isComplete = progress.isComplete;
+                    localQuest.isClaimed = progress.isClaimed;
+                    localQuest.lastUpdated = new DateTime(progress.lastUpdated, DateTimeKind.Utc);
+                    localQuest.lastWeek = progress.lastWeek;
+                }
+            }
+
+            // 해금 체크
+            TryUnlockQuests();
+
+            CheckAndResetQuests();
+
+            IsReady = true;
+            OnQuestsUpdated?.Invoke();
+        });
     }
 
     // 퀘스트 자동 리셋 체크 (서버 시간 기준)
@@ -264,7 +273,7 @@ public class QuestManager : MonoBehaviour
     // 완료 처리
     private void CompleteQuest(Quest quest)
     {
-        quest.isComplete = true;
+        quest.state = QuestState.RewardReady;
         quest.lastUpdated = NowUtc();
         Debug.Log($"퀘스트 완료: {quest.questName}");
         SaveQuests();
@@ -272,23 +281,27 @@ public class QuestManager : MonoBehaviour
     }
 
     // 보상 수령
-    public void ClaimReward(string questId)
+    public void ClaimReward(Quest quest)
     {
-        if (!activeQuests.TryGetValue(questId, out Quest quest)) return;
-        if (quest.state != QuestState.RewardReady) return;
+        if (quest == null || quest.state != QuestState.RewardReady)
+        {
+            Debug.LogWarning("보상을 수령할 수 없는 퀘스트입니다.");
+            return;
+        }
 
         quest.ClaimReward();
+
         Debug.Log($"퀘스트 보상 수령 완료: {quest.questName}");
 
-        // 체인 연결된 다음 퀘스트 해금
-        if (!string.IsNullOrEmpty(quest.nextQuestID) &&
-            activeQuests.TryGetValue(quest.nextQuestID, out Quest nextQuest))
+        // 반복 퀘스트가 아니라면, 보상 수령 후 비활성화
+        if (quest.questType != QuestCategory.Repeat)
         {
-            if (CheckUnlockCondition(nextQuest))
-            {
-                nextQuest.state = QuestState.InProgress;
-                Debug.Log($"다음 퀘스트 해금: {nextQuest.questName}");
-            }
+            quest.state = QuestState.Disabled;
+        }
+        else
+        {
+            // 반복 퀘스트라면 다시 진행상태로 리셋
+            quest.ResetProgress();
         }
 
         SaveQuests();
@@ -305,6 +318,12 @@ public class QuestManager : MonoBehaviour
     // Firebase 저장
     private void SaveQuests()
     {
+        if (BackendManager.Auth?.CurrentUser == null || dbRef == null)
+        {
+            Debug.LogWarning("[QuestManager] SaveQuests 호출 시점에 Auth/DB 준비 안 됨");
+            return;
+        }
+
         string userId = BackendManager.Auth.CurrentUser.UserId;
 
         Dictionary<string, QuestProgressData> saveData = new Dictionary<string, QuestProgressData>();
@@ -313,6 +332,8 @@ public class QuestManager : MonoBehaviour
 
         string json = JsonUtility.ToJson(new SerializationWrapper<QuestProgressData>(saveData));
         dbRef.Child("users").Child(userId).Child("quests").SetRawJsonValueAsync(json);
+
+        Debug.Log($"[QuestManager] 퀘스트 저장 완료: {saveData.Count}개");
     }
 
     // JSON 직렬화를 위한 래퍼
@@ -387,7 +408,7 @@ public class QuestManager : MonoBehaviour
     public void ReportEvent(QuestTargetType type, int amount = 1, bool saveImmediately = true)
     {
         var matchedQuests = activeQuests.Values
-            .Where(q => q.questTarget == type && !q.isComplete);
+            .Where(q => q.questTarget == type && q.state == QuestState.InProgress);
 
         foreach (var quest in matchedQuests)
         {
@@ -435,11 +456,30 @@ public class QuestManager : MonoBehaviour
     }
     public List<Quest> GetActiveQuestsForHUD()
     {
-        return activeQuests.Values
-            .Where(q => q.state == QuestState.InProgress || q.state == QuestState.RewardReady)
-            .OrderBy(q => GetQuestPriority(q.questType))
-            .Take(1)
+        // Mission 퀘스트 우선
+        var missionQuests = activeQuests.Values
+            .Where(q => q.questType == QuestCategory.Mission
+                     && q.state == QuestState.InProgress
+                     && !q.isComplete)
+            .OrderBy(q => q.requiredStage)
             .ToList();
+
+        if (missionQuests.Count > 0)
+            return missionQuests.Take(1).ToList();
+
+        // Mission 퀘스트 없으면 반복 퀘스트 표시
+        var repeatQuests = activeQuests.Values
+            .Where(q => q.questType == QuestCategory.Repeat
+                     && q.state == QuestState.InProgress
+                     && !q.isComplete)
+            .OrderBy(q => q.questID)
+            .ToList();
+
+        if (repeatQuests.Count > 0)
+            return repeatQuests.Take(1).ToList();
+
+        // 아무것도 없으면 빈 리스트 반환
+        return new List<Quest>();
     }
 
     private int GetQuestPriority(QuestCategory category)
@@ -455,17 +495,66 @@ public class QuestManager : MonoBehaviour
     }
     public bool CheckUnlockCondition(Quest quest)
     {
+        if (quest.questType != QuestCategory.Mission) return true;
         if (quest.state == QuestState.Disabled) return false;
 
-        // 스테이지 조건
         if (quest.requiredStage > 0 && PlayerDataManager.Instance.ClearedStage < quest.requiredStage)
-            return false;
-
-        // 계정 레벨 조건
-        if (quest.requiredLevel > 0 && PlayerDataManager.Instance.Level < quest.requiredLevel)
             return false;
 
         return true;
     }
+    public void NotifyQuestsUpdated()
+    {
+        OnQuestsUpdated?.Invoke();
+    }
+    public void TryUnlockQuests()
+    {
+        bool needsUpdate = false;
+        foreach (var quest in activeQuests.Values)
+        {
+            if (quest.questType != QuestCategory.Mission) continue;
 
+            if (quest.state == QuestState.Locked && CheckUnlockCondition(quest))
+            {
+                quest.state = QuestState.InProgress;
+                Debug.Log($"[TryUnlockQuests] Mission 해금: {quest.questName}");
+                needsUpdate = true;
+            }
+
+            if (needsUpdate)
+            {
+                OnQuestsUpdated?.Invoke();
+            }
+        }
+    }
+    public Quest GetQuestToDisplayOnHUD()
+    {
+        // 1순위: 진행 중이거나 보상 수령 가능한 '미션' 퀘스트
+        var missionQuest = activeQuests.Values
+            .FirstOrDefault(q => q.questType == QuestCategory.Mission &&
+                                   (q.state == QuestState.InProgress || q.state == QuestState.RewardReady));
+        if (missionQuest != null)
+        {
+            return missionQuest;
+        }
+
+        // 2순위: 보상 수령 가능한 '반복' 퀘스트
+        var repeatableRewardReadyQuest = activeQuests.Values
+            .FirstOrDefault(q => q.questType == QuestCategory.Repeat && q.state == QuestState.RewardReady);
+        if (repeatableRewardReadyQuest != null)
+        {
+            return repeatableRewardReadyQuest;
+        }
+
+        // 3순위: 진행 중인 '반복' 퀘스트
+        var repeatableInProgressQuest = activeQuests.Values
+            .FirstOrDefault(q => q.questType == QuestCategory.Repeat && q.state == QuestState.InProgress);
+        if (repeatableInProgressQuest != null)
+        {
+            return repeatableInProgressQuest;
+        }
+
+        // 4순위: 그 외 표시할 퀘스트가 없다면 null 반환
+        return null;
+    }
 }

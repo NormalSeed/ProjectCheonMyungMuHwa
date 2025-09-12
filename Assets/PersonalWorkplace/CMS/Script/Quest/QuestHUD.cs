@@ -13,7 +13,7 @@ public class QuestHUD : MonoBehaviour
     [SerializeField] private TMP_Text rewardAmount;
     [SerializeField] private TMP_Text questTitleText;
     [SerializeField] private TMP_Text progressText;
-    [SerializeField] private Button claimButton;   // 버튼 연결
+    [SerializeField] private Button claimButton;
 
     [Header("Colors")]
     [SerializeField] private Color completeColor = Color.yellow;
@@ -21,8 +21,16 @@ public class QuestHUD : MonoBehaviour
 
     private Quest currentQuest;
     private TableManager _tableManager;
-
     private AsyncOperationHandle<Sprite>? _loadedHandle;
+
+    private string GetCurrencyIconKey(CurrencyType type)
+    {
+        switch (type)
+        {
+            case CurrencyType.Gold: return "Icon_Gold";
+            default: return null;
+        }
+    }
 
     [Inject]
     public void Construct(TableManager tableManager)
@@ -38,83 +46,78 @@ public class QuestHUD : MonoBehaviour
 
     public void ShowQuest(Quest quest)
     {
-        if (quest == null)
-        {
-            questTitleText.text = "퀘스트 없음";
-            progressText.text = "";
-            rewardIcon.sprite = null;
-            rewardAmount.text = "";
-            return;
-        }
+        currentQuest = quest; // currentQuest를 먼저 업데이트
 
-        currentQuest = quest;
         if (currentQuest == null)
         {
+            // 표시할 퀘스트가 없으면 HUD를 비활성화
             gameObject.SetActive(false);
             return;
         }
+
         gameObject.SetActive(true);
 
         questTitleText.text = quest.questName;
 
-        // 진행도 표시
         bool isClear = quest.state == QuestState.RewardReady;
         progressText.text = isClear ? "클리어" : $"{quest.valueProgress}/{quest.valueGoal}";
         progressText.color = isClear ? completeColor : defaultColor;
 
-        // 보상 표시 (첫 번째 보상만)
         if (quest.rewards != null && quest.rewards.Count > 0)
         {
             var reward = quest.rewards[0];
-            var itemTable = _tableManager.GetTable<TItem>(TableType.Item);
-
-            ItemData itemData = null;
-
             if (reward.rewardType == RewardType.Currency)
-                itemData = itemTable.GetItem((int)reward.currencyType);
-            else
-                itemData = itemTable.GetItem(int.Parse(reward.rewardID));
-
-            if (itemData != null)
             {
-                LoadRewardIcon(itemData.ImageKey);
-                rewardAmount.text = reward.rewardCount > 1 ? $"x{reward.rewardCount}" : string.Empty;
+                string iconKey = GetCurrencyIconKey(reward.currencyType);
+                if (!string.IsNullOrEmpty(iconKey))
+                {
+                    LoadRewardIcon(iconKey);
+                    rewardAmount.text = reward.rewardCount > 1 ? $"x{reward.rewardCount}" : string.Empty;
+                }
+                else
+                {
+                    rewardIcon.sprite = null;
+                    rewardAmount.text = "";
+                }
             }
             else
             {
-                Debug.LogWarning($"[QuestHUD] 아이템 데이터 없음: {reward.rewardID}");
+                var itemTable = _tableManager.GetTable<TItem>(TableType.Item);
+                var itemData = itemTable.GetItem(int.Parse(reward.rewardID));
+                if (itemData != null && !string.IsNullOrEmpty(itemData.ImageKey))
+                {
+                    LoadRewardIcon(itemData.ImageKey);
+                    rewardAmount.text = reward.rewardCount > 1 ? $"x{reward.rewardCount}" : string.Empty;
+                }
+                else
+                {
+                    rewardIcon.sprite = null;
+                    rewardAmount.text = "";
+                }
             }
         }
 
-        // 버튼 상태 갱신
         claimButton.interactable = isClear;
     }
 
     private void OnClaimButtonClicked()
     {
-        if (currentQuest == null) return;
-
-        if (currentQuest.state == QuestState.RewardReady)
-        {
-            // MissionQuestManager를 통해 보상 수령
-            MissionQuestManager.Instance.ClaimReward();
-        }
-        else
+        if (currentQuest == null || currentQuest.state != QuestState.RewardReady)
         {
             Debug.Log("[QuestHUD] 아직 보상을 받을 수 없는 상태");
+            return;
         }
+        QuestManager.Instance.ClaimReward(currentQuest);
     }
 
     private void LoadRewardIcon(string key)
     {
         ReleaseImageHandle();
-
         if (string.IsNullOrEmpty(key))
         {
             Debug.LogWarning("[QuestHUD] ImageKey is empty");
             return;
         }
-
         _loadedHandle = Addressables.LoadAssetAsync<Sprite>(key);
         _loadedHandle.Value.Completed += handle =>
         {
@@ -137,7 +140,6 @@ public class QuestHUD : MonoBehaviour
     private void OnDestroy()
     {
         ReleaseImageHandle();
-
         if (claimButton != null)
             claimButton.onClick.RemoveListener(OnClaimButtonClicked);
     }
