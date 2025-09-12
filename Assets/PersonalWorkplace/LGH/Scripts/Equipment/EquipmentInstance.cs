@@ -57,4 +57,9 @@ public class EquipmentInstance
     {
         return baseStat + level * statIncrease;
     }
+    
+    public float GetNextLevelStat()
+    {
+        return baseStat + (level+1) * statIncrease;
+    }
 }
