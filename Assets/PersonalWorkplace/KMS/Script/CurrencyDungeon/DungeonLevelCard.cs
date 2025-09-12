@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 
 public class DungeonLevelCard : MonoBehaviour
@@ -38,7 +37,7 @@ public class DungeonLevelCard : MonoBehaviour
     }
     public void SetStageCleared(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
-        ButtonText.text = "소탕";
+        ButtonText.text = "소탕하기";
         locker.SetActive(false);
         startButton.onClick.AddListener(() =>
         {
@@ -48,13 +47,12 @@ public class DungeonLevelCard : MonoBehaviour
     }
     public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
-        ButtonText.text = "입장";
+        ButtonText.text = "도전하기";
         locker.SetActive(false);
         startButton.onClick.AddListener(() =>
         {
             act.Invoke(data, type);
             //AudioManager.Instance.StopAllSounds();
-            SceneManager.LoadSceneAsync("CurrencyDungeonScene");
         });
 
     }

@@ -28501,7 +28501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 466c4b9a826de164ba34eb0b582bc77f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startTime: 5
+  startTime: 15
   timeText: {fileID: 1275878253}
 --- !u!1 &1286701127
 GameObject:
@@ -50110,6 +50110,7 @@ MonoBehaviour:
   playerSet: {fileID: 1935896089}
   timer: {fileID: 1275878255}
   failUI: {fileID: 511886194}
+  clearUI: {fileID: 709438419}
 --- !u!114 &1935896089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50153,7 +50154,6 @@ MonoBehaviour:
   - {fileID: 1669735708}
   model: {fileID: 11400000, guid: ba7c565d2ccb8264b90354190ec8ef30, type: 2}
   sceneData: {fileID: 11400000, guid: b59bbfcbfb6648b428c7999bad9b4cf1, type: 2}
-  clearUI: {fileID: 709438419}
 --- !u!4 &1935896091
 Transform:
   m_ObjectHideFlags: 0
@@ -50268,6 +50268,10 @@ PrefabInstance:
     - target: {fileID: 1090440528408105350, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -125
+      objectReference: {fileID: 0}
+    - target: {fileID: 1348144755697866699, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.00006688718
       objectReference: {fileID: 0}
     - target: {fileID: 1620040997066792629, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_Pivot.x
@@ -50872,6 +50876,14 @@ PrefabInstance:
     - target: {fileID: 8769698654928675167, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -125
+      objectReference: {fileID: 0}
+    - target: {fileID: 9119756454394607578, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9119756454394607578, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

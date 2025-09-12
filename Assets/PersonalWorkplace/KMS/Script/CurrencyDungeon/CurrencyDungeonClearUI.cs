@@ -10,12 +10,12 @@ public class CurrencyDungeonClearUI : UIBase
 
     public override void SetShow()
     {
-        GiveCurrency();
         SetToFirebase();
     }
 
     private async void SetToFirebase()
     {
+        GiveCurrency();
         string json;
         string _uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         clearData = sceneData.clearData;
@@ -35,12 +35,21 @@ public class CurrencyDungeonClearUI : UIBase
     }
     private void GiveCurrency()
     {
-        BigCurrency cur = new BigCurrency(sceneData.data.Reward);
+        BigCurrency reward = new BigCurrency(sceneData.data.Reward);
         switch (sceneData.type)
         {
-            case CurrencyDungeonType.Gold: CurrencyManager.Instance.Add(CurrencyType.Gold, cur); break;
-            case CurrencyDungeonType.Honbaeg: CurrencyManager.Instance.Add(CurrencyType.Soul, cur); break;
-            case CurrencyDungeonType.Spirit: CurrencyManager.Instance.Add(CurrencyType.SpiritStone, cur); break;
+            case CurrencyDungeonType.Gold:
+                CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket,
+                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.GoldChallengeTicket).Value - 1));
+                CurrencyManager.Instance.Add(CurrencyType.Gold, reward); break;
+            case CurrencyDungeonType.Honbaeg:
+                CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket,
+                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SoulChallengeTicket).Value - 1));
+                CurrencyManager.Instance.Add(CurrencyType.Soul, reward); break;
+            case CurrencyDungeonType.Spirit:
+                CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket,
+                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SpiritStoneChallengeTicket).Value - 1));
+                CurrencyManager.Instance.Add(CurrencyType.SpiritStone, reward); break;
         }
     }
 }

@@ -8,15 +8,15 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDungeonTimer timer;
 
     [SerializeField] UIBase failUI;
+    [SerializeField] UIBase clearUI;
 
 
     void Awake()
     {
-        bossSpawner.InitBoss(() => timer.Stop());
+        bossSpawner.InitBoss(DungeonClear);
         playerSet.InitPlayer();
 
-        timer.OnTimeOver += DisableBoss;
-        timer.OnTimeOver += failUI.SetShow;
+        timer.OnTimeOver += DungeonFail;
     }
 
     void Start()
@@ -25,9 +25,24 @@ public class CurrencyDungeonManage : MonoBehaviour
         playerSet.SpawnPlayer();
     }
 
-    private void DisableBoss()
+    private void DungeonClear()
+    {
+        timer.Stop();
+        clearUI.SetShow();
+    }
+
+    private void DungeonFail()
     {
         bossSpawner.SpawnedBoss.SetActive(false);
+        failUI.SetShow();
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            DungeonClear();
+        }
+
     }
 
 }
