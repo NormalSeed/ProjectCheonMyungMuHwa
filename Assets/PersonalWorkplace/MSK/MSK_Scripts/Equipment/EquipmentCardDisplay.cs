@@ -35,6 +35,7 @@ public class EquipmentCardDisplay : MonoBehaviour
         if (equipment == null || string.IsNullOrEmpty(equipment.templateID))
         {
             Debug.LogWarning("장비 데이터가 유효하지 않습니다.");
+            LoadIcon("Exception_Sprite");
             return;
         }
 

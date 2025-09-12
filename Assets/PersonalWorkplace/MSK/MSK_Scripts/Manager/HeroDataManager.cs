@@ -25,7 +25,9 @@ public class HeroSaveData
 
 public class HeroDataManager : IStartable
 {
+    // 외부 참조용
     public static HeroDataManager Instance { get; private set; }
+    // 초기화 여부
     public bool IsInitialized { get; private set; }
 
     public Dictionary<string, HeroData> ownedHeroes = new();
@@ -39,15 +41,23 @@ public class HeroDataManager : IStartable
     private Dictionary<string, object> ConvertHeroToDict(HeroData hero)
     {
         return new Dictionary<string, object>
-        {
-            { "hasHero", hero.hasHero },
-            { "heroPiece", hero.heroPiece },
-            { "level", hero.level },
-            { "rarity", hero.rarity },
-            { "stage", hero.stage },
-            { "cardInfo", JsonUtility.ToJson(hero.cardInfo) }
-        };
+    {
+        { "hasHero", hero.hasHero },
+        { "heroPiece", hero.heroPiece },
+        { "level", hero.level },
+        { "stage", hero.stage },
+        { "rarity", hero.rarity },
+        { "heroId", hero.heroId },
+        { "cardInfo", JsonUtility.ToJson(hero.cardInfo) },
+        { "PlayerModelSO", hero.PlayerModelSO != null ? JsonUtility.ToJson(hero.PlayerModelSO) : null },
+        { "weapone", hero.weapone },
+        { "armor", hero.armor },
+        { "boots", hero.boots },
+        { "gloves", hero.gloves }
+    };
     }
+
+    // 뽑기 레어도 조각 변환 필드
     public int GetPieceAmountByRarity(HeroRarity rarity)
     {
         return rarity switch
@@ -59,16 +69,24 @@ public class HeroDataManager : IStartable
             _ => 0
         };
     }
+
+    // 새 영웅 추가 코드
     public void AddNewHero(CardInfo card)
     {
         var heroData = new HeroData
         {
             hasHero = true,
             heroPiece = 0,
+            level = 1,
             stage = 1,
             rarity = card.rarity.ToString(),
             heroId = card.HeroID,
-            cardInfo = card
+            cardInfo = card,
+            PlayerModelSO = null,
+            weapone = string.Empty,
+            armor = string.Empty,
+            boots = string.Empty,
+            gloves = string.Empty
         };
 
         ownedHeroes[card.HeroID] = heroData;
@@ -96,6 +114,7 @@ public class HeroDataManager : IStartable
     #endregion
 
     #region Private
+    // 최초 로딩함수
     private async Task LoadHeroDataFromFirebase()
     {
         var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
@@ -116,7 +135,7 @@ public class HeroDataManager : IStartable
     }
     #endregion
 
-
+    // 로딩함수
     public void LoadHeroDataFromCache()
     {
         if (!File.Exists(savePath))
@@ -134,13 +153,14 @@ public class HeroDataManager : IStartable
             ownedHeroes[data.heroId] = hero;
         }
     }
-
+    // 영웅 저장 함수
     public void SaveHeroData(string heroId)
     {
         SaveHeroDataToCache();
         SaveHeroDataToFirebase(heroId);
     }
 
+    //  모든 영웅 저장
     public void SaveHeroDataToCache()
     {
         var saveList = new HeroSaveList();
@@ -159,6 +179,23 @@ public class HeroDataManager : IStartable
         File.WriteAllText(savePath, jsonText);
     }
 
+    // 특정 영웅 저장
+    public void SaveHeroDataToCache(string heroId)
+    {
+        if (!ownedHeroes.TryGetValue(heroId, out var hero)) return;
+
+        HeroSaveList saveList = new();
+        saveList.heroes.Add(new HeroSaveData
+        {
+            heroId = heroId,
+            json = JsonUtility.ToJson(hero)
+        });
+
+        string jsonText = JsonUtility.ToJson(saveList, true);
+        File.WriteAllText(savePath, jsonText);
+    }
+
+    // DB에 저장
     public void SaveHeroDataToFirebase(string heroId)
     {
         if (string.IsNullOrEmpty(_uid))
@@ -176,6 +213,7 @@ public class HeroDataManager : IStartable
         });
     }
 
+    // 모두 DB에 저장
     public void SaveAllHeroDataToFirebase()
     {
         if (string.IsNullOrEmpty(_uid))
@@ -193,6 +231,8 @@ public class HeroDataManager : IStartable
                 Debug.Log("[HeroDataManager] 전체 영웅 Firebase 저장 완료");
         });
     }
+
+    // 조각 반환
     public void AddHeroPiece(string heroId, int amount)
     {
         if (ownedHeroes.TryGetValue(heroId, out var hero))
@@ -200,6 +240,8 @@ public class HeroDataManager : IStartable
             hero.heroPiece += amount;
         }
     }
+
+    // 뽑기 결과반환
     public void ApplyGachaResults(List<CardInfo> results)
     {
         foreach (var card in results)

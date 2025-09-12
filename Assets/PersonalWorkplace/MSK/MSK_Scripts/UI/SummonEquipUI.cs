@@ -114,6 +114,12 @@ public class SummonEquipUI : MonoBehaviour
     }
     private async Task SummonHeros(int times)
     {
+        int equipCount = gachaManager.allEquipCount + times;
+        if (equipCount >= 300) 
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
     }
