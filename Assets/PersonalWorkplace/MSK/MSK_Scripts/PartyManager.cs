@@ -52,10 +52,11 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         int activeCount = partyMembers.Count(m => m != null);
 
+        int listOrder = 0;
+
         if (activeCount < MaxPartySize && !partyMembers.Contains(member))
         {
             // 현재 추가될 멤버가 List의 몇번째에 있는지 체크해서
-            int listOrder = 0;
 
             int emptyIndex = partyMembers.FindIndex(m => m == null);
             if (emptyIndex >= 0)
@@ -80,6 +81,10 @@ public class PartyManager : MonoBehaviour, IStartable
 
             if (controller != null)
             {
+                // 활성화 전에 controller.gameObject의 위치를 현재 활성화된 alignpoint의 position으로 설정해야 함
+                Transform alignRoot = InGameManager.Instance.alignPoint.transform;
+                Transform point = alignRoot.Find($"Point{listOrder + 1}");
+                controller.transform.position = point.position;
                 controller.gameObject.SetActive(true);
                 controller.charID.Value = heroInfo.HeroID;
             }
