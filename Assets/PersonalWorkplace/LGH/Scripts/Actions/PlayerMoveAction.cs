@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -63,8 +64,10 @@ public partial class PlayerMoveAction : Action
                     hasAligned = true;
                 }
 
+                int activeMemberCount = PartyManager.Instance.partyMembers.Count(member => member != null);
+
                 // 모든 캐릭터가 정렬됐는지 확인
-                if (InGameManager.Instance.alignedNum.Value >= PartyManager.Instance.partyMembers.Count)//PartyManager.Instance.partyMembers.Count
+                if (InGameManager.Instance.alignedNum.Value >= activeMemberCount)//PartyManager.Instance.partyMembers.Count
                 {
                     NMagent.ResetPath();
                     return Status.Success; // 모두 정렬 완료 -> Idle로 전환

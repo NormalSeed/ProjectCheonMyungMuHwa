@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
@@ -32,17 +33,6 @@ public class CurrencyDungeonUI : UIBase
         levelPanel.ClearData = this.clearData;
         levelPanel.Setting(type);
     }
-    public void Toggle()
-    {
-        if (gameObject.activeSelf)
-        {
-            SetHide();
-        }
-        else
-        {
-            SetShow();
-        }
-    }
 
     public async Task LoadFromFirebase()
     {
@@ -63,7 +53,6 @@ public class CurrencyDungeonUI : UIBase
         {
             OpenLevelPanel(data.type);
             data.BackToMain = false;
-
         }
         else
         {
