@@ -60,6 +60,11 @@ public partial class PlayerUseSkillAction : Action
 
     protected override Status OnUpdate()
     {
+        if (skillSet == null)
+        {
+            skillSet = controller.skillSet.GetComponent<SkillSet>();
+        }
+
         if (!skillExecuted)
         {
             if (IsSkillReady.Value == false || IsInSkillRange.Value == false)

@@ -1,13 +1,26 @@
+using System.Collections;
 using UnityEngine;
 
 public class MyungHwa_Void : SkillEffect
 {
     public Collider2D coll;
+    private Transform originalParent;
 
     protected override void Awake()
     {
         base.Awake();
         coll = GetComponent<Collider2D>();
+        duration = 1f;
+    }
+
+    private void OnEnable()
+    {
+        StartCoroutine(AutoDisable());
+    }
+
+    public void SetParent(Transform parent)
+    {
+        originalParent = parent;
     }
 
     public void ActivateCollider()
@@ -18,6 +31,13 @@ public class MyungHwa_Void : SkillEffect
     public void UnactivateCollider()
     {
         coll.enabled = false;
+    }
+
+    private IEnumerator AutoDisable()
+    {
+        yield return new WaitForSeconds(duration);
+        transform.SetParent(originalParent);
+        gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

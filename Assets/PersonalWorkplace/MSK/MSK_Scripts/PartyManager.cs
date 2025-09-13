@@ -67,7 +67,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public void PartyInit()
     {
-        InGameManager.Instance.playerCount = 0;
+        //InGameManager.Instance.playerCount = 0;
         // 파티 추가
         for (int i = 0; i < players.Count; i++)
         {
@@ -82,6 +82,8 @@ public class PartyManager : MonoBehaviour, IStartable
                 Transform alignRoot = InGameManager.Instance.alignPoint.transform;
                 Transform point = alignRoot.Find($"Point{i + 1}");
 
+                //controller.gameObject.SetActive(false);
+
                 if (controller.charID.Value == null || controller.charID.Value == string.Empty)
                 {
                     controller.transform.position = point.position;
@@ -90,7 +92,7 @@ public class PartyManager : MonoBehaviour, IStartable
                 controller.gameObject.SetActive(true);
                 controller.charID.Value = heroID;
                 controller.partyNum = i;
-                InGameManager.Instance.playerCount++;
+                //InGameManager.Instance.playerCount++;
                 partySize++;
 
                 Debug.Log($"파티 멤버 {controller.name}의 partyNum 설정됨: {controller.partyNum}");
@@ -101,6 +103,7 @@ public class PartyManager : MonoBehaviour, IStartable
                 controller.gameObject.SetActive(false);
             }
         }
+        InGameManager.Instance.playerCount = MembersID.Count;
 
         CheckSynergy();
     }

@@ -20,18 +20,16 @@ public partial class PlayerMoveAction : Action
 
     private AlignPoint alignPoint;
     private Transform targetPoint;
-    private bool hasAligned = false;
 
     protected override Status OnStart()
     {
-        hasAligned = false;
-
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
         spumC = controller.spumController;
 
         spumC.PlayAnimation(PlayerState.MOVE, 0);
 
+        controller.hasAligned = false;
         AlignPoint.Value = GameObject.FindGameObjectWithTag("AlignPoint");
         alignPoint = AlignPoint.Value.GetComponent<AlignPoint>();
 
@@ -58,10 +56,10 @@ public partial class PlayerMoveAction : Action
         {
             if (!NMagent.hasPath || NMagent.velocity.sqrMagnitude == 0f)
             {
-                if (!hasAligned)
+                if (!controller.hasAligned)
                 {
                     InGameManager.Instance.alignedNum.Value++;
-                    hasAligned = true;
+                    controller.hasAligned = true;
                 }
 
                 int activeMemberCount = PartyManager.Instance.MembersID.Count(member => member != null);
