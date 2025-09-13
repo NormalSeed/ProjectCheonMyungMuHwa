@@ -25,7 +25,7 @@ public class CurrencyUI : MonoBehaviour
 
     private ICurrencyModel _model;
     private AsyncOperationHandle<Sprite>? _loadedHandle;
-
+    [Inject]
     private TableManager _tableManager; // VContainer 주입
 
     #endregion // private field
