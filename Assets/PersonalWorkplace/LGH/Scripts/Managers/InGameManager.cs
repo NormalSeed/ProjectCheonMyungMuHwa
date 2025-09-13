@@ -43,6 +43,7 @@ public class InGameManager : MonoBehaviour
     public void RespawnMonsters()
     {
         PoolManager.Instance.ActiveAll(stageNum);
+        alignedNum.Value = 0;
         stageProgress++;
     }
 

@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public CharacterEquipment equipment;
 
     public int partyNum;
+    public bool hasAligned = false;
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
@@ -77,8 +78,17 @@ public class PlayerController : MonoBehaviour, IDamagable
         {
             if (BGagent != null)
             {
-                BGagent.enabled = true;
-                BGagent.SetVariableValue("CurState", PlayerStates.Move);
+                BlackboardVariable<PlayerStates> prevStateVar;
+                if (BGagent.GetVariable<PlayerStates>("CurState", out prevStateVar))
+                {
+                    var prevState = prevStateVar.Value;
+
+                    BGagent.enabled = false;
+                    BGagent.enabled = true;
+                    BGagent.Init();
+
+                    BGagent.SetVariableValue("CurState", prevState);
+                }
                 spumController.PlayAnimation(PlayerState.MOVE, 0);
             }
 
@@ -91,6 +101,8 @@ public class PlayerController : MonoBehaviour, IDamagable
                 TrainingManager.Instance.ApplyTrainingModifiersToPlayer(this);
             }
             Debug.Log("모델 로드됨");
+            curCool = skillSet.GetComponent<SkillSet>().skills[0].CoolTime;
+            skill2Count = 5;
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
@@ -100,6 +112,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+        skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
 
