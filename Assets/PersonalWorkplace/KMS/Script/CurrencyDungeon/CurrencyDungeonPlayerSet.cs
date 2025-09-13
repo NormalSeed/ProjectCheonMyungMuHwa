@@ -36,6 +36,7 @@ public class CurrencyDungeonPlayerSet : MonoBehaviour
             }
         }
     }
+
     private void CreateCards()
     {
         foreach ((string id, CardInfo info) data in playerData.currentPlayerDataList)
@@ -52,7 +53,8 @@ public class CurrencyDungeonPlayerSet : MonoBehaviour
     {
         foreach (GameObject card in cards)
         {
-            PartyManager.Instance.AddMember(card);
+            PartyManager.Instance.AddMember(card.GetComponent<HeroInfoSetting>().chardata);
+            // 기존 코드             PartyManager.Instance.AddMember(card);
         }
     }
 }

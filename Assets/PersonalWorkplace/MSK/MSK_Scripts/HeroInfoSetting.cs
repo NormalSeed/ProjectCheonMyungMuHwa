@@ -128,16 +128,14 @@ public class HeroInfoSetting : MonoBehaviour
         //  파티를 편성중이라면
         if (PartyManager.Instance.IsHeroSetNow)
         {
-            if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+            if (!PartyManager.Instance.partyMembers.Contains(chardata))
             {
-                PartyManager.Instance.AddMember(gameObject);
-                PartyManager.Instance.AddMemberID(heroID);
+                PartyManager.Instance.AddMember(chardata);
                 selectRoot.gameObject.SetActive(true);
             }
             else
             {
-                PartyManager.Instance.RemoveMember(gameObject);
-                PartyManager.Instance.RemoveMemberID(heroID);
+                PartyManager.Instance.RemoveMember(chardata);
                 selectRoot.gameObject.SetActive(false);
             }
         }
