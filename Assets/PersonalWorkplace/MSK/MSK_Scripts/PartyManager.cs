@@ -67,6 +67,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public void PartyInit()
     {
+        InGameManager.Instance.playerCount = 0;
         // 파티 추가
         for (int i = 0; i < players.Count; i++)
         {
@@ -81,7 +82,11 @@ public class PartyManager : MonoBehaviour, IStartable
                 Transform alignRoot = InGameManager.Instance.alignPoint.transform;
                 Transform point = alignRoot.Find($"Point{i + 1}");
 
-                controller.transform.position = point.position;
+                if (controller.charID.Value == null || controller.charID.Value == string.Empty)
+                {
+                    controller.transform.position = point.position;
+                }
+
                 controller.gameObject.SetActive(true);
                 controller.charID.Value = heroID;
                 controller.partyNum = i;
@@ -129,11 +134,11 @@ public class PartyManager : MonoBehaviour, IStartable
     #region Synergy
     public void CheckSynergy()
     {
-        ClearSynergy();
+        //ClearSynergy();
         activeSynergies.Clear(); // UI용 리스트 초기화
 
         Dictionary<HeroFaction, int> factionCounts = new();
-        foreach (var member in partyMembers)
+        foreach (var member in MembersID)
         {
             if (member != null)
             {
@@ -176,7 +181,7 @@ public class PartyManager : MonoBehaviour, IStartable
     /// </summary>
     private void ClearSynergy()
     {
-        foreach (var member in partyMembers)
+        foreach (var member in MembersID)
         {
             if (member == null)
                 continue;
@@ -196,7 +201,7 @@ public class PartyManager : MonoBehaviour, IStartable
     /// <param name="stage">시너지 단계</param>
     private void ActiveSynergy(HeroFaction faction, int stage)
     {
-        foreach (var member in partyMembers)
+        foreach (var member in MembersID)
         {
             if (member == null) continue;
 

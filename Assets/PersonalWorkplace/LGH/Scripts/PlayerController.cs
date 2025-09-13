@@ -78,6 +78,8 @@ public class PlayerController : MonoBehaviour, IDamagable
             if (BGagent != null)
             {
                 BGagent.enabled = true;
+                BGagent.SetVariableValue("CurState", PlayerStates.Move);
+                spumController.PlayAnimation(PlayerState.MOVE, 0);
             }
 
             equipment.SetCharID();

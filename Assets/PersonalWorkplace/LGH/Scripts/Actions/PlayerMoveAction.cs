@@ -64,7 +64,7 @@ public partial class PlayerMoveAction : Action
                     hasAligned = true;
                 }
 
-                int activeMemberCount = PartyManager.Instance.partyMembers.Count(member => member != null);
+                int activeMemberCount = PartyManager.Instance.MembersID.Count(member => member != null);
 
                 // 모든 캐릭터가 정렬됐는지 확인
                 if (InGameManager.Instance.alignedNum.Value >= activeMemberCount)//PartyManager.Instance.partyMembers.Count
