@@ -57,6 +57,26 @@ public partial class PlayerAttackAction : Action
         return closest;
     }
 
+    private void FlipTowardsTarget()
+    {
+        if (Target.Value == null) return;
+
+        Vector3 scale = Self.Value.transform.localScale;
+
+        if (controller.movedRight)
+        {
+            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? -1 : 1;
+        }
+        else
+        {
+            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? 1 : -1;
+        }
+
+        Debug.Log($"방향전환 전: {Self.Value.transform.localScale}");
+        Self.Value.transform.localScale = scale;
+        Debug.Log($"방향전환 후: {Self.Value.transform.localScale}");
+    }
+
     protected override Status OnUpdate()
     {
         if (IsInAttackRange.Value == false)
@@ -76,6 +96,7 @@ public partial class PlayerAttackAction : Action
             IDamagable target = Target.Value.GetComponent<IDamagable>();
             if (target != null && attackDelay <= 0f)
             {
+                FlipTowardsTarget();
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
                 target.TakeDamage(model.ExtAtk);

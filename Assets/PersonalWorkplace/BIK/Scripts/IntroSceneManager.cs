@@ -33,6 +33,13 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
         }
 
+        if (scope != null)
+        {
+            var heroSkillSets = scope.Container.Resolve<HeroSkillSets>();
+            heroSkillSets.Init();
+            yield return new WaitUntil(() => heroSkillSets.IsInitialized);
+        }
+
         var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
         yield return new WaitUntil(() => dependencyTask.IsCompleted);
 

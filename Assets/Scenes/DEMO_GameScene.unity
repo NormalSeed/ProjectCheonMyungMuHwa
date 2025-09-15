@@ -8849,7 +8849,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: _uiEntries.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: _uiEntries.Array.data[3].ui
@@ -8859,6 +8859,10 @@ PrefabInstance:
       propertyPath: _uiEntries.Array.data[4].ui
       value: 
       objectReference: {fileID: 1523671572}
+    - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: _uiEntries.Array.data[5].ui
+      value: 
+      objectReference: {fileID: 2029911927}
     - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: _uiEntries.Array.data[2].type
       value: 14
@@ -8870,6 +8874,10 @@ PrefabInstance:
     - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: _uiEntries.Array.data[4].type
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3525040741150782886, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      propertyPath: _uiEntries.Array.data[5].type
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3781161101079836461, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       propertyPath: m_AnchorMax.y
@@ -9488,7 +9496,8 @@ PrefabInstance:
       value: 0.99999774
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8866767840199500306, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1620040997066792629, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       insertIndex: 1
@@ -9499,12 +9508,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1620040997066792629, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 860149905}
-    - targetCorrespondingSourceObject: {fileID: 1620040997066792629, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2029911926}
     - targetCorrespondingSourceObject: {fileID: 6727421089534550188, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1104733878}
+    - targetCorrespondingSourceObject: {fileID: 6727421089534550188, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2029911926}
     - targetCorrespondingSourceObject: {fileID: 6079228226564220920, guid: f08a535853c3eb94db7873c0288f8cf8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1305149878}
@@ -11265,7 +11274,7 @@ GameObject:
   - component: {fileID: 2029911926}
   - component: {fileID: 2029911927}
   m_Layer: 5
-  m_Name: TrainingUI
+  m_Name: TrainingUI(Test)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11278,7 +11287,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2029911925}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11291,7 +11300,7 @@ RectTransform:
   - {fileID: 569485090}
   - {fileID: 1475132334}
   - {fileID: 804891315}
-  m_Father: {fileID: 1831449192}
+  m_Father: {fileID: 853222930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}

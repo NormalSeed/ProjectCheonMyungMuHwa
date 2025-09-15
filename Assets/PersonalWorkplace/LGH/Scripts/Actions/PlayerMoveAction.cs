@@ -27,6 +27,8 @@ public partial class PlayerMoveAction : Action
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
         spumC = controller.spumController;
 
+        Self.Value.transform.localScale = Vector3.one;
+
         spumC.PlayAnimation(PlayerState.MOVE, 0);
 
         controller.hasAligned = false;
@@ -45,8 +47,16 @@ public partial class PlayerMoveAction : Action
     {
         // 배치 번호에 따라 이동 포인트로 이동하는 로직 구현 필요
         Transform point = points[controller.partyNum].transform;
+        if (Self.Value.transform.position.x < point.position.x)
+        {
+            controller.movedRight = true;
+        }
+        else
+        {
+            controller.movedRight = false;
+        }
 
-        Debug.Log($"이동 포인트 : {point.gameObject.name}");
+            Debug.Log($"이동 포인트 : {point.gameObject.name}");
         return point;
     }
 

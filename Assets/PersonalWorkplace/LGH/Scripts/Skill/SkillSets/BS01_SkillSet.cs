@@ -54,7 +54,7 @@ public class BS01_SkillSet : SkillSet
 
         // 반지름 5짜리 원 안의 랜덤 위치 계산
         Vector2 randomOffset = Random.insideUnitCircle * 5f;
-        Vector3 spawnPos = transform.position + new Vector3(randomOffset.x, randomOffset.y, 0f);
+        Vector3 spawnPos = controller.transform.position + new Vector3(randomOffset.x, randomOffset.y, 0f);
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -66,7 +66,7 @@ public class BS01_SkillSet : SkillSet
 
         if (projectile != null)
         {
-            projectile.Configure(controller.transform.position, target, skill2Speed, skill2Range, skills[1]);
+            projectile.Configure(controller.transform.position, target, skill2Speed, skill2Range, skills[1], controller);
             Debug.Log("Projectile Configure 호출됨");
         }
         else
