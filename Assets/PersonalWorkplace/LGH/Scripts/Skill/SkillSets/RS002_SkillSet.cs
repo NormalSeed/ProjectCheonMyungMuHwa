@@ -101,7 +101,7 @@ public class RS002_SkillSet : SkillSet
     {
         if (target == null || pController == null) return;
 
-        Vector3 spawnPos = transform.position;
+        Vector3 spawnPos = controller.transform.position;
         Vector3 direction = (target.position - spawnPos).normalized;
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -114,7 +114,7 @@ public class RS002_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(spawnPos, target, skill2Speed, skill2Range, skills[1]);
+            projectile.Configure(spawnPos, target, skill2Speed, skill2Range, skills[1], controller);
             Debug.Log("Projectile Configure 호출됨");
         }
         else

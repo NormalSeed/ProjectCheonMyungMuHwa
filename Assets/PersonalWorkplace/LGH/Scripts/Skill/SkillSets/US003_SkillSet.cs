@@ -48,7 +48,7 @@ public class US003_SkillSet : SkillSet
         skill1Effect.SetActive(true);
 
         // 발사 위치
-        Vector3 spawnPos = transform.position;
+        Vector3 spawnPos = controller.transform.position;
 
         // 타겟 방향 계산
         Vector3 direction = (newTarget.transform.position - spawnPos).normalized;
@@ -63,7 +63,7 @@ public class US003_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(controller.transform.position + offset, newTarget, skill1Speed, 15f, skills[0]);
+            projectile.Configure(controller.transform.position + offset, newTarget, skill1Speed, 15f, skills[0], controller);
             Debug.Log("Projectile Configure 호출됨");
         }
         else

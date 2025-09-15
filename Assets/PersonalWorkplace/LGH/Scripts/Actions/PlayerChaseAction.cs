@@ -27,6 +27,8 @@ public partial class PlayerChaseAction : Action
         controller = Self.Value.GetComponent<PlayerController>();
         spumC = controller.spumController;
 
+        Self.Value.transform.localScale = Vector3.one;
+
         // 이동 애니메이션 재생
         spumC.PlayAnimation(PlayerState.MOVE, 0);
 
@@ -57,6 +59,15 @@ public partial class PlayerChaseAction : Action
                 minDistance = distance;
                 closest = monster;
             }
+        }
+
+        if (Self.Value.transform.position.x < closest.transform.position.x)
+        {
+            controller.movedRight = true;
+        }
+        else
+        {
+            controller.movedRight = false;
         }
 
         return closest;
