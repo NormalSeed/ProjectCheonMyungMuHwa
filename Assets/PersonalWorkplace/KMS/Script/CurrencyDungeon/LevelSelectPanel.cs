@@ -23,8 +23,12 @@ public class LevelSelectPanel : MonoBehaviour
     [SerializeField] TMP_Text titleText;
     [SerializeField] UnityEngine.UI.Image ticketImage;
 
+    [SerializeField] CurrencyDungeonPopup popup;
+
     public CurrencyDungeonClearData ClearData { get; set; }
     private int ticketCount;
+
+    private string currency;
 
 
     public void Setting(CurrencyDungeonType type)
@@ -38,16 +42,19 @@ public class LevelSelectPanel : MonoBehaviour
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.GoldChallengeTicket).Value;
                 clearVal = ClearData.goldClearLevel;
                 titleText.text = "금화던전";
+                currency = "금화";
                 break;
             case CurrencyDungeonType.Honbaeg:
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.SoulChallengeTicket).Value;
                 clearVal = ClearData.HonbaegClearLevel;
                 titleText.text = "혼백던전";
+                currency = "혼백";
                 break;
             case CurrencyDungeonType.Spirit:
                 ticketCount = (int)CurrencyManager.Instance.Get(CurrencyType.SpiritStoneChallengeTicket).Value;
                 clearVal = ClearData.SpiritClearLevel;
                 titleText.text = "영석던전";
+                currency = "영석";
                 break;
         }
         countText.text = $"{ticketCount} / 3";
@@ -145,7 +152,12 @@ public class LevelSelectPanel : MonoBehaviour
             CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket, subtract);
 
         }
-        Debug.Log($"<color=yellow>{data.Name} 클리어 {data.Reward}개 획득</color>");
         countText.text = $"{ticketCount} / 3";
+        CurrencyDungeonPopup.Instance.SetText($"{currency}  {data.Reward}개");
+        CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
+        {
+            CurrencyDungeonPopup.Instance.Close();
+            CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
+        });
     }
 }
