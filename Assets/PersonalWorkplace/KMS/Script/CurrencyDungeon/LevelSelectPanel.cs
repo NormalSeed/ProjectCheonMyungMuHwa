@@ -117,7 +117,7 @@ public class LevelSelectPanel : MonoBehaviour
         */
 
         playerData.currentPlayerDataList.Clear();
-        foreach (CardInfo member in PartyManager.Instance.partyMembers)
+        foreach (CardInfo member in PartyManager.Instance.MembersID)
         {
             string id = member.HeroID;
             playerData.currentPlayerDataList.Add((id, member));

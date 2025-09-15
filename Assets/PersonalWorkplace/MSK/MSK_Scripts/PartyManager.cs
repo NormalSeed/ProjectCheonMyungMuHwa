@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -14,37 +12,26 @@ public class PartyManager : MonoBehaviour, IStartable
     }
     #endregion
 
-
-    public List<CardInfo> partyMembers = new List<CardInfo>();       
-
-    public List<CardInfo> MembersID = new List<CardInfo>();// 실제 배치용
-
+    public List<CardInfo> MembersID = new();// 실제 배치용
     public List<PlayerController> players = new();
-    private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
-
-
-    private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
-    public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
-
-    private int partySize = 1;                                  // 현재 편성된 파티인원
-    public int PartySize { get { return partySize; } }           //현재 편성인원 외부 참조
-
-    public event Action<Dictionary<string, CardInfo>> partySet;
 
     public List<SynergyInfo> activeSynergies = new();           // 현재 활성화된 시너지 정보
     public SynergyUI synergyUI;
     public SynergyExplainUI explainUI;
 
-    #region Unity LifeCycle
-    private void Awake() { }
 
+    private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
+    private int partySize = 1;                                  // 현재 편성된 파티인원
+    public int PartySize { get { return partySize; } }           //현재 편성인원 외부 참조
+
+    private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
+    public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
+    [SerializeField] private HeroUI heroUI;
+
+    #region Unity LifeCycle
     public void Start()
     {
-        CurrencyManager.OnInitialized += HandleCurrencyReady;
-    }
-    private void OnDestroy()
-    {
-        CurrencyManager.OnInitialized -= HandleCurrencyReady;
+        PartyLoadData();
     }
     #endregion
 
@@ -54,16 +41,43 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         if (MembersID.Contains(input) || MembersID.Count >= MaxPartySize)
             return;
-
         MembersID.Add(input);
+        // UI 갱신
+        if (heroUI != null)
+        {
+            heroUI.SetSlot(input, MembersID.Count - 1);
+        }
     }
+
     public void RemoveMember(CardInfo input)
     {
         int listOrder = MembersID.IndexOf(input);
         if (listOrder < 0) return;
 
         MembersID.RemoveAt(listOrder);
+
+        // 해당 슬롯 비우기z
+        if (heroUI != null)
+            heroUI.SetSlot(null, listOrder);
+
+        // 이후 슬롯들 재정렬
+        for (int i = listOrder; i < MembersID.Count; i++)
+        {
+            heroUI.SetSlot(MembersID[i], i);
+        }
+
+        // 마지막 슬롯 비우기
+        if (MembersID.Count < MaxPartySize)
+            heroUI.SetSlot(null, MembersID.Count);
     }
+    public void PartyLoadUI()
+    {
+        for (int i = 0; i < MembersID.Count; i++)
+        {
+            heroUI.SetSlot(MembersID[i], i);
+        }
+    }
+
 
     public void PartyInit()
     {
@@ -113,7 +127,6 @@ public class PartyManager : MonoBehaviour, IStartable
     public void StartPartySetting()
     {
         // 맴버 리스트 초기화
-        MembersID = new List<CardInfo>();
         isHeroSetNow = true;
     }
     public void EndPartySetting()
@@ -178,7 +191,7 @@ public class PartyManager : MonoBehaviour, IStartable
         synergyUI.UpdateSynergyUI(activeSynergies);
         explainUI.UpdateExplainUI(activeSynergies);
     }
-    
+
     /// <summary>
     /// 적용중인 시너지 초기화 메서드
     /// </summary>
@@ -211,7 +224,7 @@ public class PartyManager : MonoBehaviour, IStartable
             string targetCharID = member.HeroID;
 
             var player = players.Find(p => p.charID.Value == targetCharID);
-            if (player == null || player.model?.modelSO == null)
+            if (player == null || player.model == null || player.model.modelSO == null)
                 continue;
 
             // 시너지 이름을 originID로 사용
@@ -279,26 +292,18 @@ public class PartyManager : MonoBehaviour, IStartable
         }
     }
 
-    private void HandleCurrencyReady()
-    {
-        PartyLoadData();
-        PartyInit();
-    }
-
-
     private void PartyUpload()
     {
-       //  CurrencyManager.Instance.SavePartyToFirebase(MembersID);
+        CurrencyManager.Instance.SavePartyToFirebase(MembersID);
     }
 
     private void PartyLoadData()
     {
-      //  CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
+        CurrencyManager.Instance.LoadPartyFromFirebase(MembersID);
     }
     #endregion
     #endregion
 }
-
 /*
     TODO : 파티편성 필요 작업 목록
         드래그 드롭으로 순서를 변경하는 기능     
