@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -57,7 +56,8 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
-         if (heroUI != null) heroUI.partySetFin -= HeroSetting;
+        if (heroUI != null) heroUI.partySetFin -= HeroSettingEnd;
+        if (heroUI != null) heroUI.partySetStart -= HeroSettingStart;
         this.gameObject.SetActive(false);
     }
     #endregion
@@ -71,7 +71,8 @@ public class HeroInfoSetting : MonoBehaviour
         SetBadge();
 
         CardButton.onClick.AddListener(OnClickCard);
-         if (heroUI != null) heroUI.partySetFin += HeroSetting;
+        if (heroUI != null) heroUI.partySetFin += HeroSettingEnd;
+        if (heroUI != null) heroUI.partySetStart += HeroSettingStart;
     }
     private void SetBackground()
     {
@@ -128,10 +129,11 @@ public class HeroInfoSetting : MonoBehaviour
         //  파티를 편성중이라면
         if (PartyManager.Instance.IsHeroSetNow)
         {
-            if (!PartyManager.Instance.partyMembers.Contains(chardata))
+            if (!PartyManager.Instance.MembersID.Contains(chardata))
             {
                 PartyManager.Instance.AddMember(chardata);
                 selectRoot.gameObject.SetActive(true);
+                PartyNum.text = (PartyManager.Instance.MembersID.Count).ToString();
             }
             else
             {
@@ -143,7 +145,7 @@ public class HeroInfoSetting : MonoBehaviour
         {
             heroInfoUI.SetHeroData(heroData);
             heroInfoUI.gameObject.SetActive(true);
-        }   
+        }
     }
     #endregion
 
@@ -152,9 +154,22 @@ public class HeroInfoSetting : MonoBehaviour
     /// <summary>
     /// 회색으로 표시된 배치표시를 비활성화
     /// </summary>
-    private void HeroSetting()
+    private void HeroSettingEnd()
     {
         selectRoot.gameObject.SetActive(false);
+    }
+    private void HeroSettingStart()
+    {
+        for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
+        {
+            var member = PartyManager.Instance.MembersID[i];
+            if (member == chardata)
+            {
+                selectRoot.gameObject.SetActive(true);
+                PartyNum.text = (i + 1).ToString();
+                break;
+            }
+        }
     }
     #endregion
 }

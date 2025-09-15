@@ -40,11 +40,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
     public void Start()
     {
-        CurrencyManager.OnInitialized += HandleCurrencyReady;
-    }
-    private void OnDestroy()
-    {
-        CurrencyManager.OnInitialized -= HandleCurrencyReady;
+        PartyLoadData();
     }
     #endregion
 
@@ -113,7 +109,6 @@ public class PartyManager : MonoBehaviour, IStartable
     public void StartPartySetting()
     {
         // 맴버 리스트 초기화
-        MembersID = new List<CardInfo>();
         isHeroSetNow = true;
     }
     public void EndPartySetting()
@@ -279,21 +274,14 @@ public class PartyManager : MonoBehaviour, IStartable
         }
     }
 
-    private void HandleCurrencyReady()
-    {
-        PartyLoadData();
-        PartyInit();
-    }
-
-
     private void PartyUpload()
     {
-       //  CurrencyManager.Instance.SavePartyToFirebase(MembersID);
+       CurrencyManager.Instance.SavePartyToFirebase(MembersID);
     }
 
     private void PartyLoadData()
     {
-      //  CurrencyManager.Instance.LoadPartyIdsFromFirebase(MembersID);
+      CurrencyManager.Instance.LoadPartyFromFirebase(MembersID);
     }
     #endregion
     #endregion
