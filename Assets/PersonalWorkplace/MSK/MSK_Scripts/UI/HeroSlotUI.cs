@@ -7,14 +7,14 @@ using UnityEngine.UI;
 public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private HeroSlotUI heroSlotPrefab; // 슬롯 프리팹
-    
+
     private GameObject dragVisual;
     private Canvas canvas;
     public int slotIndex; // MembersID 리스트의 인덱스
     public Image icon;
     public CardInfo cardInfo;
 
-    
+
     private void Start()
     {
         canvas = GetComponentInParent<Canvas>();
@@ -31,7 +31,7 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             LoadAddressableSprite(info.HeroID + "_sprite");
         }
         else
-        {   
+        {
             LoadAddressableSprite("Exception_Sprite");
             icon.enabled = false;
         }
@@ -40,14 +40,18 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!PartyManager.Instance.IsHeroSetNow)
+            return;
+
         dragVisual = Instantiate(heroSlotPrefab.gameObject, canvas.transform);
         dragVisual.transform.SetAsLastSibling();
 
         // CanvasGroup 설정
         CanvasGroup cg = dragVisual.GetComponent<CanvasGroup>();
-        if (cg != null)
-            cg.blocksRaycasts = false;
-
+        if (cg == null)
+            cg = dragVisual.AddComponent<CanvasGroup>();
+        cg.blocksRaycasts = false;
+        icon.raycastTarget = false;
         // CardInfo 전달 및 시각적 설정
         HeroSlotUI visualSlot = dragVisual.GetComponent<HeroSlotUI>();
         if (visualSlot != null)
@@ -56,18 +60,30 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!PartyManager.Instance.IsHeroSetNow)
+            return;
+
         if (dragVisual != null)
             dragVisual.transform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Destroy(dragVisual);
+        if (!PartyManager.Instance.IsHeroSetNow)
+            return;
 
+        Destroy(dragVisual);
+        icon.raycastTarget = true;
         if (eventData.pointerEnter != null)
         {
             Debug.LogWarning("[OnEndDrag] 실행됨");
             HeroSlotUI targetSlot = eventData.pointerEnter.GetComponent<HeroSlotUI>();
+            if (targetSlot == null)
+                Debug.LogWarning("targetSlot == null");
+            else
+            {
+                Debug.LogWarning($"[OnEndDrag] {targetSlot.cardInfo.HeroID}");
+            }
             if (targetSlot != null && targetSlot != this)
             {
                 SwapPartyMembers(slotIndex, targetSlot.slotIndex);
@@ -83,11 +99,16 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     private void SwapPartyMembers(int from, int to)
     {
+        if (!PartyManager.Instance.IsHeroSetNow)
+            return;
+
         var members = PartyManager.Instance.MembersID;
         (members[from], members[to]) = (members[to], members[from]);
 
         HeroUI ui = FindFirstObjectByType<HeroUI>();
-        ui.RefreshPartySlots();
+        Debug.LogWarning($"[SwapPartyMembers] 실행됨{members[from].HeroID}, {members[to].HeroID}");
+        ui.RefreshSlot(members[from]);
+        ui.RefreshSlot(members[to]);
     }
 
     private void OnSpriteLoaded(AsyncOperationHandle<Sprite> handle)

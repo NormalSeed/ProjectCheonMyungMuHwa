@@ -29,7 +29,7 @@ public class HeroUI : UIBase
 
     public event Action PartySetFin;                    // 파티 편성 시작 알림
     public event Action PartySetStart;                  // 파티 편성 종료 알림
-
+    public event Action PartyNumChanged;                // 파티 순서 변경 알림
     #region Unity LifeCycle
 
     private void OnEnable()
@@ -126,9 +126,14 @@ public class HeroUI : UIBase
     #endregion
 
     #region Public
-    public void RefreshPartySlots()
+    public void RefreshSlot(CardInfo input)
     {
+        int index = PartyManager.Instance.MembersID.IndexOf(input);
+        if (index < 0 || index >= heroSlots.Count) return;
 
+        heroSlots[index].SetCard(input, index);
+        PartyManager.Instance.PartyLoadUI();
+        PartyNumChanged?.Invoke();
     }
 
     public void SetSlot(CardInfo input, int index)

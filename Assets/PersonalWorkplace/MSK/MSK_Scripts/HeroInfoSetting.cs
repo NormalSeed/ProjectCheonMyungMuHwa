@@ -58,6 +58,7 @@ public class HeroInfoSetting : MonoBehaviour
         CardButton.onClick.RemoveListener(OnClickCard);
         if (heroUI != null) heroUI.PartySetFin -= HeroSettingEnd;
         if (heroUI != null) heroUI.PartySetStart -= HeroSettingStart;
+        if (heroUI != null) heroUI.PartyNumChanged -= HeroSettingStart;
         this.gameObject.SetActive(false);
     }
     #endregion
@@ -73,6 +74,7 @@ public class HeroInfoSetting : MonoBehaviour
         CardButton.onClick.AddListener(OnClickCard);
         if (heroUI != null) heroUI.PartySetFin += HeroSettingEnd;
         if (heroUI != null) heroUI.PartySetStart += HeroSettingStart;
+        if (heroUI != null) heroUI.PartyNumChanged += HeroSettingStart;
     }
     private void SetBackground()
     {
@@ -158,7 +160,7 @@ public class HeroInfoSetting : MonoBehaviour
     {
         selectRoot.gameObject.SetActive(false);
     }
-    private void HeroSettingStart()
+    public void HeroSettingStart()
     {
         for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
         {

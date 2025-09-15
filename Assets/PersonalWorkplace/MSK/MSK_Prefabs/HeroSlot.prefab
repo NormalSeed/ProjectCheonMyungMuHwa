@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6077471956620188284}
   - component: {fileID: 724315307394057319}
+  - component: {fileID: -3374278397326355391}
   m_Layer: 5
   m_Name: HeroSlot
   m_TagString: Untagged
@@ -124,6 +125,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b2a6b164eef6148bd55d1ee606a545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heroSlotPrefab: {fileID: 0}
   slotIndex: 0
   icon: {fileID: 206217900882765908}
   cardInfo: {fileID: 0}
+--- !u!225 &-3374278397326355391
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3225138893254587696}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
