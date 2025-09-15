@@ -61,15 +61,18 @@ public partial class PlayerChaseAction : Action
             }
         }
 
-        if (Self.Value.transform.position.x < closest.transform.position.x)
+        if (closest != null)
         {
-            controller.movedRight = true;
+            if (Self.Value.transform.position.x < closest.transform.position.x)
+            {
+                controller.movedRight = true;
+            }
+            else
+            {
+                controller.movedRight = false;
+            }
         }
-        else
-        {
-            controller.movedRight = false;
-        }
-
+        
         return closest;
     }
 
