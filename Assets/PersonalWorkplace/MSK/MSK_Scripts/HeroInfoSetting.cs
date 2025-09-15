@@ -69,7 +69,7 @@ public class HeroInfoSetting : MonoBehaviour
         await SetCharacter(heroData.PlayerModelSO.SpriteKey);
         SetStage();
         SetBadge();
-
+        CardButton.onClick.RemoveListener(OnClickCard);
         CardButton.onClick.AddListener(OnClickCard);
         if (heroUI != null) heroUI.PartySetFin += HeroSettingEnd;
         if (heroUI != null) heroUI.PartySetStart += HeroSettingStart;

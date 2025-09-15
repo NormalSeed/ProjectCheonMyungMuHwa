@@ -192,7 +192,7 @@ public class CurrencyManager : IStartable, IDisposable
 
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo");
 
-        List<string> heroIdList = new List<string>();
+        List<string> heroIdList = new();
         foreach (var card in party)
         {
             heroIdList.Add(card.HeroID);

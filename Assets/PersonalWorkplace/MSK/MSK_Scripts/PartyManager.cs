@@ -41,12 +41,12 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         if (MembersID.Contains(input) || MembersID.Count >= MaxPartySize)
             return;
-
         MembersID.Add(input);
-
         // UI 갱신
         if (heroUI != null)
+        {
             heroUI.SetSlot(input, MembersID.Count - 1);
+        }
     }
 
     public void RemoveMember(CardInfo input)
@@ -56,7 +56,7 @@ public class PartyManager : MonoBehaviour, IStartable
 
         MembersID.RemoveAt(listOrder);
 
-        // 해당 슬롯 비우기
+        // 해당 슬롯 비우기z
         if (heroUI != null)
             heroUI.SetSlot(null, listOrder);
 
