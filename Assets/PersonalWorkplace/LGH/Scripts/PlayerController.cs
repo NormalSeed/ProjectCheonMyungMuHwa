@@ -114,6 +114,11 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+
+        shieldAmount = 0f;
+        isShieldActive = false;
+
+        skillSet.SetActive(false);
         skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
