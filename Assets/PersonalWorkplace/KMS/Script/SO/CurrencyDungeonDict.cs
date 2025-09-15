@@ -27,6 +27,7 @@ public class CurrencyDungeonDict : ScriptableObject
 
   public Dictionary<CurrencyDungeonType, Sprite> DungeonSprites;
   public Dictionary<CurrencyDungeonType, Sprite> TicketSprites;
+  public Dictionary<CurrencyDungeonType, Sprite> BackgroundSprites;
 
 
   void OnEnable()
@@ -55,8 +56,6 @@ public class CurrencyDungeonDict : ScriptableObject
       {CurrencyDungeonType.Honbaeg, soul},
       {CurrencyDungeonType.Spirit, spirit},
     };
-
-
   }
   private async void InitSprites()
   {
@@ -74,6 +73,26 @@ public class CurrencyDungeonDict : ScriptableObject
           break;
         case "영석_0":
           DungeonSprites.Add(CurrencyDungeonType.Spirit, s);
+          break;
+      }
+    }
+  }
+    private async void InitBackground()
+  {
+    var handle = Addressables.LoadAssetsAsync<Sprite>("currencydungeonbackground");
+    IList<Sprite> loadedSprites = await handle.Task;
+    foreach (Sprite s in loadedSprites)
+    {
+      switch (s.name)
+      {
+        case "BG_Gold":
+          BackgroundSprites.Add(CurrencyDungeonType.Gold, s);
+          break;
+        case "BG_Honbaeg":
+          BackgroundSprites.Add(CurrencyDungeonType.Honbaeg, s);
+          break;
+        case "BG_Spirit":
+          BackgroundSprites.Add(CurrencyDungeonType.Spirit, s);
           break;
       }
     }
