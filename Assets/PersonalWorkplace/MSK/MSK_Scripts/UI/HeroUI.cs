@@ -20,6 +20,15 @@ public class HeroUI : UIBase
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
+    [Header("HeroSlot")]
+    [SerializeField] public HeroSlotUI Slot1;
+    [SerializeField] public HeroSlotUI Slot2;
+    [SerializeField] public HeroSlotUI Slot3;
+    [SerializeField] public HeroSlotUI Slot4;
+    [SerializeField] public HeroSlotUI Slot5;
+    [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
+    [SerializeField] private GameObject heroSlotPrefab; // 슬롯 프리팹
+
     public event Action partySetFin;                    // 파티 편성 시작 알림
     public event Action partySetStart;                  // 파티 편성 종료 알림
 
@@ -117,6 +126,24 @@ public class HeroUI : UIBase
         heroSet.gameObject.SetActive(true);
 
         partySetFin?.Invoke();
+    }
+    #endregion
+
+    #region Public
+    public void RefreshPartySlots()
+    {
+        // 기존 슬롯 제거
+        foreach (Transform child in partySlotRoot)
+            Destroy(child.gameObject);
+
+        // MembersID 리스트 기준으로 슬롯 다시 생성
+        for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
+        {
+            var slot = Instantiate(heroSlotPrefab, partySlotRoot).GetComponent<HeroSlotUI>();
+            slot.SetCard(PartyManager.Instance.MembersID[i], i);
+        }
+
+        PartyMembersCount.text = $"{PartyManager.Instance.MembersID.Count} / {PartyManager.Instance.PartySize}";
     }
     #endregion
 }

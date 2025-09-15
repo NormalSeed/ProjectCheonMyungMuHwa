@@ -14,27 +14,24 @@ public class PartyManager : MonoBehaviour, IStartable
     }
     #endregion
 
-
-    public List<CardInfo> partyMembers = new List<CardInfo>();       
-
+ 
     public List<CardInfo> MembersID = new List<CardInfo>();// 실제 배치용
 
     public List<PlayerController> players = new();
-    private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
 
 
     private bool isHeroSetNow = false;                          // 파티 편성 진행중 여부
     public bool IsHeroSetNow { get { return isHeroSetNow; } }   //파티 편성 진행중 외부 참조
 
-    private int partySize = 1;                                  // 현재 편성된 파티인원
-    public int PartySize { get { return partySize; } }           //현재 편성인원 외부 참조
-
-    public event Action<Dictionary<string, CardInfo>> partySet;
-
     public List<SynergyInfo> activeSynergies = new();           // 현재 활성화된 시너지 정보
     public SynergyUI synergyUI;
     public SynergyExplainUI explainUI;
 
+
+    private readonly int MaxPartySize = 5;                      // 파티 최대 편성 수 
+
+    private int partySize = 1;                                  // 현재 편성된 파티인원
+    public int PartySize { get { return partySize; } }           //현재 편성인원 외부 참조
     #region Unity LifeCycle
     private void Awake() { }
 
