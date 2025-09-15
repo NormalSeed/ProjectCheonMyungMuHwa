@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,20 +23,14 @@ public class HeroUI : UIBase
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
     [Header("HeroSlot")]
-    [SerializeField] public HeroSlotUI Slot1;
-    [SerializeField] public HeroSlotUI Slot2;
-    [SerializeField] public HeroSlotUI Slot3;
-    [SerializeField] public HeroSlotUI Slot4;
-    [SerializeField] public HeroSlotUI Slot5;
+    [SerializeField] List<HeroSlotUI> heroSlots;
     [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
     [SerializeField] private GameObject heroSlotPrefab; // 슬롯 프리팹
 
-    public event Action partySetFin;                    // 파티 편성 시작 알림
-    public event Action partySetStart;                  // 파티 편성 종료 알림
+    public event Action PartySetFin;                    // 파티 편성 시작 알림
+    public event Action PartySetStart;                  // 파티 편성 종료 알림
 
     #region Unity LifeCycle
-
-    public void Start() { }
 
     private void OnEnable()
     {
@@ -55,11 +51,11 @@ public class HeroUI : UIBase
     #region Button OnClick
 
     //  자동 승급 
-    private void onClickStageUpgrade()
+    private void OnClickStageUpgrade()
     {
         stageUpgrade.gameObject.SetActive(false);
         // 승급 완료 후 버튼 비활성화
-        stageUpgrade.onClick.RemoveListener(onClickStageUpgrade);
+        stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
     }
 
     //  영웅 자동 배치
@@ -86,7 +82,7 @@ public class HeroUI : UIBase
         heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
         autoSet.onClick.AddListener(OnClickAutoSet);
         
-        partySetStart?.Invoke();
+        PartySetStart?.Invoke();
     }
 
 
@@ -107,7 +103,7 @@ public class HeroUI : UIBase
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
 
-        partySetFin?.Invoke();
+        PartySetFin?.Invoke();
     }
 
     // 영웅 배치하지 않고 저장
@@ -125,7 +121,7 @@ public class HeroUI : UIBase
 
         heroSet.gameObject.SetActive(true);
 
-        partySetFin?.Invoke();
+        PartySetFin?.Invoke();
     }
     #endregion
 
@@ -145,5 +141,14 @@ public class HeroUI : UIBase
 
         PartyMembersCount.text = $"{PartyManager.Instance.MembersID.Count} / {PartyManager.Instance.PartySize}";
     }
+
+    public void SetSlot(CardInfo input, int index)
+    {
+        if (index < 0 || index >= heroSlots.Count)
+            return;
+
+        heroSlots[index].SetCard(input, index);
+    }
+
     #endregion
 }

@@ -3,6 +3,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -11,23 +12,28 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public CardInfo cardInfo;
 
     private GameObject dragVisual;
-    private Canvas canvas;
 
-    private void Start()
-    {
-        canvas = GetComponentInParent<Canvas>();
-    }
 
     public void SetCard(CardInfo info, int index)
     {
         cardInfo = info;
         slotIndex = index;
-        LoadAddressableSprite(info.HeroID);
+
+        if (info != null)
+        {
+            icon.enabled = false; // 로딩 중 잠시 숨김
+            LoadAddressableSprite(info.HeroID + "_sprite");
+        }
+        else
+        {
+            LoadAddressableSprite("Exception_Sprite");
+            icon.enabled = false;
+        }
     }
+
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        dragVisual = Instantiate(gameObject, canvas.transform);
         dragVisual.GetComponent<CanvasGroup>().blocksRaycasts = false;
         dragVisual.transform.SetAsLastSibling();
     }
@@ -51,6 +57,12 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             }
         }
     }
+    private void LoadAddressableSprite(string key)
+    {
+        var handle = Addressables.LoadAssetAsync<Sprite>(key);
+
+        handle.Completed += OnSpriteLoaded;
+    }
 
     private void SwapPartyMembers(int from, int to)
     {
@@ -61,14 +73,17 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         ui.RefreshPartySlots();
     }
 
-    public void LoadAddressableSprite(string key)
+    private void OnSpriteLoaded(AsyncOperationHandle<Sprite> handle)
     {
-        Addressables.LoadAssetAsync<Sprite>(key).Completed += handle =>
+        if (handle.Status == AsyncOperationStatus.Succeeded)
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                icon.sprite = handle.Result;
-            }
-        };
+            icon.sprite = handle.Result;
+            icon.enabled = true;
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to load sprite for key: {handle.DebugName}");
+            icon.enabled = false;
+        }
     }
 }

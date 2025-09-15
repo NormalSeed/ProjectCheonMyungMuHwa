@@ -238,6 +238,7 @@ public class CurrencyManager : IStartable, IDisposable
             }
         }
         PartyManager.Instance.PartyInit();
+        PartyManager.Instance.PartyLoadUI();
     }
 
 

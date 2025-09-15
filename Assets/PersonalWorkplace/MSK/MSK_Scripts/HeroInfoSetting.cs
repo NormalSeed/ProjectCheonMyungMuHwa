@@ -56,8 +56,8 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
-        if (heroUI != null) heroUI.partySetFin -= HeroSettingEnd;
-        if (heroUI != null) heroUI.partySetStart -= HeroSettingStart;
+        if (heroUI != null) heroUI.PartySetFin -= HeroSettingEnd;
+        if (heroUI != null) heroUI.PartySetStart -= HeroSettingStart;
         this.gameObject.SetActive(false);
     }
     #endregion
@@ -71,8 +71,8 @@ public class HeroInfoSetting : MonoBehaviour
         SetBadge();
 
         CardButton.onClick.AddListener(OnClickCard);
-        if (heroUI != null) heroUI.partySetFin += HeroSettingEnd;
-        if (heroUI != null) heroUI.partySetStart += HeroSettingStart;
+        if (heroUI != null) heroUI.PartySetFin += HeroSettingEnd;
+        if (heroUI != null) heroUI.PartySetStart += HeroSettingStart;
     }
     private void SetBackground()
     {
