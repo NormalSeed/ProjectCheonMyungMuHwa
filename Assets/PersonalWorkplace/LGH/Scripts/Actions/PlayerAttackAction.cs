@@ -94,12 +94,14 @@ public partial class PlayerAttackAction : Action
         {
             Debug.Log("기본 공격 실행");
             IDamagable target = Target.Value.GetComponent<IDamagable>();
-            if (target != null && attackDelay <= 0f)
+            MonsterController mController = Target.Value.GetComponent<MonsterController>();
+            if (target != null && mController != null && attackDelay <= 0f)
             {
                 FlipTowardsTarget();
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
                 target.TakeDamage(model.ExtAtk);
+                mController.isAttackedByNormalAttack = true;
                 attackDelay = 1f / model.modelSO.AtkSpeed;
                 controller.skill2Count--;
             }
