@@ -92,17 +92,18 @@ public class PartyManager : MonoBehaviour, IStartable
             {
                 CardInfo card = MembersID[i];
                 string heroID = card.HeroID;
-
-                Transform alignRoot = InGameManager.Instance.alignPoint.transform;
-                Transform point = alignRoot.Find($"Point{i + 1}");
-
-                //controller.gameObject.SetActive(false);
-
-                if (controller.charID.Value == null || controller.charID.Value == string.Empty)
+                if (InGameManager.Instance != null)
                 {
-                    controller.transform.position = point.position;
-                }
+                    Transform alignRoot = InGameManager.Instance.alignPoint.transform;
+                    Transform point = alignRoot.Find($"Point{i + 1}");
 
+                    //controller.gameObject.SetActive(false);
+
+                    if (controller.charID.Value == null || controller.charID.Value == string.Empty)
+                    {
+                        controller.transform.position = point.position;
+                    }
+                }
                 controller.gameObject.SetActive(true);
                 controller.charID.Value = heroID;
                 controller.partyNum = i;
