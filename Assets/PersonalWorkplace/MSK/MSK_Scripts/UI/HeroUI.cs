@@ -36,9 +36,9 @@ public class HeroUI : UIBase
 
     private void OnEnable()
     {
-        CheckUpgradableHeroes();
         stageUpgrade.onClick.AddListener(OnClickStageUpgrade);
         heroSet.onClick.AddListener(OnClickHeroSet);
+        CheckUpgradableHeroes();
     }
 
     private void OnDisable()
@@ -160,24 +160,23 @@ public class HeroUI : UIBase
     //  승급 가능 여부 반환
     private void CheckUpgradableHeroes()
     {
-        bool hasUpgradable = false;
-
         foreach (var hero in HeroDataManager.Instance.ownedHeroes.Values)
         {
             if (hero.stage >= 5) continue;
-
+            Debug.LogWarning($"{hero.heroId}");
+            Debug.LogWarning($"{hero.cardInfo.rarity}");
             int rarityValue = (int)hero.cardInfo.rarity;
             int requiredPiece = hero.stage * (5 - rarityValue);
 
             if (hero.heroPiece >= requiredPiece)
             {
-                hasUpgradable = true;
-                break;
+                stageUpgrade.gameObject.SetActive(true);
+                return;
             }
         }
-
-        stageUpgrade.gameObject.SetActive(hasUpgradable);
+        stageUpgrade.gameObject.SetActive(false);
     }
+
     #endregion
 
     #region Public
