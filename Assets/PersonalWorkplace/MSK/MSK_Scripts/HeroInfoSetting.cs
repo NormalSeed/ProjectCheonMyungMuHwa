@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -57,7 +56,9 @@ public class HeroInfoSetting : MonoBehaviour
     private void OnDisable()
     {
         CardButton.onClick.RemoveListener(OnClickCard);
-         if (heroUI != null) heroUI.partySetFin -= HeroSetting;
+        if (heroUI != null) heroUI.PartySetFin -= HeroSettingEnd;
+        if (heroUI != null) heroUI.PartySetStart -= HeroSettingStart;
+        if (heroUI != null) heroUI.PartyNumChanged -= HeroSettingStart;
         this.gameObject.SetActive(false);
     }
     #endregion
@@ -69,9 +70,11 @@ public class HeroInfoSetting : MonoBehaviour
         await SetCharacter(heroData.PlayerModelSO.SpriteKey);
         SetStage();
         SetBadge();
-
+        CardButton.onClick.RemoveListener(OnClickCard);
         CardButton.onClick.AddListener(OnClickCard);
-         if (heroUI != null) heroUI.partySetFin += HeroSetting;
+        if (heroUI != null) heroUI.PartySetFin += HeroSettingEnd;
+        if (heroUI != null) heroUI.PartySetStart += HeroSettingStart;
+        if (heroUI != null) heroUI.PartyNumChanged += HeroSettingStart;
     }
     private void SetBackground()
     {
@@ -101,7 +104,7 @@ public class HeroInfoSetting : MonoBehaviour
             target.gameObject.SetActive(true);
     }
 
-    private void SetStage()
+    public void SetStage()
     {
         foreach (Transform stage in stageRoot)
         {
@@ -128,16 +131,15 @@ public class HeroInfoSetting : MonoBehaviour
         //  파티를 편성중이라면
         if (PartyManager.Instance.IsHeroSetNow)
         {
-            if (!PartyManager.Instance.partyMembers.Contains(gameObject))
+            if (!PartyManager.Instance.MembersID.Contains(chardata))
             {
-                PartyManager.Instance.AddMember(gameObject);
-                PartyManager.Instance.AddMemberID(heroID);
+                PartyManager.Instance.AddMember(chardata);
                 selectRoot.gameObject.SetActive(true);
+                PartyNum.text = (PartyManager.Instance.MembersID.Count).ToString();
             }
             else
             {
-                PartyManager.Instance.RemoveMember(gameObject);
-                PartyManager.Instance.RemoveMemberID(heroID);
+                PartyManager.Instance.RemoveMember(chardata);
                 selectRoot.gameObject.SetActive(false);
             }
         }
@@ -145,7 +147,7 @@ public class HeroInfoSetting : MonoBehaviour
         {
             heroInfoUI.SetHeroData(heroData);
             heroInfoUI.gameObject.SetActive(true);
-        }   
+        }
     }
     #endregion
 
@@ -154,9 +156,26 @@ public class HeroInfoSetting : MonoBehaviour
     /// <summary>
     /// 회색으로 표시된 배치표시를 비활성화
     /// </summary>
-    private void HeroSetting()
+    private void HeroSettingEnd()
     {
         selectRoot.gameObject.SetActive(false);
     }
+    public void HeroSettingStart()
+    {
+        for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
+        {
+            var member = PartyManager.Instance.MembersID[i];
+            if (member == chardata)
+            {
+                selectRoot.gameObject.SetActive(true);
+                PartyNum.text = (i + 1).ToString();
+                break;
+            }
+        }
+    }
+    #endregion
+
+    #region Public
+
     #endregion
 }

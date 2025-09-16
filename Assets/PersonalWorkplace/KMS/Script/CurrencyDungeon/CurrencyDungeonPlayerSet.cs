@@ -36,23 +36,28 @@ public class CurrencyDungeonPlayerSet : MonoBehaviour
             }
         }
     }
+
     private void CreateCards()
     {
-        foreach ((string id, CardInfo info) data in playerData.currentPlayerDataList)
+        foreach (CardInfo info in playerData.currentPlayerDataList)
         {
-            GameObject go = Instantiate(card);
-            HeroInfoSetting infoSetting = go.GetComponent<HeroInfoSetting>();
-            infoSetting.HeroID = data.id;
-            infoSetting.chardata = data.info;
-            cards.Add(go);
+            //GameObject go = Instantiate(card);
+            //HeroInfoSetting infoSetting = go.GetComponent<HeroInfoSetting>();
+            //infoSetting.HeroID = data.id;
+            //infoSetting.chardata = data.info;
+            //cards.Add(go);
+            PartyManager.Instance.AddMember(info);
         }
     }
 
     public void SpawnPlayer()
     {
-        foreach (GameObject card in cards)
-        {
-            PartyManager.Instance.AddMember(card);
-        }
+        PartyManager.Instance.PartyInit();
+        //foreach (GameObject card in cards)
+        //{
+        //    PartyManager.Instance.AddMember(card.GetComponent<HeroInfoSetting>().chardata);
+        //    PartyManager.Instance.PartyInit();
+        //    // 기존 코드             PartyManager.Instance.AddMember(card);
+        //}
     }
 }

@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
+using UnityEngine.UI;
 using UnityEngine;
 
 public enum CurrencyDungeonType { Gold, Honbaeg, Spirit }
@@ -9,6 +11,9 @@ public class CurrencyDungeonUI : UIBase
 {
     [SerializeField] DungeonSelectPanel dungeonPanel;
     [SerializeField] LevelSelectPanel levelPanel;
+
+    [SerializeField] Button exitButton;
+    [SerializeField] MainSceneUIController mainSceneUI;
 
     [SerializeField] CurrencyDungeonSceneLoadDataSO data;
     CurrencyDungeonClearData clearData;
@@ -23,6 +28,8 @@ public class CurrencyDungeonUI : UIBase
         levelPanel.gameObject.SetActive(false);
         dungeonPanel.gameObject.SetActive(true);
         dungeonPanel.RegisteButtons(OpenLevelPanel);
+        exitButton.onClick.RemoveAllListeners();
+        exitButton.onClick.AddListener(() => mainSceneUI.ShowUI(UIType.Dungeon));
 
     }
     public void OpenLevelPanel(CurrencyDungeonType type)
@@ -31,17 +38,8 @@ public class CurrencyDungeonUI : UIBase
         dungeonPanel.gameObject.SetActive(false);
         levelPanel.ClearData = this.clearData;
         levelPanel.Setting(type);
-    }
-    public void Toggle()
-    {
-        if (gameObject.activeSelf)
-        {
-            SetHide();
-        }
-        else
-        {
-            SetShow();
-        }
+        exitButton.onClick.RemoveAllListeners();
+        exitButton.onClick.AddListener(OpenDungeonPanel);
     }
 
     public async Task LoadFromFirebase()
@@ -56,14 +54,16 @@ public class CurrencyDungeonUI : UIBase
             json = JsonUtility.ToJson(clearData);
             await _dbRef.SetRawJsonValueAsync(json);
         }
-        json = snapshot.GetRawJsonValue();
-        clearData = JsonUtility.FromJson<CurrencyDungeonClearData>(json);
+        else
+        {
+            json = snapshot.GetRawJsonValue();
+            clearData = JsonUtility.FromJson<CurrencyDungeonClearData>(json);
+        }
         gameObject.SetActive(true);
         if (data.BackToMain)
         {
             OpenLevelPanel(data.type);
             data.BackToMain = false;
-
         }
         else
         {
