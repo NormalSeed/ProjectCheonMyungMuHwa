@@ -20,6 +20,10 @@ public class InGameManager : MonoBehaviour
 
     public NavMeshSurface surface;
 
+    [Header("게임 종료 UI")]
+    [SerializeField] private GameObject gameQuitUI;
+    public bool isQuitUIActive = false;
+
     private string stage => $"<color=yellow>{stageNum}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
 
     [SerializeField] TMPro.TMP_Text stagetext;
@@ -40,9 +44,29 @@ public class InGameManager : MonoBehaviour
         monsterDeathStack.Subscribe(CheckMonsterClear);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isQuitUIActive)
+            {
+                // UI가 떠 있는 상태에서 다시 뒤로가기 → UI 닫기
+                gameQuitUI.SetActive(false);
+                isQuitUIActive = false;
+            }
+            else
+            {
+                // UI가 안 떠 있는 상태에서 뒤로가기 → UI 띄우기
+                gameQuitUI.SetActive(true);
+                isQuitUIActive = true;
+            }
+        }
+    }
+
     public void RespawnMonsters()
     {
         PoolManager.Instance.ActiveAll(stageNum);
+        alignedNum.Value = 0;
         stageProgress++;
     }
 

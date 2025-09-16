@@ -22,23 +22,29 @@ public class BS01_SkillSet : SkillSet
         skill2Range = skills[1].SkillRange;
     }
 
+    private void OnEnable()
+    {
+        effect.SetActive(false);
+    }
+
     public override void Skill1(Transform target)
     {
+        isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.ATTACK, 1);
         StartCoroutine(Skill1Routine(target));
     }
 
     private IEnumerator Skill1Routine(Transform target)
     {
+        Debug.Log("명화 스킬1 코루틴 실행됨");
         effect.transform.position = target.position;
+        var timed = effect.GetComponent<MyungHwa_Void>();
+        timed.SetParent(transform);
         effect.SetActive(true);
         effect.transform.SetParent(null);
 
         yield return new WaitForSeconds(1f);
-
-        // 이펙트 비활성화
-        effect.SetActive(false);
-        effect.transform.SetParent(this.transform);
+        isSkillPlaying = false;
     }
 
     public override void Skill2(Transform target)
@@ -48,7 +54,7 @@ public class BS01_SkillSet : SkillSet
 
         // 반지름 5짜리 원 안의 랜덤 위치 계산
         Vector2 randomOffset = Random.insideUnitCircle * 5f;
-        Vector3 spawnPos = transform.position + new Vector3(randomOffset.x, randomOffset.y, 0f);
+        Vector3 spawnPos = controller.transform.position + new Vector3(randomOffset.x, randomOffset.y, 0f);
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -60,7 +66,7 @@ public class BS01_SkillSet : SkillSet
 
         if (projectile != null)
         {
-            projectile.Configure(controller.transform.position, target, skill2Speed, skill2Range, skills[1]);
+            projectile.Configure(controller.transform.position, target, skill2Speed, skill2Range, skills[1], controller);
             Debug.Log("Projectile Configure 호출됨");
         }
         else

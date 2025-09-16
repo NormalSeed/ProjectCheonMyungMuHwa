@@ -18,15 +18,15 @@ public class AudioManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+            soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
+            clips = new();
+            LoadAssetAsync();
         }
         else
         {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject);
-        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
-        clips = new();
-        LoadAssetAsync();
     }
     private async void LoadAssetAsync()
     {

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
-
+    public bool IsInvulnerable { get; set; }
     public Action<IPooled<MonsterController>> OnLifeEnded { get; set; }
     public SPUM_Prefabs Spum;
     public MonsterModel Model;
@@ -25,6 +25,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected WaitForSeconds RealAttackDelay;
 
     public System.Action onDeath;
+
+    public bool isAttackedByNormalAttack = false;
 
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
@@ -74,6 +76,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     }
     protected virtual void OnTakeDamage(double amount)
     {
+        if (IsInvulnerable) return;
         if (IsDead) return;
         Model.CurHealth.Value -= amount;
         if (hurtCo != null)
@@ -126,9 +129,9 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
         i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
         DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i2.Init(DroppedItemType.SpiritBack, Model.BaseModel.SpiritBackQuant);
+        i2.Init(DroppedItemType.Honbaeg, Model.BaseModel.SpiritBackQuant);
         DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i3.Init(DroppedItemType.SoulStone, Model.BaseModel.SoulStoneQuant);
+        i3.Init(DroppedItemType.SpiritStone, Model.BaseModel.SoulStoneQuant);
         i1.Shot(); i2.Shot(); i3.Shot();
 
         DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
