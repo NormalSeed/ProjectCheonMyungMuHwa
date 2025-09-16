@@ -15,11 +15,16 @@ public enum MonsterAnimationState
     DEATH
 }
 
-public abstract class BossController : MonsterController
+public class BossController : MonsterController
 {
     public System.Action OnSpawnAmimEnd;
 
     [SerializeField] protected Transform selfEffectTrs;
+
+    [SerializeField] int animationNumber;
+    [SerializeField] string effectName;
+    [SerializeField] float effectScale;
+    [SerializeField] bool targetEffect;
 
     [Inject]
     public void Construct(Image bossbar)
@@ -58,14 +63,20 @@ public abstract class BossController : MonsterController
         OnSpawnAmimEnd?.Invoke();
         IsInvulnerable = false;
     }
+    public override void OnAttack(GameObject me, IDamagable target)
+    {
+        Spum.PlayAnimation(PlayerState.ATTACK, animationNumber);
+        StartCoroutine(RealAttackRoutine(target));
+    }
 
     protected override IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return RealAttackDelay;
-        ParticleManager.Instance.GetParticle("NormalBoss_AtkEffect", selfEffectTrs.position, scale: 3);
+        if (selfEffectTrs != null) ParticleManager.Instance.GetParticle(effectName, selfEffectTrs.position, scale: effectScale);
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject go in players)
         {
+            if (targetEffect) ParticleManager.Instance.GetParticle(effectName, go.transform.position, scale: 1);
             go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
             DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
