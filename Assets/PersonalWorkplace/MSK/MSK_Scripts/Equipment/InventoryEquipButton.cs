@@ -24,7 +24,6 @@ public class InventoryEquipButton : MonoBehaviour
     {
         panel.GetEquipmentInstance(equipmentInstance);
         panel.gameObject.SetActive(true);
-        panel.Init();
     }
     #endregion
 

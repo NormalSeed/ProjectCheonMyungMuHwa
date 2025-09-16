@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,9 +20,8 @@ public class HeroUI : UIBase
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
-    [Header("HeroSlot")]
-    [SerializeField] List<HeroSlotUI> heroSlots;
-    [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
+    public event Action partySetFin;
+
 
     [Header("HeroCard")]
     [SerializeField] List<HeroInfoSetting> heroCard;
@@ -32,7 +29,10 @@ public class HeroUI : UIBase
     public event Action PartySetFin;                    // 파티 편성 시작 알림
     public event Action PartySetStart;                  // 파티 편성 종료 알림
     public event Action PartyNumChanged;                // 파티 순서 변경 알림
+
     #region Unity LifeCycle
+
+    public void Start() { }
 
     private void OnEnable()
     {
@@ -52,6 +52,7 @@ public class HeroUI : UIBase
 
 
     #region Button OnClick
+
     // 자동 승급
     private void OnClickStageUpgrade()
     {
@@ -113,8 +114,6 @@ public class HeroUI : UIBase
         heroSetSave.onClick.AddListener(OnClickHeroSetSave);
         heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
         autoSet.onClick.AddListener(OnClickAutoSet);
-        
-        PartySetStart?.Invoke();
     }
 
 
@@ -131,11 +130,12 @@ public class HeroUI : UIBase
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
         PartyManager.Instance.EndPartySetting();    // 편성 종료
+        PartyManager.Instance.PartyInit();
 
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
 
-        PartySetFin?.Invoke();
+        partySetFin?.Invoke();
     }
 
     // 영웅 배치하지 않고 저장
@@ -152,7 +152,6 @@ public class HeroUI : UIBase
         PartyManager.Instance.EndPartySetting();
 
         heroSet.gameObject.SetActive(true);
-
         PartySetFin?.Invoke();
     }
     #endregion
@@ -196,7 +195,8 @@ public class HeroUI : UIBase
             return;
 
         heroSlots[index].SetCard(input, index);
-    }
+        partySetFin?.Invoke();
 
+    }
     #endregion
 }

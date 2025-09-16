@@ -34,7 +34,7 @@ public class NanGong_QiEmission : SkillEffect
                 {
                     var buff = new StatModifier(
                         statType: StatType.InnAtk,
-                        value: 0.3f,
+                        value: 0.3,
                         source: ModifierSource.Buff,
                         originID: "QiEmissionBuff",
                         isPercent: true,

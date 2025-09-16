@@ -70,7 +70,7 @@ public class US002_SkillSet : SkillSet
         spumC.PlayAnimation(PlayerState.ATTACK, 2);
         Vector3 offset = new Vector3(0.2f, 0, 0);
         Vector3 destination;
-        if (target.position.x - controller.transform.position.x >= 0)
+        if (target.position.x - transform.position.x >= 0)
         {
             destination = target.position - offset;
         }

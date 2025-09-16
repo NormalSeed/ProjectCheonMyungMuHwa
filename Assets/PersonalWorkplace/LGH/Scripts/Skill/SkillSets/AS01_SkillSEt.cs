@@ -25,7 +25,7 @@ public class AS01_SkillSet : SkillSet
         if (target == null || pController == null) return;
 
         // 발사 위치
-        Vector3 spawnPos = controller.transform.position;
+        Vector3 spawnPos = transform.position;
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -42,7 +42,7 @@ public class AS01_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[0], controller);
+            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[0]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else
@@ -57,7 +57,7 @@ public class AS01_SkillSet : SkillSet
         if (target == null || pController == null) return;
 
         // 발사 위치
-        Vector3 spawnPos = controller.transform.position;
+        Vector3 spawnPos = transform.position;
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -74,7 +74,7 @@ public class AS01_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[1], controller);
+            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[1]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else

@@ -11,7 +11,6 @@ public class PlayerModel : MonoBehaviour
     public float Def;
     public float CritRate;
     public float CritDamage;
-    public float AttackSpeed;
 
     public float bossDamageBonus = 1;
     public float normalDamageBonus = 1;
@@ -41,7 +40,6 @@ public class PlayerModel : MonoBehaviour
         Def = modelSO.DefPoint;
         CritRate = modelSO.CritRate;
         CritDamage = modelSO.CritDamage;
-        AttackSpeed = modelSO.AtkSpeed;
 
         // 초기 체력 설정
         CurHealth.Value = Health;

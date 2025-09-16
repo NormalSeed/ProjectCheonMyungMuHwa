@@ -10,9 +10,8 @@ public enum StatType
     ExtAtk,      // 외공
     InnAtk,      // 내공
     Defense,     // 방어력
-    CritDamage,  // 치명타 배율
-    CritRate,    // 치명타 확률
-    AtkSpeed,    // 공격 속도
+    CritDamage,  //치명타 배율
+    CritRate,    //차명타 확률
     Health,      // 채력
     BDamage,     // 보스 데미지
     NDamage,     // 일반 데미지
@@ -57,10 +56,5 @@ public class EquipmentInstance
     public float GetStat()
     {
         return baseStat + level * statIncrease;
-    }
-    
-    public float GetNextLevelStat()
-    {
-        return baseStat + (level+1) * statIncrease;
     }
 }

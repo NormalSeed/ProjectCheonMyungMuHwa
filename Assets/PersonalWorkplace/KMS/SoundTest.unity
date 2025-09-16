@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1282069749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +207,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1401629484}
-  - component: {fileID: 1401629485}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -230,18 +229,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1401629485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1401629483}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40a3333a11b4b524bba13530646e5718, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1831917347
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -253,10 +240,6 @@ PrefabInstance:
     - target: {fileID: 4472520442459789275, guid: bbeb041352048c94bb4e1ad88f12c0d2, type: 3}
       propertyPath: m_Name
       value: Bow
-      objectReference: {fileID: 0}
-    - target: {fileID: 4472520442459789275, guid: bbeb041352048c94bb4e1ad88f12c0d2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7135985189332435327, guid: bbeb041352048c94bb4e1ad88f12c0d2, type: 3}
       propertyPath: m_Pivot.x
@@ -572,10 +555,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MonsterHPBar
       objectReference: {fileID: 0}
-    - target: {fileID: 1106367123911147606, guid: 7b54ac8eeb7f78944a0c2a14e43ac5ca, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -632,10 +611,6 @@ PrefabInstance:
     - target: {fileID: 9131025947530066269, guid: 77b670e660f13094a93a300224b408ee, type: 3}
       propertyPath: m_Name
       value: AudioManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 9131025947530066269, guid: 77b670e660f13094a93a300224b408ee, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

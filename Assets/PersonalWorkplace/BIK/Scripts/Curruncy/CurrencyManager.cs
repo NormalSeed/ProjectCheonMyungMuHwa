@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using VContainer.Unity;
 
 public class CurrencyManager : IStartable, IDisposable
@@ -185,62 +183,42 @@ public class CurrencyManager : IStartable, IDisposable
     /// 파티 편성정보 저장
     /// </summary>
     /// <param name="party"></param>
-    public void SavePartyToFirebase(List<CardInfo> party)
+    public void SavePartyToFirebase(List<string> party)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
 
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo");
 
-        List<string> heroIdList = new();
-        foreach (var card in party)
-        {
-            heroIdList.Add(card.HeroID);
-        }
-        partyInfoRef.SetValueAsync(heroIdList);
+        //  기존 저장된 리스트 삭제
+        partyInfoRef.RemoveValueAsync().ContinueWith(removeTask => {
+            if (removeTask.IsFaulted)
+                return;
+            // 새로운 리스트 저장
+            partyInfoRef.SetValueAsync(party).ContinueWith(setTask => {
+                if (setTask.IsFaulted) { }
+            });
+        });
     }
-
 
     /// <summary>
     /// 파티 편성정보 로딩
     /// </summary>
     /// <param name="list"></param>
-    public async void LoadPartyFromFirebase(List<CardInfo> resultList)
+    public void LoadPartyIdsFromFirebase(List<string> list)
     {
         if (string.IsNullOrEmpty(_uid))
             return;
-
-        var snapshot = await _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo").GetValueAsync();
-        resultList.Clear();
-
-        if (snapshot.Exists)
-        {
-            var rawList = snapshot.Value as List<object>;
-            if (rawList != null)
-            {
-                foreach (var obj in rawList)
-                {
-                    string heroId = obj.ToString();
-
-                    // Addressables에서 해당 HeroID로 CardInfo 로드
-                    var handle = Addressables.LoadAssetAsync<CardInfo>(heroId+"CardInfo");
-                    await handle.Task;
-
-                    if (handle.Status == AsyncOperationStatus.Succeeded)
-                    {
-                        resultList.Add(handle.Result);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Addressables에서 HeroID '{heroId}' 로드 실패");
-                    }
+        _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo")
+            .GetValueAsync().ContinueWith(task => {
+                list.Clear();
+                var raw = task.Result.Value as List<object>;
+                if (raw != null) {
+                    foreach (var obj in raw)
+                        list.Add(obj.ToString());
                 }
-            }
-        }
-        PartyManager.Instance.PartyInit();
-        PartyManager.Instance.PartyLoadUI();
+            });
     }
-
 
     /// <summary>
     /// 캐릭터 성장정보 저장

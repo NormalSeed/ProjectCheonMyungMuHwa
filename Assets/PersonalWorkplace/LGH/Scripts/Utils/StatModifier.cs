@@ -16,7 +16,7 @@ public enum ModifierSource
 public class StatModifier
 {   
     public StatType statType;       //어떤 능력치에 영향을 주는지 결정하는 필드
-    public float value;             // 증감값
+    public double value;            // 증감값
     public ModifierSource source;   //Modifier의 출처(장비, 시너지 등)
     public string originID;         // 장비 ID, 시너지 이름 등
     public bool isPercent;          // 비율 기반 처리 여부
@@ -31,7 +31,7 @@ public class StatModifier
     /// <param name="originID">장비 ID, 시너지 이름 등 구별 가능한 값</param>
     /// <param name="isPercent">비율 기반 처리 여부</param>
     /// <param name="duration">버프 지속시간</param>
-    public StatModifier(StatType statType, float value, ModifierSource source, string originID = "", bool isPercent = false, float duration = 0f)
+    public StatModifier(StatType statType, double value, ModifierSource source, string originID = "", bool isPercent = false, float duration = 0f)
     {
         this.statType = statType;
         this.value = value;
@@ -151,12 +151,12 @@ public static class StatModifierManager
     /// <param name="statType"></param>
     /// <param name="baseValue"></param>
     /// <returns></returns>
-    public static float GetTotalModifier(string charID, StatType statType, float baseValue)
+    public static double GetTotalModifier(string charID, StatType statType, double baseValue)
     {
         if (!modifierCache.ContainsKey(charID))
             return 0;
 
-        float total = 0;
+        double total = 0;
 
         foreach (var modifier in modifierCache[charID].Where(m => m.statType == statType))
         {
@@ -183,7 +183,6 @@ public static class StatModifierManager
         model.Def = (float)(model.modelSO.DefPoint + GetTotalModifier(charID, StatType.Defense, model.modelSO.DefPoint));
         model.CritRate = (float)(model.modelSO.CritRate + GetTotalModifier(charID, StatType.CritRate, model.modelSO.CritRate));
         model.CritDamage = (float)(model.modelSO.CritDamage + GetTotalModifier(charID, StatType.CritDamage, model.modelSO.CritDamage));
-        model.AttackSpeed = model.modelSO.AtkSpeed + GetTotalModifier(charID, StatType.AtkSpeed, model.modelSO.AtkSpeed);
         model.bossDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.BDamage, 1));
         model.normalDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.NDamage, 1));
         model.skillDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.SkillDamage, 1));

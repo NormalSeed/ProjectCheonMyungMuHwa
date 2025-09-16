@@ -57,26 +57,6 @@ public partial class PlayerAttackAction : Action
         return closest;
     }
 
-    private void FlipTowardsTarget()
-    {
-        if (Target.Value == null) return;
-
-        Vector3 scale = Self.Value.transform.localScale;
-
-        if (controller.movedRight)
-        {
-            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? -1 : 1;
-        }
-        else
-        {
-            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? 1 : -1;
-        }
-
-        Debug.Log($"방향전환 전: {Self.Value.transform.localScale}");
-        Self.Value.transform.localScale = scale;
-        Debug.Log($"방향전환 후: {Self.Value.transform.localScale}");
-    }
-
     protected override Status OnUpdate()
     {
         if (IsInAttackRange.Value == false)
@@ -93,19 +73,13 @@ public partial class PlayerAttackAction : Action
         if (Target.Value != null && attackDelay <= 0f)
         {
             Debug.Log("기본 공격 실행");
-
-            controller.target = Target.Value.transform;
-
             IDamagable target = Target.Value.GetComponent<IDamagable>();
-            MonsterController mController = Target.Value.GetComponent<MonsterController>();
-            if (target != null && mController != null && attackDelay <= 0f)
+            if (target != null && attackDelay <= 0f)
             {
-                FlipTowardsTarget();
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
                 target.TakeDamage(model.ExtAtk);
-                mController.isAttackedByNormalAttack = true;
-                attackDelay = 1f / model.AttackSpeed;
+                attackDelay = 1f / model.modelSO.AtkSpeed;
                 controller.skill2Count--;
             }
             else
