@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
-
+    public bool IsInvulnerable { get; set; }
     public Action<IPooled<MonsterController>> OnLifeEnded { get; set; }
     public SPUM_Prefabs Spum;
     public MonsterModel Model;
@@ -76,6 +76,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     }
     protected virtual void OnTakeDamage(double amount)
     {
+        if (IsInvulnerable) return;
         if (IsDead) return;
         Model.CurHealth.Value -= amount;
         if (hurtCo != null)

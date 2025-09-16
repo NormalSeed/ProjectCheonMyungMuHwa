@@ -51,7 +51,7 @@ public class CurrencyDungeonManage : MonoBehaviour
 
     private void DungeonFail()
     {
-        bossSpawner.SpawnedBoss.SetActive(false);
+        bossSpawner.Bosscon.IsInvulnerable = true;
         failUI.SetShow();
     }
     void Update()
