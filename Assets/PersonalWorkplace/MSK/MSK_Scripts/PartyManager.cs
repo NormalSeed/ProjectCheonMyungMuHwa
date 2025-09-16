@@ -88,6 +88,12 @@ public class PartyManager : MonoBehaviour, IStartable
             PlayerController controller = players[i];
             if (controller == null) continue;
 
+            if (!string.IsNullOrEmpty(controller.charID.Value))
+            {
+                StatModifierManager.ClearAllModifiers(controller.charID.Value);
+                StatModifierManager.ApplyToModel(controller.model);
+            }
+
             if (i < MembersID.Count)
             {
                 CardInfo card = MembersID[i];

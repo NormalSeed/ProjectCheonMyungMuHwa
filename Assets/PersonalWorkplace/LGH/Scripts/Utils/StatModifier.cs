@@ -145,6 +145,18 @@ public static class StatModifierManager
     }
 
     /// <summary>
+    /// 모든 Modifier 제거 메서드
+    /// </summary>
+    /// <param name="charID"></param>
+    public static void ClearAllModifiers(string charID)
+    {
+        if (modifierCache.ContainsKey(charID))
+        {
+            modifierCache[charID].Clear();
+        }
+    }
+
+    /// <summary>
     /// charID를 기반으로 해당 캐릭터의 해당 statType에 대해 Modifier들의 총합을 계산하는 메서드
     /// </summary>
     /// <param name="charID"></param>
