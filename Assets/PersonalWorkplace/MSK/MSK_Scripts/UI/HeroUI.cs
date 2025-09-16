@@ -197,7 +197,7 @@ public class HeroUI : UIBase
             return;
 
         heroSlots[index].SetCard(input, index);
-        partySetFin?.Invoke();
+        PartySetFin?.Invoke();
     }
 
     #endregion
