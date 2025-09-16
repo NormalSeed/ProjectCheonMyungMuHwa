@@ -174,4 +174,11 @@ public class HeroInfoSetting : MonoBehaviour
         }
     }
     #endregion
+
+    #region Public
+    public void ShowRefrashing()
+    {
+        SetStage();
+    }
+    #endregion
 }

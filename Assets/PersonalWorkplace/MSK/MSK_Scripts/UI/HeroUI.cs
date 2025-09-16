@@ -34,14 +34,15 @@ public class HeroUI : UIBase
 
     private void OnEnable()
     {
-        // 승급 가능한 영웅이 있을 경우에만 활성화
-        // stageUpgrade.onClick.AddListener(onClickStageUpgrade);
+        CheckUpgradableHeroes();
+        stageUpgrade.onClick.AddListener(OnClickStageUpgrade);
         heroSet.onClick.AddListener(OnClickHeroSet);
     }
 
     private void OnDisable()
     {
         infoPanel.SetActive(false);
+        stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
         heroSet.onClick.RemoveListener(OnClickHeroSet);
     }
     #endregion
@@ -49,14 +50,40 @@ public class HeroUI : UIBase
 
 
     #region Button OnClick
-
-    //  자동 승급 
+    // 자동 승급
     private void OnClickStageUpgrade()
     {
-        stageUpgrade.gameObject.SetActive(false);
-        // 승급 완료 후 버튼 비활성화
+        int upgradedCount = 0;
+
+        foreach (var kvp in HeroDataManager.Instance.ownedHeroes)
+        {
+            var hero = kvp.Value;
+
+            while (hero.stage < 5)
+            {
+                int rarityValue = (int)hero.cardInfo.rarity;
+                int requiredPiece = hero.stage * (5 - rarityValue);
+
+                if (hero.heroPiece < requiredPiece)
+                    break;
+
+                hero.heroPiece -= requiredPiece;
+                hero.stage++;
+
+                // 저장
+                CurrencyManager.Instance.SaveHeroStageToFireBase(hero.heroId, hero.stage);
+                CurrencyManager.Instance.SavePieceToFireBase(hero.heroId, hero.heroPiece);
+
+                upgradedCount++;
+            }
+        }
+
+        Debug.Log($"[HeroUI] 자동 승급 완료: 총 {upgradedCount}회 승급됨");
+
+        CheckUpgradableHeroes(); // 버튼 상태 갱신
         stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
     }
+
 
     //  영웅 자동 배치
     private void OnClickAutoSet()
@@ -122,6 +149,29 @@ public class HeroUI : UIBase
         heroSet.gameObject.SetActive(true);
 
         PartySetFin?.Invoke();
+    }
+    #endregion
+    #region Private
+    //  승급 가능 여부 반환
+    private void CheckUpgradableHeroes()
+    {
+        bool hasUpgradable = false;
+
+        foreach (var hero in HeroDataManager.Instance.ownedHeroes.Values)
+        {
+            if (hero.stage >= 5) continue;
+
+            int rarityValue = (int)hero.cardInfo.rarity;
+            int requiredPiece = hero.stage * (5 - rarityValue);
+
+            if (hero.heroPiece >= requiredPiece)
+            {
+                hasUpgradable = true;
+                break;
+            }
+        }
+
+        stageUpgrade.gameObject.SetActive(hasUpgradable);
     }
     #endregion
 
