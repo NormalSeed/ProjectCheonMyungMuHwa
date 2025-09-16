@@ -3563,7 +3563,7 @@ GameObject:
   - component: {fileID: 94761623221087431}
   - component: {fileID: 8427438595419694839}
   - component: {fileID: 4460636153579323541}
-  - component: {fileID: 1522147205424402225}
+  - component: {fileID: 8950412012819247944}
   m_Layer: 10
   m_Name: PunchBoss
   m_TagString: Monster
@@ -6582,7 +6582,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.22, y: 2.07}
   m_EdgeRadius: 0
---- !u!114 &1522147205424402225
+--- !u!114 &8950412012819247944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6591,7 +6591,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4999875624023369911}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9912760e5c5b90043a6dad65ee3973b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 00ae71e584415a54689035298a1256d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Spum: {fileID: 0}
@@ -6599,7 +6599,12 @@ MonoBehaviour:
   NavAgent: {fileID: 0}
   healthBar: {fileID: 0}
   attackDelay: 0.3
+  isAttackedByNormalAttack: 0
   selfEffectTrs: {fileID: 7384470397719607197}
+  animationNumber: 3
+  effectName: 'NormalBoss2_AtkEffect '
+  effectScale: 3
+  targetEffect: 0
 --- !u!1 &5244886714086304714
 GameObject:
   m_ObjectHideFlags: 0

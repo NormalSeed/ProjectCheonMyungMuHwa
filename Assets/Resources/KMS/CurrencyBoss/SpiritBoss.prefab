@@ -5182,12 +5182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tex: {fileID: 11400000, guid: ec64d9e55ef62814481318bad7c961e7, type: 2}
-  renderers:
-  - {fileID: 8095467116151347086}
-  - {fileID: 2928372845020995554}
-  - {fileID: 3397468538516113384}
-  - {fileID: 6092753312655127102}
-  - {fileID: 7136472556621859281}
+  skinRenderers: []
   AttackDistance: 0
   AttackDelay: 3
   MoveSpeed: 0
@@ -5208,7 +5203,12 @@ MonoBehaviour:
   NavAgent: {fileID: 0}
   healthBar: {fileID: 0}
   attackDelay: 0.4
+  isAttackedByNormalAttack: 0
   selfEffectTrs: {fileID: 0}
+  animationNumber: 1
+  effectName: 
+  effectScale: 0
+  targetEffect: 0
 --- !u!1 &6165224653823968232
 GameObject:
   m_ObjectHideFlags: 0
