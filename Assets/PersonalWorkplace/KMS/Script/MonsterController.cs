@@ -26,6 +26,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public System.Action onDeath;
 
+    public bool isAttackedByNormalAttack = false;
+
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
     {

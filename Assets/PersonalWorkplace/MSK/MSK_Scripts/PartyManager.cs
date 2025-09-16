@@ -236,17 +236,17 @@ public class PartyManager : MonoBehaviour, IStartable
                     if (stage == 1)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.Attack, 0.2, ModifierSource.Synergy, synergyID, true));
+                            new StatModifier(StatType.Attack, 0.2f, ModifierSource.Synergy, synergyID, true));
                     }
                     else if (stage == 2)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.Attack, 0.4, ModifierSource.Synergy, synergyID, true));
+                            new StatModifier(StatType.Attack, 0.4f, ModifierSource.Synergy, synergyID, true));
                     }
                     else if (stage == 3)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.Attack, 0.7, ModifierSource.Synergy, synergyID, true));
+                            new StatModifier(StatType.Attack, 0.7f, ModifierSource.Synergy, synergyID, true));
                     }
                     break;
 
@@ -254,17 +254,17 @@ public class PartyManager : MonoBehaviour, IStartable
                     if (stage == 1)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.BDamage, 0.2, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.BDamage, 0.2f, ModifierSource.Synergy, synergyID));
                     }
                     else if (stage == 2)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.BDamage, 0.4, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.BDamage, 0.4f, ModifierSource.Synergy, synergyID));
                     }
                     else if (stage == 3)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.BDamage, 0.7, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.BDamage, 0.7f, ModifierSource.Synergy, synergyID));
                     }
                     break;
 
@@ -272,12 +272,12 @@ public class PartyManager : MonoBehaviour, IStartable
                     if (stage == 1)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.SkillDamage, 0.15, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.SkillDamage, 0.15f, ModifierSource.Synergy, synergyID));
                     }
                     else if (stage == 2)
                     {
                         StatModifierManager.ApplyModifier(targetCharID,
-                            new StatModifier(StatType.SkillDamage, 0.5, ModifierSource.Synergy, synergyID));
+                            new StatModifier(StatType.SkillDamage, 0.5f, ModifierSource.Synergy, synergyID));
                     }
                     else if (stage == 3)
                     {

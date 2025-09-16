@@ -27,7 +27,7 @@ public class US003_SkillSet : SkillSet
     private IEnumerator Skill1Routine()
     {
         // skills[0].SkillRange 내에 있는 Monster 태그를 갖고 있는 모든 오브젝트 중 거리가 가장 먼 것을 새로운 타겟(newTarget)으로 설정하고
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, skills[0].SkillRange);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(controller.transform.position, skills[0].SkillRange);
         Transform newTarget = null;
         float maxDistance = 0f;
 
@@ -35,7 +35,7 @@ public class US003_SkillSet : SkillSet
         {
             if (hit.CompareTag("Monster"))
             {
-                float distance = Vector2.Distance(transform.position, hit.transform.position);
+                float distance = Vector2.Distance(controller.transform.position, hit.transform.position);
                 if (distance > maxDistance)
                 {
                     maxDistance = distance;
