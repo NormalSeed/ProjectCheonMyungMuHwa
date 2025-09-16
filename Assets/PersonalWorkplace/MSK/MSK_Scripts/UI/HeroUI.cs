@@ -26,22 +26,26 @@ public class HeroUI : UIBase
     [SerializeField] List<HeroSlotUI> heroSlots;
     [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
 
+    [Header("HeroCard")]
+    [SerializeField] List<HeroInfoSetting> heroCard;
 
     public event Action PartySetFin;                    // 파티 편성 시작 알림
     public event Action PartySetStart;                  // 파티 편성 종료 알림
     public event Action PartyNumChanged;                // 파티 순서 변경 알림
+
     #region Unity LifeCycle
 
     private void OnEnable()
     {
-        // 승급 가능한 영웅이 있을 경우에만 활성화
-        // stageUpgrade.onClick.AddListener(onClickStageUpgrade);
+        stageUpgrade.onClick.AddListener(OnClickStageUpgrade);
         heroSet.onClick.AddListener(OnClickHeroSet);
+        CheckUpgradableHeroes();
     }
 
     private void OnDisable()
     {
         infoPanel.SetActive(false);
+        stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
         heroSet.onClick.RemoveListener(OnClickHeroSet);
     }
     #endregion
@@ -50,11 +54,41 @@ public class HeroUI : UIBase
 
     #region Button OnClick
 
-    //  자동 승급 
+    // 자동 승급
     private void OnClickStageUpgrade()
     {
-        stageUpgrade.gameObject.SetActive(false);
-        // 승급 완료 후 버튼 비활성화
+        foreach (var ownedHero in HeroDataManager.Instance.ownedHeroes)
+        {
+            var hero = ownedHero.Value;
+
+            // 승급 로직
+            while (hero.stage < 5)
+            {
+                int rarityValue = (int)hero.cardInfo.rarity;
+                int requiredPiece = hero.stage * (5 - rarityValue);
+
+                if (hero.heroPiece < requiredPiece)
+                    break;
+
+                hero.heroPiece -= requiredPiece;
+                hero.stage++;
+
+                // 저장
+                CurrencyManager.Instance.SaveHeroStageToFireBase(hero.heroId, hero.stage);
+                CurrencyManager.Instance.SavePieceToFireBase(hero.heroId, hero.heroPiece);
+            }
+            // UI 갱신
+            foreach (var cardUI in heroCard)
+            {
+                if (cardUI.chardata.HeroID == hero.heroId)
+                {
+                    cardUI.SetStage();
+
+                }
+            }
+        }
+
+        CheckUpgradableHeroes(); // 버튼 상태 갱신
         stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
     }
 
@@ -120,9 +154,30 @@ public class HeroUI : UIBase
         PartyManager.Instance.EndPartySetting();
 
         heroSet.gameObject.SetActive(true);
-
         PartySetFin?.Invoke();
     }
+    #endregion
+    #region Private
+    //  승급 가능 여부 반환
+    private void CheckUpgradableHeroes()
+    {
+        foreach (var hero in HeroDataManager.Instance.ownedHeroes.Values)
+        {
+            if (hero.stage >= 5) continue;
+            Debug.LogWarning($"{hero.heroId}");
+            Debug.LogWarning($"{hero.cardInfo.rarity}");
+            int rarityValue = (int)hero.cardInfo.rarity;
+            int requiredPiece = hero.stage * (5 - rarityValue);
+
+            if (hero.heroPiece >= requiredPiece)
+            {
+                stageUpgrade.gameObject.SetActive(true);
+                return;
+            }
+        }
+        stageUpgrade.gameObject.SetActive(false);
+    }
+    
     #endregion
 
     #region Public
@@ -142,6 +197,7 @@ public class HeroUI : UIBase
             return;
 
         heroSlots[index].SetCard(input, index);
+        partySetFin?.Invoke();
     }
 
     #endregion
