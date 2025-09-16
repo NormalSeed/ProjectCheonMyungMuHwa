@@ -54,6 +54,8 @@ public class GameLifetimeScope : LifetimeScope
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
         // 테이블
         builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
+        // 모델
+        builder.RegisterComponentInHierarchy<HeroModels>().AsSelf();
         // 스킬셋
         builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
     }
