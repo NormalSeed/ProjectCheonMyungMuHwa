@@ -35,6 +35,13 @@ public class IntroSceneManager : MonoBehaviour
 
         if (scope != null)
         {
+            var heroModels = scope.Container.Resolve<HeroModels>();
+            heroModels.Init();
+            yield return new WaitUntil(() => heroModels.IsInitialized);
+        }
+
+        if (scope != null)
+        {
             var heroSkillSets = scope.Container.Resolve<HeroSkillSets>();
             heroSkillSets.Init();
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
