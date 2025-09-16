@@ -22,6 +22,7 @@ public class HeroSkillSets : MonoBehaviour
         "US002",
         "US003",
         "LS002",
+        "LS003",
     };
 
     public bool IsInitialized { get; private set; } = false;

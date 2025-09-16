@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
+    public Transform target;
+
     [Header("보호막 관련 필드")]
     private float shieldAmount = 0f;
     private float shieldDuration = 0f;
