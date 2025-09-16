@@ -11,5 +11,9 @@ public class HeroData
     public string heroId;                    // 영웅 고유 ID
     public CardInfo cardInfo;                // 카드 정보
     public PlayerModelSO PlayerModelSO;      // 모델 정보
-    // public PlayerSkillSO PlayerSkillSO;      // 스킬 정보
+    // public PlayerSkillSO PlayerSkillSO;   // 스킬 정보
+    public string weapone;                   // 무기 장비 ID
+    public string armor;                     // 방어구 장비 ID
+    public string boots;                     // 신발 장비 ID
+    public string gloves;                    // 장갑 장비 ID
 }

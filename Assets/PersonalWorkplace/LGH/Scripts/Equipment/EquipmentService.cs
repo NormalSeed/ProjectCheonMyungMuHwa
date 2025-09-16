@@ -120,6 +120,29 @@ public class EquipmentService
     }
 
     /// <summary>
+    /// EquipmentInstance 장착정보를 갱신하는 메서드
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public bool EquipToUnactivatedCharacter(string charID, EquipmentInstance item)
+    {
+        item.charID = charID;
+        item.isEquipped = true;
+
+        equipmentManager.SaveToJson();
+        return true;
+    }
+    public bool UnequipFromUnactivatedCharacter(string charID, EquipmentInstance item)
+    {
+        item.charID = null;
+        item.isEquipped = false;
+
+        equipmentManager.SaveToJson();
+        return true;
+    }
+
+    /// <summary>
     /// CharacterEquipment의 슬롯에서 장비를 해제하는 메서드
     /// </summary>
     /// <param name="charID">해제 대상 캐릭터 ID</param>
@@ -156,4 +179,5 @@ public class EquipmentService
         equipmentManager.SaveToJson();
         return true;
     }
+
 }

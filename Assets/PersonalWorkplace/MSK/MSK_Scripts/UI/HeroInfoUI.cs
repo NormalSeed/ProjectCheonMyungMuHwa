@@ -1,6 +1,7 @@
 using Firebase.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -44,14 +45,15 @@ public class HeroInfoUI : UIBase
 
     [Header("Panel")]
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
+    [SerializeField] private GameObject equipPanel;
     #endregion
 
     #region SO Properties
-    private HeroData heroData;
+    public HeroData heroData;
     private BigCurrency HealthPoint = new();     // 체력정보
     private BigCurrency FinalPower = new();      // 종합전투
-    private BigCurrency InnAtkPoint = new();     // 내공????
-    private BigCurrency ExtAtkPoint = new();     // 외곻????
+    private BigCurrency InnAtkPoint = new();     // 내공
+    private BigCurrency ExtAtkPoint = new();     // 외곻
     #endregion
 
     #region Goods Properties
@@ -62,7 +64,10 @@ public class HeroInfoUI : UIBase
 
     #region Equip
     private Dictionary<string, EquipmentInstance> equips = new();
-
+    public string weaponID;
+    public string armorID;
+    public string bootsID;
+    public string glovesID;
     #endregion
     #region FireBase
     private string _uid;
@@ -70,10 +75,11 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Unity LiftCycle
-    private void OnEnable()  { }
+    private void OnEnable() { }
 
     private void OnDisable()
     {
+        equipPanel.SetActive(false);
         exitButton.onClick.RemoveListener(OnClickExit);
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
         stageUPButton.onClick.RemoveListener(OnClickStageUP);
@@ -81,7 +87,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Init 
-    private async void Init()
+    public async void Init()
     {
         ButtonAddListener();                 // 버튼 리스너 연결
         PrepareHeroStats();                 // 능력치 및 조각 계산
@@ -95,16 +101,24 @@ public class HeroInfoUI : UIBase
     }
     private void SetEquipment()
     {
+        SetEquipmentSettings();
         Debug.Log("[SetEquipment] : 불러오는 중 Weapon");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Weapon);
         Debug.Log("[SetEquipment] : 불러오는 중Armor");
-        //armor.GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Armor);
+        GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Armor);
         Debug.Log("[SetEquipment] : 불러오는 중 Gloves");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Gloves);
         Debug.Log("[SetEquipment] : 불러오는 중Boots");
-        //boots.GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Boots);
+        GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Boots);
     }
-
+    private void SetEquipmentSettings()
+    {
+        EquipClass equipClass = (EquipClass)Enum.Parse(typeof(EquipClass), heroData.PlayerModelSO.Role);
+        weapone.EquipmentSettingLoad(equipClass);
+        armor.EquipmentSettingLoad(equipClass);
+        boots.EquipmentSettingLoad(equipClass);
+        gloves.EquipmentSettingLoad(equipClass);
+    }
     private void PrepareHeroStats()
     {
         HealthPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint);
@@ -179,7 +193,7 @@ public class HeroInfoUI : UIBase
     private void SetRankUpInteractable(Button btn)
     {
         btn.interactable = ownerPiece >= requirePiece;
-    }   
+    }
     #endregion
 
     #region OnClick
@@ -226,9 +240,9 @@ public class HeroInfoUI : UIBase
     /// <returns></returns>
     private string CountingHeroPower()
     {
-        double power = heroData.PlayerModelSO.ExtAtkPoint *
+        float power = heroData.PlayerModelSO.ExtAtkPoint *
                        heroData.PlayerModelSO.HealthPoint *
-                       heroData.PlayerModelSO.InnAtkPoint * 0.7;
+                       heroData.PlayerModelSO.InnAtkPoint * 0.7f;
 
         return BigCurrency.FromBaseAmount(power).ToString();
     }
@@ -270,42 +284,75 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Public
+    /// <summary>
+    /// 장착한 장비를 설정하는 코드입니다.
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <param name="type"></param>
     public void GetEquipment(string charID, EquipmentType type)
     {
-        EquipmentInstance EquipmentInstance;
+        Debug.Log("[GetEquipment] 진입");
 
-        Debug.Log("[GetEquipment] 진입 ");
-        foreach (var istance in equipmentManager.allEquipments)
+        var equipButtons = new Dictionary<EquipmentType, InfoEquipButton>
+    {
+        { EquipmentType.Weapon, weapone },
+        { EquipmentType.Armor, armor },
+        { EquipmentType.Boots, boots },
+        { EquipmentType.Gloves, gloves }
+    };
+
+        if (!equipButtons.TryGetValue(type, out var button))
         {
-            if (istance.charID == charID && istance.equipmentType == type)
+            Debug.LogWarning($"[GetEquipment] 버튼 매핑 실패: {type}");
+            return;
+        }
+
+        var instance = equipmentManager.allEquipments
+            .FirstOrDefault(e => e.charID == charID && e.equipmentType == type);
+        
+        if (instance != null)
+        {
+            button.HeroEquipSet(instance);
+            switch (type)
             {
-                switch (type)
-                {
-                    case (EquipmentType.Weapon):
-                        {
-                            weapone.HeroEquipSet(istance);
-                            break;
-                        }
-                    case (EquipmentType.Armor):
-                        {
-                            armor.HeroEquipSet(istance);
-                            break;
-                        }
-                    case (EquipmentType.Boots):
-                        {
-                            boots.HeroEquipSet(istance);
-                            break;
-                        }
-                    case (EquipmentType.Gloves):
-                        {
-                            gloves.HeroEquipSet(istance);
-                            break;
-                        }
-                }
-                break;
+                case EquipmentType.Weapon:
+                    weaponID = instance.instanceID;
+                    Debug.Log($"[GetEquipment] : 무기 ID = {weaponID}");
+                    break;
+                case EquipmentType.Armor:
+                    armorID = instance.instanceID;
+                    break;
+                case EquipmentType.Boots:
+                    bootsID = instance.instanceID;
+                    break;
+                case EquipmentType.Gloves:
+                    glovesID = instance.instanceID;
+                    break;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[GetEquipment] 장비 없음: {charID}, {type}");
+            button.EquipReset();
+
+            switch (type)
+            {
+                case EquipmentType.Weapon:
+                    weaponID = null;
+                    break;
+                case EquipmentType.Armor:
+                    armorID = null;
+                    break;
+                case EquipmentType.Boots:
+                    bootsID = null;
+                    break;
+                case EquipmentType.Gloves:
+                    glovesID = null;
+                    break;
             }
         }
     }
+
 
     public void SetHeroData(HeroData data)
     {

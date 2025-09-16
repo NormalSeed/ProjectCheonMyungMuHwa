@@ -15,7 +15,6 @@ public class JeokRang_explosion : SkillEffect
     public void SetParent(Transform parent)
     {
         originalParent = parent;
-
     }
 
     private void OnEnable()
