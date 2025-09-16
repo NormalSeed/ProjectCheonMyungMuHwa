@@ -26,6 +26,8 @@ public class HeroUI : UIBase
     [SerializeField] List<HeroSlotUI> heroSlots;
     [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
 
+    [Header("HeroCard")]
+    [SerializeField] List<HeroInfoSetting> heroCard;
 
     public event Action PartySetFin;                    // 파티 편성 시작 알림
     public event Action PartySetStart;                  // 파티 편성 종료 알림
@@ -53,12 +55,11 @@ public class HeroUI : UIBase
     // 자동 승급
     private void OnClickStageUpgrade()
     {
-        int upgradedCount = 0;
-
-        foreach (var kvp in HeroDataManager.Instance.ownedHeroes)
+        foreach (var ownedHero in HeroDataManager.Instance.ownedHeroes)
         {
-            var hero = kvp.Value;
+            var hero = ownedHero.Value;
 
+            // 승급 로직
             while (hero.stage < 5)
             {
                 int rarityValue = (int)hero.cardInfo.rarity;
@@ -73,17 +74,21 @@ public class HeroUI : UIBase
                 // 저장
                 CurrencyManager.Instance.SaveHeroStageToFireBase(hero.heroId, hero.stage);
                 CurrencyManager.Instance.SavePieceToFireBase(hero.heroId, hero.heroPiece);
+            }
+            // UI 갱신
+            foreach (var cardUI in heroCard)
+            {
+                if (cardUI.chardata.HeroID == hero.heroId)
+                {
+                    cardUI.SetStage();
 
-                upgradedCount++;
+                }
             }
         }
-
-        Debug.Log($"[HeroUI] 자동 승급 완료: 총 {upgradedCount}회 승급됨");
 
         CheckUpgradableHeroes(); // 버튼 상태 갱신
         stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
     }
-
 
     //  영웅 자동 배치
     private void OnClickAutoSet()

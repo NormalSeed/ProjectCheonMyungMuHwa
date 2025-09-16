@@ -104,7 +104,7 @@ public class HeroInfoSetting : MonoBehaviour
             target.gameObject.SetActive(true);
     }
 
-    private void SetStage()
+    public void SetStage()
     {
         foreach (Transform stage in stageRoot)
         {
@@ -176,9 +176,6 @@ public class HeroInfoSetting : MonoBehaviour
     #endregion
 
     #region Public
-    public void ShowRefrashing()
-    {
-        SetStage();
-    }
+
     #endregion
 }
