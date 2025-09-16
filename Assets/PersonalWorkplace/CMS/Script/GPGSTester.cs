@@ -4,7 +4,23 @@ using UnityEngine;
 
 public class GPGSTester : MonoBehaviour
 {
-    public void GPGSTest()
+    public static GPGSTester Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 🔹 자동 로그인 시도
+    public void GPGSAutoLogin()
     {
         PlayGamesPlatform.Instance.Authenticate(OnAuthenticated);
     }
@@ -13,17 +29,24 @@ public class GPGSTester : MonoBehaviour
     {
         if (status == SignInStatus.Success)
         {
-            Debug.Log("GPGS 로그인 성공");
+            Debug.Log("GPGS 자동 로그인 성공");
 
-            PlayGamesPlatform.Instance.RequestServerSideAccess(true, (authCode) =>
+            PlayGamesPlatform.Instance.RequestServerSideAccess(true, (serverAuthCode) =>
             {
-                Debug.Log("ServerAuthCode: " + authCode);
-                // 여기서 Firebase Auth 연동
+                if (string.IsNullOrEmpty(serverAuthCode))
+                {
+                    Debug.LogError("ServerAuthCode 가져오기 실패, 게스트 로그인 fallback");
+                    BackendManager.Instance.SignInAnonymously();
+                    return;
+                }
+
+                BackendManager.Instance.LinkWithGoogle(serverAuthCode);
             });
         }
         else
         {
-            Debug.LogError("GPGS 로그인 실패");
+            Debug.LogError("GPGS 자동 로그인 실패, 게스트 로그인 fallback");
+            BackendManager.Instance.SignInAnonymously();
         }
     }
 }
