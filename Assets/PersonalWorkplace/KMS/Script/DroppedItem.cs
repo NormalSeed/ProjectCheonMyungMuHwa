@@ -81,11 +81,11 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
         {
             CurrencyManager.Instance.Add(CurrencyType.Gold, new BigCurrency(quantity));
         }
-        else if (type == DroppedItemType.SpiritBack)
+        else if (type == DroppedItemType.Honbaeg)
         {
             CurrencyManager.Instance.Add(CurrencyType.Soul, new BigCurrency(quantity));
         }
-        else if (type == DroppedItemType.SoulStone)
+        else if (type == DroppedItemType.SpiritStone)
         {
             CurrencyManager.Instance.Add(CurrencyType.SpiritStone, new BigCurrency(quantity));
         }

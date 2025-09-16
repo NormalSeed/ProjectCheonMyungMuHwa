@@ -9,7 +9,7 @@ public class SkillSet : MonoBehaviour
     protected ProjectileController pController;
     protected InstantAttatchmentController aController;
 
-    protected PlayerController controller;
+    public PlayerController controller;
     protected Transform parentTransform;
     protected SPUM_Prefabs spumC;
 

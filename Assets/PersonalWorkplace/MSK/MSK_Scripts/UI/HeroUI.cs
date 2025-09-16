@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,8 +22,9 @@ public class HeroUI : UIBase
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI PartyMembersCount;
 
-    public event Action partySetFin;
-
+    [Header("HeroSlot")]
+    [SerializeField] List<HeroSlotUI> heroSlots;
+    [SerializeField] private Transform partySlotRoot;   // 슬롯들이 들어갈 부모 오브젝트
 
     [Header("HeroCard")]
     [SerializeField] List<HeroInfoSetting> heroCard;
@@ -31,8 +34,6 @@ public class HeroUI : UIBase
     public event Action PartyNumChanged;                // 파티 순서 변경 알림
 
     #region Unity LifeCycle
-
-    public void Start() { }
 
     private void OnEnable()
     {
@@ -114,6 +115,8 @@ public class HeroUI : UIBase
         heroSetSave.onClick.AddListener(OnClickHeroSetSave);
         heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
         autoSet.onClick.AddListener(OnClickAutoSet);
+        
+        PartySetStart?.Invoke();
     }
 
 
@@ -130,12 +133,11 @@ public class HeroUI : UIBase
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
         PartyManager.Instance.EndPartySetting();    // 편성 종료
-        PartyManager.Instance.PartyInit();
 
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
 
-        partySetFin?.Invoke();
+        PartySetFin?.Invoke();
     }
 
     // 영웅 배치하지 않고 저장
@@ -175,7 +177,7 @@ public class HeroUI : UIBase
         }
         stageUpgrade.gameObject.SetActive(false);
     }
-
+    
     #endregion
 
     #region Public
@@ -196,7 +198,7 @@ public class HeroUI : UIBase
 
         heroSlots[index].SetCard(input, index);
         partySetFin?.Invoke();
-
     }
+
     #endregion
 }

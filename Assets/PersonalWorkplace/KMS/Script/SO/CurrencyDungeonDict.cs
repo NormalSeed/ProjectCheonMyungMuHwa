@@ -14,10 +14,20 @@ public class CurrencyDungeonDict : ScriptableObject
   [SerializeField] CurrencyDungeonDataTableSO honbaegTable;
   [SerializeField] CurrencyDungeonDataTableSO spiritTable;
 
+
+  [SerializeField] Sprite gold;
+  [SerializeField] Sprite soul;
+  [SerializeField] Sprite spirit;
+  [SerializeField] Sprite goldTicket;
+  [SerializeField] Sprite soulTicket;
+  [SerializeField] Sprite spiritTicket;
+
   public Dictionary<CurrencyDungeonType, int> DungeonCounts;
   public Dictionary<CurrencyDungeonType, CurrencyDungeonDataTableSO> DungeonTables;
 
   public Dictionary<CurrencyDungeonType, Sprite> DungeonSprites;
+  public Dictionary<CurrencyDungeonType, Sprite> TicketSprites;
+  public Dictionary<CurrencyDungeonType, Sprite> BackgroundSprites;
 
 
   void OnEnable()
@@ -34,10 +44,18 @@ public class CurrencyDungeonDict : ScriptableObject
       {CurrencyDungeonType.Honbaeg, honbaegTable},
       {CurrencyDungeonType.Spirit, spiritTable},
     };
-    DungeonSprites = new();
-    InitSprites();
-
-
+    TicketSprites = new Dictionary<CurrencyDungeonType, Sprite>()
+    {
+      {CurrencyDungeonType.Gold, goldTicket},
+      {CurrencyDungeonType.Honbaeg, soulTicket},
+      {CurrencyDungeonType.Spirit, spiritTicket},
+    };
+    DungeonSprites = new Dictionary<CurrencyDungeonType, Sprite>()
+    {
+      {CurrencyDungeonType.Gold, gold},
+      {CurrencyDungeonType.Honbaeg, soul},
+      {CurrencyDungeonType.Spirit, spirit},
+    };
   }
   private async void InitSprites()
   {
@@ -55,6 +73,26 @@ public class CurrencyDungeonDict : ScriptableObject
           break;
         case "영석_0":
           DungeonSprites.Add(CurrencyDungeonType.Spirit, s);
+          break;
+      }
+    }
+  }
+    private async void InitBackground()
+  {
+    var handle = Addressables.LoadAssetsAsync<Sprite>("currencydungeonbackground");
+    IList<Sprite> loadedSprites = await handle.Task;
+    foreach (Sprite s in loadedSprites)
+    {
+      switch (s.name)
+      {
+        case "BG_Gold":
+          BackgroundSprites.Add(CurrencyDungeonType.Gold, s);
+          break;
+        case "BG_Honbaeg":
+          BackgroundSprites.Add(CurrencyDungeonType.Honbaeg, s);
+          break;
+        case "BG_Spirit":
+          BackgroundSprites.Add(CurrencyDungeonType.Spirit, s);
           break;
       }
     }
