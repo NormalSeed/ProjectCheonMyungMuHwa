@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
+    public Transform target;
+
     [Header("보호막 관련 필드")]
     private float shieldAmount = 0f;
     private float shieldDuration = 0f;
@@ -114,6 +116,11 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+
+        shieldAmount = 0f;
+        isShieldActive = false;
+
+        skillSet.SetActive(false);
         skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }

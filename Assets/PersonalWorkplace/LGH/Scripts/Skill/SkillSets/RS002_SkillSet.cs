@@ -28,7 +28,7 @@ public class RS002_SkillSet : SkillSet
     private IEnumerator Skill1Routine(Transform target)
     {
         // 발사 위치
-        Vector3 spawnPos = transform.position;
+        Vector3 spawnPos = controller.transform.position;
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -62,7 +62,7 @@ public class RS002_SkillSet : SkillSet
 
     private IEnumerator Skill2Routine(Transform target)
     {
-        Vector3 origin = transform.position;
+        Vector3 origin = controller.transform.position;
         float range = skills[1].SkillRange;
 
         // 범위 내 몬스터 탐색
