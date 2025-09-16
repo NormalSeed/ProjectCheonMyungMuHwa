@@ -21,11 +21,14 @@ public class PlayerController : MonoBehaviour, IDamagable
     public CharacterEquipment equipment;
 
     public int partyNum;
+    public bool hasAligned = false;
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
     public NavMeshAgent NMagent;
     private BehaviorGraphAgent BGagent;
+
+    public bool movedRight = false;
 
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
@@ -34,6 +37,8 @@ public class PlayerController : MonoBehaviour, IDamagable
     
     public float curCool = 0f;
     public int skill2Count = 5;
+
+    public Transform target;
 
     [Header("보호막 관련 필드")]
     private float shieldAmount = 0f;
@@ -77,7 +82,18 @@ public class PlayerController : MonoBehaviour, IDamagable
         {
             if (BGagent != null)
             {
-                BGagent.enabled = true;
+                BlackboardVariable<PlayerStates> prevStateVar;
+                if (BGagent.GetVariable<PlayerStates>("CurState", out prevStateVar))
+                {
+                    var prevState = prevStateVar.Value;
+
+                    BGagent.enabled = false;
+                    BGagent.enabled = true;
+                    BGagent.Init();
+
+                    BGagent.SetVariableValue("CurState", prevState);
+                }
+                spumController.PlayAnimation(PlayerState.MOVE, 0);
             }
 
             equipment.SetCharID();
@@ -89,6 +105,8 @@ public class PlayerController : MonoBehaviour, IDamagable
                 TrainingManager.Instance.ApplyTrainingModifiersToPlayer(this);
             }
             Debug.Log("모델 로드됨");
+            curCool = skillSet.GetComponent<SkillSet>().skills[0].CoolTime;
+            skill2Count = 5;
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
@@ -98,6 +116,12 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+
+        shieldAmount = 0f;
+        isShieldActive = false;
+
+        skillSet.SetActive(false);
+        skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
 
@@ -173,66 +197,58 @@ public class PlayerController : MonoBehaviour, IDamagable
                     Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
                 }
             };
-
-        // Resources 폴더에서 PlayerModelSO 로드
-        //var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
-        //if (modelSO != null)
-        //{
-        //    model.modelSO = modelSO;
-        //    model.SetPoints();
-
-        //    LoadPlayerSPUMAsset(charID);
-        //    LoadPlayerSkillData(model.modelSO.SkillSetID);
-        //    OnModelLoaded?.Invoke();
-        //}
-        //else
-        //{
-        //    Debug.LogError($"'{charID}' 모델 로드 실패: Resources/LGH/PlayerModels/{charID}_model");
-        //}
     }
 
     private void LoadPlayerSkillData(string skillSetID)
     {
-        // 기존 skillSet 제거
+        //// 기존 skillSet 제거
+        //if (skillSet != null)
+        //{
+        //    Destroy(skillSet);
+        //    Addressables.ReleaseInstance(skillSet);
+        //    skillSet = null;
+        //}
+
+        //Addressables.LoadAssetAsync<GameObject>(skillSetID)
+        //.Completed += handle =>
+        //{
+        //    if (handle.Status == AsyncOperationStatus.Succeeded)
+        //    {
+        //        GameObject skillSetInstance = Instantiate(handle.Result, transform);
+        //        skillSet = skillSetInstance;
+
+        //        // 컴포넌트 초기화도 여기서
+        //        var skillSetComponent = skillSet.GetComponent<SkillSet>();
+        //        skillSetComponent.Init(this); // PlayerController를 넘겨주는 방식
+        //        OnModelLoaded?.Invoke();
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
+        //    }
+        //};
         if (skillSet != null)
         {
-            Destroy(skillSet);
-            Addressables.ReleaseInstance(skillSet);
+            skillSet.SetActive(false);
             skillSet = null;
         }
 
-        Addressables.LoadAssetAsync<GameObject>(skillSetID)
-        .Completed += handle =>
+        var heroSkillSets = HeroSkillSets.Instance;
+        var found = heroSkillSets.SkillSets.Find(obj => obj.name == skillSetID);
+
+        if (found != null)
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                GameObject skillSetInstance = Instantiate(handle.Result, transform);
-                skillSet = skillSetInstance;
+            skillSet = found;
+            skillSet.SetActive(true);
 
-                // 컴포넌트 초기화도 여기서
-                var skillSetComponent = skillSet.GetComponent<SkillSet>();
-                skillSetComponent.Init(this); // PlayerController를 넘겨주는 방식
-                OnModelLoaded?.Invoke();
-            }
-            else
-            {
-                Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
-            }
-        };
-
-        //var prefab = Resources.Load<GameObject>($"LGH/SkillSets/{skillSetID}");
-        //if (prefab != null)
-        //{
-        //    GameObject skillSetInstance = Instantiate(prefab, transform);
-        //    skillSet = skillSetInstance;
-
-        //    var skillSetComponent = skillSet.GetComponent<SkillSet>();
-        //    skillSetComponent?.Init(this);
-        //}
-        //else
-        //{
-        //    Debug.LogError($"SkillSet 로드 실패: Resources/SkillSets/{skillSetID}");
-        //}
+            var skillSetComponent = skillSet.GetComponent<SkillSet>();
+            skillSetComponent.Init(this);
+            OnModelLoaded?.Invoke();
+        }
+        else
+        {
+            Debug.LogError($"SkillSet 인스턴스를 찾을 수 없음: {skillSetID}");
+        }
     }
 
     private void LoadPlayerSPUMAsset(string charID, string skillSetID)
@@ -265,22 +281,6 @@ public class PlayerController : MonoBehaviour, IDamagable
                 Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
             }
         };
-
-        //var prefab = Resources.Load<GameObject>($"LGH/SPUMAssets/{charID}_SPUM");
-        //if (prefab != null)
-        //{
-        //    GameObject SPUMInstance = Instantiate(prefab, transform);
-        //    SPUMInstance.transform.localPosition = Vector3.zero;
-        //    SPUMInstance.transform.localScale = Vector3.one;
-        //    SPUMAsset = SPUMInstance;
-        //spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
-        //// 이걸 해줘야 애니메이션이 등록됨
-        //spumController.OverrideControllerInit();
-        //}
-        //else
-        //{
-        //    Debug.LogError($"SPUM 로드 실패: Resources/SPUMAssets/{charID}_SPUM");
-        //}
     }
 
     private void Update()

@@ -20,7 +20,7 @@ public class NS003_SkillSet : SkillSet
 
     private IEnumerator Skill1ShieldRoutine()
     {
-        skill1Effect.transform.position = this.gameObject.transform.position + offset;
+        skill1Effect.transform.position = controller.transform.position + offset;
         skill1Effect.SetActive(true);
         controller.ApplyShield(
             controller.model.ExtAtk * skills[0].ExtSkillDmg +
