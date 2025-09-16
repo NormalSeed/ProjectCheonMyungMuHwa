@@ -222,4 +222,5 @@ public class GachaManager : MonoBehaviour
 }
 /*
     TODO : 뽑기 해야할 일 목록
+        영웅 뽑기 확률, 리스트 풀 수정하기
  */

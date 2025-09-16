@@ -6,13 +6,11 @@ public class ProjectileController : MonoBehaviour
     [SerializeField] private GameObject[] projectilePrefabs;
     public Dictionary<string, LGH_ObjectPool> projectilePools;
 
-    private PlayerController controller;
     private SkillSet skillSet;
 
     public void Init()
     {
-        skillSet = GetComponent<SkillSet>();
-        controller = skillSet.controller;
+        skillSet = GetComponentInChildren<SkillSet>();
 
         projectilePools = new Dictionary<string, LGH_ObjectPool>();
 
@@ -33,7 +31,6 @@ public class ProjectileController : MonoBehaviour
         }
 
         var pooledObj = projectilePools[projectileID].PopPool();
-        pooledObj.transform.localScale = Vector3.one;
         pooledObj.transform.position = spawnPos;
 
         var projectile = pooledObj as Projectile;

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -20,18 +19,18 @@ public partial class PlayerMoveAction : Action
 
     private AlignPoint alignPoint;
     private Transform targetPoint;
+    private bool hasAligned = false;
 
     protected override Status OnStart()
     {
+        hasAligned = false;
+
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
         spumC = controller.spumController;
 
-        Self.Value.transform.localScale = Vector3.one;
-
         spumC.PlayAnimation(PlayerState.MOVE, 0);
 
-        controller.hasAligned = false;
         AlignPoint.Value = GameObject.FindGameObjectWithTag("AlignPoint");
         alignPoint = AlignPoint.Value.GetComponent<AlignPoint>();
 
@@ -47,16 +46,8 @@ public partial class PlayerMoveAction : Action
     {
         // 배치 번호에 따라 이동 포인트로 이동하는 로직 구현 필요
         Transform point = points[controller.partyNum].transform;
-        if (Self.Value.transform.position.x < point.position.x)
-        {
-            controller.movedRight = true;
-        }
-        else
-        {
-            controller.movedRight = false;
-        }
 
-            Debug.Log($"이동 포인트 : {point.gameObject.name}");
+        Debug.Log($"이동 포인트 : {point.gameObject.name}");
         return point;
     }
 
@@ -66,16 +57,14 @@ public partial class PlayerMoveAction : Action
         {
             if (!NMagent.hasPath || NMagent.velocity.sqrMagnitude == 0f)
             {
-                if (!controller.hasAligned)
+                if (!hasAligned)
                 {
                     InGameManager.Instance.alignedNum.Value++;
-                    controller.hasAligned = true;
+                    hasAligned = true;
                 }
 
-                int activeMemberCount = PartyManager.Instance.MembersID.Count(member => member != null);
-
                 // 모든 캐릭터가 정렬됐는지 확인
-                if (InGameManager.Instance.alignedNum.Value >= activeMemberCount)//PartyManager.Instance.partyMembers.Count
+                if (InGameManager.Instance.alignedNum.Value >= PartyManager.Instance.partyMembers.Count)//PartyManager.Instance.partyMembers.Count
                 {
                     NMagent.ResetPath();
                     return Status.Success; // 모두 정렬 완료 -> Idle로 전환

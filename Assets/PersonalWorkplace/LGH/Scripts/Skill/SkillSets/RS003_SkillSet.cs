@@ -52,7 +52,7 @@ public class RS003_SkillSet : SkillSet
         yield return new WaitForSeconds(0.7f);
 
         // 이동 방향 계산
-        Vector3 origin = new Vector3(controller.transform.position.x, controller.transform.position.y, 0);
+        Vector3 origin = new Vector3(transform.position.x, transform.position.y, 0);
         Vector3 direction = new Vector3((target.position.x - origin.x), (target.position.y - origin.y), 0).normalized;
         Vector3 destination = origin + direction * 5f;
 

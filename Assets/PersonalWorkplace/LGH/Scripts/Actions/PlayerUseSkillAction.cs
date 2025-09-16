@@ -1,9 +1,10 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
-using UnityEngine.AI;
 using Action = Unity.Behavior.Action;
+using Unity.Properties;
+using Unity.VisualScripting;
+using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady] and [isInSkillRange]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
@@ -57,33 +58,8 @@ public partial class PlayerUseSkillAction : Action
         return closest;
     }
 
-    private void FlipTowardsTarget()
-    {
-        if (Target.Value == null) return;
-
-        Vector3 scale = Self.Value.transform.localScale;
-
-        if (controller.movedRight)
-        {
-            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? -1 : 1;
-        }
-        else
-        {
-            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? 1 : -1;
-        }
-
-        Debug.Log($"방향전환 전: {Self.Value.transform.localScale}");
-        Self.Value.transform.localScale = scale;
-        Debug.Log($"방향전환 후: {Self.Value.transform.localScale}");
-    }
-
     protected override Status OnUpdate()
     {
-        if (skillSet == null)
-        {
-            skillSet = controller.skillSet.GetComponent<SkillSet>();
-        }
-
         if (!skillExecuted)
         {
             if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
@@ -107,7 +83,6 @@ public partial class PlayerUseSkillAction : Action
                     if (controller.isSkill1Ready)
                     {
                         NMagent.ResetPath();
-                        FlipTowardsTarget();
                         skillSet.Skill1(Target.Value.transform);
                         // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
                         controller.curCool = skillSet.skills[0].CoolTime;
@@ -117,7 +92,6 @@ public partial class PlayerUseSkillAction : Action
                     else if (controller.isSkill2Ready)
                     {
                         NMagent.ResetPath();
-                        FlipTowardsTarget();
                         skillSet.Skill2(Target.Value.transform);
                         // 스킬 카운트 초기화
                         controller.skill2Count = 5;

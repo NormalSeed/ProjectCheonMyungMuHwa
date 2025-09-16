@@ -26,7 +26,7 @@ public class BS02_SkillSet : SkillSet
         if (target == null || pController == null) return;
 
         // 발사 위치
-        Vector3 spawnPos = controller.transform.position;
+        Vector3 spawnPos = transform.position;
 
         // 타겟 방향 계산
         Vector3 direction = (target.transform.position - spawnPos).normalized;
@@ -43,7 +43,7 @@ public class BS02_SkillSet : SkillSet
         if (projectile != null)
         {
             projectile.transform.rotation = rotation;
-            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[0], controller);
+            projectile.Configure(controller.transform.position, target, skill1Speed, skill1Range, skills[0]);
             Debug.Log("Projectile Configure 호출됨");
         }
         else
@@ -92,7 +92,7 @@ public class BS02_SkillSet : SkillSet
         spumC.PlayAnimation(PlayerState.ATTACK, 1);
         if (target == null || pController == null) return;
 
-        Vector3 spawnPos = controller.transform.position;
+        Vector3 spawnPos = transform.position;
         Vector3 baseDir = (target.position - spawnPos).normalized;
         float baseAngle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
 
@@ -117,7 +117,7 @@ public class BS02_SkillSet : SkillSet
                 projectile.transform.rotation = rotation;
 
                 // 방향 벡터를 기반으로 Configure
-                projectile.Configure(spawnPos, dirObj.transform, skill2Speed, skill2Range, skills[1], controller);
+                projectile.Configure(spawnPos, dirObj.transform, skill2Speed, skill2Range, skills[1]);
 
                 Debug.Log($"Projectile 생성됨: {projectile.name}, 각도: {angle}");
             }

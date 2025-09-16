@@ -1,5 +1,8 @@
+using System;
 using System.Linq;
 using TMPro;
+using Unity.Android.Gradle.Manifest;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -47,6 +50,9 @@ public class EquipmentInfoPanel : MonoBehaviour
     #region Unity
     private void OnEnable()
     {
+        Init();
+        GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
+        SetInstanceIDFromHeroData();
         SetButtonAddListener();
     }
     private void OnDisable()
@@ -56,12 +62,9 @@ public class EquipmentInfoPanel : MonoBehaviour
     #endregion
 
     #region Init
-    public void Init()
+    private void Init()
     {
         imageEquipment.SetData(instance);
-        GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
-        SetInstanceIDFromHeroData();
-
         SetPanelText();
     }
     private void SetInstanceIDFromHeroData()
@@ -78,24 +81,24 @@ public class EquipmentInfoPanel : MonoBehaviour
             _ => null
         };
     }
-    // 판넬의 텍스트 설정
     private void SetPanelText()
     {
-        textEquipmentName.text = instance.template.equipmentName;           // 이름
-        textEquipmentEffect.text = instance.template.description;           // 설명
-        textEffectRate.text = instance.GetStat().ToString() + "%";                // 장비 효과
-        textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
-        textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
-        // 상승 능력치
-        //textPresentEff.text = 
-        //textNextEff.text =
-        // 연마석
+        textEquipmentName.text = instance.template.equipmentName;
+        textEquipmentEffect.text = instance.template.description;
+        //textEffectRate.text =
+        //textPresentEffectRate
+        //textPresentEff.text
+
+
         //textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
         //textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
 
-        textEquipLevel.text = "현재 단계" + instance.level.ToString();
-        textNextLevel.text = "다음 단계" + (instance.level + 1).ToString();   
-     
+        textEquipLevel.text = instance.level.ToString();
+        textNextLevel.text = instance.level + 1.ToString();
+
+        //textNextEff.text
+        
+        //textNextEffectRate
         if (instance.isEquipped)
         {
             if (instance.charID == HeroInfo.heroData.heroId)
@@ -126,20 +129,20 @@ public class EquipmentInfoPanel : MonoBehaviour
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
     }
     #endregion
-    // 판넬 종료
+
     #region OnClick Mathood
     private void OnClickExit()
     {
         this.gameObject.SetActive(false);
     }
-    // 장비 업그레이드
+
     private void OnClickUpgrade()
     {
         // TODO : 연마석 소모체크 추가하기
         instance.level++;
         SetPanelText();
     }
-    // 장비를 장착
+
     private void OnClickEquip()
     {
         var heroData = HeroInfo.heroData;
@@ -204,7 +207,6 @@ public class EquipmentInfoPanel : MonoBehaviour
     #endregion
 
     #region Private
-    // 아이템 ID에 받아와 장비 타입 확인
     private void SetHeroEquipmentSlot(string itemId)
     {
         var type = instance.equipmentType;
@@ -222,12 +224,10 @@ public class EquipmentInfoPanel : MonoBehaviour
     #endregion
 
     #region Public
-    // 장비 받아오기
     public void GetEquipmentInstance(EquipmentInstance input)
     {
         instance = input;
     }
-    // 장착한 캐릭터 ID 받아오기
     public void GetCharID(string input)
     {
         charId = input;

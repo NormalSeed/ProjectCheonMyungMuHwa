@@ -7,5 +7,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CurrencyDungeonPlayerDataSO", menuName = "Scriptable Objects/CurrencyDungeonPlayerDataSO")]
 public class CurrencyDungeonPlayerDataSO : ScriptableObject
 {
-  public List<CardInfo> currentPlayerDataList = new();
+  public List<(string id, CardInfo info)> currentPlayerDataList = new();
 }

@@ -1,10 +1,14 @@
+using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Firebase.Extensions;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+
 
 public class BackendManager : MonoBehaviour
 {
@@ -14,6 +18,7 @@ public class BackendManager : MonoBehaviour
     public static FirebaseDatabase Database { get; private set; }
 
     private float autoSaveInterval = 30f; // 30초마다 자동 저장
+    public event Action OnFirebaseReady;
 
     private void Awake()
     {
@@ -68,58 +73,120 @@ public class BackendManager : MonoBehaviour
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
-            if (task.IsCanceled || task.IsFaulted)
-            {
-                Debug.LogError("Firebase 의존성 확인 실패");
-                return;
-            }
-
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available)
+            if (task.Result == DependencyStatus.Available)
             {
                 FirebaseApp = FirebaseApp.DefaultInstance;
                 Auth = FirebaseAuth.DefaultInstance;
                 Database = FirebaseDatabase.DefaultInstance;
 
-                Debug.Log("Firebase 초기화 완료!");
-                SignInAnonymously();
+                OnFirebaseReady?.Invoke(); // 초기화 완료 알림
+                TryGoogleLogin();
+            }
+        });
+    }
+    private void TryGoogleLogin()
+    {
+        Debug.Log("구글 로그인 시도...");
+        PlayGamesPlatform.Instance.Authenticate(status =>
+        {
+            if (status == SignInStatus.Success)
+            {
+                Debug.Log("GPGS 로그인 성공");
+
+                PlayGamesPlatform.Instance.RequestServerSideAccess(true, (serverAuthCode) =>
+                {
+                    if (string.IsNullOrEmpty(serverAuthCode))
+                    {
+                        Debug.LogError("ServerAuthCode 획득 실패, 게스트 로그인 fallback");
+                        SignInAnonymously();
+                        return;
+                    }
+
+                    LinkWithGoogle(serverAuthCode);
+                });
             }
             else
             {
-                Debug.LogError($"Firebase 해결 실패: {dependencyStatus}");
+                Debug.LogWarning("GPGS 로그인 실패, 게스트 로그인 fallback");
+                SignInAnonymously();
             }
         });
     }
 
-    private void SignInAnonymously()
+    public void SignInAnonymously()
     {
+        if (Auth == null)
+        {
+            Debug.LogError("Firebase Auth 초기화 안됨");
+            return;
+        }
+
         Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
         {
-            if (task.IsCanceled || task.IsFaulted)
+            if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.LogError("익명 로그인 실패: " + task.Exception);
                 return;
             }
 
-            FirebaseUser newUser = task.Result.User;
-            Debug.Log($"익명 로그인 성공 UID: {newUser.UserId}");
-
-            // CurrencyManager 강제 초기화
-            if (CurrencyManager.Instance == null)
-            {
-                var model = new CurrencyModel(); // ICurrencyModel 구현체
-                new CurrencyManager(model).Start();
-            }
+            Debug.Log($"익명 로그인 성공 UID={task.Result.User.UserId}");
 
             QuestManager.Instance?.InitializeAfterLogin();
         });
+    }
+
+    public void LinkWithGoogle(string serverAuthCode)
+    {
+        Debug.Log("구글 계정 연동 시도...");
+        Credential credential = PlayGamesAuthProvider.GetCredential(serverAuthCode);
+
+        if (Auth.CurrentUser == null)
+        {
+            Debug.LogError("Firebase CurrentUser 없음. 로그인 먼저 필요");
+            return;
+        }
+
+        if (Auth.CurrentUser.IsAnonymous)
+        {
+            // 게스트, 구글 계정 승격
+            Auth.CurrentUser.LinkWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.LogError("구글 계정 연동 실패: " + task.Exception);
+                    return;
+                }
+
+                Debug.Log("구글 계정 연동 성공! 기존 게스트 데이터 유지됨");
+                QuestManager.Instance?.InitializeAfterLogin();
+            });
+        }
+        else
+        {
+            // 이미 로그인된 계정이 있으면 그냥 구글 로그인 처리
+            Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.LogError("익명 로그인 실패: " + task.Exception);
+                    return;
+                }
+
+                // AuthResult 안에서 User 꺼내기
+                FirebaseUser user = task.Result.User;
+
+                Debug.Log($"익명 로그인 성공 UID={user.UserId}");
+
+                QuestManager.Instance?.InitializeAfterLogin();
+            });
+        }
     }
 
     public void UpdatePlayerData(int clearedStage, BigCurrency gold)
     {
         if (Auth.CurrentUser == null)
         {
-            Debug.LogWarning("로그인된 유저 없음 → 저장 불가");
+            Debug.LogWarning("로그인된 유저 없음, 저장 불가");
             return;
         }
 

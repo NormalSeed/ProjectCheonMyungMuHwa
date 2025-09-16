@@ -17,6 +17,7 @@ public enum MonsterAnimationState
 
 public abstract class BossController : MonsterController
 {
+    private bool isInvulnerable;
     public System.Action OnSpawnAmimEnd;
 
     [SerializeField] protected Transform selfEffectTrs;
@@ -37,7 +38,7 @@ public abstract class BossController : MonsterController
     }
     public void OnSpawn()
     {
-        IsInvulnerable = true;
+        isInvulnerable = true;
         transform.localScale = Vector3.one;
         StartCoroutine(SpawnRoutine());
     }
@@ -56,7 +57,12 @@ public abstract class BossController : MonsterController
         yield return new WaitForSeconds(1f);
 
         OnSpawnAmimEnd?.Invoke();
-        IsInvulnerable = false;
+        isInvulnerable = false;
+    }
+    protected override void OnTakeDamage(double amount)
+    {
+        if (isInvulnerable) return;
+        base.OnTakeDamage(amount);
     }
 
     protected override IEnumerator RealAttackRoutine(IDamagable target)

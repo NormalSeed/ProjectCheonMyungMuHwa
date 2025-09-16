@@ -39,6 +39,7 @@ public class GameLifetimeScope : LifetimeScope
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
 
+
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton)
                .WithParameter("values", allHeroTemplates)
                .AsSelf();
@@ -54,7 +55,5 @@ public class GameLifetimeScope : LifetimeScope
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
         // 테이블
         builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
-        // 스킬셋
-        builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
     }
 }
