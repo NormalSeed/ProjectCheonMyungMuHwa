@@ -37,6 +37,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         if (Model.BaseModel != null)
         {
+            Model.InitSprite();
+            PlaySpawnEffect();
             SetValue();
             InGameManager.Instance.monsterDeathStack.Value++;
         }
@@ -67,7 +69,26 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         treeAgent.Restart();
     }
 
-
+    public virtual void PlaySpawnEffect()
+    {
+        int stage = Model.BaseModel.CurrentStage;
+        if (stage < 100)
+        {
+            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+        }
+        else if (stage < 200)
+        {
+            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+        }
+        else if (stage < 300)
+        {
+            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+        }
+        else if (stage < 400)
+        {
+            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+        }
+    }
 
     public void TakeDamage(double amount)
     {
@@ -102,7 +123,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         if (attackCo != null) StopCoroutine(attackCo);
         StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
-        //QuestManager.Instance.UpdateQuest("Monster", 1);
+        QuestManager.Instance.UpdateQuest("Monster", 1);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Monster, 1);
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
     protected abstract IEnumerator RealAttackRoutine(IDamagable target);

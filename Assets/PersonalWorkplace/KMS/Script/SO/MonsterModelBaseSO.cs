@@ -21,11 +21,14 @@ public class MonsterModelBaseSO : ScriptableObject
   public float NormalChestDropChance;
   public float RareChestDropChance;
 
+  public int CurrentStage;
+
 
 
   //초기 값부터 계산
   public void SetFinal(int stage)
   {
+    CurrentStage = stage;
     finalMaxHealth = baseMaxHealth;
     finalAttackPower = baseAttackPower;
     for (int i = 2; i <= stage; i++)
@@ -74,6 +77,7 @@ public class MonsterModelBaseSO : ScriptableObject
   // 보스의 경우 이것을 이용
   public void SetFinalBoss(int stage, MonsterModelBaseSO model)
   {
+    CurrentStage = stage;
     finalOuterDefense = baseOuterDefense;
     finalInnerDefense = baseInnerDefense;
     if (stage == 50 || stage == 100)
