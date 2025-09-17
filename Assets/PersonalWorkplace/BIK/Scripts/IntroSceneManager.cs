@@ -44,18 +44,15 @@ public class IntroSceneManager : MonoBehaviour
         {
             var equipmentManager = scope.Container.Resolve<EquipmentManager>();
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
+            Debug.Log("[IntroScene] 장비 매니저 초기화 완료!");
         }
-
-
-        // 메인 씬 비동기 로드
-        asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);
-        asyncOperation.allowSceneActivation = false;
 
         if (scope != null)
         {
             var heroModels = scope.Container.Resolve<HeroModels>();
             heroModels.Init();
             yield return new WaitUntil(() => heroModels.IsInitialized);
+            Debug.Log("[IntroScene] 영웅 Model SO 로딩 완료!");
         }
 
         if (scope != null)
@@ -63,7 +60,12 @@ public class IntroSceneManager : MonoBehaviour
             var heroSkillSets = scope.Container.Resolve<HeroSkillSets>();
             heroSkillSets.Init();
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
+            Debug.Log("[IntroScene] 영웅 스킬셋 로딩 완료!");
         }
+
+        // 메인 씬 비동기 로드
+        asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);
+        asyncOperation.allowSceneActivation = false;
 
         // 최소 로딩 시간 보장
         float minLoadingTime = 2f;
