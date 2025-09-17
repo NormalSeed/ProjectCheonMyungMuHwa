@@ -33,12 +33,12 @@ public class MainSceneUIController : MonoBehaviour
     [SerializeField] private Button _shopUI;
 
     [Header("X 이미지")]
-    [SerializeField] private Image x_img1;
-    [SerializeField] private Image x_img2;
-    [SerializeField] private Image x_img3;
-    [SerializeField] private Image x_img4;
-    [SerializeField] private Image x_img5;
-    [SerializeField] private Image x_img6;
+    [SerializeField] private Image x_imgHero;
+    [SerializeField] private Image x_imgDungeon;
+    [SerializeField] private Image x_imgUpgrade;
+    [SerializeField] private Image x_imgInventory;
+    [SerializeField] private Image x_imgSummon;
+    [SerializeField] private Image x_imgShop;
 
     #endregion // serialized fields
 
@@ -63,12 +63,12 @@ public class MainSceneUIController : MonoBehaviour
 
     private void Awake()
     {
-        _xImageMap[UIType.Hero] = x_img1.gameObject;
-        _xImageMap[UIType.Dungeon] = x_img2.gameObject;
-        _xImageMap[UIType.Inventory] = x_img3.gameObject;
-        _xImageMap[UIType.Upgrade] = x_img4.gameObject;
-        _xImageMap[UIType.Summon] = x_img5.gameObject;
-        _xImageMap[UIType.Shop] = x_img6.gameObject;
+        _xImageMap[UIType.Hero] = x_imgHero.gameObject;
+        _xImageMap[UIType.Dungeon] = x_imgDungeon.gameObject;
+        _xImageMap[UIType.Inventory] = x_imgInventory.gameObject;
+        _xImageMap[UIType.Upgrade] = x_imgUpgrade.gameObject;
+        _xImageMap[UIType.Summon] = x_imgSummon.gameObject;
+        _xImageMap[UIType.Shop] = x_imgShop.gameObject;
 
         _heroUI.onClick.AddListener(() => ShowUI(UIType.Hero));
         _dungeonUI.onClick.AddListener(() => ShowUI(UIType.Dungeon));
