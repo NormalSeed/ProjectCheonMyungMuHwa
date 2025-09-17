@@ -9,29 +9,47 @@ using VContainer.Unity;
 public class IntroSceneManager : MonoBehaviour
 {
     [SerializeField] private string _mainSceneName = "DEMO_GameScene";
+    [SerializeField] private LoadingUI loadingUI;
+
+    private AsyncOperation asyncOperation;
+    private bool isReady = false;
 
     private IEnumerator Start()
     {
-        var scope = FindObjectOfType<GameLifetimeScope>();
-        if (scope != null) {
-            yield return new WaitUntil(() => scope.Container != null);
+        // Firebase 초기화
+        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+
+        if (dependencyTask.Result != DependencyStatus.Available)
+        {
+            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
+            yield break;
         }
 
-        if (scope != null) {
+        // VContainer Scope 대기
+        var scope = FindObjectOfType<GameLifetimeScope>();
+        if (scope != null)
+            yield return new WaitUntil(() => scope.Container != null);
+
+        // 테이블 로딩 대기
+        if (scope != null)
+        {
             var tableManager = scope.Container.Resolve<TableManager>();
-
-            // AllInitialized == true 될 때까지 기다리기
             yield return new WaitUntil(() => tableManager.AllInitialized);
-
             Debug.Log("[IntroScene] 모든 테이블 로딩 완료!");
         }
 
-        if (scope != null){
+        // 장비 매니저 초기화 대기
+        if (scope != null)
+        {
             var equipmentManager = scope.Container.Resolve<EquipmentManager>();
-
-            // Initialize가 실행될 때까지 기다리기
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
         }
+
+
+        // 메인 씬 비동기 로드
+        asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);
+        asyncOperation.allowSceneActivation = false;
 
         if (scope != null)
         {
@@ -47,15 +65,42 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
         }
 
-        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
-        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+        // 최소 로딩 시간 보장
+        float minLoadingTime = 2f;
+        float elapsed = 0f;
+        float displayedProgress = 0f;
 
-        if (dependencyTask.Result != DependencyStatus.Available)
+        while (!asyncOperation.isDone)
         {
-            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
-            yield break;
+            elapsed += Time.deltaTime;
+
+            // 실제 로딩 진행도 (0 ~ 0.9)
+            float target = Mathf.Clamp01(asyncOperation.progress / 0.9f);
+
+            // 최소 로딩 시간 동안은 Progress를 서서히 올리기
+            if (elapsed < minLoadingTime)
+            {
+                target = Mathf.Min(target, elapsed / minLoadingTime);
+            }
+
+            // 부드럽게 보간
+            displayedProgress = Mathf.MoveTowards(displayedProgress, target, Time.deltaTime * 0.5f);
+            loadingUI.UpdateProgress(displayedProgress);
+
+            // 로딩이 다 끝나고 Progress도 1.0에 도달하면 Tap to Start로 이동
+            if (asyncOperation.progress >= 0.9f && displayedProgress >= 0.99f)
+                break;
+
+            yield return null;
         }
 
-        SceneManager.LoadScene(_mainSceneName);
+        // Tap to Start 연출
+        loadingUI.ShowTapToStart();
+        yield return new WaitUntil(() => Input.anyKeyDown || Input.touchCount > 0);
+
+        Debug.Log("[IntroScene] 게임 시작!");
+        loadingUI.gameObject.SetActive(false);
+
+        asyncOperation.allowSceneActivation = true;
     }
 }
