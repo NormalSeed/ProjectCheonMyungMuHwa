@@ -18,7 +18,6 @@ public class Projectile : PooledObject
 
     protected virtual void OnEnable()
     {
-        controller = GetComponentInParent<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
         isFired = false;
     }
@@ -63,8 +62,9 @@ public class Projectile : PooledObject
         }
     }
 
-    public void Configure(Vector2 fireOrigin, Transform targetTransform, float skillSpeed, float skillRange, PlayerSkillSO skillSO)
+    public void Configure(Vector2 fireOrigin, Transform targetTransform, float skillSpeed, float skillRange, PlayerSkillSO skillSO, PlayerController controllerRef)
     {
+        controller = controllerRef;
         target = targetTransform;
         startPosition = fireOrigin;
         transform.position = startPosition;

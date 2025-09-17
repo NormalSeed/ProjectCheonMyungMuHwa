@@ -3,6 +3,7 @@ using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
+using System.Linq;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "UpdateDistance", story: "Update [Self] and [Target] [CurrentDistance]", category: "Action", id: "e3c7858e8b92f9290bd7715f255f2cc2")]
@@ -19,7 +20,11 @@ public partial class UpdateDistanceAction : Action
         {
             CurrentDistance.Value = Vector2.Distance(Self.Value.transform.position, Target.Value.transform.position);
         }
-        
+        else
+        {
+            CurrentDistance.Value = 999f;
+        }
+
         return Status.Success;
     }
 

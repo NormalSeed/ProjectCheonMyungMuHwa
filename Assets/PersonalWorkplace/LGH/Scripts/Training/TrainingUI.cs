@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TrainingUI : MonoBehaviour
+public class TrainingUI : UIBase
 {
     public Button extLevelUpButton;
     public Button innLevelUpButton;

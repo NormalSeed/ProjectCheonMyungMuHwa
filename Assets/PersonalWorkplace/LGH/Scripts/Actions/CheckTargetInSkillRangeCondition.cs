@@ -21,8 +21,19 @@ public partial class CheckTargetInSkillRangeCondition : Condition
 
     public override bool IsTrue()
     {
-        if (controller == null || skillSet == null || skillSet.skills.Count < 2)
+        if (controller == null && Self.Value != null)
+        {
+            controller = Self.Value.GetComponent<PlayerController>();
+        }
+
+        if (skillSet == null && controller != null && controller.skillSet != null)
+        {
+            skillSet = controller.skillSet.GetComponent<SkillSet>();
+        }
+
+        if (skillSet == null || skillSet.skills.Count < 2)
             return false;
+
 
         if (controller.isSkill1Ready)
         {

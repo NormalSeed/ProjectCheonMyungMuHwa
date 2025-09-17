@@ -21,16 +21,16 @@ public class ParticleManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+            poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
+            particleDelays = new Dictionary<string, WaitForSeconds>();
+            particleName = new Dictionary<ParticleSystem, string>();
+            LoadAssetAsync();
         }
         else
         {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject);
-        poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
-        particleDelays = new Dictionary<string, WaitForSeconds>();
-        particleName = new Dictionary<ParticleSystem, string>();
-        LoadAssetAsync();
     }
 
     private async void LoadAssetAsync()

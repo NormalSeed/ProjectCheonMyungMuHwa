@@ -21,11 +21,14 @@ public class PlayerController : MonoBehaviour, IDamagable
     public CharacterEquipment equipment;
 
     public int partyNum;
+    public bool hasAligned = false;
 
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
     public NavMeshAgent NMagent;
     private BehaviorGraphAgent BGagent;
+
+    public bool movedRight = false;
 
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
@@ -35,6 +38,8 @@ public class PlayerController : MonoBehaviour, IDamagable
     public float curCool = 0f;
     public int skill2Count = 5;
 
+    public Transform target;
+
     [Header("보호막 관련 필드")]
     private float shieldAmount = 0f;
     private float shieldDuration = 0f;
@@ -42,20 +47,6 @@ public class PlayerController : MonoBehaviour, IDamagable
     public bool isShieldActive = false;
 
     public event System.Action OnModelLoaded;
-
-    private void Awake()
-    {
-        //model = GetComponent<PlayerModel>();
-        //view = GetComponent<PlayerView>();
-        //equipment = GetComponent<CharacterEquipment>();
-
-        //NMagent = GetComponent<NavMeshAgent>();
-        //BGagent = GetComponent<BehaviorGraphAgent>();
-        //BGagent.enabled = false;
-
-        //NMagent.updateRotation = false;
-        //NMagent.updateUpAxis = false;
-    }
 
     private void OnEnable()
     {
@@ -77,7 +68,18 @@ public class PlayerController : MonoBehaviour, IDamagable
         {
             if (BGagent != null)
             {
-                BGagent.enabled = true;
+                BlackboardVariable<PlayerStates> prevStateVar;
+                if (BGagent.GetVariable<PlayerStates>("CurState", out prevStateVar))
+                {
+                    var prevState = prevStateVar.Value;
+
+                    BGagent.enabled = false;
+                    BGagent.enabled = true;
+                    BGagent.Init();
+
+                    BGagent.SetVariableValue("CurState", prevState);
+                }
+                spumController.PlayAnimation(PlayerState.MOVE, 0);
             }
 
             equipment.SetCharID();
@@ -89,6 +91,8 @@ public class PlayerController : MonoBehaviour, IDamagable
                 TrainingManager.Instance.ApplyTrainingModifiersToPlayer(this);
             }
             Debug.Log("모델 로드됨");
+            curCool = skillSet.GetComponent<SkillSet>().skills[0].CoolTime;
+            skill2Count = 5;
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
@@ -98,6 +102,12 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         charID.Unsubscribe(LoadPlayerData);
         OnModelLoaded = null;
+
+        shieldAmount = 0f;
+        isShieldActive = false;
+
+        skillSet.SetActive(false);
+        skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
     }
 
@@ -114,125 +124,144 @@ public class PlayerController : MonoBehaviour, IDamagable
             return;
         }
 
-        // Addressable 로딩 형식
-        // csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
-        Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
-            .Completed += handle =>
+        //// Addressable 로딩 형식
+        //// csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
+        //Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
+        //    .Completed += handle =>
+        //    {
+        //        if (handle.Status == AsyncOperationStatus.Succeeded)
+        //        {
+        //            model.modelSO = handle.Result;
+
+        //            // Firebase에서 캐릭터 레벨 정보 불러오기
+        //            string userID = CurrencyManager.Instance.UserID;
+        //            Debug.Log("현재 유저 아이디 : " + userID);
+        //            string path = $"users/{userID}/character/charInfo/{charID}";
+
+        //            FirebaseDatabase.DefaultInstance
+        //                .GetReference(path)
+        //                .GetValueAsync()
+        //                .ContinueWithOnMainThread(task =>
+        //                {
+        //                    if (task.IsFaulted)
+        //                    {
+        //                        Debug.LogError("Firebase 요청 실패: " + task.Exception);
+        //                        return;
+        //                    }
+
+        //                    if (task.IsCanceled)
+        //                    {
+        //                        Debug.LogWarning("Firebase 요청이 취소됨");
+        //                        return;
+        //                    }
+
+        //                    if (task.IsCompleted && task.Result.Exists)
+        //                    {
+        //                        DataSnapshot snapshot = task.Result;
+
+        //                        int level = int.Parse(snapshot.Child("level").Value.ToString());
+        //                        int stage = int.Parse(snapshot.Child("stage").Value.ToString());
+
+        //                        // 모델에 적용
+        //                        model.modelSO.Level = level;
+        //                        model.modelSO.Grade = stage;
+
+        //                        model.SetPoints(); // 능력치 계산
+        //                        equipment.InitializeEquippedSlotsFromManager(equipmentManager.allEquipments);
+        //                    }
+        //                    else
+        //                    {
+        //                        Debug.LogWarning($"Firebase에서 '{charID}' 캐릭터 데이터를 찾을 수 없습니다.");
+        //                    }
+        //                });
+
+        //            LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
+        //        }
+        //        else
+        //        {
+        //            gameObject.SetActive(false);
+        //            Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
+        //        }
+        //    };
+
+        var cachedModel = HeroModels.Instance.GetModelSO(charID);
+        if (cachedModel == null)
+        {
+            Debug.LogError($"'{charID}'에 해당하는 모델SO를 HeroModels에서 찾을 수 없습니다.");
+            gameObject.SetActive(false);
+            return;
+        }
+
+        model.modelSO = cachedModel;
+
+        // Firebase에서 캐릭터 레벨 정보 불러오기
+        string userID = CurrencyManager.Instance.UserID;
+        Debug.Log("현재 유저 아이디 : " + userID);
+        string path = $"users/{userID}/character/charInfo/{charID}";
+
+        FirebaseDatabase.DefaultInstance
+            .GetReference(path)
+            .GetValueAsync()
+            .ContinueWithOnMainThread(task =>
             {
-                if (handle.Status == AsyncOperationStatus.Succeeded)
+                if (task.IsFaulted)
                 {
-                    model.modelSO = handle.Result;
+                    Debug.LogError("Firebase 요청 실패: " + task.Exception);
+                    return;
+                }
 
-                    // Firebase에서 캐릭터 레벨 정보 불러오기
-                    string userID = CurrencyManager.Instance.UserID;
-                    Debug.Log("현재 유저 아이디 : " + userID);
-                    string path = $"users/{userID}/character/charInfo/{charID}";
+                if (task.IsCanceled)
+                {
+                    Debug.LogWarning("Firebase 요청이 취소됨");
+                    return;
+                }
 
-                    FirebaseDatabase.DefaultInstance
-                        .GetReference(path)
-                        .GetValueAsync()
-                        .ContinueWithOnMainThread(task =>
-                        {
-                            if (task.IsFaulted)
-                            {
-                                Debug.LogError("Firebase 요청 실패: " + task.Exception);
-                                return;
-                            }
+                if (task.IsCompleted && task.Result.Exists)
+                {
+                    DataSnapshot snapshot = task.Result;
 
-                            if (task.IsCanceled)
-                            {
-                                Debug.LogWarning("Firebase 요청이 취소됨");
-                                return;
-                            }
+                    int level = int.Parse(snapshot.Child("level").Value.ToString());
+                    int stage = int.Parse(snapshot.Child("stage").Value.ToString());
 
-                            if (task.IsCompleted && task.Result.Exists)
-                            {
-                                DataSnapshot snapshot = task.Result;
+                    model.modelSO.Level = level;
+                    model.modelSO.Grade = stage;
 
-                                int level = int.Parse(snapshot.Child("level").Value.ToString());
-                                int stage = int.Parse(snapshot.Child("stage").Value.ToString());
-
-                                // 모델에 적용
-                                model.modelSO.Level = level;
-                                model.modelSO.Grade = stage;
-
-                                model.SetPoints(); // 능력치 계산
-                                equipment.InitializeEquippedSlotsFromManager(equipmentManager.allEquipments);
-                            }
-                            else
-                            {
-                                Debug.LogWarning($"Firebase에서 '{charID}' 캐릭터 데이터를 찾을 수 없습니다.");
-                            }
-                        });
-
-                    LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
+                    model.SetPoints(); // 능력치 계산
+                    equipment.InitializeEquippedSlotsFromManager(equipmentManager.allEquipments);
                 }
                 else
                 {
-                    gameObject.SetActive(false);
-                    Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
+                    Debug.LogWarning($"Firebase에서 '{charID}' 캐릭터 데이터를 찾을 수 없습니다.");
                 }
-            };
+            });
 
-        // Resources 폴더에서 PlayerModelSO 로드
-        //var modelSO = Resources.Load<PlayerModelSO>($"LGH/PlayerModels/{charID}_model");
-        //if (modelSO != null)
-        //{
-        //    model.modelSO = modelSO;
-        //    model.SetPoints();
-
-        //    LoadPlayerSPUMAsset(charID);
-        //    LoadPlayerSkillData(model.modelSO.SkillSetID);
-        //    OnModelLoaded?.Invoke();
-        //}
-        //else
-        //{
-        //    Debug.LogError($"'{charID}' 모델 로드 실패: Resources/LGH/PlayerModels/{charID}_model");
-        //}
+        LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
     }
 
     private void LoadPlayerSkillData(string skillSetID)
     {
-        // 기존 skillSet 제거
         if (skillSet != null)
         {
-            Destroy(skillSet);
-            Addressables.ReleaseInstance(skillSet);
+            skillSet.SetActive(false);
             skillSet = null;
         }
 
-        Addressables.LoadAssetAsync<GameObject>(skillSetID)
-        .Completed += handle =>
+        var heroSkillSets = HeroSkillSets.Instance;
+        var found = heroSkillSets.SkillSets.Find(obj => obj.name == skillSetID);
+
+        if (found != null)
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                GameObject skillSetInstance = Instantiate(handle.Result, transform);
-                skillSet = skillSetInstance;
+            skillSet = found;
+            skillSet.SetActive(true);
 
-                // 컴포넌트 초기화도 여기서
-                var skillSetComponent = skillSet.GetComponent<SkillSet>();
-                skillSetComponent.Init(this); // PlayerController를 넘겨주는 방식
-                OnModelLoaded?.Invoke();
-            }
-            else
-            {
-                Debug.LogError($"SkillSet 로드 실패: {handle.OperationException}");
-            }
-        };
-
-        //var prefab = Resources.Load<GameObject>($"LGH/SkillSets/{skillSetID}");
-        //if (prefab != null)
-        //{
-        //    GameObject skillSetInstance = Instantiate(prefab, transform);
-        //    skillSet = skillSetInstance;
-
-        //    var skillSetComponent = skillSet.GetComponent<SkillSet>();
-        //    skillSetComponent?.Init(this);
-        //}
-        //else
-        //{
-        //    Debug.LogError($"SkillSet 로드 실패: Resources/SkillSets/{skillSetID}");
-        //}
+            var skillSetComponent = skillSet.GetComponent<SkillSet>();
+            skillSetComponent.Init(this);
+            OnModelLoaded?.Invoke();
+        }
+        else
+        {
+            Debug.LogError($"SkillSet 인스턴스를 찾을 수 없음: {skillSetID}");
+        }
     }
 
     private void LoadPlayerSPUMAsset(string charID, string skillSetID)
@@ -265,22 +294,6 @@ public class PlayerController : MonoBehaviour, IDamagable
                 Debug.LogError($"SPUM 로드 실패: {handle.OperationException}");
             }
         };
-
-        //var prefab = Resources.Load<GameObject>($"LGH/SPUMAssets/{charID}_SPUM");
-        //if (prefab != null)
-        //{
-        //    GameObject SPUMInstance = Instantiate(prefab, transform);
-        //    SPUMInstance.transform.localPosition = Vector3.zero;
-        //    SPUMInstance.transform.localScale = Vector3.one;
-        //    SPUMAsset = SPUMInstance;
-        //spumController = SPUMAsset.GetComponent<SPUM_Prefabs>();
-        //// 이걸 해줘야 애니메이션이 등록됨
-        //spumController.OverrideControllerInit();
-        //}
-        //else
-        //{
-        //    Debug.LogError($"SPUM 로드 실패: Resources/SPUMAssets/{charID}_SPUM");
-        //}
     }
 
     private void Update()

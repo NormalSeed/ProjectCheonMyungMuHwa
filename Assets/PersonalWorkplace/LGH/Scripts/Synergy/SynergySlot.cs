@@ -38,8 +38,6 @@ public class SynergySlot : MonoBehaviour
             synergyIconMap["M"] = mIcons;
             Debug.Log("M 아이콘 등록 완료");
         }
-
-        Debug.Log($"최종 등록된 키: {string.Join(", ", synergyIconMap.Keys)}, 슬롯이름 : {this.name}");
     }
 
     public void SetData(string synergyKey, int stage, int count)
