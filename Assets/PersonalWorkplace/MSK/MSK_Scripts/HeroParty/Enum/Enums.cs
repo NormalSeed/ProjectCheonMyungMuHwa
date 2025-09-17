@@ -26,6 +26,7 @@ public enum CurrencyType
     GoldChallengeTicket,        // 도전장(입장권)
     SoulChallengeTicket,        // 혼백도전장(입장권)
     SpiritStoneChallengeTicket, // 영석도전장(입장권)
+    EquipmentSummonTicket,    // 장비뽑기권(입장권)
 }
 
 public enum UIType
