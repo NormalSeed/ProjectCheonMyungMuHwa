@@ -16,16 +16,6 @@ public class IntroSceneManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // Firebase 초기화
-        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
-        yield return new WaitUntil(() => dependencyTask.IsCompleted);
-
-        if (dependencyTask.Result != DependencyStatus.Available)
-        {
-            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
-            yield break;
-        }
-
         // VContainer Scope 대기
         var scope = FindObjectOfType<GameLifetimeScope>();
         if (scope != null)
@@ -64,6 +54,20 @@ public class IntroSceneManager : MonoBehaviour
             heroSkillSets.Init();
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
         }
+
+        // Firebase 초기화
+        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+
+        if (dependencyTask.Result != DependencyStatus.Available)
+        {
+            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
+            yield break;
+        }
+
+        // 메인 씬 비동기 로드
+        asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);
+        asyncOperation.allowSceneActivation = false;
 
         // 최소 로딩 시간 보장
         float minLoadingTime = 2f;
