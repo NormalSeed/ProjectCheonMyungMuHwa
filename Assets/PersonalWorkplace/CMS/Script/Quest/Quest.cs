@@ -138,12 +138,20 @@ public enum QuestCategory
 public enum QuestTargetType
 {
     None,
-    Onlogin,
-    Monster,
-    Summon,
-    Training,
-    Upgrade,
-    Playtime
+    OnLogin,       // 게임 접속 여부 확인
+    Monster,       // 몬스터 사냥 개수
+    Gacha1,        // 캐릭터 뽑기 횟수
+    Gacha2,        // 장비 뽑기 횟수
+    Growth,        // 캐릭터 레벨업 횟수
+    Training,      // 수련(외공/내공/체력) 전체
+    Enhance,       // 장비 강화 횟수
+    Organization,  // 캐릭터 편성 캐릭터 수
+    Vital,         // 체력 수련
+    ExtPow,        // 외공 수련
+    InnPow,        // 내공 수련
+    Box,           // 상자 아이템 사용
+    Stage,         // 스테이지 클리어
+    Playtime       // 세션 접속 시간
 }
 
 public enum RewardType
