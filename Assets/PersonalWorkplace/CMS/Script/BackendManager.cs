@@ -1,10 +1,13 @@
+using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Firebase.Extensions;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using System.Collections.Generic;
+using System.Collections;
+using System;
 
 public class BackendManager : MonoBehaviour
 {
@@ -14,6 +17,7 @@ public class BackendManager : MonoBehaviour
     public static FirebaseDatabase Database { get; private set; }
 
     private float autoSaveInterval = 30f; // 30초마다 자동 저장
+    public event Action OnFirebaseReady;
 
     private void Awake()
     {
@@ -82,6 +86,7 @@ public class BackendManager : MonoBehaviour
                 Database = FirebaseDatabase.DefaultInstance;
 
                 Debug.Log("Firebase 초기화 완료!");
+                OnFirebaseReady?.Invoke();
                 SignInAnonymously();
             }
             else
@@ -119,7 +124,7 @@ public class BackendManager : MonoBehaviour
     {
         if (Auth.CurrentUser == null)
         {
-            Debug.LogWarning("로그인된 유저 없음 → 저장 불가");
+            Debug.LogWarning("로그인된 유저 없음, 저장 불가");
             return;
         }
 

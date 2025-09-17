@@ -51,6 +51,9 @@ public class PlayerProfileManager : IStartable, IDisposable
                 string json = snapshot.GetRawJsonValue();
                 CurrentProfile = JsonUtility.FromJson<PlayerProfileData>(json);
 
+                // 레벨/경험치 최소 보정
+                NormalizeProfile();
+
                 Debug.Log($"[ProfileManager] 프로필 로드 완료:  {CurrentProfile.Nickname}, {CurrentProfile.Title}, {CurrentProfile.Background}, {CurrentProfile.ProfileImage}, Lv.{CurrentProfile.Level}, Exp={CurrentProfile.Exp}");
             }
             else {
@@ -66,6 +69,17 @@ public class PlayerProfileManager : IStartable, IDisposable
 
         _initialized = true;
         OnProfileChanged?.Invoke(CurrentProfile);
+    }
+
+    private void NormalizeProfile()
+    {
+        if (CurrentProfile == null) return;
+
+        if (CurrentProfile.Level <= 0)
+            CurrentProfile.Level = 1;
+
+        if (CurrentProfile.Exp < 0)
+            CurrentProfile.Exp = 0;
     }
 
     public void SaveProfileToFirebase()
@@ -189,6 +203,7 @@ public class PlayerProfileManager : IStartable, IDisposable
                 CurrentProfile.Exp -= req;
                 CurrentProfile.Level += 1;
                 Debug.Log($"[ProfileManager] 레벨업! → Lv.{CurrentProfile.Level}");
+                PopupManager.Instance.ShowLevelUpPopup(CurrentProfile.Level - 1, CurrentProfile.Level);
             }
             else break;
         }
