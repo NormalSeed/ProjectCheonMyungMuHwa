@@ -349,6 +349,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a65a4d715b239d342836652866e50123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1197940894
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1197940895}
+  - component: {fileID: 1197940896}
+  m_Layer: 0
+  m_Name: HeroModels
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1197940895
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197940894}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 857.3629, y: 1932.2156, z: -11.977761}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1197940896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197940894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe248343e9240b34794227c9d6911f7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ModelSOs: []
 --- !u!1 &1749771360
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,4 +595,4 @@ SceneRoots:
   - {fileID: 1117035975}
   - {fileID: 292679975}
   - {fileID: 1749771361}
-  - {fileID: 343988936}
+  - {fileID: 1197940895}

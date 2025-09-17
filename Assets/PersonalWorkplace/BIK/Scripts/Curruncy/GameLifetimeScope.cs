@@ -36,6 +36,8 @@ public class GameLifetimeScope : LifetimeScope
         builder.Register<CurrencyModel>(Lifetime.Singleton)
                .As<ICurrencyModel>();
         builder.RegisterEntryPoint<CurrencyManager>(Lifetime.Singleton);
+        // 인벤토리
+        builder.RegisterEntryPoint<InventoryManager>(Lifetime.Singleton);
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
 
@@ -54,6 +56,8 @@ public class GameLifetimeScope : LifetimeScope
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
         // 테이블
         builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
+        // 모델
+        builder.RegisterComponentInHierarchy<HeroModels>().AsSelf();
         // 스킬셋
         builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
     }

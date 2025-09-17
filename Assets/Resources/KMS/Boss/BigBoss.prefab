@@ -1785,10 +1785,10 @@ GameObject:
   - component: {fileID: 7732539621275910925}
   - component: {fileID: 8323717353500381834}
   - component: {fileID: 8663675326496307783}
-  - component: {fileID: 1657059789726551729}
   - component: {fileID: 404319898246505288}
   - component: {fileID: 6446197733084287000}
   - component: {fileID: 9094063379891722684}
+  - component: {fileID: 3473838984030624890}
   m_Layer: 5
   m_Name: BigBoss
   m_TagString: Monster
@@ -4867,24 +4867,6 @@ MonoBehaviour:
   - {fileID: 497003598975552747}
   - {fileID: 2330682404664590264}
   - {fileID: 902708977137992992}
---- !u!114 &1657059789726551729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3885455601715278780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8494b5b80fadd5d479351de16a0c1006, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Spum: {fileID: 0}
-  Model: {fileID: 0}
-  NavAgent: {fileID: 0}
-  healthBar: {fileID: 0}
-  attackDelay: 0.4
-  selfEffectTrs: {fileID: 6033892109620634783}
 --- !u!195 &404319898246505288
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -4981,6 +4963,29 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 2.02}
   m_EdgeRadius: 0
+--- !u!114 &3473838984030624890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3885455601715278780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00ae71e584415a54689035298a1256d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Spum: {fileID: 0}
+  Model: {fileID: 0}
+  NavAgent: {fileID: 0}
+  healthBar: {fileID: 0}
+  attackDelay: 0.4
+  isAttackedByNormalAttack: 0
+  selfEffectTrs: {fileID: 6033892109620634783}
+  animationNumber: 5
+  effectName: 'NormalBoss2_AtkEffect '
+  effectScale: 3
+  targetEffect: 0
 --- !u!1 &3944128972288857583
 GameObject:
   m_ObjectHideFlags: 0

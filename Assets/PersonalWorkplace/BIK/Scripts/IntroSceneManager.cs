@@ -46,9 +46,24 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
         }
 
+
         // 메인 씬 비동기 로드
         asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);
         asyncOperation.allowSceneActivation = false;
+
+        if (scope != null)
+        {
+            var heroModels = scope.Container.Resolve<HeroModels>();
+            heroModels.Init();
+            yield return new WaitUntil(() => heroModels.IsInitialized);
+        }
+
+        if (scope != null)
+        {
+            var heroSkillSets = scope.Container.Resolve<HeroSkillSets>();
+            heroSkillSets.Init();
+            yield return new WaitUntil(() => heroSkillSets.IsInitialized);
+        }
 
         // 최소 로딩 시간 보장
         float minLoadingTime = 2f;

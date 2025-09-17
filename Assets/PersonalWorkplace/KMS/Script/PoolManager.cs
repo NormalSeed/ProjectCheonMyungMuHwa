@@ -105,32 +105,33 @@ public class PoolManager : MonoBehaviour
     {
         ParticleManager.Instance.GetParticle("Boss_1_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
-        int last = currentstage / 3 % 10;
-        string str;
+        int door = currentstage / 3;
+        int last = door % 10;
+        string str = "";
         switch (last)
         {
-            case 0: case 5: str = "BigBoss"; break;
+            case 0:
+                if (door % 100 == 0)
+                {
+                    str = "100Boss";
+                }
+                else if (door % 50 == 0)
+                {
+                    str = "50Boss";
+                }
+                break;
+            case 5: str = "BigBoss"; break;
             case 1: case 6: str = "PunchBoss"; break;
             case 2: case 7: str = "StickBoss"; break;
             case 3: case 8: str = "CaneBoss"; break;
             case 4: case 9: str = "BowBoss"; break;
             default: str = ""; break;
-
         }
         MonsterController bosscon = bosses[str];
         bosscon.transform.position = pos;
-        if (str != "SpiritBoss" && str != "HonbaegBoss" && str != "GoldBoss") bosscon.Model.InitSprite(currentstage);
+        if (str != "50Boss" && str != "100Boss") bosscon.Model.InitSprite(currentstage);
         bosscon.Model.BaseModel = bossModel;
         bosscon.gameObject.SetActive(true);
-    }
-    private void SpawnBoss(string str, Vector2 pos)
-    {
-        MonsterController bosscon = bosses[str];
-        bosscon.transform.position = pos;
-        if (str != "SpiritBoss") bosscon.Model.InitSprite(currentstage);
-        bosscon.Model.BaseModel = bossModel;
-        bosscon.gameObject.SetActive(true);
-
     }
     public void ActiveBoss(int dummy) //컴파일 오류 방지용 오버로딩
     {

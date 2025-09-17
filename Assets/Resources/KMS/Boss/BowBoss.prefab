@@ -3528,7 +3528,7 @@ GameObject:
   - component: {fileID: 94761623221087431}
   - component: {fileID: 8427438595419694839}
   - component: {fileID: 4460636153579323541}
-  - component: {fileID: 3911746185811965072}
+  - component: {fileID: 6698364368036170293}
   m_Layer: 10
   m_Name: BowBoss
   m_TagString: Monster
@@ -6547,7 +6547,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.22, y: 2.07}
   m_EdgeRadius: 0
---- !u!114 &3911746185811965072
+--- !u!114 &6698364368036170293
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6556,7 +6556,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4999875624023369911}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05b10ec4acf88e94abd316869aa6e165, type: 3}
+  m_Script: {fileID: 11500000, guid: 00ae71e584415a54689035298a1256d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Spum: {fileID: 0}
@@ -6564,7 +6564,12 @@ MonoBehaviour:
   NavAgent: {fileID: 0}
   healthBar: {fileID: 0}
   attackDelay: 0.3
+  isAttackedByNormalAttack: 0
   selfEffectTrs: {fileID: 6765699305450091028}
+  animationNumber: 2
+  effectName: 'NormalBoss2_AtkEffect '
+  effectScale: 3
+  targetEffect: 0
 --- !u!1 &5244886714086304714
 GameObject:
   m_ObjectHideFlags: 0
