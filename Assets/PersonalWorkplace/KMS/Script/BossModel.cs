@@ -5,8 +5,10 @@ public class BossModel : MonsterModel
   [SerializeField] SpriteRenderer[] clothes;
   private Color[] colors;
 
-  public override void InitSprite(int stage)
+  public override void InitSprite()
   {
+    if (!paletteSwap) return;
+    int stage = BaseModel.CurrentStage;
 
     if (stage < 100)
     {
