@@ -74,7 +74,7 @@ public class QuestManager : MonoBehaviour
                 LoadQuests();
 
                 // 로그인 퀘스트 진행도 보고
-                ReportEvent(QuestTargetType.Onlogin);
+                ReportEvent(QuestTargetType.OnLogin);
             });
         }
         else
@@ -89,12 +89,12 @@ public class QuestManager : MonoBehaviour
         // 오늘 날짜 기준으로 이미 카운트했는지 체크
         foreach (var quest in activeQuests.Values)
         {
-            if (quest.questTarget == QuestTargetType.Onlogin && quest.questType == QuestCategory.Daily)
+            if (quest.questTarget == QuestTargetType.OnLogin && quest.questType == QuestCategory.Daily)
             {
                 if (quest.lastUpdated.Date < now.Date)
                 {
                     // 오늘은 아직 로그인 보상 미처리, 카운트 증가
-                    ReportEvent(QuestTargetType.Onlogin);
+                    ReportEvent(QuestTargetType.OnLogin);
                     quest.lastUpdated = now; // 오늘 처리한 걸로 갱신
                     SaveQuests();
                 }
@@ -289,8 +289,13 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
-        quest.ClaimReward();
+        // 실제 보상 지급
+        foreach (var reward in quest.rewards)
+        {
+            GrantReward(reward);
+        }
 
+        quest.ClaimReward();
         Debug.Log($"퀘스트 보상 수령 완료: {quest.questName}");
 
         // 반복 퀘스트가 아니라면, 보상 수령 후 비활성화
@@ -313,6 +318,9 @@ public class QuestManager : MonoBehaviour
     {
         var currencyModel = CurrencyManager.Instance.Model;
         currencyModel.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
+
+        Debug.Log($"[보상 지급] {reward.currencyType} +{reward.rewardCount} 지급 완료! " +
+          $"현재 보유: {currencyModel.Get(reward.currencyType)}");
     }
 
     // Firebase 저장
