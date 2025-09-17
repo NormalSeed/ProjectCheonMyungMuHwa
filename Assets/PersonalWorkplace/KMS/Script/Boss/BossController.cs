@@ -26,6 +26,8 @@ public class BossController : MonsterController
     [SerializeField] float effectScale;
     [SerializeField] bool targetEffect;
 
+    [SerializeField] protected string attackSound;
+
     [Inject]
     public void Construct(Image bossbar)
     {
@@ -45,6 +47,30 @@ public class BossController : MonsterController
         IsInvulnerable = true;
         transform.localScale = Vector3.one;
         StartCoroutine(SpawnRoutine());
+    }
+    public override void PlaySpawnEffect()
+    {
+        int stage = Model.BaseModel.CurrentStage;
+        if (stage < 100)
+        {
+            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+        }
+        else if (stage < 200)
+        {
+            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+        }
+        else if (stage < 300)
+        {
+            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+        }
+        else if (stage < 400)
+        {
+            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+        }
+        else
+        {
+            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+        }
     }
     public override void OnDeath()
     {
@@ -72,6 +98,7 @@ public class BossController : MonsterController
     protected override IEnumerator RealAttackRoutine(IDamagable target)
     {
         yield return RealAttackDelay;
+        AudioManager.Instance.PlaySound(attackSound);
         if (selfEffectTrs != null) ParticleManager.Instance.GetParticle(effectName, selfEffectTrs.position, scale: effectScale);
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject go in players)

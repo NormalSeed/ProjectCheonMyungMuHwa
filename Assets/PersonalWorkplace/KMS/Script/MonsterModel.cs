@@ -16,6 +16,7 @@ public class MonsterModel : MonoBehaviour
   public float AttackDistanceWithClearance => AttackDistance + 0.5f; //공격 중에 벗어날 경우 다시 추적하기 위한 사정거리 (Attackdistance보다 약간 높게)
   [SerializeField] public float AttackDelay; //공격 쿨타임
   [SerializeField] public float MoveSpeed; //이동속도
+  [SerializeField] protected bool paletteSwap;
 
   public MonsterModelBaseSO BaseModel { get; set; }
 
@@ -33,9 +34,10 @@ public class MonsterModel : MonoBehaviour
       allColors.Add(sr.color);
     }
   }
-  public virtual void InitSprite(int stage)
+  public virtual void InitSprite()
   {
-
+    if (!paletteSwap) return;
+    int stage = BaseModel.CurrentStage;
     if (stage < 100)
     {
       SetSprite(tex.Orc_1);
@@ -51,6 +53,26 @@ public class MonsterModel : MonoBehaviour
     else if (stage < 400)
     {
       SetSprite(tex.Orc_4);
+    }
+  }
+  public virtual void PlaySpawnEffect()
+  {
+    int stage = BaseModel.CurrentStage;
+    if (stage < 100)
+    {
+      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+    }
+    else if (stage < 200)
+    {
+      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+    }
+    else if (stage < 300)
+    {
+      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+    }
+    else if (stage < 400)
+    {
+      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
     }
   }
   protected void SetSprite(Dictionary<string, Sprite> dict)

@@ -67,7 +67,7 @@ public class PoolManager : MonoBehaviour
     {
         currentstage = stage;
         normalOrcModel.SetFinal(stage);
-        bossModel.SetFinalBoss(currentstage, normalOrcModel);
+        bossModel.SetFinalBoss(stage, normalOrcModel);
     }
 
     //지정된 위치에 몬스터 소환
@@ -103,7 +103,6 @@ public class PoolManager : MonoBehaviour
 
     private void ActiveBoss(Vector2 pos)
     {
-        ParticleManager.Instance.GetParticle("Boss_1_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         int door = currentstage / 3;
         int last = door % 10;
@@ -129,7 +128,6 @@ public class PoolManager : MonoBehaviour
         }
         MonsterController bosscon = bosses[str];
         bosscon.transform.position = pos;
-        if (str != "50Boss" && str != "100Boss") bosscon.Model.InitSprite(currentstage);
         bosscon.Model.BaseModel = bossModel;
         bosscon.gameObject.SetActive(true);
     }
@@ -139,10 +137,8 @@ public class PoolManager : MonoBehaviour
     }
     private void ActiveMonster(DefaultPool<MonsterController> pool, Vector2 pos)
     {
-        ParticleManager.Instance.GetParticle("M_12_Recall", pos);
         AudioManager.Instance.PlaySound("Monster_Recall_New");
         MonsterController monster = pool.GetItem(pos);
-        monster.Model.InitSprite(currentstage);
         monster.Model.BaseModel = normalOrcModel;
         monster.gameObject.SetActive(true);
     }
