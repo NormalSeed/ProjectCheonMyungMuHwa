@@ -70,16 +70,19 @@ public class SummonHeroUI : UIBase
     {
         SummonHeros(1);
         InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 1);
     }
     private void onClickSummon10th()
     {
         SummonHeros(10);
         InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 10);
     }
     private void onClickSummon50th()
     {
         SummonHeros(50);
         InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 50);
     }
     private void OnClickShowInfo()
     {
