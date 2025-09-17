@@ -16,15 +16,15 @@ public class IntroSceneManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // Firebase 초기화
-        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
-        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+        //// Firebase 초기화
+        //var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        //yield return new WaitUntil(() => dependencyTask.IsCompleted);
 
-        if (dependencyTask.Result != DependencyStatus.Available)
-        {
-            Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
-            yield break;
-        }
+        //if (dependencyTask.Result != DependencyStatus.Available)
+        //{
+        //    Debug.LogError($"Firebase 초기화 실패: {dependencyTask.Result}");
+        //    yield break;
+        //}
 
         // VContainer Scope 대기
         var scope = FindObjectOfType<GameLifetimeScope>();
