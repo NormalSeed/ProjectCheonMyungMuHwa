@@ -27,4 +27,13 @@ public class CurrencyConfig : ScriptableObject
     {
         return _map.TryGetValue(type, out var id) ? id : -1;
     }
+
+    public CurrencyType GetCurrencyType(int itemId)
+    {
+        foreach (var kvp in _map) {
+            if (kvp.Value == itemId)
+                return kvp.Key;
+        }
+        return CurrencyType.Gold;
+    }
 }

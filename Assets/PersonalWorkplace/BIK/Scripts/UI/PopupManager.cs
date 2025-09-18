@@ -196,6 +196,21 @@ public class PopupManager : MonoBehaviour
         }
     }
 
+    public void ShowRewardPopup(List<ItemData> rewards, List<BigCurrency> rewardCount, bool bonus = false, float bonusRate = 0f)
+    {
+        if (!_popupDict.TryGetValue(PopupType.RewardPopup, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Reward 팝업이 등록되지 않았습니다.");
+            return;
+        }
+        if (uiBase is RewardUI rewardUI) {
+            rewardUI.SetShow(rewards, rewardCount, bonus, bonusRate);
+            Debug.Log($"[PopupManager] ShowRewardPopup: {rewards.Count}개 보상");
+        }
+        else {
+            Debug.LogError("[PopupManager] PopupType.Reward 이 RewardUI가 아님");
+        }
+    }
+
     public void CloseAllPopups()
     {
         foreach (var kvp in _popupDict) {
