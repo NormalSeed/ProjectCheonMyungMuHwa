@@ -26,6 +26,7 @@ public class QuestManager : MonoBehaviour
 
     //UI 갱신용 이벤트
     public event Action OnQuestsUpdated;
+    public event Action<Quest> OnQuestProgressChanged;
 
     // Firebase 서버 시간 오프셋(ms)
     private long serverTimeOffsetMs = 0;
@@ -421,16 +422,20 @@ public class QuestManager : MonoBehaviour
         foreach (var quest in matchedQuests)
         {
             quest.valueProgress += amount;
+
             if (quest.valueProgress >= quest.valueGoal)
             {
                 quest.valueProgress = quest.valueGoal;
-                CompleteQuest(quest);
+                CompleteQuest(quest); // 여기서 OnQuestsUpdated 호출
             }
             else
             {
                 quest.lastUpdated = NowUtc();
-                if (saveImmediately) SaveQuests(); // 필요 시만 즉시 저장
-                OnQuestsUpdated?.Invoke();
+                if (saveImmediately) SaveQuests();
+
+                // 진행도 이벤트 호출
+                OnQuestProgressChanged?.Invoke(quest);
+
                 Debug.Log($"[ReportEvent] {type} → {quest.questName}: {quest.valueProgress}/{quest.valueGoal}");
             }
         }
