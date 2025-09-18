@@ -12,11 +12,10 @@ public class GachaRateInfoUI : MonoBehaviour
     [SerializeField] private Button[] levelButtons;
     [SerializeField] private Button exitButton;
 
-    [Header("Text")]
-    [SerializeField] private TextMeshProUGUI nRateText;
-    [SerializeField] private TextMeshProUGUI rRateText;
-    [SerializeField] private TextMeshProUGUI uRateText;
-    [SerializeField] private TextMeshProUGUI lRateText;
+    [Header("Text Groups")]
+    [SerializeField] private List<TextMeshProUGUI> heroRateTexts;
+    [SerializeField] private List<TextMeshProUGUI> equipRateTexts;
+    [SerializeField] private List<TextMeshProUGUI> petRateTexts;
     [SerializeField] private TextMeshProUGUI summonLevelText;
 
     [Header("Panel")]
@@ -29,10 +28,7 @@ public class GachaRateInfoUI : MonoBehaviour
     [SerializeField] private GameObject equipContents;
     [SerializeField] private GameObject petContents;
 
-    [Header("Category")]
-    [SerializeField] private SummonCategory summonCategory;
-
-    private Dictionary<SummonLevel, RateData> _rateCache = new();
+    private SummonCategory summonCategory;
 
     private DatabaseReference _dbRef;
     private string _uid;
@@ -100,6 +96,22 @@ public class GachaRateInfoUI : MonoBehaviour
 
     #endregion
 
+    #region Public
+
+    public void SetupCategory(int categoryValue)
+    {
+        if (!Enum.IsDefined(typeof(SummonCategory), categoryValue))
+        {
+            Debug.LogWarning($"[GachaRateInfoUI] 잘못된 카테고리 값: {categoryValue}");
+            return;
+        }
+
+        summonCategory = (SummonCategory)categoryValue;
+        ShowCategoryPanels();
+    }
+
+    #endregion
+
     #region OnClick
 
     private async void OnLevelButtonClicked(int levelIndex)
@@ -144,11 +156,25 @@ public class GachaRateInfoUI : MonoBehaviour
         };
     }
 
+    private List<TextMeshProUGUI> GetCurrentRateTextGroup()
+    {
+        return summonCategory switch
+        {
+            SummonCategory.heroList => heroRateTexts,
+            SummonCategory.equipmentList => equipRateTexts,
+            SummonCategory.PetList => petRateTexts,
+            _ => null
+        };
+    }
+
     private async Task<int> GetUserSummonLevelAsync()
     {
         var snap = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").GetValueAsync();
         if (snap == null || !snap.Exists)
-            return -1;
+        {
+            Debug.LogWarning($"[GachaRateInfoUI] summonLevel 정보 없음: {_uid}");
+            return 1;
+        }
 
         return Convert.ToInt32(snap.Value);
     }
@@ -159,7 +185,10 @@ public class GachaRateInfoUI : MonoBehaviour
         var snap = await _dbRef.Child("summon").Child(levelKey).GetValueAsync();
 
         if (snap == null || !snap.Exists)
+        {
+            Debug.LogWarning($"[GachaRateInfoUI] summon/{levelKey} 경로 없음");
             return null;
+        }
 
         return new RateData
         {
@@ -199,15 +228,35 @@ public class GachaRateInfoUI : MonoBehaviour
 
     private void UpdateRateUI(RateData rate, HeroCountData count)
     {
-        float normal = count.Normal > 0 ? rate.Normal / count.Normal : 0f;
-        float rare = count.Rare > 0 ? rate.Rare / count.Rare : 0f;
-        float unique = count.Unique > 0 ? rate.Unique / count.Unique : 0f;
-        float epic = count.Epic > 0 ? rate.Epic / count.Epic : 0f;
+        var rateTexts = GetCurrentRateTextGroup();
+        if (rateTexts == null || rateTexts.Count < 4)
+        {
+            Debug.LogWarning("[GachaRateInfoUI] 텍스트 그룹이 잘못 설정됨");
+            return;
+        }
 
-        nRateText.text = $"{normal * 100f:F3}%";
-        rRateText.text = $"{rare * 100f:F3}%";
-        uRateText.text = $"{unique * 100f:F3}%";
-        lRateText.text = $"{epic * 100f:F3}%";
+        float normal, rare, unique, epic;
+
+        if (summonCategory == SummonCategory.equipmentList)
+        {
+            const int fixedEquipCount = 16;
+            normal = rate.Normal / fixedEquipCount;
+            rare = rate.Rare / fixedEquipCount;
+            unique = rate.Unique / fixedEquipCount;
+            epic = rate.Epic / fixedEquipCount;
+        }
+        else
+        {
+            normal = count.Normal > 0 ? rate.Normal / count.Normal : 0f;
+            rare = count.Rare > 0 ? rate.Rare / count.Rare : 0f;
+            unique = count.Unique > 0 ? rate.Unique / count.Unique : 0f;
+            epic = count.Epic > 0 ? rate.Epic / count.Epic : 0f;
+        }
+
+        rateTexts[0].text = $"각각 {normal * 100f:F3}%";
+        rateTexts[1].text = $"각각 {rare * 100f:F3}%";
+        rateTexts[2].text = $"각각 {unique * 100f:F3}%";
+        rateTexts[3].text = $"각각 {epic * 100f:F3}%";
     }
 
     private async Task LoadRateDataAsync(SummonLevel summonLevel)
@@ -221,15 +270,5 @@ public class GachaRateInfoUI : MonoBehaviour
         UpdateRateUI(rate, count);
     }
 
-    #endregion
-
-    #region Public
-    public void SetupCategory(int categoryValue)
-    {
-        if (!Enum.IsDefined(typeof(SummonCategory), categoryValue))
-            return;
-        summonCategory = (SummonCategory)categoryValue;
-        ShowCategoryPanels();
-    }
     #endregion
 }
