@@ -12,6 +12,8 @@ public class PartyManager : MonoBehaviour, IStartable
     }
     #endregion
 
+
+    private List<CardInfo> backupMembers = new(); // 기존 멤버 백업용
     public List<CardInfo> MembersID = new();// 실제 배치용
     public List<PlayerController> players = new();
 
@@ -135,11 +137,22 @@ public class PartyManager : MonoBehaviour, IStartable
     {
         // 맴버 리스트 초기화
         isHeroSetNow = true;
+        backupMembers = new List<CardInfo>(MembersID);
     }
+    public void StartWithoutPartySetting()
+    {
+        // 기존 멤버 복원
+        MembersID = new List<CardInfo>(backupMembers);
+        PartyLoadUI();
+        CheckSynergy();
+        isHeroSetNow = false;
+    }
+
     public void EndPartySetting()
     {
         PartyInit();
         PartyUpload();
+        backupMembers.Clear();
         isHeroSetNow = false;
     }
 
