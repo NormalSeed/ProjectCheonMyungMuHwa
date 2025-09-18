@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Database;
+using System.Collections.Generic;
 
 public class GachaRateInfoUI : MonoBehaviour
 {
@@ -23,11 +24,29 @@ public class GachaRateInfoUI : MonoBehaviour
 
     [Header("Category")]
     [SerializeField] private SummonCategory summonCategory;
+
+    private Dictionary<SummonLevel, RateData> _rateCache = new();   //
+
+    private class RateData
+    {
+        public float Normal;
+        public float Rare;
+        public float Unique;
+        public float Epic;
+    }
+
+    private class HeroCountData
+    {
+        public int Normal;
+        public int Rare;
+        public int Unique;
+        public int Epic;
+    }
     public enum SummonCategory
     {
-        Hero,
-        Equip,
-        Pet
+        heroList,
+        equipmentList,
+        PetList
     }
 
     private DatabaseReference _dbRef;
@@ -35,7 +54,7 @@ public class GachaRateInfoUI : MonoBehaviour
 
     #region Unity
 
-    private void OnEnable()
+    private async void OnEnable()
     {
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
@@ -46,7 +65,17 @@ public class GachaRateInfoUI : MonoBehaviour
             levelButtons[i].onClick.AddListener(() => OnLevelButtonClicked(index));
         }
         exitButton.onClick.AddListener(OnClickExit);
+
+        int userLevel = await GetUserSummonLevelAsync();
+        if (Enum.IsDefined(typeof(SummonLevel), userLevel))
+        {
+            SummonLevel summonLevel = (SummonLevel)userLevel;
+            await LoadRateDataAsync(summonLevel);
+            summonLevelText.text = $"Lv.{userLevel}";
+            legendPanel.SetActive(summonLevel != SummonLevel.level01);
+        }
     }
+
 
     private void OnDisable()
     {
@@ -61,12 +90,13 @@ public class GachaRateInfoUI : MonoBehaviour
     #region OnClick
     private async void OnLevelButtonClicked(int levelIndex)
     {
-        int summonLevel = levelIndex + 1;
+        SummonLevel summonLevel = (SummonLevel)(levelIndex + 1);
         await LoadRateDataAsync(summonLevel);
-        summonLevelText.text = $"Lv.{summonLevel}";
-        legendPanel.SetActive(summonLevel == 1);
+        summonLevelText.text = $"Lv.{(int)summonLevel}";
+        legendPanel.SetActive(summonLevel != SummonLevel.level01);
     }
-    
+
+
     private void OnClickExit()
     {
         this.gameObject.SetActive(false);
@@ -74,26 +104,75 @@ public class GachaRateInfoUI : MonoBehaviour
     #endregion
 
     #region private
-    private async Task LoadRateDataAsync(int summonLevel)
+    private async Task<int> GetUserSummonLevelAsync()
     {
-        string categoryKey = summonCategory.ToString().ToLower(); // "hero", "equip", "pet"
-
-        var snap = await _dbRef.Child("summon").Child(categoryKey).Child(summonLevel.ToString()).GetValueAsync();
+        var snap = await _dbRef.Child("users").Child(_uid).Child("summonLevel").GetValueAsync();
         if (snap == null || !snap.Exists)
         {
-            Debug.LogWarning($"[GachaRateInfoUI] summon/{categoryKey}/{summonLevel} 경로 없음");
-            return;
+            Debug.LogWarning($"[GachaRateInfoUI] summonLevel 정보 없음: {_uid}");
+            return 1; // 기본값
         }
 
-        float normal = Convert.ToSingle(snap.Child("normal").Value);
-        float rare = Convert.ToSingle(snap.Child("rare").Value);
-        float unique = Convert.ToSingle(snap.Child("unique").Value);
-        float epic = Convert.ToSingle(snap.Child("epic").Value);
+        return Convert.ToInt32(snap.Value);
+    }
+    private async Task<RateData> LoadSummonRateAsync(SummonLevel summonLevel)
+    {
+        string levelKey = summonLevel.ToString();
+        var snap = await _dbRef.Child("summon").Child(levelKey).GetValueAsync();
 
-        nRateText.text = $"{normal * 100f:F1}%";
-        rRateText.text = $"{rare * 100f:F1}%";
-        uRateText.text = $"{unique * 100f:F1}%";
-        lRateText.text = $"{epic * 100f:F1}%";
+        if (snap == null || !snap.Exists)
+        {
+            Debug.LogWarning($"[GachaRateInfoUI] summon/{levelKey} 경로 없음");
+            return null;
+        }
+
+        return new RateData
+        {
+            Normal = Convert.ToSingle(snap.Child("normal").Value),
+            Rare = Convert.ToSingle(snap.Child("rare").Value),
+            Unique = Convert.ToSingle(snap.Child("unique").Value),
+            Epic = Convert.ToSingle(snap.Child("epic").Value)
+        };
+    }
+    private async Task<HeroCountData> LoadHeroCountsAsync()
+    {
+        var snap = await _dbRef.Child("summon").Child("heroList").GetValueAsync();
+
+        if (snap == null || !snap.Exists)
+        {
+            Debug.LogWarning("[GachaRateInfoUI] summon/heroList 경로 없음");
+            return null;
+        }
+
+        return new HeroCountData
+        {
+            Normal = (int)snap.Child("normal").ChildrenCount,
+            Rare = (int)snap.Child("rare").ChildrenCount,
+            Unique = (int)snap.Child("unique").ChildrenCount,
+            Epic = (int)snap.Child("epic").ChildrenCount
+        };
+    }
+    private void UpdateRateUI(RateData rate, HeroCountData count)
+    {
+        float normal = count.Normal > 0 ? rate.Normal / count.Normal : 0f;
+        float rare = count.Rare > 0 ? rate.Rare / count.Rare : 0f;
+        float unique = count.Unique > 0 ? rate.Unique / count.Unique : 0f;
+        float epic = count.Epic > 0 ? rate.Epic / count.Epic : 0f;
+
+        nRateText.text = $"{normal * 100f:F3}%";
+        rRateText.text = $"{rare * 100f:F3}%";
+        lRateText.text = $"{unique * 100f:F3}%";
+        uRateText.text = $"{epic * 100f:F3}%";
+    }
+    private async Task LoadRateDataAsync(SummonLevel summonLevel)
+    {
+        var rate = await LoadSummonRateAsync(summonLevel);
+        var count = await LoadHeroCountsAsync();
+
+        if (rate == null || count == null)
+            return;
+
+        UpdateRateUI(rate, count);
     }
     #endregion
 }

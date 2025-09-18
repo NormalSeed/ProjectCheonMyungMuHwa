@@ -42,6 +42,7 @@ public class HeroDataManager : IStartable
     {
         return new Dictionary<string, object>
     {
+        { "heroName", hero.heroName },
         { "hasHero", hero.hasHero },
         { "heroPiece", hero.heroPiece },
         { "level", hero.level },
@@ -73,8 +74,13 @@ public class HeroDataManager : IStartable
     // 새 영웅 추가 코드
     public void AddNewHero(CardInfo card)
     {
+        var template = allTemplates.Find(t => t.heroId == card.HeroID);
+        var modelSO = template != null ? template.PlayerModelSO : null;
+        var heroName = modelSO != null ? modelSO.CharName : "Unknown";
+
         var heroData = new HeroData
         {
+            heroName = heroName,
             hasHero = true,
             heroPiece = 0,
             level = 1,
@@ -82,7 +88,7 @@ public class HeroDataManager : IStartable
             rarity = card.rarity.ToString(),
             heroId = card.HeroID,
             cardInfo = card,
-            PlayerModelSO = null,
+            PlayerModelSO = modelSO,
             weapone = string.Empty,
             armor = string.Empty,
             boots = string.Empty,
@@ -91,6 +97,7 @@ public class HeroDataManager : IStartable
 
         ownedHeroes[card.HeroID] = heroData;
     }
+
 
     public HeroDataManager(List<HeroData> values)
     {

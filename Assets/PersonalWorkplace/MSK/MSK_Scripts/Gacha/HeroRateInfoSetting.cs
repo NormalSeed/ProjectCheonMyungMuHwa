@@ -11,7 +11,6 @@ public class HeroRateInfoSetting : MonoBehaviour
 
     public string HeroID { get; private set; }
     private HeroRarity rarity;
-    private HeroFaction faction;
 
     [Header("Root References")]
     [SerializeField] private Transform cardBackgroundRoot; // 배경 레어도
@@ -37,7 +36,6 @@ public class HeroRateInfoSetting : MonoBehaviour
 
         HeroID = chardata.HeroID;
         rarity = chardata.rarity;
-        faction = chardata.faction;
 
         SetBackground();
         SetCharacter();
