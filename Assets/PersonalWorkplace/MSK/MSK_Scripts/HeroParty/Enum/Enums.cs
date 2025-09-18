@@ -74,6 +74,8 @@ public enum TableType
 {
     Item,
     Level,
+    NormalChest,
+    RareChest,
 }
 
 public enum ItemType

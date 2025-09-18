@@ -135,23 +135,23 @@ public sealed class BigCurrency : IComparable<BigCurrency>, IEquatable<BigCurren
     /// </summary>
     private static string GetUnit(int tier)
     {
-        if (tier < 0) return "";
-        // 스프레드시트 열 인덱싱과 유사 (1-based로 바꿔서 나눗셈)
-        tier += 1;
+        if (tier <= 0) return "";
+        int n = tier; // 1-based
         string s = "";
-        while (tier > 0) {
-            tier--; // 0~25로 맞춘 뒤 문자화
-            int r = tier % 26;
+        while (n > 0) {
+            n--; // 0~25
+            int r = n % 26;
             s = (char)('A' + r) + s;
-            tier /= 26;
+            n /= 26;
         }
         return s;
     }
 
     public override string ToString()
     {
-        if (Value == 0) return "0A"; // 혹은 "0"
-        return $"{Value:F2}{GetUnit(Tier)}";
+        if (Value == 0) return "0";
+        var unit = GetUnit(Tier);
+        return string.IsNullOrEmpty(unit) ? $"{Value:F2}" : $"{Value:F2}{unit}";
     }
 
     // 문자열 파싱(옵션): "12.3AB" -> Value=12.3, Tier=27
@@ -186,12 +186,12 @@ public sealed class BigCurrency : IComparable<BigCurrency>, IEquatable<BigCurren
         for (int k = 0; k < unit.Length; k++)
             if (unit[k] < 'A' || unit[k] > 'Z') return -1;
 
-        // 스프레드시트 역변환: "A"->1, ... "Z"->26, "AA"->27 ...
+        // "A"->1, ... "Z"->26, "AA"->27 ...
         int n = 0;
         for (int k = 0; k < unit.Length; k++) {
             n = n * 26 + (unit[k] - 'A' + 1);
         }
-        return n - 1; // 0-based로
+        return n; // 1-based (0은 단위 없음)
     }
 
     // 팩토리: A단위 원시값(예: 1500000A)에서 생성
@@ -207,4 +207,6 @@ public sealed class BigCurrency : IComparable<BigCurrency>, IEquatable<BigCurren
         }
         return new BigCurrency(value, tier);
     }
+
+    public double ToBaseAmount() => Value == 0 ? 0 : Value * Math.Pow(1000.0, Tier);
 }
