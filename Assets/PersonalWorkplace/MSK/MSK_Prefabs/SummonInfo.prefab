@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 5102177337245578525}
   - component: {fileID: 3461974365090071556}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: RRate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -577,6 +577,7 @@ GameObject:
   - component: {fileID: 4849073759628921187}
   - component: {fileID: 5548242733144548041}
   - component: {fileID: 3286773151724630149}
+  - component: {fileID: 1710964276332686502}
   m_Layer: 5
   m_Name: SummonInfo
   m_TagString: Untagged
@@ -643,6 +644,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1710964276332686502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709920034672915548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f943aca8bd27854194bc39e2e527423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelButtons:
+  - {fileID: 194160674106243227}
+  - {fileID: 850963373590592444}
+  - {fileID: 5384167799338170328}
+  - {fileID: 1217170966644793677}
+  - {fileID: 6225076841332757227}
+  - {fileID: 5781206839376514670}
+  - {fileID: 6414355851492325742}
+  - {fileID: 3746811123513906990}
+  - {fileID: 413730266104690290}
+  - {fileID: 6466008449789203681}
+  exitButton: {fileID: 1440848769496057716}
+  nRateText: {fileID: 2228984786384674008}
+  rRateText: {fileID: 3461974365090071556}
+  uRateText: {fileID: 1444375565585461127}
+  lRateText: {fileID: 3228668763524216013}
+  summonLevelText: {fileID: 1746526808297526217}
+  legendPanel: {fileID: 4417298552305275323}
+  summonCategory: 0
 --- !u!1 &713279990276468514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,7 +1101,7 @@ GameObject:
   - component: {fileID: 8297222889517957370}
   - component: {fileID: 2228984786384674008}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: NRate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3498,7 +3530,7 @@ GameObject:
   - component: {fileID: 4259486920369016054}
   - component: {fileID: 3228668763524216013}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: LRate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5248,7 +5280,7 @@ GameObject:
   - component: {fileID: 7429879814982758421}
   - component: {fileID: 1444375565585461127}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: URate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
