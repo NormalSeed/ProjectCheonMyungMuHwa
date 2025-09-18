@@ -64,14 +64,9 @@ public class HeroRateInfoSetting : MonoBehaviour
     }
     private void SetHeroName()
     {
-        foreach (var hero in HeroDataManager.Instance.ownedHeroes.Values)
-        {
-            if (hero.cardInfo == chardata) { 
-                heroName.text = hero.PlayerModelSO.CharName;
-            break;
-            }
-        }
+        heroName.text = chardata.HeroName;
     }
+
     #endregion
 }
 
