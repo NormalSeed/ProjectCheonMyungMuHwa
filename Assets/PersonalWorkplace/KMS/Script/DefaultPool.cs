@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.AddressableAssets;
+using System.Threading.Tasks;
+using UnityEngine.ResourceManagement.AsyncOperations;
+
 
 public interface IPooled<T>
 {
@@ -24,19 +28,6 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private Transform parent;
 
     //private List<IPooled<T>> pooledItems;
-
-    public DefaultPool(string id, int max, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
-    {
-        assetID = id;
-        //targetObj = Addressables.LoadAssetAsync<GameObject>(assetID).WaitForCompletion();
-        targetObj = Resources.Load<GameObject>($"KMS/{assetID}");
-        maxCount = max;
-        activeOnGet = active;
-        canExceedMaxCount = exceed;
-        useWarmUp = warmup;
-        this.parent = parent;
-        Init();
-    }
     public DefaultPool(GameObject obj, int maxCount, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
     {
         targetObj = obj;
@@ -50,7 +41,6 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
 
     private void Init()
     {
-        //pooledItems = new();
         pool = new ObjectPool<IPooled<T>>(
             createFunc: () => Create(),
             actionOnGet: obj => Active(obj),

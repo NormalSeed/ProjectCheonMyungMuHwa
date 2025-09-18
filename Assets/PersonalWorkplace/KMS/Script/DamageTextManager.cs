@@ -6,10 +6,12 @@ public class DamageTextManager : MonoBehaviour
 
     public DefaultPool<DamageText> DamagePool;
 
+    [SerializeField] GameObject damageText;
+
     void Awake()
     {
         Instance = this;
-        DamagePool = new DefaultPool<DamageText>("DamageText", 30, exceed:true, warmup:false, parent:gameObject.transform);
+        DamagePool = new DefaultPool<DamageText>(damageText, 30, exceed:true, warmup:false, parent:gameObject.transform);
     }
 
     public DamageText Get(Vector2 pos)
