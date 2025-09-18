@@ -10,23 +10,25 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private GameObject AudioSourcePrefab;
     private Dictionary<string, AudioClip> clips;
 
-    private List<AudioSourceController> pooledSounds;
+    public bool IsInitialized;
 
     private void Awake()
     {
-        pooledSounds = new();
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
-            clips = new();
-            LoadAssetAsync();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+    public void Init()
+    {
+        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
+        clips = new();
+        LoadAssetAsync();
     }
     private async void LoadAssetAsync()
     {
@@ -36,6 +38,7 @@ public class AudioManager : MonoBehaviour
         {
             clips.Add(clip.name, clip);
         }
+        IsInitialized = true;
         Debug.Log($"<color=yellow> 사운드 로드 완료 </color>");
     }
 
@@ -44,7 +47,6 @@ public class AudioManager : MonoBehaviour
         AudioClip clip = clips[id];
         AudioSourceController asc = soundPool.GetItem();
         asc.Init(clip, volume, mode);
-        pooledSounds.Add(asc);
         return asc;
     }
     public void StopSound(AudioSourceController asc)

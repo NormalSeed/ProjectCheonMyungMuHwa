@@ -12,6 +12,7 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     [SerializeField] CurrencyDungeonPoint[] bossPoints;
     [SerializeField] CurrencyBossModelBaseSO model;
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
+    [SerializeField] LoadedMonsterSO loadedData;
 
     public MonsterController Bosscon;
 
@@ -29,7 +30,11 @@ public class CurrencyDugeonBossSpawner : MonoBehaviour
     public void InitBoss(Action act)
     {
         bosses = new();
-        GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/CurrencyBoss");
+        GameObject[] loadedbosses = new GameObject[] {
+            loadedData.Objects["GoldBoss"],
+            loadedData.Objects["HonbaegBoss"],
+            loadedData.Objects["SpiritBoss"]
+        };
         foreach (GameObject go in loadedbosses)
         {
             GameObject boss = container.Instantiate(go);

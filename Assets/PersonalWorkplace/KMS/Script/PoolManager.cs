@@ -24,6 +24,8 @@ public class PoolManager : MonoBehaviour
     [SerializeField] private MonsterModelBaseSO bossModel;
     [SerializeField] private RectTransform goldRect;
 
+    [SerializeField] LoadedMonsterSO loadedData;
+
     private Dictionary<string, MonsterController> bosses;
 
     private Stack<DroppedItem> droppedItems;
@@ -44,15 +46,21 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         droppedItems = new();
         bosses = new();
-        PunchPool = new DefaultPool<MonsterController>("Punch", 3, active: false);
-        StickPool = new DefaultPool<MonsterController>("Stick", 3, active: false);
-        CanePool = new DefaultPool<MonsterController>("Cane", 3, active: false);
-        BowPool = new DefaultPool<MonsterController>("Bow", 3, active: false);
-        ArrowPool = new DefaultPool<MonsterProjectile>("Arrow", 8, exceed: true, warmup: false, parent: gameObject.transform);
-        MagicPool = new DefaultPool<MonsterProjectile>("MagicBall", 8, exceed: true, warmup: false, parent: gameObject.transform);
-        ItemPool = new DefaultPool<DroppedItem>("DroppedItem", 60, exceed: true, warmup: false, parent: gameObject.transform);
+        PunchPool = new DefaultPool<MonsterController>(loadedData.Objects["Punch"], 3, active: false);
+        StickPool = new DefaultPool<MonsterController>(loadedData.Objects["Stick"], 3, active: false);
+        CanePool = new DefaultPool<MonsterController>(loadedData.Objects["Cane"], 3, active: false);
+        BowPool = new DefaultPool<MonsterController>(loadedData.Objects["Bow"], 3, active: false);
+        ArrowPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["Arrow"], 8, exceed: true, warmup: false, parent: gameObject.transform);
+        MagicPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["MagicBall"], 8, exceed: true, warmup: false, parent: gameObject.transform);
+        ItemPool = new DefaultPool<DroppedItem>(loadedData.Objects["DroppedItem"], 60, exceed: true, warmup: false, parent: gameObject.transform);
 
-        GameObject[] loadedbosses = Resources.LoadAll<GameObject>("KMS/Boss");
+        GameObject[] loadedbosses = new GameObject[] {
+            loadedData.Objects["PunchBoss"],
+            loadedData.Objects["StickBoss"],
+            loadedData.Objects["CaneBoss"],
+            loadedData.Objects["BowBoss"],
+            loadedData.Objects["BigBoss"]
+        };
         foreach (GameObject go in loadedbosses)
         {
             GameObject boss = container.Instantiate(go);

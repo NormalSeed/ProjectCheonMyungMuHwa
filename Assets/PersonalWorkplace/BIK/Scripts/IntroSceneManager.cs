@@ -62,6 +62,33 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
             Debug.Log("[IntroScene] 영웅 스킬셋 로딩 완료!");
         }
+        if (scope != null)
+        {
+            if (scope.Container.TryResolve(out MonsterLoader monsterLoader))
+            {
+                monsterLoader.Init();
+                yield return new WaitUntil(() => monsterLoader.IsInitialized);
+                Debug.Log("[IntroScene] 몬스터 로딩 완료!");
+            }
+        }
+        if (scope != null)
+        {
+            if (scope.Container.TryResolve(out AudioManager audioManager))
+            {
+                audioManager.Init();
+                yield return new WaitUntil(() => audioManager.IsInitialized);
+                Debug.Log("[IntroScene] 사운드 로딩 완료!");
+            }
+        }
+        if (scope != null)
+        {
+            if (scope.Container.TryResolve(out ParticleManager particleManager))
+            {
+                particleManager.Init();
+                yield return new WaitUntil(() => particleManager.IsInitialized);
+                Debug.Log("[IntroScene] 파티클 로딩 완료!");
+            }
+        }
 
         // 메인 씬 비동기 로드
         asyncOperation = SceneManager.LoadSceneAsync(_mainSceneName);

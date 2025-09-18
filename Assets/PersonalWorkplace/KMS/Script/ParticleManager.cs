@@ -10,6 +10,8 @@ public class ParticleManager : MonoBehaviour
 
     public static ParticleManager Instance;
 
+    public bool IsInitialized;
+
     private Dictionary<string, ObjectPool<ParticleSystem>> poolDict;
 
     private Dictionary<string, WaitForSeconds> particleDelays;
@@ -22,15 +24,19 @@ public class ParticleManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
-            particleDelays = new Dictionary<string, WaitForSeconds>();
-            particleName = new Dictionary<ParticleSystem, string>();
-            LoadAssetAsync();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    public void Init()
+    {
+        poolDict = new Dictionary<string, ObjectPool<ParticleSystem>>();
+        particleDelays = new Dictionary<string, WaitForSeconds>();
+        particleName = new Dictionary<ParticleSystem, string>();
+        LoadAssetAsync();
     }
 
     private async void LoadAssetAsync()
@@ -57,6 +63,7 @@ public class ParticleManager : MonoBehaviour
             poolDict.Add(prefab.name, Pool);
             particleName.Add(part, prefab.name);
         }
+        IsInitialized = true;
         Debug.Log($"<color=green> 파티클 로드 완료 </color>");
 
     }
