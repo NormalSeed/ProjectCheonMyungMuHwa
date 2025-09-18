@@ -22,7 +22,7 @@ public class SummonHeroUI : UIBase
     [Header("Panel")]
     [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
     [SerializeField] private GachaManager gachaManager;     // 가챠 메니저
-    [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
+    [SerializeField] private GachaRateInfoUI summonInfoPanel;    // 소환확률 정보창
 
     [Header("Slider")]
     [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
@@ -86,7 +86,8 @@ public class SummonHeroUI : UIBase
     }
     private void OnClickShowInfo()
     {
-        summonInfoPanel.SetActive(true);
+        summonInfoPanel.gameObject.SetActive(true);
+        summonInfoPanel.SetupCategory(1);
     }
     #endregion
 

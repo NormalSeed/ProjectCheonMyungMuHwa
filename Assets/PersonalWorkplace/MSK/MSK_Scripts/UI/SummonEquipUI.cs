@@ -22,7 +22,7 @@ public class SummonEquipUI : MonoBehaviour
     [Header("Panel")]
     [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
     [SerializeField] private EquipGachaManager gachaManager;     // 가챠 메니저
-    [SerializeField] private GameObject summonInfoPanel;    // 소환확률 정보창
+    [SerializeField] private GachaRateInfoUI summonInfoPanel;    // 소환확률 정보창
 
     [Header("Slider")]
     [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
@@ -86,7 +86,8 @@ public class SummonEquipUI : MonoBehaviour
     }
     private void OnClickShowInfo()
     {
-        summonInfoPanel.SetActive(true);
+        summonInfoPanel.gameObject.SetActive(true);
+        summonInfoPanel.SetupCategory(2);
     }
     #endregion
 

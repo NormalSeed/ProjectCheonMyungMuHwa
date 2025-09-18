@@ -55,9 +55,9 @@ public class GachaRateInfoUI : MonoBehaviour
 
     public enum SummonCategory
     {
-        heroList,
-        equipmentList,
-        PetList
+        heroList = 1,
+        equipmentList = 2,
+        PetList = 3,
     }
 
     #region Unity
@@ -148,10 +148,7 @@ public class GachaRateInfoUI : MonoBehaviour
     {
         var snap = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").GetValueAsync();
         if (snap == null || !snap.Exists)
-        {
-            Debug.LogWarning($"[GachaRateInfoUI] summonLevel 정보 없음: {_uid}");
-            return 1;
-        }
+            return -1;
 
         return Convert.ToInt32(snap.Value);
     }
@@ -162,10 +159,7 @@ public class GachaRateInfoUI : MonoBehaviour
         var snap = await _dbRef.Child("summon").Child(levelKey).GetValueAsync();
 
         if (snap == null || !snap.Exists)
-        {
-            Debug.LogWarning($"[GachaRateInfoUI] summon/{levelKey} 경로 없음");
             return null;
-        }
 
         return new RateData
         {
@@ -227,5 +221,15 @@ public class GachaRateInfoUI : MonoBehaviour
         UpdateRateUI(rate, count);
     }
 
+    #endregion
+
+    #region Public
+    public void SetupCategory(int categoryValue)
+    {
+        if (!Enum.IsDefined(typeof(SummonCategory), categoryValue))
+            return;
+        summonCategory = (SummonCategory)categoryValue;
+        ShowCategoryPanels();
+    }
     #endregion
 }
