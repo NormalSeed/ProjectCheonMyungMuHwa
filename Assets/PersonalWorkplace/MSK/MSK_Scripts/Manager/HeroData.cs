@@ -2,7 +2,8 @@ using UnityEngine;
 
 [System.Serializable]
 public class HeroData
-{   
+{
+    public string heroName;                  // 영웅 이름
     public bool hasHero;                     // 영웅 보유 여부
     public int heroPiece;                    // 영웅 조각 개수
     public int level;                        // 영웅 래벨

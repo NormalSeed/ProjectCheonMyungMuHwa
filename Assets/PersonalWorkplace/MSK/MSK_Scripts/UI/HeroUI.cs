@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -96,6 +95,8 @@ public class HeroUI : UIBase
     private void OnClickAutoSet()
     {
         // 규칙에 따라서 영웅을 자동으로 배치
+
+        Debug.LogWarning("[OnClickAutoSet] 입력됨");
     }
 
 
@@ -111,11 +112,16 @@ public class HeroUI : UIBase
         IsHeroSetting.gameObject.SetActive(true);
         heroSetSave.gameObject.SetActive(true);
         autoSet.gameObject.SetActive(true);
+        heroSetEnd.gameObject.SetActive(true);
 
+        Debug.LogWarning("[heroSetSave] 등록");
         heroSetSave.onClick.AddListener(OnClickHeroSetSave);
+        Debug.LogWarning("[heroSetEnd] 등록");
         heroSetEnd.onClick.AddListener(OnClickHeroSetEnd);
+        Debug.LogWarning("리스너 등록됨: " + heroSetEnd.onClick != null);
+        Debug.LogWarning("[heroSetEnd] 등록");
         autoSet.onClick.AddListener(OnClickAutoSet);
-        
+
         PartySetStart?.Invoke();
     }
 
@@ -127,6 +133,7 @@ public class HeroUI : UIBase
         IsHeroSetting.gameObject.SetActive(false);
         heroSetSave.gameObject.SetActive(false);
         autoSet.gameObject.SetActive(false);
+        heroSetEnd.gameObject.SetActive(false);
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         heroSetEnd.onClick.RemoveListener(OnClickHeroSetEnd);
@@ -136,27 +143,29 @@ public class HeroUI : UIBase
 
         // 배치하기 버튼 활성화
         heroSet.gameObject.SetActive(true);
-
         PartySetFin?.Invoke();
     }
 
     // 영웅 배치하지 않고 저장
     private void OnClickHeroSetEnd()
     {
+        Debug.LogWarning("나가기 버튼눌림");
         IsHeroSetting.gameObject.SetActive(false);
         heroSetSave.gameObject.SetActive(false);
         autoSet.gameObject.SetActive(false);
+        heroSetEnd.gameObject.SetActive(false);
 
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         heroSetEnd.onClick.RemoveListener(OnClickHeroSetEnd);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
 
-        PartyManager.Instance.EndPartySetting();
+        PartyManager.Instance.StartWithoutPartySetting();
 
         heroSet.gameObject.SetActive(true);
         PartySetFin?.Invoke();
     }
     #endregion
+
     #region Private
     //  승급 가능 여부 반환
     private void CheckUpgradableHeroes()
@@ -177,7 +186,7 @@ public class HeroUI : UIBase
         }
         stageUpgrade.gameObject.SetActive(false);
     }
-    
+
     #endregion
 
     #region Public
