@@ -46,6 +46,7 @@ public class HeroInfoUI : UIBase
     [Header("Panel")]
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     [SerializeField] private GameObject equipPanel;
+    [SerializeField] private HeroUI heroUI;
     #endregion
 
     #region SO Properties
@@ -69,6 +70,7 @@ public class HeroInfoUI : UIBase
     public string bootsID;
     public string glovesID;
     #endregion
+
     #region FireBase
     private string _uid;
     private DatabaseReference _dbRef;
@@ -79,6 +81,7 @@ public class HeroInfoUI : UIBase
 
     private void OnDisable()
     {
+        heroUI.RefreshAllCards();
         equipPanel.SetActive(false);
         exitButton.onClick.RemoveListener(OnClickExit);
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
@@ -240,11 +243,14 @@ public class HeroInfoUI : UIBase
     /// <returns></returns>
     private string CountingHeroPower()
     {
+        /*
         float power = heroData.PlayerModelSO.ExtAtkPoint *
                        heroData.PlayerModelSO.HealthPoint *
                        heroData.PlayerModelSO.InnAtkPoint * 0.7f;
 
         return BigCurrency.FromBaseAmount(power).ToString();
+        */
+        return "총 전투력 계산 코드에서 공격력 계산이 이해가 안가요.";
     }
 
     /// <summary>
