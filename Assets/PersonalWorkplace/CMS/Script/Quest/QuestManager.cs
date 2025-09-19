@@ -317,11 +317,40 @@ public class QuestManager : MonoBehaviour
     // 보상 지급 로직
     public void GrantReward(Reward reward)
     {
-        var currencyModel = CurrencyManager.Instance.Model;
-        currencyModel.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
+        switch (reward.rewardType)
+        {
+            case RewardType.Currency:
+                if (reward.currencyType.HasValue)
+                {
+                    var currencyModel = CurrencyManager.Instance.Model;
+                    currencyModel.Add(reward.currencyType.Value, new BigCurrency(reward.rewardCount, 0));
+                    Debug.Log($"[보상 지급] {reward.currencyType.Value} +{reward.rewardCount} 지급 완료!");
+                }
+                else
+                {
+                    Debug.LogWarning("[보상 지급] CurrencyType이 지정되지 않았습니다. 지급을 건너뜁니다.");
+                }
+                break;
 
-        Debug.Log($"[보상 지급] {reward.currencyType} +{reward.rewardCount} 지급 완료! " +
-          $"현재 보유: {currencyModel.Get(reward.currencyType)}");
+            case RewardType.Equipment:
+                Debug.LogWarning($"[보상 지급] 장비 지급 로직 필요, {reward.rewardID} x{reward.rewardCount}");
+                break;
+
+            case RewardType.Item:
+                if (!InventoryManager.Instance.IsInitialized)
+                {
+                    Debug.LogError("[보상 지급] 인벤토리가 초기화되지 않음!");
+                    return;
+                }
+
+                InventoryManager.Instance.Add(reward.rewardID, reward.rewardCount);
+                Debug.Log($"[보상 지급] 아이템 {reward.rewardID} x{reward.rewardCount} 지급 완료! 현재 보유: {InventoryManager.Instance.Get(reward.rewardID)}");
+                break;
+
+            default:
+                Debug.LogWarning($"알 수 없는 보상 타입: {reward.rewardType}");
+                break;
+        }
     }
 
     // Firebase 저장

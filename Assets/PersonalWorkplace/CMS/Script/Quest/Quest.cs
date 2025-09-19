@@ -174,7 +174,7 @@ public class Reward
 {
     public string rewardID;          // 아이템/재화 식별자 (ex "H0001", "S0001" 등)
     public RewardType rewardType;    // CSV에서 넘어오는 보상 타입 (Currency, Equipment, Item 등)
-    public CurrencyType currencyType; // 재화형 보상일 경우 구분(선택적, 프로젝트에 따라 사용)
+    public CurrencyType? currencyType; // 재화형 보상일 경우 구분(선택적, 프로젝트에 따라 사용)
     public int rewardCount;          // 수량
 
     public string GetDisplayName()

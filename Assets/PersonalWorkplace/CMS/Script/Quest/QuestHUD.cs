@@ -68,7 +68,7 @@ public class QuestHUD : MonoBehaviour
             var reward = quest.rewards[0];
             if (reward.rewardType == RewardType.Currency)
             {
-                string iconKey = GetCurrencyIconKey(reward.currencyType);
+                string iconKey = GetCurrencyIconKey(reward.currencyType.Value);
                 if (!string.IsNullOrEmpty(iconKey))
                 {
                     LoadRewardIcon(iconKey);
