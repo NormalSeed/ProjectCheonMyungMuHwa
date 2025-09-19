@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
 public class LevelSelectPanel : MonoBehaviour
@@ -21,21 +20,23 @@ public class LevelSelectPanel : MonoBehaviour
     [SerializeField] TMP_Text countText;
 
     [SerializeField] TMP_Text titleText;
-    [SerializeField] UnityEngine.UI.Image ticketImage;
+    [SerializeField] Image ticketImage;
 
-    [SerializeField] CurrencyDungeonPopup popup;
+    [SerializeField] Button AdButton;
+
+    [SerializeField] AdDataSO adData;
 
     public CurrencyDungeonClearData ClearData { get; set; }
     private int ticketCount;
 
     private string currency;
 
-
     public void Setting(CurrencyDungeonType type)
     {
         int clearVal = 0;
         int countVal = dict.DungeonCounts[type];
         ticketImage.sprite = dict.TicketSprites[type];
+
         switch (type)
         {
             case CurrencyDungeonType.Gold:
@@ -57,6 +58,7 @@ public class LevelSelectPanel : MonoBehaviour
                 currency = "영석";
                 break;
         }
+        ActiveAdButton(type, ticketCount);
         countText.text = $"{ticketCount} / 3";
         for (int i = 0; i < allCards.Length; i++)
         {
@@ -90,7 +92,7 @@ public class LevelSelectPanel : MonoBehaviour
         scrollbar.value = (float)clearVal / countVal;
     }
 
-    public void SetSceneData(CurrencyDungeonData data, CurrencyDungeonType type)
+    private void SetSceneData(CurrencyDungeonData data, CurrencyDungeonType type)
     {
         if (ticketCount < 1)
         {
@@ -103,7 +105,7 @@ public class LevelSelectPanel : MonoBehaviour
         GetCurrentPlayerDatas();
     }
 
-    public void GetCurrentPlayerDatas()
+    private void GetCurrentPlayerDatas()
     {
         /*  기존 코드입니다. 
            playerData.currentPlayerDataList.Clear();
@@ -125,7 +127,7 @@ public class LevelSelectPanel : MonoBehaviour
         SceneManager.LoadSceneAsync("CurrencyDungeonScene");
     }
 
-    public void ClearedDungeon(CurrencyDungeonData data, CurrencyDungeonType type)
+    private void ClearedDungeon(CurrencyDungeonData data, CurrencyDungeonType type)
     {
         if (ticketCount < 1)
         {
@@ -159,5 +161,30 @@ public class LevelSelectPanel : MonoBehaviour
             CurrencyDungeonPopup.Instance.Close();
             CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
         });
+        ActiveAdButton(type, ticketCount);
+    }
+
+    private void ActiveAdButton(CurrencyDungeonType type, int ticketCount)
+    {
+        AdButton.onClick.RemoveAllListeners();
+        if (ticketCount > 0)
+        {
+            AdButton.gameObject.SetActive(false);
+            return;
+        }
+        int amount = 1;
+        AdButton.gameObject.SetActive(true);
+        AdButton.onClick.AddListener(() => adData.ShowRewardAD(() =>
+        {
+            BigCurrency reward = new BigCurrency(amount);
+            switch (type)
+            {
+                case CurrencyDungeonType.Gold: CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket, reward); break;
+                case CurrencyDungeonType.Honbaeg: CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket, reward); break;
+                case CurrencyDungeonType.Spirit: CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket, reward); break;
+            }
+            countText.text = $"{amount} / 3";
+            AdButton.gameObject.SetActive(false);
+        }));
     }
 }
