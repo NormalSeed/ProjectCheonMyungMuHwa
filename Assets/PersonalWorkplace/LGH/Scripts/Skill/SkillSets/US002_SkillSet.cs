@@ -83,11 +83,25 @@ public class US002_SkillSet : SkillSet
         controller.transform.position = destination;
 
         IDamagable damagable = target.GetComponent<IDamagable>();
-        if (damagable != null)
+        MonsterController mController = target.GetComponent<MonsterController>();
+        float rawDamage = (float)(
+                skills[1].ExtSkillDmg * controller.model.ExtAtk +
+                skills[1].InnSkillDmg * controller.model.InnAtk -
+                mController.Model.BaseModel.finalOuterDefense -
+                mController.Model.BaseModel.finalInnerDefense);
+        float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+        if (damagable != null && mController != null)
         {
-            damagable.TakeDamage(
-                controller.model.ExtAtk * skills[0].ExtSkillDmg +
-                controller.model.InnAtk * skills[1].InnSkillDmg);
+            bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+            if (isCritical)
+            {
+                damage *= controller.model.CritDamage;
+            }
+
+            damagable.TakeDamage(damage);
+
+            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
 
         if (Random.value < 0.2f)

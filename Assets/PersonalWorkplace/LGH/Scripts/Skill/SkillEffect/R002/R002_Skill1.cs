@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 public class R002_Skill1 : SkillEffect
@@ -7,12 +8,26 @@ public class R002_Skill1 : SkillEffect
         if (collision.CompareTag("Monster"))
         {
             IDamagable damagable = collision.GetComponent<IDamagable>();
-
-            if (damagable != null)
+            MonsterController mController = collision.GetComponent<MonsterController>();
+            if (damagable != null && mController != null)
             {
-                damagable.TakeDamage(
-                    controller.model.ExtAtk * skill1Data.ExtSkillDmg +
-                    controller.model.InnAtk * skill1Data.InnSkillDmg);
+                float rawDamage = (float)(
+                    skillSet.skills[0].ExtSkillDmg * controller.model.ExtAtk +
+                    skillSet.skills[0].InnSkillDmg * controller.model.InnAtk -
+                    mController.Model.BaseModel.finalOuterDefense -
+                    mController.Model.BaseModel.finalInnerDefense);
+                float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+
+                bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+                if (isCritical)
+                {
+                    damage *= controller.model.CritDamage;
+                }
+
+                damagable.TakeDamage(damage);
+
+                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
             }
             else
             {

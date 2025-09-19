@@ -103,8 +103,21 @@ public partial class PlayerAttackAction : Action
                 FlipTowardsTarget();
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
                 // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
-                target.TakeDamage(model.ExtAtk);
+                float rawDamage = (float)(model.ExtAtk + model.InnAtk - (mController.Model.BaseModel.finalInnerDefense + mController.Model.BaseModel.finalOuterDefense));
+                float damage = Math.Clamp(rawDamage, 1f, float.MaxValue);
+
+                bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+                if (isCritical)
+                {
+                    damage *= controller.model.CritDamage;
+                }
+
+                target.TakeDamage(damage);
                 mController.isAttackedByNormalAttack = true;
+
+                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
+
                 attackDelay = 1f / model.AttackSpeed;
                 controller.skill2Count--;
             }

@@ -1,6 +1,7 @@
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
+using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -26,9 +27,10 @@ public class PlayerController : MonoBehaviour, IDamagable
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
     public NavMeshAgent NMagent;
-    private BehaviorGraphAgent BGagent;
+    public BehaviorGraphAgent BGagent;
 
     public bool movedRight = false;
+    public bool isDead = false;
 
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
@@ -60,6 +62,8 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
+
+        isDead = true;
 
         charID.Subscribe(LoadPlayerData);
 
@@ -123,66 +127,6 @@ public class PlayerController : MonoBehaviour, IDamagable
             gameObject.SetActive(false);
             return;
         }
-
-        //// Addressable 로딩 형식
-        //// csv 파일을 받아오는 것이 아닌 CharID와 같은 Address를 가진 Model SO를 받아와서 등록하게 함
-        //Addressables.LoadAssetAsync<PlayerModelSO>(charID + "_model")
-        //    .Completed += handle =>
-        //    {
-        //        if (handle.Status == AsyncOperationStatus.Succeeded)
-        //        {
-        //            model.modelSO = handle.Result;
-
-        //            // Firebase에서 캐릭터 레벨 정보 불러오기
-        //            string userID = CurrencyManager.Instance.UserID;
-        //            Debug.Log("현재 유저 아이디 : " + userID);
-        //            string path = $"users/{userID}/character/charInfo/{charID}";
-
-        //            FirebaseDatabase.DefaultInstance
-        //                .GetReference(path)
-        //                .GetValueAsync()
-        //                .ContinueWithOnMainThread(task =>
-        //                {
-        //                    if (task.IsFaulted)
-        //                    {
-        //                        Debug.LogError("Firebase 요청 실패: " + task.Exception);
-        //                        return;
-        //                    }
-
-        //                    if (task.IsCanceled)
-        //                    {
-        //                        Debug.LogWarning("Firebase 요청이 취소됨");
-        //                        return;
-        //                    }
-
-        //                    if (task.IsCompleted && task.Result.Exists)
-        //                    {
-        //                        DataSnapshot snapshot = task.Result;
-
-        //                        int level = int.Parse(snapshot.Child("level").Value.ToString());
-        //                        int stage = int.Parse(snapshot.Child("stage").Value.ToString());
-
-        //                        // 모델에 적용
-        //                        model.modelSO.Level = level;
-        //                        model.modelSO.Grade = stage;
-
-        //                        model.SetPoints(); // 능력치 계산
-        //                        equipment.InitializeEquippedSlotsFromManager(equipmentManager.allEquipments);
-        //                    }
-        //                    else
-        //                    {
-        //                        Debug.LogWarning($"Firebase에서 '{charID}' 캐릭터 데이터를 찾을 수 없습니다.");
-        //                    }
-        //                });
-
-        //            LoadPlayerSPUMAsset(charID, model.modelSO.SkillSetID);
-        //        }
-        //        else
-        //        {
-        //            gameObject.SetActive(false);
-        //            Debug.LogError($"'{charID}' 모델 로드 실패: {handle.OperationException}");
-        //        }
-        //    };
 
         var cachedModel = HeroModels.Instance.GetModelSO(charID);
         if (cachedModel == null)
@@ -373,6 +317,13 @@ public class PlayerController : MonoBehaviour, IDamagable
             model.CurHealth.Value -= amount;
             Debug.Log($"현재 체력 : {model.CurHealth.Value}");
         }
+    }
+
+    public void Dead()
+    {
+        BGagent.enabled = false;
+        spumController.PlayAnimation(PlayerState.DEATH, 0);
+        isDead = true;
     }
 
     public void Heal(float amount)
