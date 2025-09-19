@@ -17,6 +17,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected Coroutine hurtCo;
 
     protected Coroutine attackCo;
+    protected Coroutine deathCo;
 
     [SerializeField] protected Image healthBar;
 
@@ -121,7 +122,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         onDeath?.Invoke();
         InGameManager.Instance.monsterDeathStack.Value--;
         if (attackCo != null) StopCoroutine(attackCo);
-        StartCoroutine(DeathRoutine());
+        deathCo = StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
         QuestManager.Instance.UpdateQuest("Monster", 1);
         QuestManager.Instance.ReportEvent(QuestTargetType.Monster, 1);
@@ -136,6 +137,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         Model.SetSpriteColor(Color.black);
         yield return hurtWfs;
         Model.SetSpriteColor(Color.white);
+        hurtCo = null;
     }
     protected virtual IEnumerator DeathRoutine()
     {
@@ -169,5 +171,13 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         float v = (float)val;
         float res = Mathf.Max(0, v);
         healthBar.fillAmount = res;
+    }
+
+
+    void OnDisable()
+    {
+        if (attackCo != null) StopCoroutine(attackCo);
+        if (hurtCo != null) StopCoroutine(hurtCo);
+        if (deathCo != null) StopCoroutine(deathCo);
     }
 }

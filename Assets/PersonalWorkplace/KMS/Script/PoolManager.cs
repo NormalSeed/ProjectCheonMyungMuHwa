@@ -31,6 +31,7 @@ public class PoolManager : MonoBehaviour
     private Stack<DroppedItem> droppedItems;
 
     private IObjectResolver container;
+    private MonsterController bosscon;
 
     private WaitForSeconds GetItemWfs;
     [Inject]
@@ -134,7 +135,7 @@ public class PoolManager : MonoBehaviour
             case 4: case 9: str = "BowBoss"; break;
             default: str = ""; break;
         }
-        MonsterController bosscon = bosses[str];
+        bosscon = bosses[str];
         bosscon.transform.position = pos;
         bosscon.Model.BaseModel = bossModel;
         bosscon.gameObject.SetActive(true);
@@ -171,6 +172,23 @@ public class PoolManager : MonoBehaviour
             yield return GetItemWfs;
         }
 
+    }
+    public void ReleaseAll()
+    {
+        PunchPool.ReleaseAllItes();
+        StickPool.ReleaseAllItes();
+        CanePool.ReleaseAllItes();
+        BowPool.ReleaseAllItes();
+        ArrowPool.ReleaseAllItes();
+        MagicPool.ReleaseAllItes();
+        bosscon?.gameObject.SetActive(false);
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.PageUp))
+        {
+            ReleaseAll();
+        }
     }
 
 }

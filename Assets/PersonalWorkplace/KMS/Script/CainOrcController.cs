@@ -21,6 +21,7 @@ public class CainOrcController : MonsterController
             proj.Damage = Model.BaseModel.finalAttackPower;
             proj.Shot();
         }
+        attackCo = null;
 
     }
 }

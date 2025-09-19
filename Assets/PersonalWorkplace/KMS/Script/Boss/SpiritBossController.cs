@@ -25,5 +25,6 @@ public class SpiritBossController : BossController
             DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
+        attackCo = null;
     }
 }

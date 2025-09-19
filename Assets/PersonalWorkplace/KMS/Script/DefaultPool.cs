@@ -27,7 +27,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private bool useWarmUp;
     private Transform parent;
 
-    //private List<IPooled<T>> pooledItems;
+    private List<IPooled<T>> pooledItems;
     public DefaultPool(GameObject obj, int maxCount, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
     {
         targetObj = obj;
@@ -36,6 +36,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
         canExceedMaxCount = exceed;
         useWarmUp = warmup;
         this.parent = parent;
+        pooledItems = new();
         Init();
     }
 
@@ -97,16 +98,17 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
             Debug.LogError($"<color=red>최대 개수 초과{pool.CountActive}</color>");
             return null;
         }
-        //pooledItems.Add(pooled);
-        return pool.Get();
+        IPooled<T> pooled = pool.Get();
+        pooledItems.Add(pooled);
+        return pooled;
     }
 
     public void ReleaseAllItes()
     {
-        //for (int i = pooledItems.Count - 1; i >= 0; i--)
-        //{
-        //    ReleaseItem(pooledItems[i]);
-        //}
+        for (int i = pooledItems.Count - 1; i >= 0; i--)
+        {
+            ReleaseItem(pooledItems[i]);
+        }
     }
 
     public T GetItem()
@@ -125,7 +127,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     public void ReleaseItem(IPooled<T> pooled)
     {
         if (pool.CountActive <= 0) return;
-        //pooledItems.Remove(pooled);
+        pooledItems.Remove(pooled);
         pool.Release(pooled);
     }
 }
