@@ -149,7 +149,6 @@ public class HeroUI : UIBase
     // 영웅 배치하지 않고 저장
     private void OnClickHeroSetEnd()
     {
-        Debug.LogWarning("나가기 버튼눌림");
         IsHeroSetting.gameObject.SetActive(false);
         heroSetSave.gameObject.SetActive(false);
         autoSet.gameObject.SetActive(false);
@@ -158,10 +157,10 @@ public class HeroUI : UIBase
         heroSetSave.onClick.RemoveListener(OnClickHeroSetSave);
         heroSetEnd.onClick.RemoveListener(OnClickHeroSetEnd);
         autoSet.onClick.RemoveListener(OnClickAutoSet);
-
+        SlotClear();
         PartyManager.Instance.StartWithoutPartySetting();
-
         heroSet.gameObject.SetActive(true);
+
         PartySetFin?.Invoke();
     }
     #endregion
@@ -187,6 +186,39 @@ public class HeroUI : UIBase
         stageUpgrade.gameObject.SetActive(false);
     }
 
+    private void SlotClear()
+    {
+        // 파티 멤버 리스트 복사 후 초기화
+        var members = PartyManager.Instance.MembersID;
+        PartyManager.Instance.MembersID.Clear();
+
+        // 해당 멤버에 대응하는 카드만 HeroSettingEnd 호출
+        foreach (var member in members)
+        {
+            foreach (var card in heroCard)
+            {
+                if (card.chardata == member)
+                {
+                    card.HeroSettingEnd();
+                    break; // 찾았으면 이탈
+                }
+            }
+        }
+
+        // 슬롯 초기화
+        for (int i = 0; i < heroSlots.Count; i++)
+        {
+            if (i < PartyManager.Instance.MembersID.Count)
+            {
+                var card = PartyManager.Instance.MembersID[i];
+                heroSlots[i].SetCard(card, i);
+            }
+            else
+            {
+                heroSlots[i].SetCard(null, i);
+            }
+        }
+    }
     #endregion
 
     #region Public
@@ -199,7 +231,13 @@ public class HeroUI : UIBase
         PartyManager.Instance.PartyLoadUI();
         PartyNumChanged?.Invoke();
     }
-
+    public void RefreshAllCards()
+    {
+        foreach (var card in heroCard)
+        {
+            card.SetStage();
+        }
+    }
     public void SetSlot(CardInfo input, int index)
     {
         if (index < 0 || index >= heroSlots.Count)

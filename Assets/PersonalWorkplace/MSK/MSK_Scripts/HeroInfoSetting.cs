@@ -153,10 +153,14 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     #region Private
+
+    #endregion
+
+    #region Public
     /// <summary>
     /// 회색으로 표시된 배치표시를 비활성화
     /// </summary>
-    private void HeroSettingEnd()
+    public void HeroSettingEnd()
     {
         selectRoot.gameObject.SetActive(false);
     }
@@ -173,9 +177,5 @@ public class HeroInfoSetting : MonoBehaviour
             }
         }
     }
-    #endregion
-
-    #region Public
-
     #endregion
 }

@@ -11,7 +11,6 @@ public class GameLifetimeScope : LifetimeScope
 
     [SerializeField] private List<EquipmentSO> allTemplates;
     [SerializeField] private List<HeroData> allHeroTemplates;
-
     protected override void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -41,8 +40,9 @@ public class GameLifetimeScope : LifetimeScope
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
 
+        builder.RegisterInstance(allHeroTemplates);
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton)
-               .WithParameter("values", allHeroTemplates)
+               .WithParameter("allHeroTemplates", allHeroTemplates)
                .AsSelf();
         Debug.Log("[GameLifetimeScope] HeroDataManager 등록 완료");
 
