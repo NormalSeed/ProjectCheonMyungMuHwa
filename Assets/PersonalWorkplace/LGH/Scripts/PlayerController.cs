@@ -1,6 +1,7 @@
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
+using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -26,9 +27,10 @@ public class PlayerController : MonoBehaviour, IDamagable
     public ObservableProperty<string> charID { get; private set; } = new(string.Empty);
 
     public NavMeshAgent NMagent;
-    private BehaviorGraphAgent BGagent;
+    public BehaviorGraphAgent BGagent;
 
     public bool movedRight = false;
+    public bool isDead = false;
 
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
@@ -60,6 +62,8 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
+
+        isDead = true;
 
         charID.Subscribe(LoadPlayerData);
 
@@ -313,6 +317,13 @@ public class PlayerController : MonoBehaviour, IDamagable
             model.CurHealth.Value -= amount;
             Debug.Log($"현재 체력 : {model.CurHealth.Value}");
         }
+    }
+
+    public void Dead()
+    {
+        BGagent.enabled = false;
+        spumController.PlayAnimation(PlayerState.DEATH, 0);
+        isDead = true;
     }
 
     public void Heal(float amount)
