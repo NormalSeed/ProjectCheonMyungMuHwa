@@ -6,7 +6,7 @@ public class GroupCamera2D : MonoBehaviour
     public Transform[] units;        // 5명 유닛 Transform
     public Vector3 offset;           // 카메라 오프셋 
     public float smoothTime = 0.3f;  // 따라가는 부드러움
-    public float minZoom = 5f;       // 최소 줌
+    public float minZoom = 8f;       // 최소 줌
     public float maxZoom = 15f;      // 최대 줌
     public float zoomLimiter = 10f;  // 유닛 간 거리 대비 줌 조정 정도
 

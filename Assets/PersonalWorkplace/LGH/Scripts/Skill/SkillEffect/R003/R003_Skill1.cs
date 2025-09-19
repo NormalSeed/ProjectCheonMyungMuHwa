@@ -37,11 +37,26 @@ public class R003_Skill1 : SkillEffect
                 if (hit.CompareTag("Monster"))
                 {
                     IDamagable damagable = hit.GetComponent<IDamagable>();
-                    if (damagable != null)
+                    MonsterController mController = hit.GetComponent<MonsterController>();
+                    if (damagable != null && mController != null)
                     {
-                        damagable.TakeDamage(
-                            controller.model.ExtAtk * skill2Data.ExtSkillDmg +
-                            controller.model.InnAtk * skill2Data.InnSkillDmg);
+                        float rawDamage = (float)(
+                            skillSet.skills[0].ExtSkillDmg * controller.model.ExtAtk +
+                            skillSet.skills[0].InnSkillDmg * controller.model.InnAtk -
+                            mController.Model.BaseModel.finalOuterDefense -
+                            mController.Model.BaseModel.finalInnerDefense);
+                        float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+
+                        bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+                        if (isCritical)
+                        {
+                            damage *= controller.model.CritDamage;
+                        }
+
+                        damagable.TakeDamage(damage);
+
+                        DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+                        text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
                     }
                     else
                     {

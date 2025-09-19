@@ -56,12 +56,26 @@ public class L002_Skill1 : SkillEffect
     private void ApplyCurseDamage(MonsterController monster)
     {
         IDamagable damagable = monster.GetComponent<IDamagable>();
-        if (damagable != null)
+        MonsterController mController = monster.GetComponent<MonsterController>();
+        if (damagable != null && mController != null)
         {
-            damagable.TakeDamage(
+            float rawDamage = (float)(
                 skillSet.skills[0].ExtSkillDmg * controller.model.ExtAtk +
-                skillSet.skills[0].InnSkillDmg * controller.model.InnAtk);
-            Debug.Log($"{monster.name}에게 저주 데미지 적용됨");
+                skillSet.skills[0].InnSkillDmg * controller.model.InnAtk -
+                mController.Model.BaseModel.finalOuterDefense -
+                mController.Model.BaseModel.finalInnerDefense);
+            float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+
+            bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+            if (isCritical)
+            {
+                damage *= controller.model.CritDamage;
+            }
+
+            damagable.TakeDamage(damage);
+
+            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
     }
 }

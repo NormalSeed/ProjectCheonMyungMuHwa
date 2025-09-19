@@ -18,7 +18,7 @@ public class PlayerModel : MonoBehaviour
     public float skillDamageBonus = 1;
 
     // 총 전투력
-    public double combatPower;
+    public float combatPower;
 
     // Observable Properties
     public ObservableProperty<double> CurHealth { get; private set; } = new();

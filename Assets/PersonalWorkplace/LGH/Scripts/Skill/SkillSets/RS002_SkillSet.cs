@@ -71,14 +71,26 @@ public class RS002_SkillSet : SkillSet
 
         foreach (var monsterObj in monsters)
         {
-            var damagable = monsterObj.GetComponent<IDamagable>();
-            if (damagable != null)
+            IDamagable damagable = monsterObj.GetComponent<IDamagable>();
+            MonsterController mController = monsterObj.GetComponent<MonsterController>();
+            float rawDamage = (float)(
+                    skills[1].ExtSkillDmg * controller.model.ExtAtk +
+                    skills[1].InnSkillDmg * controller.model.InnAtk -
+                    mController.Model.BaseModel.finalOuterDefense -
+                    mController.Model.BaseModel.finalInnerDefense);
+            float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+            if (damagable != null && mController != null)
             {
-                float dist = Vector2.Distance(transform.position, monsterObj.transform.position);
-                if (dist <= skills[1].SkillRange)
+                bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+                if (isCritical)
                 {
-                    validTargets.Add(monsterObj.transform);
+                    damage *= controller.model.CritDamage;
                 }
+
+                damagable.TakeDamage(damage);
+
+                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
             }
         }
 

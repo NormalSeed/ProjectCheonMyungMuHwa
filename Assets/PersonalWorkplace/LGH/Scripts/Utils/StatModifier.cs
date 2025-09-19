@@ -182,6 +182,34 @@ public static class StatModifierManager
     }
 
     /// <summary>
+    /// 캐릭터 카드의 전투력 표시를 위한 Modifier(장비, 훈련)를 불러와 기본 능력치에 더해서 각 캐릭터 Card에 표시할 전투력을 계산하기 위한 메서드
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <param name="statType"></param>
+    /// <param name="baseValue"></param>
+    /// <returns></returns>
+    public static float GetCardModifier(string charID, StatType statType, float baseValue)
+    {
+        // 장비, 훈련 Modifier만 가져오는 메서드
+        if (!modifierCache.ContainsKey(charID))
+            return 0f;
+
+        float total = 0f;
+
+        foreach (var modifier in modifierCache[charID].Where(m =>
+            m.statType == statType &&
+            (m.source == ModifierSource.Equipment || m.source == ModifierSource.Training)))
+        {
+            if (modifier.isPercent)
+                total += baseValue * modifier.value;
+            else
+                total += modifier.value;
+        }
+
+        return total;
+    }
+
+    /// <summary>
     /// Player ModleSO의 기본 능력치에 Modifier를 더해서 Player Model 안의 최종 능력치를 설정하는 메서드
     /// </summary>
     /// <param name="model"></param>
@@ -199,5 +227,15 @@ public static class StatModifierManager
         model.bossDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.BDamage, 1));
         model.normalDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.NDamage, 1));
         model.skillDamageBonus = (float)(1 + GetTotalModifier(charID, StatType.SkillDamage, 1));
+    }
+
+    public static void ApplyToCard(CardInfo card)
+    {
+        string charID = card.HeroID;
+
+        // charID를 기반으로 modelSO를 불러와서
+        // PlayerModel 클래스의 SetPoints의 첫부분과 같이 먼저 레벨에 따른 기초 스탯을 계산한 후
+        // GetCardModifier해온 값을 기초 스탯에 더해 각각의 최종 스탯을 계산해서
+        // card 안의 총 전투력 필드에 넣어줌
     }
 }

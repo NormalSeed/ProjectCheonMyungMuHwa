@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -99,11 +100,26 @@ public class L003_Skill1 : SkillEffect
         weapon.SetTarget(target);
 
         IDamagable damagable = target.GetComponent<IDamagable>();
-        if (damagable != null)
+        MonsterController mController = target.GetComponent<MonsterController>();
+        if (damagable != null && mController != null)
         {
-            damagable.TakeDamage(
-                skill1Data.ExtSkillDmg * controller.model.ExtAtk +
-                skill1Data.InnSkillDmg * controller.model.InnAtk);
+            float rawDamage = (float)(
+                skillSet.skills[0].ExtSkillDmg * controller.model.ExtAtk +
+                skillSet.skills[0].InnSkillDmg * controller.model.InnAtk -
+                mController.Model.BaseModel.finalOuterDefense -
+                mController.Model.BaseModel.finalInnerDefense);
+            float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+
+            bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+            if (isCritical)
+            {
+                damage *= controller.model.CritDamage;
+            }
+
+            damagable.TakeDamage(damage);
+
+            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
+            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
 
         atkInterval = 1 / atkSpeed;

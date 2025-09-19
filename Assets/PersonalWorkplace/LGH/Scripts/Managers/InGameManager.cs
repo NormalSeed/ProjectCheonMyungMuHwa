@@ -1,5 +1,6 @@
 using NavMeshPlus.Components;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InGameManager : MonoBehaviour
@@ -105,6 +106,13 @@ public class InGameManager : MonoBehaviour
     {
         if (monsterDeathStack.Value <= 0)
         {
+            List<PlayerController> players = PartyManager.Instance.players;
+
+            foreach (PlayerController player in players)
+            {
+                player.model.CurHealth.Value = player.model.Health;
+            }
+
             alignedNum.Value = 0; // 전투 종료 후 초기화
             isProcessingAlignment = false;
             PoolManager.Instance.GetItems();
