@@ -90,17 +90,10 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Init 
-    public async void Init()
+    public void Init()
     {
-        ButtonAddListener();                 // 버튼 리스너 연결
-        PrepareHeroStats();                 // 능력치 및 조각 계산
-        InfoTextSetting();                  // 텍스트 UI 세팅
-        await SetCharacter(heroData.PlayerModelSO.SpriteKey); // 이미지 로딩
-        SetStage();                         // 돌파 단계 표시
-        SetBadge();                         // 진영 표시
-        SetUpgradeInteractable(upgradeButton); // 레벨업 버튼 활성화 여부
-        SetRankUpInteractable(stageUPButton);  // 돌파 버튼 활성화 여부
-        SetEquipment();                        // 장착 중 장비 설정
+        ButtonAddListener();
+        RefreshUI();
     }
     private void SetEquipment()
     {
@@ -132,7 +125,6 @@ public class HeroInfoUI : UIBase
         ownerPiece = heroData.heroPiece;
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
     }
-
     private void ButtonAddListener()
     {
         exitButton.onClick.AddListener(OnClickExit);
@@ -150,7 +142,6 @@ public class HeroInfoUI : UIBase
         exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
         heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
     }
-
     private async Task SetCharacter(string spriteKey)
     {
         var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
@@ -159,7 +150,6 @@ public class HeroInfoUI : UIBase
         if (handle.Status == AsyncOperationStatus.Succeeded)
             characterRoot.sprite = handle.Result;
     }
-
     private void SetBadge()
     {
         foreach (Transform child in badgeRoot)
@@ -192,7 +182,6 @@ public class HeroInfoUI : UIBase
     {
         btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold;
     }
-
     private void SetRankUpInteractable(Button btn)
     {
         btn.interactable = ownerPiece >= requirePiece;
@@ -224,16 +213,10 @@ public class HeroInfoUI : UIBase
         if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
         {
             heroData.PlayerModelSO.Level++;
-            level.text = heroData.PlayerModelSO.Level.ToString();
             requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
-            exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
-
-            CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
-
-            // GameEvents 안의 이벤트 호출
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-
-            SetUpgradeInteractable(upgradeButton);
+            CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
+            RefreshUI();
         }
     }
 
@@ -243,14 +226,7 @@ public class HeroInfoUI : UIBase
     /// <returns></returns>
     private string CountingHeroPower()
     {
-        /*
-        float power = heroData.PlayerModelSO.ExtAtkPoint *
-                       heroData.PlayerModelSO.HealthPoint *
-                       heroData.PlayerModelSO.InnAtkPoint * 0.7f;
-
-        return BigCurrency.FromBaseAmount(power).ToString();
-        */
-        return "총 전투력 계산 코드에서 공격력 계산이 이해가 안가요.";
+        return BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower).ToString();
     }
 
     /// <summary>
@@ -271,22 +247,43 @@ public class HeroInfoUI : UIBase
     /// <param name="piece"></param>
     private void HeroRankUpPiece()
     {
-        // 5회 아상 돌파방지 코드
         if (heroData.stage >= 5) return;
 
         ownerPiece -= requirePiece;
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
-        //  돌파저장
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
-
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
-        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
-
-        SetStage();
-        SetRankUpInteractable(stageUPButton);
+        RefreshUI();
     }
+
+    /// <summary>
+    /// 전투력 갱신용 코드
+    /// </summary>
+    private void RefreshCombatPower()
+    {
+        float powerValue = HeroDataManager.Instance.CalculateCombatPower(heroData);
+        heroData.cardInfo.combatPower = powerValue;
+        power.text = BigCurrency.FromBaseAmount(powerValue).ToString();
+    }
+
+    /// <summary>
+    /// 전체 UI를 새로고침하는 통합 메서드입니다.
+    /// </summary>
+    private async void RefreshUI()
+    {
+        PrepareHeroStats();                          // 능력치 및 조각 계산
+        InfoTextSetting();                           // 텍스트 UI 세팅
+        SetUpgradeInteractable(upgradeButton);       // 레벨업 버튼 활성화 여부
+        SetRankUpInteractable(stageUPButton);        // 돌파 버튼 활성화 여부
+        RefreshCombatPower();                        // 전투력 갱신
+        SetStage();                                  // 돌파 단계 표시
+        SetBadge();                                  // 진영 표시
+        SetEquipment();                              // 장비 설정
+        await SetCharacter(heroData.PlayerModelSO.SpriteKey); // 캐릭터 이미지 로딩
+    }
+
     #endregion
 
     #region Public

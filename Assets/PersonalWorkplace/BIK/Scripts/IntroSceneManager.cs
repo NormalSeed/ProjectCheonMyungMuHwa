@@ -49,6 +49,14 @@ public class IntroSceneManager : MonoBehaviour
 
         if (scope != null)
         {
+            var heroDataManager = scope.Container.Resolve<HeroDataManager>();
+            Debug.Log("[IntroScene] 영웅 데이터 매니저 초기화 대기 시작");
+            yield return new WaitUntil(() => heroDataManager.IsInitialized);
+            Debug.Log("[IntroScene] 영웅 데이터 매니저 초기화 완료!");
+        }
+
+        if (scope != null)
+        {
             var heroModels = scope.Container.Resolve<HeroModels>();
             heroModels.Init();
             yield return new WaitUntil(() => heroModels.IsInitialized);

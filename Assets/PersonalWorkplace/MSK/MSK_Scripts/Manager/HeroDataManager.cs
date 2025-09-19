@@ -31,7 +31,7 @@ public class HeroDataManager : IStartable
     public bool IsInitialized { get; private set; }
 
     public Dictionary<string, HeroData> ownedHeroes = new();
-    public List<HeroData> allTemplates = new();
+    public List<HeroData> heroTemplates = new();
 
     private string _uid;
     private DatabaseReference _dbRef;
@@ -74,7 +74,7 @@ public class HeroDataManager : IStartable
     // 새 영웅 추가 코드
     public void AddNewHero(CardInfo card)
     {
-        var template = allTemplates.Find(t => t.heroId == card.HeroID);
+        var template = heroTemplates.Find(t => t.heroId == card.HeroID);
         var modelSO = template != null ? template.PlayerModelSO : null;
         var heroName = modelSO != null ? modelSO.CharName : "Unknown";
 
@@ -101,23 +101,46 @@ public class HeroDataManager : IStartable
 
     public HeroDataManager(List<HeroData> values)
     {
-        this.allTemplates = values;
+        this.heroTemplates = values;
     }
 
 
     #region Unity
-    public async void Start()
+    public void Start()
     {
+        Debug.Log("[HeroDataManager] Start() 호출됨");
+
         Instance = this;
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
 
+        Debug.Log("[HeroDataManager] 캐시 로딩 시작");
         LoadHeroDataFromCache();
-        await LoadHeroDataFromFirebase();
-        SaveHeroDataToCache();
+        Debug.Log("[HeroDataManager] 캐시 로딩 완료");
 
+        Debug.Log("[HeroDataManager] Firebase 로딩 시작");
+        LoadHeroDataFromFirebase().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("[HeroDataManager] Firebase 로딩 완료");
+                RefreshAllCombatPower();
+                Debug.Log("[HeroDataManager] 전투력 갱신 완료");
+
+                SaveHeroDataToCache();
+                Debug.Log("[HeroDataManager] 캐시 저장 완료");
+
+                IsInitialized = true;
+                Debug.Log("[HeroDataManager] 초기화 완료 → IsInitialized = true");
+            }
+            else
+            {
+                Debug.LogWarning("[HeroDataManager] Firebase 로딩 실패: " + task.Exception?.Message);
+            }
+        });
         IsInitialized = true;
     }
+
     #endregion
 
     #region Private
@@ -137,7 +160,19 @@ public class HeroDataManager : IStartable
             HeroData hero = JsonUtility.FromJson<HeroData>(json);
             ownedHeroes[heroId] = hero;
         }
-
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
+        foreach (var hero in ownedHeroes.Values)
+        {
+            if (hero.PlayerModelSO == null)
+            {
+                var template = heroTemplates.Find(t => t.heroId == hero.heroId);
+                if (template != null)
+                {
+                    hero.PlayerModelSO = template.PlayerModelSO;
+                    hero.cardInfo = template.cardInfo;
+                }
+            }
+        }
         Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
     }
     #endregion
@@ -259,4 +294,22 @@ public class HeroDataManager : IStartable
                 AddHeroPiece(card.HeroID, GetPieceAmountByRarity(card.rarity));
         }
     }
+    public float CalculateCombatPower(HeroData hero)
+    {
+        var model = hero.PlayerModelSO; 
+        return 2.0f * (
+            (model.InnAtkPoint + model.ExtAtkPoint) *
+            (1 + model.CritRate * (model.CritDamage - 1)) + 
+            1.4f * model.DefPoint + 0.1f * model.HealthPoint
+       );
+    }
+    private void RefreshAllCombatPower()
+    {
+        foreach (var hero in ownedHeroes.Values)
+        {
+            float power = CalculateCombatPower(hero);
+            hero.cardInfo.combatPower = power;
+        }
+    }
+
 }
