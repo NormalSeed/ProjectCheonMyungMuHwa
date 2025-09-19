@@ -31,18 +31,20 @@ public class QuestUIController : UIBase
     private void UpdateStateUI()
     {
         bool isRewardReady = currentQuest.state == QuestState.RewardReady;
-        bool isCompleted = currentQuest.state == QuestState.Completed;
+        bool isCompletedOrDisabled =
+            currentQuest.state == QuestState.Completed ||
+            currentQuest.state == QuestState.Disabled;
 
         // 버튼 활성화 여부
         claimButton.interactable = isRewardReady;
 
         // 완료 마크는 "완전히 완료"일 때만 활성화
         if (completeMark != null)
-            completeMark.SetActive(isCompleted);
+            completeMark.SetActive(isCompletedOrDisabled);
 
         // 어두워지는 효과도 "완전히 완료"일 때만 적용
         if (dimOverlay != null)
-            dimOverlay.gameObject.SetActive(isCompleted);
+            dimOverlay.gameObject.SetActive(isCompletedOrDisabled);
     }
 
     private void OnClickClaim()
@@ -53,9 +55,41 @@ public class QuestUIController : UIBase
 
     public override void RefreshUI()
     {
-        if (currentQuest != null && QuestManager.Instance.activeQuests.TryGetValue(currentQuest.questID, out Quest updatedQuest))
+        if (currentQuest != null &&
+            QuestManager.Instance.activeQuests.TryGetValue(currentQuest.questID, out Quest updatedQuest))
         {
-            SetData(updatedQuest);
+            // 상태가 바뀐 경우에만 전체 UI 갱신
+            if (currentQuest.state != updatedQuest.state)
+            {
+                SetData(updatedQuest);
+            }
+            else
+            {
+                // 진행도만 갱신
+                currentQuest.valueProgress = updatedQuest.valueProgress;
+                progressFill.fillAmount = (float)updatedQuest.valueProgress / updatedQuest.valueGoal;
+                progressText.text = $"{updatedQuest.valueProgress}/{updatedQuest.valueGoal}";
+            }
+        }
+    }
+    private void OnEnable()
+    {
+        QuestManager.Instance.OnQuestProgressChanged += HandleProgressChanged;
+        QuestManager.Instance.OnQuestsUpdated += RefreshUI;
+    }
+
+    private void OnDisable()
+    {
+        QuestManager.Instance.OnQuestProgressChanged -= HandleProgressChanged;
+        QuestManager.Instance.OnQuestsUpdated -= RefreshUI;
+    }
+
+    private void HandleProgressChanged(Quest quest)
+    {
+        if (currentQuest != null && currentQuest.questID == quest.questID)
+        {
+            progressFill.fillAmount = (float)quest.valueProgress / quest.valueGoal;
+            progressText.text = $"{quest.valueProgress}/{quest.valueGoal}";
         }
     }
 }
