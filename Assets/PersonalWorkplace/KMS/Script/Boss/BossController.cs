@@ -92,7 +92,7 @@ public class BossController : MonsterController
     public override void OnAttack(GameObject me, IDamagable target)
     {
         Spum.PlayAnimation(PlayerState.ATTACK, animationNumber);
-        StartCoroutine(RealAttackRoutine(target));
+        attackCo = StartCoroutine(RealAttackRoutine(target));
     }
 
     protected override IEnumerator RealAttackRoutine(IDamagable target)
@@ -108,6 +108,7 @@ public class BossController : MonsterController
             DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
+        attackCo = null;
     }
 
     //private void SetAnimation(MonsterAnimationState state)

@@ -22,6 +22,7 @@ public class BowOrcController : MonsterController
             proj.Damage = Model.BaseModel.finalAttackPower;
             proj.Shot();
         }
+        attackCo = null;
 
     }
 }
