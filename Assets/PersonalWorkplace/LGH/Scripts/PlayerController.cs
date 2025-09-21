@@ -292,7 +292,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         Debug.Log($"보호막 적용됨: {amount} / {duration}s");
     }
 
-    public void TakeDamage(double amount)
+    public void TakeDamage(float amount)
     {
         if (isShieldActive)
         {

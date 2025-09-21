@@ -43,7 +43,7 @@ public class MonsterProjectile : MonoBehaviour, IPooled<MonsterProjectile>
             IDamagable damagable = collision.GetComponent<IDamagable>();
             if (damagable != null)
             {
-                damagable.TakeDamage(Damage);
+                damagable.TakeDamage((float)Damage);
                 DamageText text = DamageTextManager.Instance.Get(TargetPos);
                 text.SetText(BigCurrency.FromBaseAmount(Damage).ToString());
 

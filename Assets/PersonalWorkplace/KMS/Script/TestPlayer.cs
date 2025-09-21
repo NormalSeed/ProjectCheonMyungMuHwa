@@ -4,7 +4,7 @@ public class TestPlayer : MonoBehaviour, IDamagable
 {
 
     [SerializeField] double HP;
-    void IDamagable.TakeDamage(double amount)
+    void IDamagable.TakeDamage(float amount)
     {
         HP -= amount;
 
