@@ -9,7 +9,7 @@ public abstract class PooledObject : MonoBehaviour
         ObjPool = objPool;
     }
 
-    public void ReturnPool()
+    public virtual void ReturnPool()
     {
         ObjPool.PushPool(this);
     }

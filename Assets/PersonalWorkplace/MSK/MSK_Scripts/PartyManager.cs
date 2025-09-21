@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -170,7 +172,7 @@ public class PartyManager : MonoBehaviour, IStartable
     #region Synergy
     public void CheckSynergy()
     {
-        //ClearSynergy();
+        ClearSynergy();
         activeSynergies.Clear(); // UI용 리스트 초기화
 
         Dictionary<HeroFaction, int> factionCounts = new();
@@ -210,6 +212,26 @@ public class PartyManager : MonoBehaviour, IStartable
         }
         synergyUI.UpdateSynergyUI(activeSynergies);
         explainUI.UpdateExplainUI(activeSynergies);
+
+        // 1. 가장 높은 stage 찾기
+        int maxStage = activeSynergies.Max(s => s.stage);
+
+        // 2. 해당 stage를 가진 시너지들 필터링
+        var topSynergies = activeSynergies
+            .Where(s => s.stage == maxStage)
+            .ToList();
+
+        // 3. 우선순위에 따라 정렬
+        HeroFaction[] priority = { HeroFaction.S, HeroFaction.J, HeroFaction.M };
+        topSynergies.Sort((a, b) =>
+            Array.IndexOf(priority, a.faction).CompareTo(Array.IndexOf(priority, b.faction))
+        );
+
+        // 4. 최종 선택된 시너지
+        SynergyInfo selected = topSynergies.First();
+
+        // 5. SynergyUI에서 합격 스킬 활성화
+        synergyUI.SetSynergySkillButtonState(selected);
     }
 
     /// <summary>
