@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Unity.Behavior;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -28,6 +29,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     public System.Action onDeath;
 
     public bool isAttackedByNormalAttack = false;
+
+    [SerializeField] protected bool DoNotDropItem;
 
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
@@ -150,17 +153,33 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     protected virtual void DropItem()
     {
-        DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
-        DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i2.Init(DroppedItemType.Honbaeg, Model.BaseModel.SpiritBackQuant);
-        DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i3.Init(DroppedItemType.SpiritStone, Model.BaseModel.SoulStoneQuant);
-        i1.Shot(); i2.Shot(); i3.Shot();
-
-        DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
-        i4.Init(DroppedItemType.NormalChest, 1);
-        i4.Shot();
+        if (DoNotDropItem) return;
+        int stage = Model.BaseModel.CurrentStage;
+        int door = (stage + 2) / 3;
+        if (door >= 2)
+        {
+            DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
+            i1.Shot();
+            if (UnityEngine.Random.Range(1, 10) <= 1)
+            {
+                DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+                i4.Init(DroppedItemType.NormalChest, 1);
+                i4.Shot();
+            }
+        }
+        if (door >= 11)
+        {
+            DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i2.Init(DroppedItemType.Honbaeg, Model.BaseModel.SpiritBackQuant);
+            i2.Shot();
+        }
+        if (door >= 151)
+        {
+            DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i3.Init(DroppedItemType.SpiritStone, Model.BaseModel.SoulStoneQuant);
+            i3.Shot();
+        }
 
 
     }

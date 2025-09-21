@@ -82,6 +82,34 @@ public class BossController : MonsterController
         AudioManager.Instance.PlaySound("Monster_Dead");
         StartCoroutine(DeathRoutine());
     }
+
+    protected override void DropItem()
+    {
+        if (DoNotDropItem) return;
+        int stage = Model.BaseModel.CurrentStage;
+        int door = (stage + 2) / 3;
+        if (door >= 2)
+        {
+            DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i1.Init(DroppedItemType.Gold, Model.BaseModel.GoldQuant);
+            i1.Shot();
+            DroppedItem i4 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i4.Init(DroppedItemType.EpicChest, 1);
+            i4.Shot();
+        }
+        if (door >= 11)
+        {
+            DroppedItem i2 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i2.Init(DroppedItemType.Honbaeg, Model.BaseModel.SpiritBackQuant);
+            i2.Shot();
+        }
+        if (door >= 151)
+        {
+            DroppedItem i3 = PoolManager.Instance.ItemPool.GetItem(transform.position);
+            i3.Init(DroppedItemType.SpiritStone, Model.BaseModel.SoulStoneQuant);
+            i3.Shot();
+        }
+    }
     private IEnumerator SpawnRoutine()
     {
         yield return new WaitForSeconds(1f);
