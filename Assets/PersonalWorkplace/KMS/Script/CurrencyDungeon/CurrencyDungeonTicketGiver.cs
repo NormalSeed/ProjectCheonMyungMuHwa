@@ -108,7 +108,7 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
     private IEnumerator AddTicket()
     {
         CurrencyManager manager = CurrencyManager.Instance;
-        int amount = 5;
+        int amount = 3;
         while (manager == null)
         {
             yield return null;
