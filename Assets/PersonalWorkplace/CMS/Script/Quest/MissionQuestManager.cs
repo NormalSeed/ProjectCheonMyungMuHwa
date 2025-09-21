@@ -57,7 +57,7 @@ public class MissionQuestManager : MonoBehaviour
         if (CurrentMission == null || CurrentMission.state != QuestState.Completed) return;
 
         foreach (var reward in CurrentMission.rewards)
-            CurrencyManager.Instance.Add(reward.currencyType, new BigCurrency(reward.rewardCount, 0));
+            CurrencyManager.Instance.Add(reward.currencyType.Value, new BigCurrency(reward.rewardCount, 0));
 
         CurrentMission.ClaimReward();
         Debug.Log($"보상 수령: {CurrentMission.questName}");
