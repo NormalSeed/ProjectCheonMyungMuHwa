@@ -13,7 +13,7 @@ public class JeokRang_BlazingSlash : SkillEffect
         // Monster 태그를 갖고 있는 오브젝트와 충돌했을 때 데미지를 줌
         if (collision.CompareTag("Monster"))
         {
-            IDamagable damagable = target.GetComponent<IDamagable>();
+            IDamagable damagable = collision.GetComponent<IDamagable>();
             MonsterController mController = target.GetComponent<MonsterController>();
             float rawDamage = (float)(
                     skillSet.skills[1].ExtSkillDmg * controller.model.ExtAtk +
