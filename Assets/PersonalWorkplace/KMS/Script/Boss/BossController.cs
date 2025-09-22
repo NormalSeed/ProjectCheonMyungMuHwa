@@ -133,8 +133,6 @@ public class BossController : MonsterController
         {
             if (targetEffect) ParticleManager.Instance.GetParticle(effectName, go.transform.position, scale: 1);
             go.GetComponent<IDamagable>().TakeDamage((float)Model.BaseModel.finalAttackPower);
-            DamageText text = DamageTextManager.Instance.Get(go.transform.position);
-            text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
         attackCo = null;
     }

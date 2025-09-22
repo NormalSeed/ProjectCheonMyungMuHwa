@@ -1,6 +1,8 @@
 using UnityEngine;
 using Firebase.Auth;
 using Firebase.Database;
+using System.Collections;
+using System.Collections.Generic;
 
 public class CurrencyDungeonManage : MonoBehaviour
 {
@@ -13,6 +15,8 @@ public class CurrencyDungeonManage : MonoBehaviour
 
     [SerializeField] UIBase failUI;
     [SerializeField] UIBase clearUI;
+
+    [SerializeField] FadeCanvas fade;
 
 
     void Awake()
@@ -33,20 +37,45 @@ public class CurrencyDungeonManage : MonoBehaviour
     {
         timer.Stop();
         SetToFirebase();
-        string cur = "";
-        switch (sceneData.type)
+        StartCoroutine(ClearRoutine());
+        //CurrencyDungeonPopup.Instance.SetText($"{cur}  {sceneData.data.Reward}개");
+        //CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
+        //{
+        //    CurrencyDungeonPopup.Instance.Close();
+        //    clearUI.SetShow();
+        //    CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
+        //});
+    }
+
+    private IEnumerator ClearRoutine()
+    {
+        PopupManager.Instance.ShowStageClearPopup();
+        BigCurrency reward = new BigCurrency(sceneData.data.Reward);
+        ItemData rewardItem = null;
+        if (sceneData.type == CurrencyDungeonType.Gold)
         {
-            case CurrencyDungeonType.Gold: cur = "금화"; break;
-            case CurrencyDungeonType.Honbaeg: cur = "혼백"; break;
-            case CurrencyDungeonType.Spirit: cur = "영석"; break;
+            rewardItem = new ItemData(11002, "", "", "GoldImage", true, ItemType.Currency);
+            CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket,
+            new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.GoldChallengeTicket).Value - 1));
         }
-        CurrencyDungeonPopup.Instance.SetText($"{cur}  {sceneData.data.Reward}개");
-        CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
+        else if (sceneData.type == CurrencyDungeonType.Honbaeg)
         {
-            CurrencyDungeonPopup.Instance.Close();
-            clearUI.SetShow();
-            CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
-        });
+            rewardItem = new ItemData(11003, "", "", "SoulImage", true, ItemType.Currency);
+            CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket,
+            new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SoulChallengeTicket).Value - 1));
+        }
+        else if (sceneData.type == CurrencyDungeonType.Spirit)
+        {
+            rewardItem = new ItemData(11004, "", "", "SpiritImage", true, ItemType.Currency);
+            CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket,
+            new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SpiritStoneChallengeTicket).Value - 1));
+        }
+        yield return new WaitForSeconds(4f);
+        PopupManager.Instance.ShowRewardPopup(new List<ItemData>() { rewardItem }, new List<BigCurrency>() { reward });
+        yield return new WaitForSeconds(3f);
+        fade.FadeOutAndLoadMainScene();
+
+
     }
 
     private void DungeonFail()
@@ -64,7 +93,7 @@ public class CurrencyDungeonManage : MonoBehaviour
     }
     private async void SetToFirebase()
     {
-        GiveCurrency();
+        //GiveCurrency();
         string json;
         string _uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         clearData = sceneData.clearData;
@@ -80,24 +109,4 @@ public class CurrencyDungeonManage : MonoBehaviour
         json = JsonUtility.ToJson(clearData);
         await _dbRef.SetRawJsonValueAsync(json);
     }
-    private void GiveCurrency()
-    {
-        BigCurrency reward = new BigCurrency(sceneData.data.Reward);
-        switch (sceneData.type)
-        {
-            case CurrencyDungeonType.Gold:
-                CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket,
-                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.GoldChallengeTicket).Value - 1));
-                CurrencyManager.Instance.Add(CurrencyType.Gold, reward); break;
-            case CurrencyDungeonType.Honbaeg:
-                CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket,
-                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SoulChallengeTicket).Value - 1));
-                CurrencyManager.Instance.Add(CurrencyType.Soul, reward); break;
-            case CurrencyDungeonType.Spirit:
-                CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket,
-                new BigCurrency(CurrencyManager.Instance.Get(CurrencyType.SpiritStoneChallengeTicket).Value - 1));
-                CurrencyManager.Instance.Add(CurrencyType.SpiritStone, reward); break;
-        }
-    }
-
 }
