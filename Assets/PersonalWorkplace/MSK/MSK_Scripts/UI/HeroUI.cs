@@ -96,31 +96,28 @@ public class HeroUI : UIBase
     private void OnClickAutoSet()
     {
         Debug.LogWarning("[OnClickAutoSet] 입력됨");
-
         // 기존 파티 초기화
         PartyManager.Instance.MembersID.Clear();
-
-        // 전투력 기준 정렬 후 상위 5명 선택
         var top5 = heroCard
-            .Where(card => card.chardata != null)
-            .OrderByDescending(card => card.chardata.combatPower)
-            .Take(5)
-            .ToList();
+             .OrderByDescending(hero => hero.chardata.combatPower)
+             .Take(5)
+             .ToList();
 
         // 파티에 추가
-        foreach (var card in top5)
-        {
-            PartyManager.Instance.AddMember(card.chardata);
-        }
-
-        // UI 갱신
         foreach (var card in heroCard)
         {
-            card.HeroSettingStart(); // 배치 순서 표시
+            if (card.chardata != null && top5.Contains(card))
+            {
+                card.OnClickCard();
+                card.HeroSettingStart();
+                if (PartyManager.Instance.MembersID.Count >= 5)
+                    break;
+            }
         }
 
         PartyNumChanged?.Invoke(); // 외부 알림
     }
+
 
 
     //  영웅 배치 시작

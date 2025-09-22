@@ -126,7 +126,7 @@ public class HeroInfoSetting : MonoBehaviour
 
 
     #region OnClick
-    private void OnClickCard()
+    public void OnClickCard()
     {
         //  파티를 편성중이라면
         if (PartyManager.Instance.IsHeroSetNow)

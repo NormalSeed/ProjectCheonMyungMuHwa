@@ -242,12 +242,13 @@ public static class StatModifierManager
             Debug.LogWarning($"[ApplyToCard] 모델 SO를 찾을 수 없습니다: {charID}");
             return;
         }
+        Debug.Log($"[ApplyToCard] 목표 모델 : {modelSO.CharName}");
 
         // 스탯 계산
-        modelSO.HealthPoint = (modelSO.Vital * (modelSO.Level * (1 + modelSO.Vital_Increase))) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Grade));
-        modelSO.ExtAtkPoint = (modelSO.ExtPow * (modelSO.Level * (1 + modelSO.ExtPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
-        modelSO.InnAtkPoint = (modelSO.InnPow * (modelSO.Level * (1 + modelSO.InnPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
-        modelSO.DefPoint = (modelSO.ExtPow + modelSO.InnPow) * (modelSO.DefRatio + (modelSO.DefRatio_Increase * modelSO.Grade));
+        // modelSO.HealthPoint = (float)GetCardModifier(charID, StatType.Health, card.PlayerModelSO.HealthRatio_Increase);
+        // modelSO.ExtAtkPoint = (float)GetCardModifier(charID, StatType.ExtAtk, card.PlayerModelSO.ExtPow_Increase);
+        // modelSO.InnAtkPoint = (float)GetCardModifier(charID, StatType.InnAtk, card.PlayerModelSO.InnPow_Increase);
+        // modelSO.DefPoint = (float)GetCardModifier(charID, StatType.Defense, card.PlayerModelSO.DefRatio_Increase);
 
         // HeroData 임시 생성
         var hero = new HeroData
