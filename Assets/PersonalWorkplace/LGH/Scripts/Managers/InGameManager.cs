@@ -1,3 +1,4 @@
+using GooglePlayGames.BasicApi;
 using NavMeshPlus.Components;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +8,9 @@ using UnityEngine;
 public class InGameManager : MonoBehaviour
 {
     public static InGameManager Instance;
+
+    private List<PlayerController> players;
+
     public ObservableProperty<int> monsterDeathStack { get; private set; } = new();
     public int stageProgress = 0;
     public int stageNum = 1;
@@ -37,6 +41,8 @@ public class InGameManager : MonoBehaviour
 
     private void Start()
     {
+        players = PartyManager.Instance.players;
+
         monsterDeathStack.Value = 0;
         stageProgress = 0;
 
@@ -107,10 +113,10 @@ public class InGameManager : MonoBehaviour
     {
         if (monsterDeathStack.Value <= 0)
         {
-            List<PlayerController> players = PartyManager.Instance.players;
-
-            foreach (PlayerController player in players)
+            foreach (var player in players)
             {
+                if (player.model == null) continue;
+
                 player.model.CurHealth.Value = player.model.Health;
             }
 

@@ -94,7 +94,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         }
     }
 
-    public void TakeDamage(double amount)
+    public void TakeDamage(float amount)
     {
         OnTakeDamage(amount);
         SetHealthBar();

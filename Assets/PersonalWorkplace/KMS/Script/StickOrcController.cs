@@ -15,7 +15,7 @@ public class StickOrcController : MonsterController
         AudioManager.Instance.PlaySound("Stick_Attack");
         if (target != null)
         {
-            target.TakeDamage(Model.BaseModel.finalAttackPower);
+            target.TakeDamage((float)Model.BaseModel.finalAttackPower);
             DamageText text = DamageTextManager.Instance.Get((target as PlayerController).transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }

@@ -21,7 +21,7 @@ public class PlayerModel : MonoBehaviour
     public float combatPower;
 
     // Observable Properties
-    public ObservableProperty<double> CurHealth { get; private set; } = new();
+    public ObservableProperty<float> CurHealth { get; private set; } = new();
 
     /// <summary>
     /// Status의 계산값을 적용시키는 메서드

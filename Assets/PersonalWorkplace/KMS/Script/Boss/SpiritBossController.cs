@@ -11,7 +11,7 @@ public class SpiritBossController : BossController
         foreach (GameObject go in players)
         {
             ParticleManager.Instance.GetParticle("SpiritBoss_Effect", go.transform.position, scale: 1);
-            go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
+            go.GetComponent<IDamagable>().TakeDamage((float)Model.BaseModel.finalAttackPower);
             DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
@@ -21,7 +21,7 @@ public class SpiritBossController : BossController
         {
             if (!go.activeSelf) continue;
             ParticleManager.Instance.GetParticle("SpiritBoss_Effect2", go.transform.position, scale: 1);
-            go.GetComponent<IDamagable>().TakeDamage(Model.BaseModel.finalAttackPower);
+            go.GetComponent<IDamagable>().TakeDamage((float)Model.BaseModel.finalAttackPower);
             DamageText text = DamageTextManager.Instance.Get(go.transform.position);
             text.SetText(BigCurrency.FromBaseAmount(Model.BaseModel.finalAttackPower).ToString());
         }
