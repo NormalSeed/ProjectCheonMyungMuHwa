@@ -25,9 +25,6 @@ public class R002_Skill1 : SkillEffect
                 }
 
                 damagable.TakeDamage(damage);
-
-                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
             }
             else
             {

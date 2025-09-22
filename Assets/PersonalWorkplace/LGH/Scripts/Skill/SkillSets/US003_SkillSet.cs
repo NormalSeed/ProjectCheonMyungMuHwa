@@ -117,9 +117,6 @@ public class US003_SkillSet : SkillSet
                         }
 
                         damagable.TakeDamage(damage);
-
-                        DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-                        text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
                     }
                 }
             }

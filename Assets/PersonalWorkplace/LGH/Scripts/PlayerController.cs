@@ -6,6 +6,7 @@ using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AI;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using VContainer;
 
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     public bool movedRight = false;
     public bool isDead = false;
+
+    private Vector3 damageOffest = new Vector3(0, 0.8f, 0);
 
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
@@ -317,6 +320,9 @@ public class PlayerController : MonoBehaviour, IDamagable
             model.CurHealth.Value -= amount;
             Debug.Log($"현재 체력 : {model.CurHealth.Value}");
         }
+
+        DamageText text = DamageTextManager.Instance.Get(transform.position + damageOffest);
+        text.SetText(BigCurrency.FromBaseAmount(amount).ToString());
     }
 
     public void Dead()

@@ -60,9 +60,6 @@ public class NS003_SkillSet : SkillSet
             {
                 damage *= controller.model.CritDamage;
             }
-
-            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
 
         yield return new WaitForSeconds(0.4f);

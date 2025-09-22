@@ -13,7 +13,7 @@ public class ParticleController : MonoBehaviour
         foreach (var prefab in particlePrefabs)
         {
             var pooled = prefab.GetComponent<PooledParticle>();
-            var pool = new LGH_ObjectPool(transform, pooled, 5);
+            var pool = new LGH_ObjectPool(transform, pooled, 15);
             particlePools.Add(prefab.name, pool);
         }
     }
