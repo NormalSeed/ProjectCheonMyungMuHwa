@@ -129,6 +129,7 @@ public class PartyManager : MonoBehaviour, IStartable
             }
         }
         InGameManager.Instance.playerCount = MembersID.Count;
+        TeamInfoUI.Instance.UpdateTeamUI();
 
         CheckSynergy();
     }
@@ -156,6 +157,7 @@ public class PartyManager : MonoBehaviour, IStartable
         PartyUpload();
         backupMembers.Clear();
         isHeroSetNow = false;
+        TeamInfoUI.Instance.UpdateTeamUI();
     }
 
     /// <summary>
