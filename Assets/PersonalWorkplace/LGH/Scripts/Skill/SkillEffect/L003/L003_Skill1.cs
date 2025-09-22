@@ -117,9 +117,6 @@ public class L003_Skill1 : SkillEffect
             }
 
             damagable.TakeDamage(damage);
-
-            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
 
         atkInterval = 1 / atkSpeed;

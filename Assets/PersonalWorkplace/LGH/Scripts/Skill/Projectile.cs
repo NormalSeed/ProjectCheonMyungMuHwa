@@ -65,9 +65,6 @@ public class Projectile : PooledObject
                 }
 
                 damagable.TakeDamage(damage);
-
-                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
             }
             else
             {

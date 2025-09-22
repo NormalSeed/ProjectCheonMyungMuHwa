@@ -60,9 +60,6 @@ public class NS002_SkillSet : SkillSet
             }
 
             damagable.TakeDamage(damage);
-
-            DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-            text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
         }
 
         GameObject effect2 = skill2Effect;

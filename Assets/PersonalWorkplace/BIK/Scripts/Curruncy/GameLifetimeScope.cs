@@ -10,7 +10,7 @@ public class GameLifetimeScope : LifetimeScope
     private bool _firebaseInitialized = false;
 
     [SerializeField] private List<EquipmentSO> allTemplates;
-    [SerializeField] private List<HeroData> allHeroTemplates;
+    [SerializeField] private List<HeroTemplateSO> allHeroTemplates;
     protected override void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -42,7 +42,7 @@ public class GameLifetimeScope : LifetimeScope
 
         builder.RegisterInstance(allHeroTemplates);
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton)
-               .WithParameter("allHeroTemplates", allHeroTemplates)
+               .WithParameter("templates", allHeroTemplates)
                .AsSelf();
         Debug.Log("[GameLifetimeScope] HeroDataManager 등록 완료");
 

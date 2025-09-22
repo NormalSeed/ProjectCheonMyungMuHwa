@@ -14,7 +14,7 @@ public class JeokRang_BlazingSlash : SkillEffect
         if (collision.CompareTag("Monster"))
         {
             IDamagable damagable = collision.GetComponent<IDamagable>();
-            MonsterController mController = target.GetComponent<MonsterController>();
+            MonsterController mController = collision.GetComponent<MonsterController>();
             float rawDamage = (float)(
                     skillSet.skills[1].ExtSkillDmg * controller.model.ExtAtk +
                     skillSet.skills[1].InnSkillDmg * controller.model.InnAtk -
