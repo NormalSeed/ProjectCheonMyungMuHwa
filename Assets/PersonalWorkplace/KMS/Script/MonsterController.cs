@@ -32,6 +32,10 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     [SerializeField] protected bool DoNotDropItem;
 
+    [SerializeField] protected float damageOffset;
+
+    private Vector2 damagePos => transform.position + new Vector3(0, damageOffset, 0);
+
     public bool IsDead => Model.CurHealth.Value <= 0;
     void Awake()
     {
@@ -104,6 +108,8 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         if (IsInvulnerable) return;
         if (IsDead) return;
         Model.CurHealth.Value -= amount;
+        DamageText text = DamageTextManager.Instance.Get(damagePos);
+        text.SetText(BigCurrency.FromBaseAmount(amount).ToString());
         if (hurtCo != null)
         {
             StopCoroutine(hurtCo);

@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class LevelSelectPanel : MonoBehaviour
 {
@@ -22,9 +23,8 @@ public class LevelSelectPanel : MonoBehaviour
     [SerializeField] TMP_Text titleText;
     [SerializeField] Image ticketImage;
 
-    [SerializeField] Button AdButton;
-
-    [SerializeField] AdDataSO adData;
+    [SerializeField] RectTransform viewPort;
+    [SerializeField] RectTransform contents;
 
     public CurrencyDungeonClearData ClearData { get; set; }
     private int ticketCount;
@@ -58,7 +58,6 @@ public class LevelSelectPanel : MonoBehaviour
                 currency = "영석";
                 break;
         }
-        ActiveAdButton(type, ticketCount);
         countText.text = $"{ticketCount} / 3";
         for (int i = 0; i < allCards.Length; i++)
         {
@@ -89,7 +88,19 @@ public class LevelSelectPanel : MonoBehaviour
                 allCards[i].gameObject.SetActive(false);
             }
         }
-        scrollbar.value = (float)clearVal / countVal;
+        StartCoroutine(Align(clearVal));
+    }
+    public IEnumerator Align(int clearVal)
+    {
+        yield return null;
+        float canvWidth = viewPort.rect.width;
+        float contWidth = contents.rect.width;
+        float wDelta = contWidth - canvWidth;
+        float canvCenter = canvWidth / 2;
+        float targetPos = allCards[clearVal].transform.localPosition.x;
+        float distance = targetPos - canvCenter;
+        float scrollValue = Mathf.Clamp(distance / wDelta, 0, 1);
+        scrollbar.value = scrollValue;
     }
 
     private void SetSceneData(CurrencyDungeonData data, CurrencyDungeonType type)
@@ -137,54 +148,30 @@ public class LevelSelectPanel : MonoBehaviour
         BigCurrency reward = new BigCurrency(data.Reward);
         ticketCount--;
         BigCurrency subtract = new BigCurrency(ticketCount);
+        ItemData rewardItem = null;
         if (type == CurrencyDungeonType.Gold)
         {
-            CurrencyManager.Instance.Add(CurrencyType.Gold, reward);
+            rewardItem = new ItemData(11002, "", "", "GoldImage", true, ItemType.Currency);
             CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket, subtract);
         }
         else if (type == CurrencyDungeonType.Honbaeg)
         {
-            CurrencyManager.Instance.Add(CurrencyType.Soul, reward);
+            rewardItem = new ItemData(11003, "", "", "SoulImage", true, ItemType.Currency);
             CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket, subtract);
         }
         else if (type == CurrencyDungeonType.Spirit)
         {
-
-            CurrencyManager.Instance.Add(CurrencyType.SpiritStone, reward);
+            rewardItem = new ItemData(11004, "", "", "SpiritImage", true, ItemType.Currency);
             CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket, subtract);
 
         }
+        PopupManager.Instance.ShowRewardPopup(new List<ItemData>() {rewardItem}, new List<BigCurrency>() {reward});
         countText.text = $"{ticketCount} / 3";
-        CurrencyDungeonPopup.Instance.SetText($"{currency}  {data.Reward}개");
-        CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
-        {
-            CurrencyDungeonPopup.Instance.Close();
-            CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
-        });
-        ActiveAdButton(type, ticketCount);
-    }
-
-    private void ActiveAdButton(CurrencyDungeonType type, int ticketCount)
-    {
-        AdButton.onClick.RemoveAllListeners();
-        if (ticketCount > 0)
-        {
-            AdButton.gameObject.SetActive(false);
-            return;
-        }
-        int amount = 1;
-        AdButton.gameObject.SetActive(true);
-        AdButton.onClick.AddListener(() => adData.ShowRewardAD(() =>
-        {
-            BigCurrency reward = new BigCurrency(amount);
-            switch (type)
-            {
-                case CurrencyDungeonType.Gold: CurrencyManager.Instance.Set(CurrencyType.GoldChallengeTicket, reward); break;
-                case CurrencyDungeonType.Honbaeg: CurrencyManager.Instance.Set(CurrencyType.SoulChallengeTicket, reward); break;
-                case CurrencyDungeonType.Spirit: CurrencyManager.Instance.Set(CurrencyType.SpiritStoneChallengeTicket, reward); break;
-            }
-            countText.text = $"{amount} / 3";
-            AdButton.gameObject.SetActive(false);
-        }));
+        //CurrencyDungeonPopup.Instance.SetText($"{currency}  {data.Reward}개");
+        //CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
+        //{
+        //    CurrencyDungeonPopup.Instance.Close();
+        //    CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
+        //});
     }
 }
