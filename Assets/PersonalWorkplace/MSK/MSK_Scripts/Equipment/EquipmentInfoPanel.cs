@@ -138,6 +138,7 @@ public class EquipmentInfoPanel : MonoBehaviour
         // TODO : 연마석 소모체크 추가하기
         instance.level++;
         SetPanelText();
+        HeroInfo.RefreshUI();
     }
     // 장비를 장착
     private void OnClickEquip()
@@ -197,6 +198,7 @@ public class EquipmentInfoPanel : MonoBehaviour
 
         SetPanelText();
         HeroInfo.Init();
+        HeroInfo.RefreshUI();
     }
 
 

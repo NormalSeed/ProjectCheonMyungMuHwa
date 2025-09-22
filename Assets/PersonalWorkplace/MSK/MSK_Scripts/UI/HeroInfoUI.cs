@@ -199,10 +199,14 @@ public class HeroInfoUI : UIBase
     private void OnClickUpgrade()
     {
         HeroLevelUpgrade();
+        RefreshCombatPower();
+        RefreshUI();
     }
     private void OnClickStageUP()
     {
         HeroRankUpPiece();
+        RefreshCombatPower();
+        RefreshUI();
     }
     #endregion
 
@@ -215,8 +219,10 @@ public class HeroInfoUI : UIBase
         if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
         {
             heroData.PlayerModelSO.Level++;
-            requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
+            Debug.Log($"[HeroLevelUpgrade] {heroData.heroName} 전투력 적용");
+            StatModifierManager.ApplyToCard(heroData.cardInfo);
+            requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
             RefreshUI();
         }
@@ -253,8 +259,10 @@ public class HeroInfoUI : UIBase
 
         ownerPiece -= requirePiece;
         heroData.stage++;
-        heroUI.RefreshAllCards();
         heroData.heroPiece = ownerPiece;
+        GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
+        Debug.Log($"[HeroRankUpPiece] {heroData.heroName} 전투력 적용");
+        heroUI.RefreshAllCards();
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
@@ -270,6 +278,7 @@ public class HeroInfoUI : UIBase
         heroData.cardInfo.combatPower = powerValue;
         power.text = BigCurrency.FromBaseAmount(powerValue).ToString();
     }
+
 
     /// <summary>
     /// 전체 UI를 새로고침하는 통합 메서드입니다.
