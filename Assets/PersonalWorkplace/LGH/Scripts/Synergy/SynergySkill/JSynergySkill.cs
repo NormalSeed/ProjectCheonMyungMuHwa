@@ -4,7 +4,7 @@ using UnityEngine;
 public class JSynergySkill : SynergySkill
 {
     [SerializeField] private List<PlayerController> players;
-    private Vector3 spearPosition = new Vector3(0f, 4.5f, 0f);
+    private Vector3 spearPosition = new Vector3(0f, -4.5f, 0f);
 
     public override void PlaySkill()
     {
