@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -94,10 +95,29 @@ public class HeroUI : UIBase
     //  영웅 자동 배치
     private void OnClickAutoSet()
     {
-        // 규칙에 따라서 영웅을 자동으로 배치
-
         Debug.LogWarning("[OnClickAutoSet] 입력됨");
+        // 기존 파티 초기화
+        PartyManager.Instance.MembersID.Clear();
+        var top5 = heroCard
+             .OrderByDescending(hero => hero.chardata.combatPower)
+             .Take(5)
+             .ToList();
+
+        // 파티에 추가
+        foreach (var card in heroCard)
+        {
+            if (card.chardata != null && top5.Contains(card))
+            {
+                card.OnClickCard();
+                card.HeroSettingStart();
+                if (PartyManager.Instance.MembersID.Count >= 5)
+                    break;
+            }
+        }
+
+        PartyNumChanged?.Invoke(); // 외부 알림
     }
+
 
 
     //  영웅 배치 시작
