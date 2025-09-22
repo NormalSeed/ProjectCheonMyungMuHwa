@@ -77,11 +77,13 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Unity LiftCycle
-    private void OnEnable() { }
+    private void OnEnable()
+    {
+
+    }
 
     private void OnDisable()
     {
-        heroUI.RefreshAllCards();
         equipPanel.SetActive(false);
         exitButton.onClick.RemoveListener(OnClickExit);
         upgradeButton.onClick.RemoveListener(OnClickUpgrade);
@@ -251,6 +253,7 @@ public class HeroInfoUI : UIBase
 
         ownerPiece -= requirePiece;
         heroData.stage++;
+        heroUI.RefreshAllCards();
         heroData.heroPiece = ownerPiece;
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);

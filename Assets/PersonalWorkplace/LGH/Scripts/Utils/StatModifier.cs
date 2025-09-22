@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 public enum ModifierSource
@@ -232,10 +233,36 @@ public static class StatModifierManager
     public static void ApplyToCard(CardInfo card)
     {
         string charID = card.HeroID;
+        Debug.Log($"[ApplyToCard] 요청된 charID: '{charID}'");
 
-        // charID를 기반으로 modelSO를 불러와서
-        // PlayerModel 클래스의 SetPoints의 첫부분과 같이 먼저 레벨에 따른 기초 스탯을 계산한 후
-        // GetCardModifier해온 값을 기초 스탯에 더해 각각의 최종 스탯을 계산해서
-        // card 안의 총 전투력 필드에 넣어줌
+        // 모델 정보 가져오기
+        var modelSO = HeroModels.Instance.GetModelSO(charID);
+        if (modelSO == null)
+        {
+            Debug.LogWarning($"[ApplyToCard] 모델 SO를 찾을 수 없습니다: {charID}");
+            return;
+        }
+
+        // 레벨 정보 적용 (필요 시)
+        modelSO.Level = card.HeroStage;
+
+        // 스탯 계산
+        modelSO.HealthPoint = (modelSO.Vital * (modelSO.Level * (1 + modelSO.Vital_Increase))) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Grade));
+        modelSO.ExtAtkPoint = (modelSO.ExtPow * (modelSO.Level * (1 + modelSO.ExtPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
+        modelSO.InnAtkPoint = (modelSO.InnPow * (modelSO.Level * (1 + modelSO.InnPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));
+        modelSO.DefPoint = (modelSO.ExtPow + modelSO.InnPow) * (modelSO.DefRatio + (modelSO.DefRatio_Increase * modelSO.Grade));
+
+        // HeroData 임시 생성
+        var hero = new HeroData
+        {
+            heroId = charID,
+            cardInfo = card,
+            PlayerModelSO = modelSO
+        };
+
+        // 전투력 계산
+        card.combatPower = HeroDataManager.Instance.CalculateCombatPower(hero);
+        Debug.Log($"[ApplyToCard] : {card.HeroName}의 전투력 {card.combatPower} 적용됨");
     }
+
 }
