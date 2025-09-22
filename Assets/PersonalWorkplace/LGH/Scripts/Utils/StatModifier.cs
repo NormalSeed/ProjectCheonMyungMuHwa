@@ -243,9 +243,6 @@ public static class StatModifierManager
             return;
         }
 
-        // 레벨 정보 적용 (필요 시)
-        modelSO.Level = card.HeroStage;
-
         // 스탯 계산
         modelSO.HealthPoint = (modelSO.Vital * (modelSO.Level * (1 + modelSO.Vital_Increase))) * (modelSO.HealthRatio + (modelSO.HealthRatio_Increase * modelSO.Grade));
         modelSO.ExtAtkPoint = (modelSO.ExtPow * (modelSO.Level * (1 + modelSO.ExtPow_Increase))) * (modelSO.AttackRatio + (modelSO.AttackRatio_Increase * modelSO.Grade));

@@ -13,4 +13,5 @@ public class CardInfo : ScriptableObject
     public HeroRarity rarity;               // 레어도
     public HeroFaction faction;             // 소속
     public float combatPower;               // 최종 전투력
+    public PlayerModelSO PlayerModelSO;     // 모델SO 
 }

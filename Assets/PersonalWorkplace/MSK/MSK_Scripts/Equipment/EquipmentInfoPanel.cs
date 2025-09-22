@@ -137,6 +137,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     {
         // TODO : 연마석 소모체크 추가하기
         instance.level++;
+        StatModifierManager.ApplyToCard(HeroInfo.heroData.cardInfo);
         SetPanelText();
         HeroInfo.RefreshUI();
     }
@@ -195,10 +196,10 @@ public class EquipmentInfoPanel : MonoBehaviour
         {
             Debug.LogError("[OnClickEquip] heroData.heroId가 null입니다. 저장 실패");
         }
-
-        SetPanelText();
+        StatModifierManager.ApplyToCard(heroData.cardInfo);
         HeroInfo.Init();
         HeroInfo.RefreshUI();
+        SetPanelText();
     }
 
 
