@@ -170,7 +170,6 @@ public class EquipmentInfoPanel : MonoBehaviour
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
 
             HeroDataManager.Instance.ApplyHeorStats(instance, charId);
-
             StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
         else
@@ -187,7 +186,6 @@ public class EquipmentInfoPanel : MonoBehaviour
                 Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
 
                 HeroDataManager.Instance.ApplyHeorStats(instance, charId);
-
                 StatModifierManager.ApplyToCard(heroData.cardInfo);
             }
 
@@ -200,8 +198,6 @@ public class EquipmentInfoPanel : MonoBehaviour
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 장착됨");
 
             HeroDataManager.Instance.ApplyHeorStats(instance, charId);
-
-            StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
 
         // 저장 및 UI 갱신

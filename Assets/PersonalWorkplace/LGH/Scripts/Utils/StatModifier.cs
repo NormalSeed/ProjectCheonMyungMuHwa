@@ -193,26 +193,20 @@ public static class StatModifierManager
     {
         // 장비, 훈련 Modifier만 가져오는 메서드
         if (!modifierCache.ContainsKey(charID))
-        {
-            Debug.LogWarning("[GetCardModifier] 반려됨"); 
             return 0f;
-        }
         float total = 0f;
-        Debug.LogWarning($"{charID} / {statType}/ {baseValue}");
         foreach (var modifier in modifierCache[charID].Where(m =>
             m.statType == statType &&
             (m.source == ModifierSource.Equipment || m.source == ModifierSource.Training)))
         {
             if (modifier.isPercent)
             {
-                Debug.LogWarning($"{statType}/ {baseValue} / {total} /{baseValue} / {modifier.value}");
-                Debug.LogWarning($"{modifier.source} / {modifier.statType}");
+                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += baseValue * modifier.value;
             }
             else
             {
-                Debug.LogWarning($"{charID} / {statType}/ {baseValue} / {total} /{baseValue} / {modifier.value}");
-                Debug.LogWarning($"{modifier.source} / {modifier.statType}");
+                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += modifier.value;
             }
         }
