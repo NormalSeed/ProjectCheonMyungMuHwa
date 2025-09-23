@@ -60,6 +60,9 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<HeroModels>().AsSelf();
         // 스킬셋
         builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
+        // 스프라이트
+        builder.RegisterComponentInHierarchy<HeroSprites>().AsSelf();
+
         builder.RegisterComponentInHierarchy<MonsterLoader>().AsSelf();
         builder.RegisterComponentInHierarchy<AudioManager>().AsSelf();
         builder.RegisterComponentInHierarchy<ParticleManager>().AsSelf();
