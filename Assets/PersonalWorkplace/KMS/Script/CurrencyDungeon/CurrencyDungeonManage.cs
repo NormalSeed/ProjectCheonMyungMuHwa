@@ -14,9 +14,6 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDungeonTimer timer;
 
     [SerializeField] UIBase failUI;
-    [SerializeField] UIBase clearUI;
-
-    [SerializeField] FadeCanvas fade;
 
 
     void Awake()
@@ -38,13 +35,6 @@ public class CurrencyDungeonManage : MonoBehaviour
         timer.Stop();
         SetToFirebase();
         StartCoroutine(ClearRoutine());
-        //CurrencyDungeonPopup.Instance.SetText($"{cur}  {sceneData.data.Reward}개");
-        //CurrencyDungeonPopup.Instance.OnTouch.AddListener(() =>
-        //{
-        //    CurrencyDungeonPopup.Instance.Close();
-        //    clearUI.SetShow();
-        //    CurrencyDungeonPopup.Instance.OnTouch.RemoveAllListeners();
-        //});
     }
 
     private IEnumerator ClearRoutine()
@@ -52,6 +42,7 @@ public class CurrencyDungeonManage : MonoBehaviour
         PopupManager.Instance.ShowStageClearPopup();
         BigCurrency reward = new BigCurrency(sceneData.data.Reward);
         ItemData rewardItem = null;
+        sceneData.MainUiToOpen = UIType.Dungeon;
         if (sceneData.type == CurrencyDungeonType.Gold)
         {
             rewardItem = new ItemData(11002, "", "", "GoldImage", true, ItemType.Currency);
@@ -73,15 +64,45 @@ public class CurrencyDungeonManage : MonoBehaviour
         yield return new WaitForSeconds(4f);
         PopupManager.Instance.ShowRewardPopup(new List<ItemData>() { rewardItem }, new List<BigCurrency>() { reward });
         yield return new WaitForSeconds(3f);
-        fade.FadeOutAndLoadMainScene();
+        //fade.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
 
 
     }
 
     private void DungeonFail()
     {
-        bossSpawner.Bosscon.IsInvulnerable = true;
-        failUI.SetShow();
+        bossSpawner.Bosscon.gameObject.SetActive(false);
+        DungeonFailUI ui = PopupManager.Instance.ShowDungeonFailPopup();
+        ui.SetActionToButton(0, () =>
+        {
+            sceneData.MainUiToOpen = UIType.Hero;
+            ui.SetHide();
+            ui.LoadScene("Demo_GameScene");
+        });
+        ui.SetActionToButton(1, () =>
+        {
+            sceneData.MainUiToOpen = UIType.Dungeon;
+            ui.SetHide();
+            ui.LoadScene("Demo_GameScene");
+        });
+        ui.SetActionToButton(2, () =>
+        {
+            sceneData.MainUiToOpen = UIType.Upgrade;
+            ui.SetHide();
+            ui.LoadScene("Demo_GameScene");
+        });
+        ui.SetActionToButton(3, () =>
+        {
+            sceneData.MainUiToOpen = UIType.Summon;
+            ui.SetHide();
+            ui.LoadScene("Demo_GameScene");
+        });
+        ui.SetActionToScreen(() =>
+        {
+            sceneData.MainUiToOpen = UIType.Dungeon;
+            ui.SetHide();
+            ui.LoadScene("Demo_GameScene");
+        });
     }
     void Update()
     {

@@ -100,12 +100,12 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public void TakeDamage(float amount)
     {
+        if (IsInvulnerable) return;
         OnTakeDamage(amount);
         SetHealthBar();
     }
     protected virtual void OnTakeDamage(double amount)
     {
-        if (IsInvulnerable) return;
         if (IsDead) return;
         Model.CurHealth.Value -= amount;
         DamageText text = DamageTextManager.Instance.Get(damagePos);

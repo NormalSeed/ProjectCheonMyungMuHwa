@@ -30,6 +30,7 @@ public class CurrencyDungeonTimer : MonoBehaviour
         {
             timeText.text = "타임 오버";
             OnTimeOver?.Invoke();
+            isStopped = true;
             return;
         }
         currentTime -= Time.deltaTime;

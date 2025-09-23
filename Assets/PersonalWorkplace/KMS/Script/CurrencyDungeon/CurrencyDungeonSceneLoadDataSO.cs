@@ -6,15 +6,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CurrencyDungeonSceneLoadDataSO", menuName = "Scriptable Objects/CurrencyDungeonSceneLoadDataSO")]
 public class CurrencyDungeonSceneLoadDataSO : ScriptableObject
 {
-  public CurrencyDungeonData data;
-  public CurrencyDungeonType type;
-  public CurrencyDungeonClearData clearData;
-
-  //재화 던전에서 메인으로 돌아왔는지에 대한 여부
-  public bool BackToMain;
+  public CurrencyDungeonData data; //던전 레벨, 리워드 개수 등
+  public CurrencyDungeonType type; // 던전의 타입 (금화 혼백 영석)
+  public CurrencyDungeonClearData clearData; // 현재 몇 레벨까지 클리어 되어있는지
+  public UIType MainUiToOpen; //던전에서 돌아왔을때 열 UI
   void OnEnable()
   {
-    BackToMain = false;
+    MainUiToOpen = 0;
   }
-
 }
