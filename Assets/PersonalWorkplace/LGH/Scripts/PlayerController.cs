@@ -1,13 +1,11 @@
-using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
-using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
 using VContainer;
 
 public class PlayerController : MonoBehaviour, IDamagable
@@ -21,6 +19,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public GameObject SPUMAsset;
     public SPUM_Prefabs spumController;
     public CharacterEquipment equipment;
+    public Slider healthBar;
 
     public int partyNum;
     public bool hasAligned = false;
@@ -103,6 +102,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         };
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
+        model.CurHealth.Subscribe(UpdateHealthBar);
     }
 
     private void OnDisable()
@@ -346,5 +346,10 @@ public class PlayerController : MonoBehaviour, IDamagable
     {
         model.modelSO.Level = newLevel;
         model.SetPoints();
+    }
+
+    private void UpdateHealthBar(float hp)
+    {
+        healthBar.value = hp / model.Health;
     }
 }

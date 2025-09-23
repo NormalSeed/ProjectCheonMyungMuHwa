@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class HeroModels : MonoBehaviour
+public class HeroSprites : MonoBehaviour
 {
-    public static HeroModels Instance;
+    public static HeroSprites Instance { get; private set; }
 
-    public List<PlayerModelSO> ModelSOs = new();
+    public List<Sprite> Sprites = new();
 
-    private Dictionary<string, PlayerModelSO> modelLookup = new();
+    private Dictionary<string, Sprite> spriteLookup = new();
 
     private List<string> charIDs = new List<string>
     {
@@ -51,35 +51,30 @@ public class HeroModels : MonoBehaviour
     {
         foreach (var id in ids)
         {
-            string modelSOId = id + "_model";
-            var handle = Addressables.LoadAssetAsync<PlayerModelSO>(modelSOId);
+            string spriteId = id + "_sprite";
+            var handle = Addressables.LoadAssetAsync<Sprite>(spriteId);
             yield return handle;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                var modelSO = handle.Result;
-                ModelSOs.Add(modelSO);
-                modelLookup[id] = modelSO;
-                Debug.Log($"[HeroModels] 모델SO 로드 완료: {id}");
+                var sprite = handle.Result;
+                Sprites.Add(sprite);
+                spriteLookup[id] = sprite;
+                Debug.Log($"[HeroSprites] 스프라이트 로드 완료: {id}");
             }
             else
             {
-                Debug.LogError($"ModelSO 로딩 실패: {id}");
+                Debug.LogError($"스프라이트 로딩 실패: {id}");
             }
         }
 
         IsInitialized = true;
-        Debug.Log("[HeroModels] 모든 모델SO 로딩 완료!");
+        Debug.Log("[HeroSprites] 모든 스프라이트 로딩 완료!");
     }
 
-    /// <summary>
-    /// HeroModels에 등록되어있는 ModelSO를 charID를 기준으로 반환하는 메서드
-    /// </summary>
-    /// <param name="charID"></param>
-    /// <returns></returns>
-    public PlayerModelSO GetModelSO(string charID)
+    public Sprite GetCharacterSprite(string charID)
     {
-        modelLookup.TryGetValue(charID, out var model);
-        return model;
+        spriteLookup.TryGetValue(charID, out var sprite);
+        return sprite;
     }
 }
