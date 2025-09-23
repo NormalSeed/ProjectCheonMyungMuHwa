@@ -7,6 +7,7 @@ public class MSynergySkill : SynergySkill
     [SerializeField] private List<PlayerController> players;
     private float partyCombatPower;
     private WaitForSeconds damageInterval = new WaitForSeconds(1f);
+    private Vector3 effectPosition = new Vector3(0f, -4.5f, 0f);
 
     private void Awake()
     {
@@ -42,7 +43,7 @@ public class MSynergySkill : SynergySkill
                 IDamagable damagable = monster.GetComponent<IDamagable>();
                 if (damagable != null)
                 {
-                    particleController.PlayParticle("FX_splash_hit_02_air", monster.transform.position);
+                    particleController.PlayParticle("FX_splash_hit_02_air", monster.transform.position + effectPosition);
                     damagable.TakeDamage(partyCombatPower * 0.5f * 0.05f);
                 }
             }
