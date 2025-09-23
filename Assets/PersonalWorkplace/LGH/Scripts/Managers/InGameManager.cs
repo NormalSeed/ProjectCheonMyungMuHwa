@@ -1,4 +1,6 @@
 using DG.Tweening;
+using Firebase.Auth;
+using Firebase.Database;
 using GooglePlayGames.BasicApi;
 using NavMeshPlus.Components;
 using System.Collections;
@@ -55,6 +57,8 @@ public class InGameManager : MonoBehaviour
 
         alignedNum.Subscribe(ExamineAllAligned);
         monsterDeathStack.Subscribe(CheckMonsterClear);
+
+        LoadStageFromFirebase();
     }
 
     private void Update()
@@ -74,6 +78,26 @@ public class InGameManager : MonoBehaviour
                 isQuitUIActive = true;
             }
         }
+    }
+
+    private void LoadStageFromFirebase()
+    {
+        string uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.GetReference($"users/{uid}/stage");
+
+        dbRef.GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted && task.Result.Exists)
+            {
+                int savedStage = int.Parse(task.Result.Value.ToString());
+                stageNum = savedStage;
+                Debug.Log($"Firebase에서 불러온 스테이지: {stageNum}");
+            }
+            else
+            {
+                Debug.LogWarning("Firebase에서 스테이지 데이터를 찾을 수 없습니다. 기본값 사용.");
+            }
+        });
     }
 
     public void RespawnMonsters()
@@ -153,6 +177,21 @@ public class InGameManager : MonoBehaviour
     public void SetNextStage()
     {
         stageNum++;
+
+        string uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.GetReference($"users/{uid}/stage");
+
+        dbRef.SetValueAsync(stageNum).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log($"스테이지 {stageNum} 저장 완료");
+            }
+            else
+            {
+                Debug.LogError("스테이지 저장 실패: " + task.Exception);
+            }
+        });
     }
 
     public void CheckAllPlayersDead(bool isDead)
