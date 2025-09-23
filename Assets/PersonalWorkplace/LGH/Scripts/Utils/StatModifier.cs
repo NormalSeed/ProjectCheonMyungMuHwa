@@ -191,20 +191,31 @@ public static class StatModifierManager
     /// <returns></returns>
     public static float GetCardModifier(string charID, StatType statType, float baseValue)
     {
+        Debug.LogWarning("[GetCardModifier] 작동");
         // 장비, 훈련 Modifier만 가져오는 메서드
         if (!modifierCache.ContainsKey(charID))
+        {
+            Debug.LogWarning("[GetCardModifier] 반려됨"); 
             return 0f;
-
+        }
         float total = 0f;
-
+        Debug.LogWarning($"{charID} / {statType}/ {baseValue}");
         foreach (var modifier in modifierCache[charID].Where(m =>
             m.statType == statType &&
             (m.source == ModifierSource.Equipment || m.source == ModifierSource.Training)))
         {
             if (modifier.isPercent)
+            {
+                Debug.LogWarning($"{statType}/ {baseValue} / {total} /{baseValue} / {modifier.value}");
+                Debug.LogWarning($"{modifier.source} / {modifier.statType}");
                 total += baseValue * modifier.value;
+            }
             else
+            {
+                Debug.LogWarning($"{charID} / {statType}/ {baseValue} / {total} /{baseValue} / {modifier.value}");
+                Debug.LogWarning($"{modifier.source} / {modifier.statType}");
                 total += modifier.value;
+            }
         }
 
         return total;
@@ -245,12 +256,11 @@ public static class StatModifierManager
         Debug.Log($"[ApplyToCard] 목표 모델 : {modelSO.CharName}");
 
         // 스탯 계산
-        // modelSO.HealthPoint = (float)GetCardModifier(charID, StatType.Health, card.PlayerModelSO.HealthRatio_Increase);
-        // modelSO.ExtAtkPoint = (float)GetCardModifier(charID, StatType.ExtAtk, card.PlayerModelSO.ExtPow_Increase);
-        // modelSO.InnAtkPoint = (float)GetCardModifier(charID, StatType.InnAtk, card.PlayerModelSO.InnPow_Increase);
-        // modelSO.DefPoint = (float)GetCardModifier(charID, StatType.Defense, card.PlayerModelSO.DefRatio_Increase);
+        modelSO.HealthPoint = modelSO.HealthPoint + GetCardModifier(charID, StatType.Health, modelSO.HealthPoint);
+        modelSO.ExtAtkPoint = modelSO.ExtAtkPoint + GetCardModifier(charID, StatType.ExtAtk, modelSO.ExtAtkPoint);
+        modelSO.InnAtkPoint = modelSO.InnAtkPoint + GetCardModifier(charID, StatType.InnAtk, modelSO.InnAtkPoint);
+        modelSO.DefPoint = modelSO.DefPoint + GetCardModifier(charID, StatType.Defense, modelSO.DefPoint);
 
-        // HeroData 임시 생성
         var hero = new HeroData
         {
             heroId = charID,

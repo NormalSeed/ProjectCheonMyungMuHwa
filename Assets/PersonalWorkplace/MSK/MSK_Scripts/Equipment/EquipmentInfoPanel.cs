@@ -165,8 +165,10 @@ public class EquipmentInfoPanel : MonoBehaviour
             SetHeroEquipmentSlot(null);
             instance.isEquipped = false;
             instance.charID = null;
-            equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
+            equipmentService.UnequipFromUnactivatedCharacter(charId, instance);
+            equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
+            StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
         else
         {
@@ -176,7 +178,9 @@ public class EquipmentInfoPanel : MonoBehaviour
                 oldInstance.isEquipped = false;
                 oldInstance.charID = null;
                 equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
+                equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
                 Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
+                StatModifierManager.ApplyToCard(heroData.cardInfo);
             }
 
             // 3. 장착: 새 장비를 슬롯에 등록
@@ -184,7 +188,9 @@ public class EquipmentInfoPanel : MonoBehaviour
             instance.isEquipped = true;
             instance.charID = heroData.heroId;
             equipmentService.EquipToUnactivatedCharacter(charId, instance);
+            equipmentService.EquipToCharacter(charId, instance);
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 장착됨");
+            StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
 
         // 저장 및 UI 갱신
@@ -196,7 +202,6 @@ public class EquipmentInfoPanel : MonoBehaviour
         {
             Debug.LogError("[OnClickEquip] heroData.heroId가 null입니다. 저장 실패");
         }
-        StatModifierManager.ApplyToCard(heroData.cardInfo);
         HeroInfo.Init();
         HeroInfo.RefreshUI();
         SetPanelText();

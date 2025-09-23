@@ -274,9 +274,7 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void RefreshCombatPower()
     {
-        float powerValue = HeroDataManager.Instance.CalculateCombatPower(heroData);
-        heroData.cardInfo.combatPower = powerValue;
-        power.text = BigCurrency.FromBaseAmount(powerValue).ToString();
+        power.text = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower).ToString();
     }
 
 
