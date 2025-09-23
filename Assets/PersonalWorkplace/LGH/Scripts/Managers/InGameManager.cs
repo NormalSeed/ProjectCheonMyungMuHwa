@@ -122,6 +122,11 @@ public class InGameManager : MonoBehaviour
             {
                 if (player.model == null) continue;
 
+                if (player.isDead.Value == true)
+                {
+                    player.Resurrect();
+                }
+
                 player.model.CurHealth.Value = player.model.Health;
             }
 

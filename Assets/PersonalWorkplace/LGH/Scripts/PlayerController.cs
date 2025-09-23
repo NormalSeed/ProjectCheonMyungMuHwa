@@ -1,5 +1,6 @@
 using Firebase.Database;
 using Firebase.Extensions;
+using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public SPUM_Prefabs spumController;
     public CharacterEquipment equipment;
     public Slider healthBar;
+    [SerializeField] private ParticleController particleController;
 
     public int partyNum;
     public bool hasAligned = false;
@@ -282,10 +284,15 @@ public class PlayerController : MonoBehaviour, IDamagable
             }
         }
 
-        // 테스트용 99999999 데미지 입는 버튼
+        // 테스트용 데미지 입는 버튼
         if (Input.GetKeyDown(KeyCode.D))
         {
             TakeDamage(99999999f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            TakeDamage(100f);
         }
     }
 
@@ -346,6 +353,20 @@ public class PlayerController : MonoBehaviour, IDamagable
         BGagent.enabled = false;
         spumController.PlayAnimation(PlayerState.DEATH, 0);
         isDead.Value = true;
+    }
+
+    public void Resurrect()
+    {
+        StartCoroutine(ResurrectRoutine());
+    }
+
+    private IEnumerator ResurrectRoutine()
+    {
+        particleController.PlayParticle("부활", transform.position);
+        spumController.PlayAnimation(PlayerState.IDLE, 0);
+        yield return new WaitForSeconds(2f);
+        BGagent.enabled = true;
+        isDead.Value = false;
     }
 
     public void Heal(float amount)
