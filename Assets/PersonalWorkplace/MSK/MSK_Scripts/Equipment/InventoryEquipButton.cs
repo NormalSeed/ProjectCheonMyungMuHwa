@@ -4,10 +4,10 @@ using UnityEngine.UI;
 public class InventoryEquipButton : MonoBehaviour
 {
     [SerializeField] Button button;
+    [SerializeField] Image isEquipImg;
 
     private EquipmentInfoPanel panel;
     private EquipmentInstance equipmentInstance;
-
     #region Unity
     private void OnEnable()
     {
@@ -33,6 +33,18 @@ public class InventoryEquipButton : MonoBehaviour
     {
         panel = input;
         equipmentInstance = equip;
+        if (equip.isEquipped == true)
+        {
+            isEquipImg.gameObject.SetActive(true);
+        }
+        else
+        {
+            isEquipImg.gameObject.SetActive(false);
+        }
+    }
+    public bool IsSameInstance(EquipmentInstance target)
+    {
+        return equipmentInstance != null && equipmentInstance.instanceID == target.instanceID;
     }
     #endregion
 }

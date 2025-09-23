@@ -36,9 +36,10 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     [Header("Instance")]
     [SerializeField] private HeroInfoUI HeroInfo;
+    [SerializeField] private EquipmentItemList itemList;
 
     private EquipmentInstance instance;     // 판넬의 장비
-
+   
     private string charId;                  // 영웅 ID
     private string instanceID;              // 장비 ID
 
@@ -213,6 +214,7 @@ public class EquipmentInfoPanel : MonoBehaviour
         HeroInfo.Init();
         HeroInfo.RefreshHeroUI();
         SetPanelText();
+        RefreshEquipCardUI();
     }
 
 
@@ -234,7 +236,24 @@ public class EquipmentInfoPanel : MonoBehaviour
             case EquipmentType.Boots: heroData.boots = itemId; break;
         }
     }
-        
+    private void RefreshEquipCardUI()
+    {
+        var itemList = FindFirstObjectByType<EquipmentItemList>();
+        if (itemList == null)
+        {
+            Debug.LogWarning("[RefreshEquipCardUI] EquipmentItemList를 찾을 수 없습니다.");
+            return;
+        }
+
+        foreach (var button in itemList.activeEquipButtons)
+        {
+            if (button != null && button.IsSameInstance(instance))
+            {
+                button.Init(this, instance);
+                break;
+            }
+        }
+    }
 
     #endregion
 
