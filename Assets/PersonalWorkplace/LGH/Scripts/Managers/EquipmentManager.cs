@@ -37,7 +37,7 @@ public class EquipmentFirebaseData
 }
 
 
-public class EquipmentManager : IStartable
+public class    EquipmentManager : IStartable
 {
     public bool IsInitialized { get; private set; }
 

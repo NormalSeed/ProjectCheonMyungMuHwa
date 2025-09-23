@@ -12,8 +12,7 @@ using VContainer;
 
 public class HeroInfoUI : UIBase
 {
-    [Inject] private EquipmentService equipmentService;
-    [Inject] private EquipmentManager equipmentManager;
+    [Inject] private readonly EquipmentManager equipmentManager;
 
     #region SerializeField
     [Header("Button")]
@@ -52,7 +51,6 @@ public class HeroInfoUI : UIBase
     #region SO Properties
     public HeroData heroData;
     private BigCurrency HealthPoint = new();     // 체력정보
-    private BigCurrency FinalPower = new();      // 종합전투
     private BigCurrency InnAtkPoint = new();     // 내공
     private BigCurrency ExtAtkPoint = new();     // 외곻
     #endregion
@@ -64,24 +62,13 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Equip
-    private Dictionary<string, EquipmentInstance> equips = new();
     public string weaponID;
     public string armorID;
     public string bootsID;
     public string glovesID;
     #endregion
 
-    #region FireBase
-    private string _uid;
-    private DatabaseReference _dbRef;
-    #endregion
-
     #region Unity LiftCycle
-    private void OnEnable()
-    {
-
-    }
-
     private void OnDisable()
     {
         equipPanel.SetActive(false);
@@ -95,7 +82,7 @@ public class HeroInfoUI : UIBase
     public void Init()
     {
         ButtonAddListener();
-        RefreshUI();
+        RefreshHeroUI();
     }
     private void SetEquipment()
     {
@@ -119,9 +106,9 @@ public class HeroInfoUI : UIBase
     }
     private void PrepareHeroStats()
     {
-        HealthPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint);
-        ExtAtkPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.ExtAtkPoint);
-        InnAtkPoint = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.InnAtkPoint);
+        HealthPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.HealthPoint);
+        ExtAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.ExtAtkPoint);
+        InnAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.InnAtkPoint);
         requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
 
         ownerPiece = heroData.heroPiece;
@@ -137,9 +124,9 @@ public class HeroInfoUI : UIBase
     {
         charName.text = heroData.PlayerModelSO.CharName;
         level.text = heroData.PlayerModelSO.Level.ToString();
-        health.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.HealthPoint).ToString();
-        outPow.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.ExtAtkPoint).ToString();
-        inPow.text = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.InnAtkPoint).ToString();
+        health.text = HealthPoint.ToString();
+        outPow.text = ExtAtkPoint.ToString();
+        inPow.text = InnAtkPoint.ToString();
         power.text = CountingHeroPower();
         exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
         heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
@@ -200,13 +187,13 @@ public class HeroInfoUI : UIBase
     {
         HeroLevelUpgrade();
         RefreshCombatPower();
-        RefreshUI();
+        RefreshHeroUI();
     }
     private void OnClickStageUP()
     {
         HeroRankUpPiece();
         RefreshCombatPower();
-        RefreshUI();
+        RefreshHeroUI();
     }
     #endregion
 
@@ -221,10 +208,9 @@ public class HeroInfoUI : UIBase
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
             Debug.Log($"[HeroLevelUpgrade] {heroData.heroName} 전투력 적용");
-            StatModifierManager.ApplyToCard(heroData.cardInfo);
             requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
-            RefreshUI();
+            RefreshHeroUI();
         }
     }
 
@@ -266,7 +252,7 @@ public class HeroInfoUI : UIBase
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
-        RefreshUI();
+        RefreshHeroUI();
     }
 
     /// <summary>
@@ -276,13 +262,16 @@ public class HeroInfoUI : UIBase
     {
         power.text = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower).ToString();
     }
+    #endregion
 
+    #region Public
 
     /// <summary>
     /// 전체 UI를 새로고침하는 통합 메서드입니다.
     /// </summary>
-    private async void RefreshUI()
+    public async void RefreshHeroUI()
     {
+        StatModifierManager.ApplyToCard(heroData.cardInfo);
         PrepareHeroStats();                          // 능력치 및 조각 계산
         InfoTextSetting();                           // 텍스트 UI 세팅
         SetUpgradeInteractable(upgradeButton);       // 레벨업 버튼 활성화 여부
@@ -294,9 +283,6 @@ public class HeroInfoUI : UIBase
         await SetCharacter(heroData.PlayerModelSO.SpriteKey); // 캐릭터 이미지 로딩
     }
 
-    #endregion
-
-    #region Public
     /// <summary>
     /// 장착한 장비를 설정하는 코드입니다.
     /// </summary>
@@ -330,7 +316,6 @@ public class HeroInfoUI : UIBase
             {
                 case EquipmentType.Weapon:
                     weaponID = instance.instanceID;
-                    Debug.Log($"[GetEquipment] : 무기 ID = {weaponID}");
                     break;
                 case EquipmentType.Armor:
                     armorID = instance.instanceID;

@@ -191,7 +191,6 @@ public static class StatModifierManager
     /// <returns></returns>
     public static float GetCardModifier(string charID, StatType statType, float baseValue)
     {
-        Debug.LogWarning("[GetCardModifier] 작동");
         // 장비, 훈련 Modifier만 가져오는 메서드
         if (!modifierCache.ContainsKey(charID))
         {
@@ -244,7 +243,6 @@ public static class StatModifierManager
     public static void ApplyToCard(CardInfo card)
     {
         string charID = card.HeroID;
-        Debug.Log($"[ApplyToCard] 요청된 charID: '{charID}'");
 
         // 모델 정보 가져오기
         var modelSO = HeroModels.Instance.GetModelSO(charID);
@@ -253,13 +251,12 @@ public static class StatModifierManager
             Debug.LogWarning($"[ApplyToCard] 모델 SO를 찾을 수 없습니다: {charID}");
             return;
         }
-        Debug.Log($"[ApplyToCard] 목표 모델 : {modelSO.CharName}");
-
         // 스탯 계산
-        modelSO.HealthPoint = modelSO.HealthPoint + GetCardModifier(charID, StatType.Health, modelSO.HealthPoint);
-        modelSO.ExtAtkPoint = modelSO.ExtAtkPoint + GetCardModifier(charID, StatType.ExtAtk, modelSO.ExtAtkPoint);
-        modelSO.InnAtkPoint = modelSO.InnAtkPoint + GetCardModifier(charID, StatType.InnAtk, modelSO.InnAtkPoint);
-        modelSO.DefPoint = modelSO.DefPoint + GetCardModifier(charID, StatType.Defense, modelSO.DefPoint);
+        card.HealthPoint = modelSO.HealthPoint + GetCardModifier(charID, StatType.Health, modelSO.HealthPoint);
+        card.ExtAtkPoint = modelSO.ExtAtkPoint + GetCardModifier(charID, StatType.ExtAtk, modelSO.ExtAtkPoint);
+        card.InnAtkPoint = modelSO.InnAtkPoint + GetCardModifier(charID, StatType.InnAtk, modelSO.InnAtkPoint);
+        card.DefPoint = modelSO.DefPoint + GetCardModifier(charID, StatType.Defense, modelSO.DefPoint);
+        Debug.Log($"[ApplyToCard] 목표 모델 : {modelSO.CharName}");
 
         var hero = new HeroData
         {

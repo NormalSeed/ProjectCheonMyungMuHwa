@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -6,8 +7,8 @@ using VContainer;
 
 public class EquipmentInfoPanel : MonoBehaviour
 {
-    [Inject] private EquipmentService equipmentService;
-    [Inject] private EquipmentManager equipmentManager;
+    [Inject] private readonly EquipmentService equipmentService;
+    [Inject] private readonly EquipmentManager equipmentManager;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI textEquipmentName;       //장비 이름
@@ -37,10 +38,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     [SerializeField] private HeroInfoUI HeroInfo;
 
     private EquipmentInstance instance;     // 판넬의 장비
-    private EquipmentInstance oldinstance;  // 장착중인 장비
-    private int level;                      // 장비 레벨
-    private int effectRate;                 // 증가량
-    private int nextEffectRate;             // 다음 레벨 증가량
+
     private string charId;                  // 영웅 ID
     private string instanceID;              // 장비 ID
 
@@ -165,9 +163,14 @@ public class EquipmentInfoPanel : MonoBehaviour
             SetHeroEquipmentSlot(null);
             instance.isEquipped = false;
             instance.charID = null;
+           
             equipmentService.UnequipFromUnactivatedCharacter(charId, instance);
             equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
+            
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
+
+            HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+
             StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
         else
@@ -177,9 +180,14 @@ public class EquipmentInfoPanel : MonoBehaviour
             {
                 oldInstance.isEquipped = false;
                 oldInstance.charID = null;
+                
                 equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
                 equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
+                
                 Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
+
+                HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+
                 StatModifierManager.ApplyToCard(heroData.cardInfo);
             }
 
@@ -190,6 +198,9 @@ public class EquipmentInfoPanel : MonoBehaviour
             equipmentService.EquipToUnactivatedCharacter(charId, instance);
             equipmentService.EquipToCharacter(charId, instance);
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 장착됨");
+
+            HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+
             StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
 
@@ -202,8 +213,9 @@ public class EquipmentInfoPanel : MonoBehaviour
         {
             Debug.LogError("[OnClickEquip] heroData.heroId가 null입니다. 저장 실패");
         }
+        StatModifierManager.ApplyToCard(heroData.cardInfo);
         HeroInfo.Init();
-        HeroInfo.RefreshUI();
+        HeroInfo.RefreshHeroUI();
         SetPanelText();
     }
 
@@ -227,6 +239,7 @@ public class EquipmentInfoPanel : MonoBehaviour
         }
     }
         
+
     #endregion
 
     #region Public
