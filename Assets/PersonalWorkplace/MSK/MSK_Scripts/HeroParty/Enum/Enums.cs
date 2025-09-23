@@ -68,6 +68,8 @@ public enum PopupType
     RewardPopup,
     Tooltip,
     Alert,
+    Roulette,
+    DungeonFail
 }
 
 public enum TableType

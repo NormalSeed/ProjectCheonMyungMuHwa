@@ -9,7 +9,7 @@ public class PopupEntry
     public UIBase uiBase;
 }
 
-public class PopupManager : MonoBehaviour
+public partial class PopupManager : MonoBehaviour
 {
     #region Singleton
 
