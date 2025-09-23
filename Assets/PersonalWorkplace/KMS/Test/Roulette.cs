@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AlignTest : MonoBehaviour
+public class Roulette : MonoBehaviour
 {
-
     [SerializeField] bool clockwise;
     [SerializeField] float defaultDPS;
     [SerializeField] Transform roulette;

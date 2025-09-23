@@ -3,52 +3,53 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class FadeCanvas : MonoBehaviour
 {
-    [SerializeField] CurrencyDungeonSceneLoadDataSO data;
+
+    private static bool isInstantiated;
 
     [SerializeField] Image image;
 
-    [SerializeField] MainSceneUIController mainSceneUI;
-    CurrencyDungeonClearData clearData;
-
-    void Start()
+    void Awake()
     {
-        if (data.BackToMain)
+        if (isInstantiated)
         {
-            FadeIn();
-            StartCoroutine(TestRoutine());
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(gameObject);
+            isInstantiated = true;
         }
     }
-    private IEnumerator TestRoutine()
-    {
-        yield return null;
-        mainSceneUI.ShowUI(UIType.Dungeon);
-    }
 
-    public void FadeIn()
+    public void FadeIn(float time)
     {
         image.color = new Color(0, 0, 0, 1);
-        image.DOFade(0f, 1.5f);
+        image.DOFade(0f, time);
     }
-    public void FadeOut()
+    public void FadeOut(float time)
     {
         image.color = new Color(0, 0, 0, 0);
-        image.DOFade(1f, 1.5f);
+        image.DOFade(1f, time);
     }
 
-    public void FadeOutAndLoadMainScene()
+    public void FadeOutAndLoadScene(string scene, float time)
     {
         AudioManager.Instance.StopAllSounds();
-        data.BackToMain = true;
         Sequence seq = DOTween.Sequence();
-        seq.Append(image.DOFade(1f, 1.5f));
+        seq.Append(image.DOFade(1f, time));
         seq.OnComplete(() =>
         {
-            SceneManager.LoadSceneAsync("Demo_GameScene");
+            LoadSceneAndFadeInAsync(scene, time);
         });
-
+    }
+    private async void LoadSceneAndFadeInAsync(string scene, float time)
+    {
+        await SceneManager.LoadSceneAsync(scene);
+        FadeIn(time);
     }
 
 }

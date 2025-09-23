@@ -60,10 +60,9 @@ public class CurrencyDungeonUI : UIBase
             clearData = JsonUtility.FromJson<CurrencyDungeonClearData>(json);
         }
         gameObject.SetActive(true);
-        if (data.BackToMain)
+        if (data.MainUiToOpen == UIType.Dungeon)
         {
             OpenLevelPanel(data.type);
-            data.BackToMain = false;
         }
         else
         {

@@ -21,6 +21,9 @@ public class OfflineRewardUI : UIBase
     public Button adButton;
     public Button rewardButton;
 
+    [Header("KMS Add")]
+    public AdDataSO adData;
+
     private double rewardGold;
     private double adMultiplier = 1.3f;
 
@@ -100,13 +103,23 @@ public class OfflineRewardUI : UIBase
 
         // 광고 보상 버튼
         adButton.onClick.RemoveAllListeners();
+        //adButton.onClick.AddListener(() =>
+        //{
+        //    foreach (var reward in rewards)
+        //    {
+        //        CurrencyManager.Instance.Add(reward.Key, reward.Value);
+        //    }
+        //    offlineRewardPanel.SetActive(false);
+        //});
         adButton.onClick.AddListener(() =>
         {
-            foreach (var reward in rewards)
+            adData.ShowRewardAD(() =>
             {
-                CurrencyManager.Instance.Add(reward.Key, reward.Value);
-            }
-            offlineRewardPanel.SetActive(false);
+                RouletteUI ui = PopupManager.Instance.ShowRoulettePopup();
+                ui.Rewards = rewards; //리워드 룰렛 ui로 전달
+                this.SetHide();
+            });
+
         });
     }
 

@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 3398441593374509947}
   - component: {fileID: 5294090484424668369}
   - component: {fileID: 7973500662646769127}
+  - component: {fileID: 7328452005248960258}
   m_Layer: 5
   m_Name: RoulettePopup
   m_TagString: Untagged
@@ -290,6 +291,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7328452005248960258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764962398492789658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92f521e5ffad82b46951e173a7d0a3e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7132613231771207796
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,7 +314,7 @@ GameObject:
   - component: {fileID: 3990848899204282742}
   - component: {fileID: 7972565979349348812}
   - component: {fileID: 3315637174142161166}
-  - component: {fileID: 3408542735377392314}
+  - component: {fileID: 4236871269491219296}
   m_Layer: 5
   m_Name: roulette
   m_TagString: Untagged
@@ -366,7 +379,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3408542735377392314
+--- !u!114 &4236871269491219296
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -378,10 +391,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87bf13ba910b5d14a968fad5d7a85524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clockwise: 1
+  clockwise: 0
   defaultDPS: 3
   roulette: {fileID: 3990848899204282742}
-  targetDeg: 180
+  targetDeg: 110
   samplingCount: 50
 --- !u!1 &9063809906157148214
 GameObject:
