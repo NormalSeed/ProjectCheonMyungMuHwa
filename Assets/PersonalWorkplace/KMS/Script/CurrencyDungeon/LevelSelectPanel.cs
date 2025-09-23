@@ -135,6 +135,7 @@ public class LevelSelectPanel : MonoBehaviour
             //string id = member.HeroID;
             playerData.currentPlayerDataList.Add(member);
         }
+        GameEvents.ReturnAllPOs();
         SceneManager.LoadSceneAsync("CurrencyDungeonScene");
     }
 

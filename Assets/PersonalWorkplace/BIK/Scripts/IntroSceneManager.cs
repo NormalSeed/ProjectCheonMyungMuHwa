@@ -70,6 +70,15 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
             Debug.Log("[IntroScene] 영웅 스킬셋 로딩 완료!");
         }
+
+        if (scope != null)
+        {
+            var heroSprites = scope.Container.Resolve<HeroSprites>();
+            heroSprites.Init();
+            yield return new WaitUntil(() => heroSprites.IsInitialized);
+            Debug.Log("[IntroScene] 영웅 스프라이트 로딩 완료!");
+        }
+
         if (scope != null)
         {
             if (scope.Container.TryResolve(out MonsterLoader monsterLoader))

@@ -7,7 +7,13 @@ public class LGH_ObjectPool
     private PooledObject prefab;
     private GameObject poolObject;
 
-    public LGH_ObjectPool(Transform parent, PooledObject targetPrefab, int initSize) => Init(parent, targetPrefab, initSize);
+    private List<PooledObject> activeObjects = new List<PooledObject>();
+
+    public LGH_ObjectPool(Transform parent, PooledObject targetPrefab, int initSize)
+    {
+        Init(parent, targetPrefab, initSize);
+        GameEvents.OnSceneLoaded += ReturnAllActiveObjects;
+    }
 
     private void Init(Transform parent, PooledObject targetPrefab, int initSize)
     {
@@ -26,6 +32,7 @@ public class LGH_ObjectPool
     {
         target.transform.parent = poolObject.transform;
         target.gameObject.SetActive(false);
+        activeObjects.Remove(target);
         pool.Push(target);
     }
 
@@ -36,6 +43,7 @@ public class LGH_ObjectPool
         PooledObject obj = pool.Pop();
         //obj.transform.SetParent(null);
         obj.gameObject.SetActive(true);
+        activeObjects.Add(obj);
         return obj;
     }
 
@@ -45,5 +53,18 @@ public class LGH_ObjectPool
         PooledObject obj = objGO.GetComponent<PooledObject>();           // 다시 컴포넌트 꺼내기
         obj.PooledInit(this);
         PushPool(obj);
+    }
+
+    public void ReturnAllActiveObjects()
+    {
+        foreach (var obj in activeObjects.ToArray()) // 복사본으로 루프
+        {
+            obj.ReturnPool();
+        }
+    }
+
+    ~LGH_ObjectPool()
+    {
+        GameEvents.OnSceneLoaded -= ReturnAllActiveObjects;
     }
 }

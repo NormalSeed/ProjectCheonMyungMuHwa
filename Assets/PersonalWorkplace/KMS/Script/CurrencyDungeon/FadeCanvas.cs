@@ -48,8 +48,8 @@ public class FadeCanvas : MonoBehaviour
     }
     private async void LoadSceneAndFadeInAsync(string scene, float time)
     {
+        GameEvents.ReturnAllPOs();
         await SceneManager.LoadSceneAsync(scene);
         FadeIn(time);
     }
-
 }

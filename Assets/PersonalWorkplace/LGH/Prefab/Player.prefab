@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1666091133234881422}
   - component: {fileID: 8321359456987646730}
   - component: {fileID: 1036335220788246256}
+  - component: {fileID: 5534352364233236718}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -94,12 +95,20 @@ MonoBehaviour:
   SPUMAsset: {fileID: 0}
   spumController: {fileID: 0}
   equipment: {fileID: 0}
+  healthBar: {fileID: 0}
+  particleController: {fileID: 5534352364233236718}
   partyNum: 0
+  hasAligned: 0
+  NMagent: {fileID: 0}
+  BGagent: {fileID: 0}
+  movedRight: 0
   isSkillReady: 1
   isSkill1Ready: 1
   isSkill2Ready: 0
   curCool: 0
   skill2Count: 5
+  target: {fileID: 0}
+  isShieldActive: 0
 --- !u!114 &4976470927240636388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,6 +140,7 @@ MonoBehaviour:
   Def: 0
   CritRate: 0
   CritDamage: 0
+  AttackSpeed: 0
   bossDamageBonus: 1
   normalDamageBonus: 1
   skillDamageBonus: 1
@@ -240,3 +250,17 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.3}
   m_Size: {x: 0.5, y: 0.8}
   m_Direction: 0
+--- !u!114 &5534352364233236718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089584962320658526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81e05fdc304425e4a9b13d21b9b3c610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlePrefabs:
+  - {fileID: 6679002610472394333, guid: 1face08fbb66a26469338be32c22ea4c, type: 3}
