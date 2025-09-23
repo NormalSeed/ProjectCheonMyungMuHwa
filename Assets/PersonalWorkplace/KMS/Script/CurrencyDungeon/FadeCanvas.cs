@@ -46,9 +46,8 @@ public class FadeCanvas : MonoBehaviour
         seq.Append(image.DOFade(1f, 1.5f));
         seq.OnComplete(() =>
         {
+            GameEvents.ReturnAllPOs();
             SceneManager.LoadSceneAsync("Demo_GameScene");
         });
-
     }
-
 }

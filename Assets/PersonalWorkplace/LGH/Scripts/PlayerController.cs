@@ -1,5 +1,6 @@
 using Firebase.Database;
 using Firebase.Extensions;
+using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public SPUM_Prefabs spumController;
     public CharacterEquipment equipment;
     public Slider healthBar;
+    [SerializeField] private ParticleController particleController;
 
     public int partyNum;
     public bool hasAligned = false;
@@ -30,7 +32,7 @@ public class PlayerController : MonoBehaviour, IDamagable
     public BehaviorGraphAgent BGagent;
 
     public bool movedRight = false;
-    public bool isDead = false;
+    public ObservableProperty<bool> isDead { get; private set; } = new(true);
 
     private Vector3 damageOffest = new Vector3(0, 0.8f, 0);
 
@@ -65,7 +67,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         NMagent.updateRotation = false;
         NMagent.updateUpAxis = false;
 
-        isDead = true;
+        isDead.Value = false;
 
         charID.Subscribe(LoadPlayerData);
 
@@ -103,6 +105,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
         model.CurHealth.Subscribe(UpdateHealthBar);
+        isDead.Subscribe(InGameManager.Instance.CheckAllPlayersDead);
     }
 
     private void OnDisable()
@@ -116,6 +119,8 @@ public class PlayerController : MonoBehaviour, IDamagable
         skillSet.SetActive(false);
         skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
+        model.CurHealth.UnsubscribeAll();
+        isDead.UnsubscribeAll();
     }
 
     /// <summary>
@@ -278,6 +283,17 @@ public class PlayerController : MonoBehaviour, IDamagable
                 Debug.Log("보호막 지속시간 종료");
             }
         }
+
+        // 테스트용 데미지 입는 버튼
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            TakeDamage(99999999f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            TakeDamage(100f);
+        }
     }
 
     /// <summary>
@@ -297,6 +313,8 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     public void TakeDamage(float amount)
     {
+        if (isDead.Value == true) return;
+
         if (isShieldActive)
         {
             shieldAmount -= (float)amount;
@@ -323,13 +341,32 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         DamageText text = DamageTextManager.Instance.Get(transform.position + damageOffest);
         text.SetText(BigCurrency.FromBaseAmount(amount).ToString());
+
+        if (model.CurHealth.Value <= 0f)
+        {
+            Dead();
+        }
     }
 
     public void Dead()
     {
         BGagent.enabled = false;
         spumController.PlayAnimation(PlayerState.DEATH, 0);
-        isDead = true;
+        isDead.Value = true;
+    }
+
+    public void Resurrect()
+    {
+        StartCoroutine(ResurrectRoutine());
+    }
+
+    private IEnumerator ResurrectRoutine()
+    {
+        particleController.PlayParticle("부활", transform.position);
+        spumController.PlayAnimation(PlayerState.IDLE, 0);
+        yield return new WaitForSeconds(2f);
+        BGagent.enabled = true;
+        isDead.Value = false;
     }
 
     public void Heal(float amount)
