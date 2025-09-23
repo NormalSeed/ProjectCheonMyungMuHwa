@@ -200,7 +200,6 @@ public class HeroDataManager : IStartable
                     if (equip != null)
                     {
                         ApplyHeorStats(equip, hero.cardInfo.HeroID);
-                        
                     }
                     StatModifierManager.ApplyToCard(hero.cardInfo);
                 }

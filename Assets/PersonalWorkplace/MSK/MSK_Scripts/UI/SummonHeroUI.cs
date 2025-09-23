@@ -30,6 +30,7 @@ public class SummonHeroUI : UIBase
     #endregion
 
     #region Properties
+    private BigCurrency currency;
     private int summonCount;
     private int requireCount;
     private SummonLevel userSummonLevel;
@@ -120,11 +121,6 @@ public class SummonHeroUI : UIBase
     {
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
-    }
-
-    private void ChangeButtonText()
-    {
-        /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
     }
     #endregion
 

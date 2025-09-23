@@ -69,6 +69,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Unity LiftCycle
+
     private void OnDisable()
     {
         equipPanel.SetActive(false);
@@ -209,6 +210,7 @@ public class HeroInfoUI : UIBase
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
             Debug.Log($"[HeroLevelUpgrade] {heroData.heroName} 전투력 적용");
             requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
+            RequireLevelUpGold(heroData.PlayerModelSO.Level);
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
             RefreshHeroUI();
         }
@@ -251,7 +253,7 @@ public class HeroInfoUI : UIBase
         heroUI.RefreshAllCards();
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
-        requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
+        requirePiece = heroData.stage + (5 - (int)heroData.cardInfo.rarity) * (heroData.stage);
         RefreshHeroUI();
     }
 
