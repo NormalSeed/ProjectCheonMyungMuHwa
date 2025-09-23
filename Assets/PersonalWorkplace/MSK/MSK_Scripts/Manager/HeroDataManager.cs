@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 using VContainer.Unity;
-
+using System.Linq;
 #region Serializable
 [Serializable]
 public class HeroSaveList
@@ -25,6 +26,7 @@ public class HeroSaveData
 
 public class HeroDataManager : IStartable
 {
+    [Inject] private EquipmentManager equipmentManager;
     // 외부 참조용
     public static HeroDataManager Instance { get; private set; }
     // 초기화 여부
@@ -135,7 +137,7 @@ public class HeroDataManager : IStartable
         Instance = this;
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
-
+        Debug.Log("[HeroDataMagaer] Start 실행");
         WaitForHeroModelsAndInit();
     }
 
@@ -177,7 +179,9 @@ public class HeroDataManager : IStartable
             HeroData hero = JsonUtility.FromJson<HeroData>(json);
             ownedHeroes[heroId] = hero;
         }
+
         Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
+
         foreach (var hero in ownedHeroes.Values)
         {
             if (hero.PlayerModelSO == null)
@@ -188,12 +192,24 @@ public class HeroDataManager : IStartable
                     hero.PlayerModelSO = template.PlayerModelSO;
                     hero.cardInfo = template.cardInfo;
                 }
+                foreach (EquipmentType type in Enum.GetValues(typeof(EquipmentType)))
+                {
+                    var equip = equipmentManager.allEquipments
+                        .FirstOrDefault(e => e.charID == hero.cardInfo.HeroID && e.equipmentType == type);
+
+                    if (equip != null)
+                    {
+                        ApplyHeorStats(equip, hero.cardInfo.HeroID);
+                    }
+                    StatModifierManager.ApplyToCard(hero.cardInfo);
+                }
                 Debug.Log($"[LoadHeroDataFromFirebase] {hero.heroName} 전투력 적용");
-                StatModifierManager.ApplyToCard(hero.cardInfo);
             }
         }
+
         Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
     }
+
     #endregion
 
     // 로딩함수
@@ -330,4 +346,52 @@ public class HeroDataManager : IStartable
             hero.cardInfo.combatPower = power;
         }
     }
+
+    public void ApplyHeorStats(EquipmentInstance instance, string charId)
+    {
+        Debug.LogWarning($" [ApplyHeorStats] : {instance.statType}");
+        var value = instance.GetStat();
+        string originID = instance.instanceID;
+
+        switch (instance.statType)
+        {
+            case StatType.Attack:
+                StatModifierManager.ApplyModifier(charId,
+                    new StatModifier(StatType.Attack, value / 100f, ModifierSource.Equipment, originID, true));
+                StatModifierManager.ApplyModifier(charId,
+                    new StatModifier(StatType.Attack, value / 100f, ModifierSource.Equipment, originID, true));
+                break;
+            case StatType.Defense:
+                StatModifierManager.ApplyModifier(charId,
+                    new StatModifier(StatType.Defense, value / 100f, ModifierSource.Equipment, originID, true));
+                break;
+            case StatType.CritRate:
+                StatModifierManager.ApplyModifier(charId,
+                    new StatModifier(StatType.CritRate, value / 100f, ModifierSource.Equipment, originID));
+                break;
+            case StatType.CritDamage:
+                StatModifierManager.ApplyModifier(charId,
+                    new StatModifier(StatType.CritDamage, value / 100f, ModifierSource.Equipment, originID));
+                break;
+
+            default:
+                Debug.LogWarning($"알 수 없는 StatType: {instance.statType}");
+                break;
+        }
+    }
+    public EquipmentInstance GetEquipment(string charID, EquipmentType type)
+    {
+        Debug.Log("[GetEquipment] 진입");
+
+        var instance = equipmentManager.allEquipments
+            .FirstOrDefault(e => e.charID == charID && e.equipmentType == type);
+
+        if (instance == null)
+        {
+            Debug.LogWarning($"[GetEquipment] 장비 없음: {charID}, {type}");
+        }
+
+        return instance;
+    }
+
 }

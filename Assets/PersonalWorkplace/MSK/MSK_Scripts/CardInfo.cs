@@ -13,5 +13,8 @@ public class CardInfo : ScriptableObject
     public HeroRarity rarity;               // 레어도
     public HeroFaction faction;             // 소속
     public float combatPower;               // 최종 전투력
-    public PlayerModelSO PlayerModelSO;     // 모델SO 
+    public float HealthPoint;               // 표기 Hp 
+    public float ExtAtkPoint;               // 표기 외공
+    public float InnAtkPoint;               // 표기 내공
+    public float DefPoint;                  // 표기 방어
 }

@@ -16,6 +16,8 @@ public class EquipmentItemList : MonoBehaviour
     [Header("Button")]
     [SerializeField] private Button button;
 
+    public List<InventoryEquipButton> activeEquipButtons = new();
+
     #region Unity
     private void OnEnable()
     {
@@ -38,30 +40,26 @@ public class EquipmentItemList : MonoBehaviour
     public void ShowEquipmentListByTemplateID(string templateID)
     {
         cardPoolManager.ReturnAll(); // 기존 카드 초기화
+        activeEquipButtons.Clear();
 
         var filtered = equipmentManager.allEquipments.FindAll(e => e.templateID == templateID);
 
         Debug.Log($"[ShowEquipmentListByTemplateID] templateID: {templateID}, 장비 수: {filtered.Count}");
-
         foreach (var equip in filtered)
         {
             var card = cardPoolManager.GetCard();
             var display = card.GetComponent<EquipmentCardDisplay>();
             var button = card.GetComponent<InventoryEquipButton>();
 
-            if (display != null)
+            if (display != null) display.SetData(equip);
+            if (button != null)
             {
-                display.SetData(equip);
-            }
-            else
-            {
-                Debug.LogWarning($"[ShowEquipmentListByTemplateID] 카드에 EquipmentCardDisplay가 없습니다 - {equip.templateID}");
+                button.Init(equipPanel, equip);
+                activeEquipButtons.Add(button);
             }
 
             card.transform.SetAsLastSibling();
-            button.Init(equipPanel, equip);
             card.SetActive(true);
         }
     }
-
 }
