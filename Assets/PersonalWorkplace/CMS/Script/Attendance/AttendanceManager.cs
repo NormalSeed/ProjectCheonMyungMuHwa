@@ -9,118 +9,180 @@ public class AttendanceManager : MonoBehaviour
 {
     public static AttendanceManager Instance;
 
-    [SerializeField] private AttendanceCSVLoader csvLoader;
-    private Dictionary<int, AttendanceReward> rewardDict = new();
-    private const int totalDays = 14;
+    [Header("Config")]
+    public AttendanceCSVLoader csvLoader;
+    public int totalDays = 14;
 
+    private List<AttendanceReward> rewardTable;
     private DatabaseReference dbRef;
     private string uid;
-
-    public event Action OnAttendanceUpdated;
-
-    private DateTime cachedFirstLogin;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     private async void Start()
     {
-        // 보상 테이블 로드
-        foreach (var reward in csvLoader.LoadRewards())
-            rewardDict[reward.day] = reward;
+        if (csvLoader == null)
+        {
+            Debug.LogError("[Attendance] CSV Loader가 인스펙터에 연결되지 않았습니다!");
+            return;
+        }
 
-        uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "dev-local-test";
+        rewardTable = csvLoader.LoadRewards();
+        if (rewardTable == null || rewardTable.Count == 0)
+        {
+            Debug.LogError("[Attendance] CSV 로딩 실패 - rewardTable이 비어있음");
+            return;
+        }
+
+        uid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
 
-        await EnsureFirstLoginDate();
-        await RefreshAttendance();
+        bool claimed = await CheckAndClaimTodayReward();
+        if (claimed)
+        {
+            Debug.Log("[Attendance] 오늘 출석 보상 자동 수령됨");
+        }
+
+        await Task.Yield();
+        AttendanceUIManager.Instance?.ShowUI();
     }
 
-    // 최초 로그인일 없으면 서버 기준으로 저장
-    private async Task EnsureFirstLoginDate()
+
+
+    //오늘이 몇일차 출석인지 계산 (14일 루프 + 매월 1일 초기화)
+    private int GetTodayIndex(DateTime serverDate)
     {
-        var snapshot = await dbRef.Child("users").Child(uid).Child("attendance/firstLoginDate").GetValueAsync();
-        if (snapshot.Exists)
+        // 매월 1일이면 무조건 Day1부터 시작
+        if (serverDate.Day == 1)
+            return 1;
+
+        // 기준일(예시: 2025-01-01)로부터 며칠째인지
+        int todayDay = (int)(serverDate.Date - new DateTime(2025, 1, 1)).TotalDays + 1;
+        return ((todayDay - 1) % totalDays) + 1;
+    }
+
+    // 오늘 보상 자동 수령 (최초 접속 시)
+    public async Task<bool> CheckAndClaimTodayReward()
+    {
+        DateTime serverDate = await ServerTimeManager.GetServerTime();
+        int todayIndex = GetTodayIndex(serverDate);
+
+        string todayKey = serverDate.ToString("yyyyMMdd");
+        string lastDate = PlayerPrefs.GetString("LastAttendanceDate", "");
+
+        // 이미 오늘 수령함
+        if (todayKey == lastDate)
+            return false;
+
+        await ClaimReward(todayIndex);
+
+        // 로컬 저장
+        PlayerPrefs.SetString("LastAttendanceDate", todayKey);
+        PlayerPrefs.SetInt("LastAttendanceDay", todayIndex);
+        PlayerPrefs.Save();
+        PlayerPrefs.DeleteKey("LastAttendanceDate");
+
+        // 서버 저장
+        if (!string.IsNullOrEmpty(uid))
         {
-            cachedFirstLogin = DateTime.Parse(snapshot.Value.ToString());
+            var data = new Dictionary<string, object>
+            {
+                { "lastDay", todayIndex },
+                { "lastClaimedDate", todayKey }
+            };
+
+            await dbRef.Child("users").Child(uid).Child("attendance").UpdateChildrenAsync(data);
+        }
+
+        return true;
+    }
+
+    // 특정 일차 보상 지급 
+    public async Task ClaimReward(int day)
+    {
+        var rewardData = GetRewardForDay(day);
+        if (rewardData == null || rewardData.rewards == null)
+        {
+            Debug.LogError($"[Attendance] {day}일차 보상 데이터가 없음");
             return;
         }
 
-        DateTime serverTime = await ServerTimeManager.GetServerTime();
-        cachedFirstLogin = serverTime.Date;
-        await dbRef.Child("users").Child(uid).Child("attendance/firstLoginDate").SetValueAsync(cachedFirstLogin.ToString("yyyy-MM-dd"));
-    }
+        foreach (var reward in rewardData.rewards)
+        {
+            switch (reward.rewardType)
+            {
+                case RewardType.Currency:
+                    if (CurrencyManager.Instance == null)
+                    {
+                        Debug.LogError("[Attendance] CurrencyManager.Instance 가 초기화되지 않음");
+                        continue;
+                    }
+                    if (reward.currencyType != null)
+                        CurrencyManager.Instance.Model.Add(reward.currencyType.Value, new BigCurrency(reward.rewardCount, 0));
+                    break;
 
-    // 오늘이 몇 일차인지 계산
-    public int GetTodayIndex(DateTime serverTime)
+                case RewardType.Item:
+                case RewardType.Equipment:
+                    if (InventoryManager.Instance == null)
+                    {
+                        Debug.LogError("[Attendance] InventoryManager.Instance 가 초기화되지 않음");
+                        continue;
+                    }
+                    InventoryManager.Instance.Add(reward.rewardID, reward.rewardCount);
+                    break;
+            }
+        }
+
+        Debug.Log($"[Attendance] {day}일차 보상 지급 완료");
+        await Task.CompletedTask;
+    }
+    // 7일차 광고 보상 지급 (7~14일차 허용)
+    public async Task ClaimAdBonus(int day)
     {
-        int daysPassed = (serverTime.Date - cachedFirstLogin.Date).Days;
-        return (daysPassed % totalDays) + 1;
+        if (day < 7 || day > totalDays) return;
+
+        // CSV에서 "AdBonus" 같은 RewardType 따로 관리 가능
+        var rewardData = GetRewardForDay(day);
+        if (rewardData == null) return;
+
+        foreach (var reward in rewardData.rewards)
+        {
+            if (reward.rewardID.Contains("AdBonus")) // CSV에서 특별 보상 구분
+            {
+                InventoryManager.Instance.Add(reward.rewardID, reward.rewardCount);
+                Debug.Log($"[Attendance] {day}일차 광고 보상 지급 완료");
+            }
+        }
+
+        await Task.CompletedTask;
     }
 
+    // 보상 데이터 가져오기
     public AttendanceReward GetRewardForDay(int day)
     {
+        if (rewardTable == null || rewardTable.Count == 0)
+        {
+            Debug.LogError("[Attendance] rewardTable이 비어 있음");
+            return null;
+        }
+
         int cycleDay = ((day - 1) % totalDays) + 1;
-        return rewardDict.TryGetValue(cycleDay, out var reward) ? reward : null;
+        var reward = rewardTable.Find(r => r.day == cycleDay);
+
+        if (reward == null)
+            Debug.LogWarning($"[Attendance] {cycleDay}일차 보상을 찾을 수 없음 (CSV 확인 필요)");
+
+        return reward;
     }
 
-    // 보상 수령
-    public async Task ClaimTodayReward()
+    public int GetRewardForDayIndex(DateTime serverTime)
     {
-        DateTime serverTime = await ServerTimeManager.GetServerTime();
-        int todayDay = GetTodayIndex(serverTime);
-
-        var snapshot = await dbRef.Child("users").Child(uid).Child("attendance/lastDay").GetValueAsync();
-        int lastDay = snapshot.Exists ? int.Parse(snapshot.Value.ToString()) : 0;
-
-        if (todayDay <= lastDay)
-        {
-            Debug.Log("[Attendance] 이미 보상 수령 완료");
-            return;
-        }
-
-        var rewardData = GetRewardForDay(todayDay);
-        if (rewardData != null)
-        {
-            foreach (var reward in rewardData.rewards)
-                GrantReward(reward);
-        }
-
-        await dbRef.Child("users").Child(uid).Child("attendance/lastDay").SetValueAsync(todayDay);
-        Debug.Log($"[Attendance] {todayDay}일차 보상 지급 완료");
-
-        await RefreshAttendance();
-    }
-
-    private void GrantReward(Reward reward)
-    {
-        switch (reward.rewardType)
-        {
-            case RewardType.Currency:
-                if (reward.currencyType != null)
-                    CurrencyManager.Instance.Model.Add(
-                        reward.currencyType.Value,
-                        new BigCurrency(reward.rewardCount, 0)
-                    );
-                break;
-            case RewardType.Item:
-            case RewardType.Equipment:
-                InventoryManager.Instance.Add(reward.rewardID, reward.rewardCount);
-                break;
-        }
-    }
-
-    private async Task RefreshAttendance()
-    {
-        OnAttendanceUpdated?.Invoke();
-    }
-
-    public async Task<bool> IsClaimed(int day)
-    {
-        var snapshot = await dbRef.Child("users").Child(uid).Child("attendance/lastDay").GetValueAsync();
-        int lastDay = snapshot.Exists ? int.Parse(snapshot.Value.ToString()) : 0;
-        return day <= lastDay;
+        // 기준일 (예: 2025-01-01)
+        int todayDay = (int)(serverTime.Date - new DateTime(2025, 1, 1)).TotalDays + 1;
+        return ((todayDay - 1) % totalDays) + 1; // 1~14 사이로 변환
     }
 }
