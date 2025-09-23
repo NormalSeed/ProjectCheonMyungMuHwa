@@ -15,18 +15,15 @@ public class GachaRateInfoUI : MonoBehaviour
     [Header("Text Groups")]
     [SerializeField] private List<TextMeshProUGUI> heroRateTexts;
     [SerializeField] private List<TextMeshProUGUI> equipRateTexts;
-    [SerializeField] private List<TextMeshProUGUI> petRateTexts;
     [SerializeField] private TextMeshProUGUI summonLevelText;
 
     [Header("Panel")]
     [SerializeField] private GameObject herolegendPanel;
     [SerializeField] private GameObject equiplegendPanel;
-    [SerializeField] private GameObject petlegendPanel;
 
     [Header("Contents")]
     [SerializeField] private GameObject heroContents;
     [SerializeField] private GameObject equipContents;
-    [SerializeField] private GameObject petContents;
 
     private SummonCategory summonCategory;
 
@@ -138,11 +135,9 @@ public class GachaRateInfoUI : MonoBehaviour
     {
         herolegendPanel.SetActive(summonCategory == SummonCategory.heroList);
         equiplegendPanel.SetActive(summonCategory == SummonCategory.equipmentList);
-        petlegendPanel.SetActive(summonCategory == SummonCategory.PetList);
 
         heroContents.SetActive(summonCategory == SummonCategory.heroList);
         equipContents.SetActive(summonCategory == SummonCategory.equipmentList);
-        petContents.SetActive(summonCategory == SummonCategory.PetList);
     }
 
     private GameObject GetLegendPanel()
@@ -151,7 +146,6 @@ public class GachaRateInfoUI : MonoBehaviour
         {
             SummonCategory.heroList => herolegendPanel,
             SummonCategory.equipmentList => equiplegendPanel,
-            SummonCategory.PetList => petlegendPanel,
             _ => null
         };
     }
@@ -162,7 +156,6 @@ public class GachaRateInfoUI : MonoBehaviour
         {
             SummonCategory.heroList => heroRateTexts,
             SummonCategory.equipmentList => equipRateTexts,
-            SummonCategory.PetList => petRateTexts,
             _ => null
         };
     }

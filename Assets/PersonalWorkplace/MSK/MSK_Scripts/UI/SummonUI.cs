@@ -6,12 +6,10 @@ public class SummonUI : UIBase
     [Header("Panel")]
     [SerializeField] private GameObject heroSummon;
     [SerializeField] private GameObject equipSummon;
-    [SerializeField] private GameObject petSummon;
 
     [Header("Button")]
     [SerializeField] private Button heroBtn;
     [SerializeField] private Button equipBtn;
-    [SerializeField] private Button petBtn;
 
     #region Unity
     private void OnEnable()
@@ -23,12 +21,10 @@ public class SummonUI : UIBase
     private void OnDisable()
     {
         heroSummon.SetActive(true);
-        equipSummon.SetActive(false);
-        petSummon.SetActive(false);
+        equipSummon.SetActive(false);;
 
         heroBtn.onClick.RemoveListener(onClickHeroButton);
         equipBtn.onClick.RemoveListener(onClickEquipButton);
-        petBtn.onClick.RemoveListener(onClickPetButton);
     }
     #endregion
 
@@ -37,7 +33,6 @@ public class SummonUI : UIBase
     {
         heroBtn.onClick.AddListener(onClickHeroButton);
         equipBtn.onClick.AddListener(onClickEquipButton);
-        petBtn.onClick.AddListener(onClickPetButton);
     }
     #endregion
 
@@ -46,19 +41,16 @@ public class SummonUI : UIBase
     {
         heroSummon.SetActive(true);
         equipSummon.SetActive(false);
-        petSummon.SetActive(false);
     }
     private void onClickEquipButton()
     {
         heroSummon.SetActive(false);
         equipSummon.SetActive(true);
-        petSummon.SetActive(false);
     }
     private void onClickPetButton()
     {
         heroSummon.SetActive(false);
         equipSummon.SetActive(false);
-        petSummon.SetActive(true);
     }
     #endregion
 }
