@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using System.Threading.Tasks;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class SummonEquipUI : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class SummonEquipUI : MonoBehaviour
     [SerializeField] private Button summon50thTimesButton;  // 50챠
     [SerializeField] private Button summonInfo;             // 확률정보
     [SerializeField] private Button summonResult;
+
+    [Header("ButtonSet")]
+    [SerializeField] private List<GachaButton> summonButtons;      // 버튼 스크립트   
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI summonLevelText;   // 소환레벨 텍스트
@@ -33,6 +37,7 @@ public class SummonEquipUI : MonoBehaviour
     private BigCurrency currency;
     private int summonCount;
     private int requireCount;
+    private int inputTimes;
     private SummonLevel userSummonLevel;
     #endregion
 
@@ -40,14 +45,13 @@ public class SummonEquipUI : MonoBehaviour
     private void OnEnable()
     {
         Init();
-
     }
 
     private void OnDisable()
     {
-        summonButton.onClick.RemoveListener(onClickSummon);
-        summon10thButton.onClick.RemoveListener(onClickSummon10th);
-        summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
+        summonButton.onClick.RemoveListener(OnClickSummon);
+        summon10thButton.onClick.RemoveListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.RemoveListener(OnClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
     }
 
@@ -60,39 +64,45 @@ public class SummonEquipUI : MonoBehaviour
     private void ButtonInit()
     {
         summonInfo.onClick.AddListener(OnClickShowInfo);
-        summonButton.onClick.AddListener(onClickSummon);
-        summon10thButton.onClick.AddListener(onClickSummon10th);
-        summon50thTimesButton.onClick.AddListener(onClickSummon50th);
+        summonButton.onClick.AddListener(OnClickSummon);
+        summon10thButton.onClick.AddListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.AddListener(OnClickSummon50th);
     }
     #endregion
 
     #region Button OnClick
-    private void onClickSummon()
+    private void OnClickSummon()
     {
-        currency = BigCurrency.FromBaseAmount(1);
+        inputTimes = 1;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
             return;
-        SummonHeros(1);
+
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 1);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
     }
-    private void onClickSummon10th()
+    private void OnClickSummon10th()
     {
-        currency = BigCurrency.FromBaseAmount(1);
+        inputTimes = 10;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
             return;
-        SummonHeros(10);
+
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 10);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
     }
-    private void onClickSummon50th()
+    private void OnClickSummon50th()
     {
-        currency = BigCurrency.FromBaseAmount(1);
+        inputTimes = 50;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
             return;
-        SummonHeros(50);
+
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 50);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
     }
     private void OnClickShowInfo()
     {
@@ -138,11 +148,6 @@ public class SummonEquipUI : MonoBehaviour
         await gachaManager.Summon(times);
     }
 
-
-    private void ChangeButtonText()
-    {
-        /*   TODO : 가진 재화를 확인하여 소환 타입을 설정하기   */
-    }
     #endregion
 
     #region Public
@@ -151,6 +156,13 @@ public class SummonEquipUI : MonoBehaviour
     {
         SummonLevelChange();
         InterActButtons(true);
+        foreach (var gachaButton in summonButtons)
+        {
+            if (gachaButton != null)
+            {
+                gachaButton.ButtonImageSetting(gachaButton.inputTimes);
+            }
+        }
     }
     #endregion
 }

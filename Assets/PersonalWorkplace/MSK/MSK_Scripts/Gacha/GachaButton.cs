@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class GachaButton : MonoBehaviour
 {
     [Header("SummmonCount")]
-    [SerializeField] private int inputTimes;
+    [SerializeField] public int inputTimes;
 
     [Header("Image")]
     [SerializeField] private Image buttonImage;
@@ -25,10 +25,9 @@ public class GachaButton : MonoBehaviour
     }
     #endregion
 
-    #region Private
-    private void ButtonImageSetting(int times)
+    #region public
+    public void ButtonImageSetting(int times)
     {
-        BigCurrency currency = BigCurrency.FromBaseAmount(times);
         BigCurrency ticketCost = BigCurrency.FromBaseAmount(times);
         BigCurrency spiritStoneCost = BigCurrency.FromBaseAmount(times * 100);
 
