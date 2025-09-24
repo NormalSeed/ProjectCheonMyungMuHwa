@@ -1,27 +1,35 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using VContainer;
 
 public class AttendanceUIManager : MonoBehaviour
 {
     public static AttendanceUIManager Instance;
 
     [Header("UI Elements")]
-    public GameObject panel;                 // 출석 UI 전체 패널
-    public Transform slotParent;             // 슬롯들이 붙을 부모
-    public AttendanceSlot slotPrefab;        // 슬롯 프리팹
-    public Button closeButton;               // 닫기 버튼
-    public TextMeshProUGUI titleText;        // "출석 체크" 제목
+    public GameObject panel;
+    public Transform slotParent;
+    public AttendanceSlot slotPrefab;
+    public Button closeButton;
+    public TextMeshProUGUI titleText;
 
     private List<AttendanceSlot> slots = new();
     private int totalDays = 14;
+
+    private TableManager _tableManager;
+
+    [Inject]
+    public void Construct(TableManager tableManager)
+    {
+        _tableManager = tableManager;
+    }
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-
         panel.SetActive(false);
     }
 
@@ -30,62 +38,64 @@ public class AttendanceUIManager : MonoBehaviour
         closeButton.onClick.AddListener(() => panel.SetActive(false));
     }
 
-    /// <summary> 출석 UI 표시 및 슬롯 갱신 </summary>
-    public async void ShowUI()
+    public void ShowUI()
     {
-        panel.SetActive(true);
-
-        // 서버 시간 기준 오늘 몇일차인지 가져오기
-        var serverTime = await ServerTimeManager.GetServerTime();
-        int todayIndex = AttendanceManager.Instance.GetRewardForDayIndex(serverTime);
-
-        // 마지막 수령한 날짜 확인
-        string todayKey = serverTime.ToString("yyyyMMdd");
-        string lastDate = PlayerPrefs.GetString("LastAttendanceDate", "");
-
-        RefreshSlots(todayIndex, todayKey == lastDate);
+        if (!panel.activeSelf)
+        {
+            panel.SetActive(true);
+            Debug.Log("[AttendanceUIManager] Panel 활성화됨");
+        }
+        RefreshSlots();
     }
 
-    /// <summary> 슬롯 생성 및 상태 갱신 </summary>
-    private void RefreshSlots(int todayIndex, bool alreadyClaimed)
+    private void RefreshSlots()
     {
-        // 슬롯 없으면 생성
         if (slots.Count == 0)
         {
-            for (int i = 1; i <= totalDays; i++)
+            for (int i = 0; i < totalDays; i++)
             {
                 var slotObj = Instantiate(slotPrefab, slotParent);
                 slots.Add(slotObj);
+                Debug.Log($"[AttendanceUIManager] 슬롯 {slots.Count}개 생성됨");
             }
         }
 
-        // 각 슬롯 갱신
+        int currentDay = AttendanceManager.Instance.GetCurrentAttendanceDay();
+        Debug.Log($"[AttendanceUIManager] 현재 출석일: {currentDay}");
+        string lastDate = PlayerPrefs.GetString("LastAttendanceDate", "");
+        string todayKey = System.DateTime.Now.ToString("yyyyMMdd"); // 간단한 비교용. 실제 시간은 서버시간 기준으로.
+        bool hasClaimedToday = lastDate == todayKey;
+
         for (int i = 0; i < totalDays; i++)
         {
             int day = i + 1;
             var rewardData = AttendanceManager.Instance.GetRewardForDay(day);
             var slot = slots[i];
 
-            bool isToday = (day == todayIndex);
-            bool isClaimed = (day < todayIndex) || (isToday && alreadyClaimed);
+            bool isClaimed = day < currentDay || (day == currentDay && hasClaimedToday);
+            bool isToday = day == currentDay;
 
-            slot.SetData(rewardData, day, isToday, isClaimed);
+            slot.SetData(rewardData, day, isToday, isClaimed, _tableManager);
 
-            // 7일차/14일차 → 금색 테두리 강조
-            if (day % 7 == 0)
-                slot.HighlightAsSpecial();
-            else
-                slot.ResetHighlight();
-
-            // 광고 버튼은 7일차에만 표시
-            if (day == 7 || day == 14)
+            bool adButtonActive = false;
+            if (day == 7)
             {
-                slot.SetAdButtonActive(isToday && alreadyClaimed);
+                // 7일차 광고는 현재 출석일이 7일 이상이고, 아직 보상을 받지 않았다면 활성화
+                if (currentDay >= 7 && !AttendanceManager.Instance.IsAdRewardClaimed(7))
+                {
+                    adButtonActive = true;
+                }
             }
-            else
+            else if (day == 14)
             {
-                slot.SetAdButtonActive(false);
+                // 14일차 광고는 정확히 14일차이고, 기본 보상을 받았고, 아직 광고 보상을 받지 않았다면 활성화
+                if (currentDay == 14 && hasClaimedToday && !AttendanceManager.Instance.IsAdRewardClaimed(14))
+                {
+                    adButtonActive = true;
+                }
             }
+
+            slot.SetAdButtonActive(adButtonActive);
         }
     }
 }
