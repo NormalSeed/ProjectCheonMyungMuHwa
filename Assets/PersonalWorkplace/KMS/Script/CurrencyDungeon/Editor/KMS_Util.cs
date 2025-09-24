@@ -38,6 +38,44 @@ public static class KMS_Util
 
     AssetDatabase.SaveAssets();
   }
+[MenuItem("Utilities/Generate Monster State Data Scriptable Object")]
+  public static void GenMonsterStateDataTable()
+  {
+    string[] stateAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monsterstate.csv");
+    string[] currencyAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monstercurrency.csv");
+    MonsterStateDataTableSO so = ScriptableObject.CreateInstance<MonsterStateDataTableSO>();
+    for (int i = 3; i < stateAllLines.Length; i++)
+    {
+      string[] ss = stateAllLines[i].Split(',');
+      string[] sc = currencyAllLines[i].Split(',');
+      MonsterStateData monster = new MonsterStateData()
+      {
+        HP = double.Parse(ss[1]),
+        Attack = float.Parse(ss[2]),
+        ExpPowArmor = float.Parse(ss[3]),
+        InnPowArmor = float.Parse(ss[4]),
+        GoldRate = float.Parse(sc[1]),
+        SoulRate = float.Parse(sc[2]),
+        SpiritRate = float.Parse(sc[3])
+      };
+      MonsterStateData boss = new MonsterStateData()
+      {
+        HP = double.Parse(ss[5]),
+        Attack = float.Parse(ss[6]),
+        ExpPowArmor = float.Parse(ss[7]),
+        InnPowArmor = float.Parse(ss[8]),
+        GoldRate = float.Parse(sc[4]),
+        SoulRate = float.Parse(sc[5]),
+        SpiritRate = float.Parse(sc[6])
+      };
+      so.NormalMonster.Add(monster);
+      so.BossMonster.Add(boss);
+    }
+    AssetDatabase.CreateAsset(so, $"Assets/PersonalWorkplace/KMS/Script/SO/monsterStateTable.asset");
+    AssetDatabase.SaveAssets();
+
+
+  }
 
   public static Dictionary<CurrencyDungeonType, string> DungeonTypeToName = new Dictionary<CurrencyDungeonType, string>()
   {

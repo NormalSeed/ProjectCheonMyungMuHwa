@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum MonsterColor { Green, Red, Blue, Black}
 public class MonsterModel : MonoBehaviour
 {
   public ObservableProperty<double> CurHealth;
@@ -20,6 +20,9 @@ public class MonsterModel : MonoBehaviour
 
   public MonsterModelBaseSO BaseModel { get; set; }
 
+  private MonsterColor skinColor;
+  public int Door => BaseModel.CurrentDoor % 100; // 1~ 98, 99, 0, 1 ..
+
   void Awake()
   {
     allColors = new();
@@ -37,42 +40,25 @@ public class MonsterModel : MonoBehaviour
   public virtual void InitSprite()
   {
     if (!paletteSwap) return;
-    int stage = BaseModel.CurrentStage;
-    if (stage < 100)
-    {
-      SetSprite(tex.Orc_1);
-    }
-    else if (stage < 200)
-    {
-      SetSprite(tex.Orc_2);
-    }
-    else if (stage < 300)
-    {
-      SetSprite(tex.Orc_3);
-    }
-    else if (stage < 400)
+    if (Door == 0)
     {
       SetSprite(tex.Orc_4);
     }
-  }
-  public virtual void PlaySpawnEffect()
-  {
-    int stage = BaseModel.CurrentStage;
-    if (stage < 100)
+    if (Door <= 25)
     {
-      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+      SetSprite(tex.Orc_1);
     }
-    else if (stage < 200)
+    else if (Door <= 50)
     {
-      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+      SetSprite(tex.Orc_2);
     }
-    else if (stage < 300)
+    else if (Door <= 75)
     {
-      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+      SetSprite(tex.Orc_3);
     }
-    else if (stage < 400)
+    else
     {
-      ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+      SetSprite(tex.Orc_4);
     }
   }
   protected void SetSprite(Dictionary<string, Sprite> dict)

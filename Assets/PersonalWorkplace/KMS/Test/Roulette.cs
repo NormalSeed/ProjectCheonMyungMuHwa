@@ -6,8 +6,7 @@ public class Roulette : MonoBehaviour
 {
     [SerializeField] bool clockwise;
     [SerializeField] float defaultDPS;
-    [SerializeField] Transform roulette;
-    [SerializeField] float targetDeg;
+    private float targetDeg;
     [SerializeField] int samplingCount;
 
     private Vector3 axis;
@@ -20,20 +19,22 @@ public class Roulette : MonoBehaviour
     private float speed = 0;
     private int index = 0;
 
+    public System.Action OnEnd;
+
     void Awake()
     {
         sample = new();
         axis = clockwise ? Vector3.back : Vector3.forward;
-        int a = Random.Range(12, 15);
-        targetRotate = clockwise ? targetDeg : 360 - targetDeg;
-        targetRotate += 360 * a;
-        Sampling();
-        GetAverage();
     }
     void Update()
     {
         if (!isStarted) return;
-        if (targetRotate <= 0) return;
+        if (targetRotate <= 0)
+        {
+            isStarted = false;
+            OnEnd?.Invoke();
+            return;
+        }
         if (timer <= 0)
         {
             timer = average;
@@ -58,13 +59,19 @@ public class Roulette : MonoBehaviour
         {
             rotate *= delta;
         }
-        roulette.Rotate(axis, rotate);
+        transform.Rotate(axis, rotate);
         targetRotate -= rotate;
         timer = temp;
     }
 
-    public void Start()
+    public void StartRoulette(float targetDeg)
     {
+        this.targetDeg = targetDeg;
+        int a = Random.Range(5, 6);
+        targetRotate = clockwise ? targetDeg : 360 - targetDeg;
+        targetRotate += 360 * a;
+        Sampling();
+        GetAverage();
         isStarted = true;
     }
 

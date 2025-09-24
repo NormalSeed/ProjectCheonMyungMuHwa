@@ -18,7 +18,7 @@ public class PoolManager : MonoBehaviour
     public DefaultPool<MonsterProjectile> MagicPool;
     public DefaultPool<DroppedItem> ItemPool;
 
-    int currentstage;
+    int currentDoor;
 
     [SerializeField] private MonsterModelBaseSO normalOrcModel;
     [SerializeField] private MonsterModelBaseSO bossModel;
@@ -71,18 +71,17 @@ public class PoolManager : MonoBehaviour
             boss.SetActive(false);
         }
     }
-    //현재 스테이지에 따른 몬스터, 보스 스텟 설정 (1~1200)
-    public void SetMonsterState(int stage)
+    //현재 관문에 따른 몬스터, 보스 스텟 설정 
+    public void SetMonsterState(int door)
     {
-        currentstage = stage;
-        normalOrcModel.SetFinal(stage);
-        bossModel.SetFinalBoss(stage, normalOrcModel);
+        currentDoor = door;
+        normalOrcModel.SetState(door);
+        bossModel.SetBossState(door);
     }
 
     //지정된 위치에 몬스터 소환
     public void SpawnMonster(Vector2 pos, MonsterType type)
     {
-        Debug.Log($"<color=green> 소환 시도 </color>");
         if (type == MonsterType.Punch)
         {
             ActiveMonster(PunchPool, pos);
@@ -113,17 +112,16 @@ public class PoolManager : MonoBehaviour
     private void ActiveBoss(Vector2 pos)
     {
         AudioManager.Instance.PlaySound("Monster_Recall_New");
-        int door = (currentstage + 2) / 3;
-        int last = door % 10;
+        int last = currentDoor % 10;
         string str = "";
         switch (last)
         {
             case 0:
-                if (door % 100 == 0)
+                if (currentDoor % 50 == 0)
                 {
                     str = "100Boss";
                 }
-                else if (door % 50 == 0)
+                else if (currentDoor % 25 == 0)
                 {
                     str = "50Boss";
                 }
@@ -133,7 +131,7 @@ public class PoolManager : MonoBehaviour
             case 2: case 7: str = "StickBoss"; break;
             case 3: case 8: str = "CaneBoss"; break;
             case 4: case 9: str = "BowBoss"; break;
-            default: str = ""; break;
+            default: str = "PunchBoss"; break;
         }
         bosscon = bosses[str];
         bosscon.transform.position = pos;

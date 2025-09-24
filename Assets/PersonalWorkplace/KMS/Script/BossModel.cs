@@ -8,9 +8,17 @@ public class BossModel : MonsterModel
   public override void InitSprite()
   {
     if (!paletteSwap) return;
-    int stage = BaseModel.CurrentStage;
+    if (Door == 0)
+    {
+      SetSprite(tex.Orc_4);
+      clothes[0].color = Color.magenta;
+      clothes[1].color = Color.magenta;
+      clothes[2].color = Color.magenta;
+      clothes[3].color = Color.magenta;
+      clothes[4].color = Color.magenta;
+    }
 
-    if (stage < 100)
+    else if (Door <= 25)
     {
       SetSprite(tex.Orc_1);
       clothes[0].color = Color.white;
@@ -19,7 +27,7 @@ public class BossModel : MonsterModel
       clothes[3].color = Color.white;
       clothes[4].color = Color.white;
     }
-    else if (stage < 200)
+    else if (Door <= 50)
     {
       SetSprite(tex.Orc_2);
       clothes[0].color = Color.red;
@@ -28,7 +36,7 @@ public class BossModel : MonsterModel
       clothes[3].color = Color.red;
       clothes[4].color = Color.red;
     }
-    else if (stage < 300)
+    else if (Door <= 75)
     {
       SetSprite(tex.Orc_3);
       clothes[0].color = Color.blue;
@@ -37,7 +45,7 @@ public class BossModel : MonsterModel
       clothes[3].color = Color.blue;
       clothes[4].color = Color.blue;
     }
-    else if (stage < 400)
+    else
     {
       SetSprite(tex.Orc_4);
       clothes[0].color = Color.magenta;
