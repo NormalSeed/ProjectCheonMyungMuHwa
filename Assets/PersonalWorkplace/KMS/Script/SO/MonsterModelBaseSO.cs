@@ -1,123 +1,80 @@
-using System.ComponentModel;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MonsterModelBaseSO", menuName = "Scriptable Objects/MonsterModelBaseSO")]
 public class MonsterModelBaseSO : ScriptableObject
 {
-  public double baseMaxHealth;
-  public double baseAttackPower;
-  public double baseOuterDefense;
-  public double baseInnerDefense;
+  [SerializeField] MonsterStateDataTableSO table;
+  public MonsterStateData data;
 
-  public double finalMaxHealth;
-  public double finalAttackPower;
-  public double finalOuterDefense;
-  public double finalInnerDefense;
+  public double finalMaxHealth => data.HP;
+  public double finalAttackPower => data.Attack;
+  public double finalOuterDefense => data.ExpPowArmor;
+  public double finalInnerDefense => data.InnPowArmor;
 
-  public int GoldQuant;
-  public int SpiritBackQuant;
-  public int SoulStoneQuant;
-
-  public float NormalChestDropChance;
-  public float RareChestDropChance;
-
-  public int CurrentStage;
+  public float GoldQuant => data.GoldRate;
+  public float SpiritBackQuant => data.SpiritRate;
+  public float SoulStoneQuant => data.SoulRate;
+  public int CurrentDoor;
 
 
 
-  //초기 값부터 계산
-  public void SetFinal(int stage)
+  public void SetState(int door)
   {
-    CurrentStage = stage;
-    finalMaxHealth = baseMaxHealth;
-    finalAttackPower = baseAttackPower;
-    for (int i = 2; i <= stage; i++)
-    {
-      int last = i % 100;
-      if (last == 51 || last == 81 || last == 91)
-      {
-        finalMaxHealth *= 1.14;
-      }
-      else if (i > 200 && last == 1)
-      {
-        finalMaxHealth *= 1.18;
-      }
-      else
-      {
-        finalMaxHealth *= 1.07;
-      }
-      finalAttackPower *= 1.009;
-    }
-
-    GoldQuant = stage;
-    SpiritBackQuant = stage;
-    SoulStoneQuant = stage;
-    NormalChestDropChance = 1;
-    RareChestDropChance = 1;
-  }
-  //다음 스테이지에 맞게 업데이트 (계산 부담 줄이는 용도)
-  public void UpdateFinal(int stage)
-  {
-    int last = stage % 100;
-    if (last == 51 || last == 81 || last == 91)
-    {
-      finalMaxHealth *= 1.14;
-    }
-    else if (stage > 200 && last == 1)
-    {
-      finalMaxHealth *= 1.18;
-    }
-    else
-    {
-      finalMaxHealth *= 1.07;
-    }
-    finalAttackPower *= 1.009;
-
+    CurrentDoor = door;
+    data = table.NormalMonster[CurrentDoor - 1];
   }
   // 보스의 경우 이것을 이용
-  public void SetFinalBoss(int stage, MonsterModelBaseSO model)
+  public void SetBossState(int door)
   {
-    CurrentStage = stage;
-    finalOuterDefense = baseOuterDefense;
-    finalInnerDefense = baseInnerDefense;
-    if (stage == 50 || stage == 100)
-    {
-      finalMaxHealth = model.finalMaxHealth * 7.5;
-    }
-    else
-    {
-      finalMaxHealth = model.finalMaxHealth * 5;
-    }
-    finalAttackPower = model.finalAttackPower * 3;
-
-    if (stage >= 101)
-    {
-      finalOuterDefense -= 14700;
-      finalInnerDefense -= 14850;
-    }
-    if (stage >= 102)
-    {
-      int count = Mathf.Min(stage - 101, 99);
-      finalOuterDefense += count * 300;
-      finalInnerDefense += count * 150;
-    }
-    if (stage >= 201)
-    {
-      finalOuterDefense -= 14850;
-      finalInnerDefense -= 14850;
-    }
-    if (stage >= 202)
-    {
-      int count = Mathf.Min(stage - 201, 99);
-      finalOuterDefense += count * 150;
-      finalInnerDefense += count * 150;
-    }
-    if (stage >= 301)
-    {
-      int count = Mathf.Min(stage - 300, 99);
-      finalOuterDefense += count * 300;
-      finalInnerDefense += count * 300;
-    }
+    CurrentDoor = door;
+    data = table.BossMonster[CurrentDoor - 1];
+    //if (CurrentDoor == door) return;
+    //CurrentDoor = door;
+    //finalOuterDefense = baseOuterDefense;
+    //finalInnerDefense = baseInnerDefense;
+    //int final = CurrentDoor % 100;
+    //if (final == 25 || final == 50)
+    //{
+    //  finalMaxHealth = model.finalMaxHealth * 6;
+    //}
+    //else if (final == 0 || final == 75)
+    //{
+    //  finalMaxHealth = model.finalMaxHealth * 7.5;
+    //}
+    //else
+    //{
+    //  finalMaxHealth = model.finalMaxHealth * 5;
+    //}
+    //finalAttackPower = model.finalAttackPower * 3;
+    //
+    //if (door >= 26)
+    //{
+    //  finalOuterDefense -= 14700;
+    //  finalInnerDefense -= 14850;
+    //}
+    //if (door >= 102)
+    //{
+    //  int count = Mathf.Min(door - 101, 99);
+    //  finalOuterDefense += count * 300;
+    //  finalInnerDefense += count * 150;
+    //}
+    //if (door >= 201)
+    //{
+    //  finalOuterDefense -= 14850;
+    //  finalInnerDefense -= 14850;
+    //}
+    //if (door >= 202)
+    //{
+    //  int count = Mathf.Min(door - 201, 99);
+    //  finalOuterDefense += count * 150;
+    //  finalInnerDefense += count * 150;
+    //}
+    //if (door >= 301)
+    //{
+    //  int count = Mathf.Min(door - 300, 99);
+    //  finalOuterDefense += count * 300;
+    //  finalInnerDefense += count * 300;
+    //}
 
 
   }

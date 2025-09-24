@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using VContainer;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public enum MonsterAnimationState
 {
@@ -28,6 +29,8 @@ public class BossController : MonsterController
 
     [SerializeField] protected string attackSound;
 
+    [SerializeField] protected string spawnEffect;
+
     [Inject]
     public void Construct(Image bossbar)
     {
@@ -50,26 +53,31 @@ public class BossController : MonsterController
     }
     public override void PlaySpawnEffect()
     {
-        int stage = Model.BaseModel.CurrentStage;
-        if (stage < 100)
+        if (spawnEffect != "")
+        {
+            ParticleManager.Instance.GetParticle(spawnEffect, transform.position);
+            return;
+        }
+        int door = Model.Door;
+        if (door == 0)
+        {
+            ParticleManager.Instance.GetParticle("Boss_4_Recall", transform.position);
+        }
+        if (door <= 25)
         {
             ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
         }
-        else if (stage < 200)
+        else if (door <= 50)
         {
-            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+            ParticleManager.Instance.GetParticle("Boss_2_Recall", transform.position);
         }
-        else if (stage < 300)
+        else if (door <= 75)
         {
-            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
-        }
-        else if (stage < 400)
-        {
-            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+            ParticleManager.Instance.GetParticle("Boss_3_Recall", transform.position);
         }
         else
         {
-            ParticleManager.Instance.GetParticle("Boss_1_Recall", transform.position);
+            ParticleManager.Instance.GetParticle("Boss_4_Recall", transform.position);
         }
     }
     public override void OnDeath()
@@ -86,8 +94,7 @@ public class BossController : MonsterController
     protected override void DropItem()
     {
         if (DoNotDropItem) return;
-        int stage = Model.BaseModel.CurrentStage;
-        int door = (stage + 2) / 3;
+        int door = Model.BaseModel.CurrentDoor;
         if (door >= 2)
         {
             DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
