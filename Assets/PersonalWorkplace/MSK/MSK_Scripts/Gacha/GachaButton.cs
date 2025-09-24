@@ -1,46 +1,62 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 public class GachaButton : MonoBehaviour
 {
     [Header("SummmonCount")]
-    [SerializeField] private int inputTimes;
+    [SerializeField] public int inputTimes;
 
     [Header("Image")]
-    [SerializeField] private Image Image;
-    [SerializeField] private Sprite Tickets;
-    [SerializeField] private Sprite Jam;
+    [SerializeField] private Image buttonImage;
+    [SerializeField] private Sprite ticketSprite;
+    [SerializeField] private Sprite spiritStoneSprite;
 
     [Header("Button")]
-    [SerializeField] private Button Button;
+    [SerializeField] private Button summonButton;
 
-
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI buttonText;
+    [SerializeField] private CurrencyType currencyType;
     #region Unity
     private void OnEnable()
     {
-        Button.interactable= true;
         ButtonImageSetting(inputTimes);
     }
     #endregion
 
-    #region Private
-    private void ButtonImageSetting(int times)
+    #region public
+    public void ButtonImageSetting(int times)
     {
-        BigCurrency currency = BigCurrency.FromBaseAmount(times);
+        BigCurrency ticketCost = BigCurrency.FromBaseAmount(times);
+        BigCurrency spiritStoneCost = BigCurrency.FromBaseAmount(times * 100);
+
         // 만약에 보유중인 뽑기권의 개수가 인풋보다 크다면
-        if (CurrencyManager.Instance.Model.Get(CurrencyType.InvitationTicket) > currency)
+
+        var model = CurrencyManager.Instance.Model;
+
+        // 이미지 설정
+        // 상호작용 여부
+        // 텍스트 설정
+
+        // 만약에 보유중인 뽑기권의 개수가 인풋보다 크다면
+        if (model.Get(currencyType) > ticketCost)
         {
-            Image.sprite = Tickets;
-        } // 인풋보다 보유중인 용옥이 충분하면
-        else if (CurrencyManager.Instance.Model.Get(CurrencyType.SpiritStone) > (currency * 100))
+            buttonImage.sprite = ticketSprite;
+            summonButton.interactable = true;
+            buttonText.text = $"{ticketCost} 개";
+        }// 인풋보다 보유중인 용옥이 충분하면
+        else if (model.Get(CurrencyType.SpiritStone) > spiritStoneCost)
         {
-            Image.sprite = Jam;
+            buttonImage.sprite = spiritStoneSprite;
+            summonButton.interactable = true;
+            buttonText.text = $"{spiritStoneCost} 개";
         }
-        else  // 용옥도 모자라다면 작동 불가
+        else // 용옥도 모자라다면 작동 불가
         {
-            Image.sprite = Jam;
-            Button.interactable = false;
+            buttonImage.sprite = spiritStoneSprite;
+            summonButton.interactable = false;
+            buttonText.text = $"<color=red>{spiritStoneCost} 개</color>";
         }
     }
     #endregion

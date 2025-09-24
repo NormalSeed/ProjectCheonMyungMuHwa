@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -12,6 +13,9 @@ public class SummonHeroUI : UIBase
     [SerializeField] private Button summon50thTimesButton;  // 50챠
     [SerializeField] private Button summonInfo;             // 확률정보
     [SerializeField] private Button summonResult;
+
+    [Header("ButtonSet")]
+    [SerializeField] private List<GachaButton> summonButtons;      // 버튼 스크립트   
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI summonLevelText;   // 소환레벨 텍스트
@@ -33,6 +37,7 @@ public class SummonHeroUI : UIBase
     private BigCurrency currency;
     private int summonCount;
     private int requireCount;
+    private int inputTimes;
     private SummonLevel userSummonLevel;
     #endregion
 
@@ -45,9 +50,9 @@ public class SummonHeroUI : UIBase
 
     private void OnDisable()
     {
-        summonButton.onClick.RemoveListener(onClickSummon);
-        summon10thButton.onClick.RemoveListener(onClickSummon10th);
-        summon50thTimesButton.onClick.RemoveListener(onClickSummon50th);
+        summonButton.onClick.RemoveListener(OnClickSummon);
+        summon10thButton.onClick.RemoveListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.RemoveListener(OnClickSummon50th);
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
     }
 
@@ -60,30 +65,43 @@ public class SummonHeroUI : UIBase
     private void ButtonInit()
     {
         summonInfo.onClick.AddListener(OnClickShowInfo);
-        summonButton.onClick.AddListener(onClickSummon);
-        summon10thButton.onClick.AddListener(onClickSummon10th);
-        summon50thTimesButton.onClick.AddListener(onClickSummon50th);
+        summonButton.onClick.AddListener(OnClickSummon);
+        summon10thButton.onClick.AddListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.AddListener(OnClickSummon50th);
     }
     #endregion
 
     #region Button OnClick
-    private void onClickSummon()
+    private void OnClickSummon()
     {
-        SummonHeros(1);
+        inputTimes = 1;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 1);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
     }
-    private void onClickSummon10th()
+    private void OnClickSummon10th()
     {
-        SummonHeros(10);
+        inputTimes = 10;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 10);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
     }
-    private void onClickSummon50th()
+    private void OnClickSummon50th()
     {
-        SummonHeros(50);
+        inputTimes = 50;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
+
+        SummonHeros(inputTimes);
         InterActButtons(false);
-        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 50);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
     }
     private void OnClickShowInfo()
     {
@@ -129,6 +147,13 @@ public class SummonHeroUI : UIBase
     {
         SummonLevelChange();
         InterActButtons(true);
+        foreach (var gachaButton in summonButtons)
+        {
+            if (gachaButton != null)
+            {
+                gachaButton.ButtonImageSetting(gachaButton.inputTimes);
+            }
+        }
     }
     #endregion
 }

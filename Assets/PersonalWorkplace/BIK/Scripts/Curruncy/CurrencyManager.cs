@@ -65,11 +65,8 @@ public class CurrencyManager : IStartable, IDisposable
     {
         public int SummonCount { get; set; } = 1;
         public int EquipSummonCount { get; set; } = 1;
-        public int PetSummonCount { get; set; } = 1;
-
         public SummonLevel SummonLevel { get; set; } = SummonLevel.level01;
         public SummonLevel EquipSummonLevel { get; set; } = SummonLevel.level01;
-        public SummonLevel PetSummonLevel { get; set; } = SummonLevel.level01;
     }
     #endregion // constructor
 
@@ -381,22 +378,6 @@ public class CurrencyManager : IStartable, IDisposable
             else {
                 Debug.LogWarning("[LoadUserProfileAsync] equipsummonCount가 DB에 없습니다. 기본값 사용");
             }
-
-            // 영물 소환 데이터
-            if (snapshot.HasChild("petsummonLevel")) {
-                int petLevelValue = Convert.ToInt32(snapshot.Child("petsummonLevel").Value);
-                result.PetSummonLevel = (SummonLevel)petLevelValue;
-            }
-            else {
-                Debug.LogWarning("[LoadUserProfileAsync] petsummonLevel이 DB에 없습니다. 기본값 사용");
-            }
-
-            if (snapshot.HasChild("petsummonCount")) {
-                result.PetSummonCount = Convert.ToInt32(snapshot.Child("petsummonCount").Value);
-            }
-            else {
-                Debug.LogWarning("[LoadUserProfileAsync] petsummonCount가 DB에 없습니다. 기본값 사용");
-            }
         }
         return result;
     }
@@ -414,7 +395,5 @@ public class CurrencyManager : IStartable, IDisposable
         int count = Convert.ToInt32(dataSnapshop.Value);
         return count;
     }
-
-
     #endregion
 }

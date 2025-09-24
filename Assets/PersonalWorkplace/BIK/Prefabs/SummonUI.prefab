@@ -616,10 +616,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 50
-  Image: {fileID: 7851026118990204488}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 7551634778057595791}
+  buttonImage: {fileID: 7851026118990204488}
+  ticketSprite: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 7551634778057595791}
+  buttonText: {fileID: 2656452993167363969}
+  currencyType: 4
 --- !u!1 &497585786232589750
 GameObject:
   m_ObjectHideFlags: 0
@@ -1414,10 +1416,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 10
-  Image: {fileID: 8838873033818135208}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 605717784492883312}
+  buttonImage: {fileID: 8838873033818135208}
+  ticketSprite: {fileID: -2169431989998540820, guid: 0588bc2f486bcf345a0de4d992f771b1, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 605717784492883312}
+  buttonText: {fileID: 7470447133500234776}
+  currencyType: 5
 --- !u!1 &1406989293038240323
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,10 +1593,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 10
-  Image: {fileID: 6775043308393736615}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 338261929119798428}
+  buttonImage: {fileID: 7851026118990204488}
+  ticketSprite: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 338261929119798428}
+  buttonText: {fileID: 2142372255799124273}
+  currencyType: 4
 --- !u!1 &1495339551780037495
 GameObject:
   m_ObjectHideFlags: 0
@@ -2704,10 +2710,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 1
-  Image: {fileID: 397179628752848790}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 4747763907545331730}
+  buttonImage: {fileID: 7851026118990204488}
+  ticketSprite: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 4747763907545331730}
+  buttonText: {fileID: 143658058604353870}
+  currencyType: 4
 --- !u!1 &2423874732759767097
 GameObject:
   m_ObjectHideFlags: 0
@@ -2984,10 +2992,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 1
-  Image: {fileID: 2280480095190589478}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 8259179711620855991}
+  buttonImage: {fileID: 2280480095190589478}
+  ticketSprite: {fileID: -2169431989998540820, guid: 0588bc2f486bcf345a0de4d992f771b1, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 8259179711620855991}
+  buttonText: {fileID: 2344144234415923106}
+  currencyType: 5
 --- !u!1 &2921647107235035158
 GameObject:
   m_ObjectHideFlags: 0
@@ -3083,7 +3093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3383,7 +3393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -4472,6 +4482,10 @@ MonoBehaviour:
   summon50thTimesButton: {fileID: 7551634778057595791}
   summonInfo: {fileID: 8129878104650961795}
   summonResult: {fileID: 7287291631738957897}
+  summonButtons:
+  - {fileID: 6158565753221411729}
+  - {fileID: 142642229268904592}
+  - {fileID: 5175081786892987702}
   summonLevelText: {fileID: 7530630373396982424}
   button1Text: {fileID: 143658058604353870}
   button10Text: {fileID: 2142372255799124273}
@@ -5759,10 +5773,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputTimes: 50
-  Image: {fileID: 4273116998265518921}
-  Tickets: {fileID: 2843231321492682717, guid: acd4c241c8df3da4da3ec0c879bd40db, type: 3}
-  Jam: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
-  Button: {fileID: 1491472958550764483}
+  buttonImage: {fileID: 4273116998265518921}
+  ticketSprite: {fileID: -2169431989998540820, guid: 0588bc2f486bcf345a0de4d992f771b1, type: 3}
+  spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
+  summonButton: {fileID: 1491472958550764483}
+  buttonText: {fileID: 893661005327987572}
+  currencyType: 5
 --- !u!1 &5939869459477696499
 GameObject:
   m_ObjectHideFlags: 0
@@ -6246,7 +6262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -7015,7 +7031,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -600}
+  m_AnchoredPosition: {x: 0, y: -400}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5932670924466945942
@@ -7227,7 +7243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
