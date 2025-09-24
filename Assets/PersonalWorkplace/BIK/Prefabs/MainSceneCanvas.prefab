@@ -9539,11 +9539,8 @@ MonoBehaviour:
   HPLevelText: {fileID: 1433749078485343084}
   TrainingTierText: {fileID: 2600183325352291090}
   extValueText: {fileID: 6919567580174565929}
-  innValueText: {fileID: 3050221868710897282}
+  innBalueText: {fileID: 0}
   HPValueText: {fileID: 2820053540284071621}
-  extRequireGoldText: {fileID: 2123679058562629290}
-  innRequireGoldText: {fileID: 3630305169247936479}
-  HPRequireGoldText: {fileID: 2780205142041928218}
 --- !u!1 &5095336977757260804
 GameObject:
   m_ObjectHideFlags: 0
@@ -27000,6 +26997,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 599348318498064448}
   m_SourcePrefab: {fileID: 100100000, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
+--- !u!114 &1147055430970688737 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5901053274733979924, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
+  m_PrefabInstance: {fileID: 6777891491107597813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bae7b09f60515d14a93dc6118c8480f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1274175865268833296 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5737902948267450853, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
@@ -27064,6 +27072,17 @@ MonoBehaviour:
   cardPrefab: {fileID: 3197025553814878799, guid: c90c8a191b8cf614a9fa162f171e6d32, type: 3}
   parentTransform: {fileID: 1339616016512989272}
   poolSize: 50
+--- !u!114 &3113757458994564931 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8446960212224795318, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
+  m_PrefabInstance: {fileID: 6777891491107597813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bae7b09f60515d14a93dc6118c8480f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3211462728721519938 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8259179711620855991, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
@@ -27135,11 +27154,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &5587077252296667062 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1406989293038240323, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
-  m_PrefabInstance: {fileID: 6777891491107597813}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5751160519726405559 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1287979345072585282, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
@@ -27184,6 +27198,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6750809401805266342 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 261306653333532755, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
+  m_PrefabInstance: {fileID: 6777891491107597813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bae7b09f60515d14a93dc6118c8480f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7338648382168296938 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4312185322264756255, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
+  m_PrefabInstance: {fileID: 6777891491107597813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f943aca8bd27854194bc39e2e527423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8135942388939150307 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3379744921012321814, guid: a4ef8ebe1ca5c9a468e6c3662d53cffd, type: 3}
@@ -27220,13 +27256,17 @@ MonoBehaviour:
   summon50thTimesButton: {fileID: 5385512022372288054}
   summonInfo: {fileID: 5466080262776376947}
   summonResult: {fileID: 1274175865268833296}
+  summonButtons:
+  - {fileID: 1147055430970688737}
+  - {fileID: 6750809401805266342}
+  - {fileID: 3113757458994564931}
   summonLevelText: {fileID: 3285082073639370663}
   button1Text: {fileID: 6626436109435281490}
   button10Text: {fileID: 5751160519726405559}
   button50Text: {fileID: 4302433202225764253}
   summonResultUI: {fileID: 2169687899591484414}
   gachaManager: {fileID: 6098241429644502620}
-  summonInfoPanel: {fileID: 5587077252296667062}
+  summonInfoPanel: {fileID: 7338648382168296938}
   summonSlider: {fileID: 6405523178179397944}
 --- !u!1001 &6799018751890980408
 PrefabInstance:
