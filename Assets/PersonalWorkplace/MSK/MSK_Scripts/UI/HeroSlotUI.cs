@@ -28,7 +28,7 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if (info != null)
         {
             icon.enabled = false; // 로딩 중 잠시 숨김
-            LoadAddressableSprite(info.HeroID + "_sprite");
+            LoadAddressableSprite(info.HeroID + "_face");
         }
         else
         {
