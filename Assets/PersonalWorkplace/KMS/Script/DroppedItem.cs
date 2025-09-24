@@ -13,7 +13,7 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     private SpriteRenderer sprite;
 
     private DroppedItemType type;
-    private int quantity;
+    private float quantity;
 
     private bool throwing;
 
@@ -28,7 +28,7 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
         sprite = GetComponent<SpriteRenderer>();
     }
 
-    public void Init(DroppedItemType type, int quantity)
+    public void Init(DroppedItemType type, float quantity)
     {
         this.type = type;
         this.quantity = quantity;
@@ -94,8 +94,8 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
             case DroppedItemType.Gold: CurrencyManager.Instance.Add(CurrencyType.Gold, new BigCurrency(quantity)); break;
             case DroppedItemType.Honbaeg: CurrencyManager.Instance.Add(CurrencyType.Soul, new BigCurrency(quantity)); break;
             case DroppedItemType.SpiritStone: CurrencyManager.Instance.Add(CurrencyType.SpiritStone, new BigCurrency(quantity)); break;
-            case DroppedItemType.NormalChest: InventoryManager.Instance.Add("NormalChest", quantity); break;
-            case DroppedItemType.EpicChest: InventoryManager.Instance.Add("RareChest", quantity); break;
+            case DroppedItemType.NormalChest: InventoryManager.Instance.Add("NormalChest", 1); break;
+            case DroppedItemType.EpicChest: InventoryManager.Instance.Add("RareChest", 1); break;
         }
     }
 }

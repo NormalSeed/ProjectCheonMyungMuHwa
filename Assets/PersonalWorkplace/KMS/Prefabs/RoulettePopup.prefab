@@ -304,7 +304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92f521e5ffad82b46951e173a7d0a3e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roulette: {fileID: 0}
+  roulette: {fileID: 4236871269491219296}
+  screen: {fileID: 1541501369153074480}
 --- !u!114 &1541501369153074480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,19 +349,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7973500662646769127}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7328452005248960258}
-        m_TargetAssemblyTypeName: UIBase, Assembly-CSharp
-        m_MethodName: SetHide
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &7132613231771207796
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,8 +440,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clockwise: 0
   defaultDPS: 3
-  roulette: {fileID: 3990848899204282742}
-  targetDeg: 110
   samplingCount: 50
 --- !u!1 &9063809906157148214
 GameObject:

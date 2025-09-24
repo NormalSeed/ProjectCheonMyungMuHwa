@@ -155,9 +155,9 @@ public class MapManager : MonoBehaviour
     {
         // --- 몬스터 소환 로직 ---
         // 일반 스테이지
+        PoolManager.Instance.SetMonsterState(stageIndex);
         if (stageProgress < 3)
         {
-            PoolManager.Instance.SetMonsterState((stageIndex - 1) * 3 + stageProgress + 1);
             var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
             Debug.Log($"[MapManager] {currentMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
 

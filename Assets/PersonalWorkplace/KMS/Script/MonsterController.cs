@@ -79,22 +79,26 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public virtual void PlaySpawnEffect()
     {
-        int stage = Model.BaseModel.CurrentStage;
-        if (stage < 100)
+        int door = Model.Door;
+        if (door == 0)
+        {
+            ParticleManager.Instance.GetParticle("M_34_Recall", transform.position);
+        }
+        if (door <= 25)
         {
             ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
         }
-        else if (stage < 200)
+        else if (door <= 50)
         {
             ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
         }
-        else if (stage < 300)
+        else if (door <= 75)
         {
-            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+            ParticleManager.Instance.GetParticle("M_34_Recall", transform.position);
         }
-        else if (stage < 400)
+        else
         {
-            ParticleManager.Instance.GetParticle("M_12_Recall", transform.position);
+            ParticleManager.Instance.GetParticle("M_34_Recall", transform.position);
         }
     }
 
@@ -160,7 +164,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected virtual void DropItem()
     {
         if (DoNotDropItem) return;
-        int stage = Model.BaseModel.CurrentStage;
+        int stage = Model.BaseModel.CurrentDoor;
         int door = (stage + 2) / 3;
         if (door >= 2)
         {
