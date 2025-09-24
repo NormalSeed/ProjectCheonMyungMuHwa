@@ -132,13 +132,9 @@ public class HeroInfoUI : UIBase
         exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
         heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
     }
-    private async Task SetCharacter(string spriteKey)
+    private void SetCharacter()
     {
-        var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            characterRoot.sprite = handle.Result;
+        characterRoot.sprite = HeroSprites.Instance.GetCharacterSprite(heroData.heroId);
     }
     private void SetBadge()
     {
@@ -282,7 +278,7 @@ public class HeroInfoUI : UIBase
         SetStage();                                  // 돌파 단계 표시
         SetBadge();                                  // 진영 표시
         SetEquipment();                              // 장비 설정
-        await SetCharacter(heroData.PlayerModelSO.SpriteKey); // 캐릭터 이미지 로딩
+        SetCharacter(); // 캐릭터 이미지 로딩
     }
 
     /// <summary>

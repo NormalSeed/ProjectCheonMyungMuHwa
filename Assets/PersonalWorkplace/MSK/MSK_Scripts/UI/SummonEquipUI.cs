@@ -30,6 +30,7 @@ public class SummonEquipUI : MonoBehaviour
     #endregion
 
     #region Properties
+    private BigCurrency currency;
     private int summonCount;
     private int requireCount;
     private SummonLevel userSummonLevel;
@@ -68,18 +69,27 @@ public class SummonEquipUI : MonoBehaviour
     #region Button OnClick
     private void onClickSummon()
     {
+        currency = BigCurrency.FromBaseAmount(1);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
         SummonHeros(1);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 1);
     }
     private void onClickSummon10th()
     {
+        currency = BigCurrency.FromBaseAmount(1);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
         SummonHeros(10);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 10);
     }
     private void onClickSummon50th()
     {
+        currency = BigCurrency.FromBaseAmount(1);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
         SummonHeros(50);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, 50);

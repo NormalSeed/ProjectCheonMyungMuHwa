@@ -67,7 +67,7 @@ public class HeroInfoSetting : MonoBehaviour
     private async Task Init()
     {
         SetBackground();
-        await SetCharacter(heroData.PlayerModelSO.SpriteKey);
+        SetCharacter();
         SetStage();
         SetBadge();
         CardButton.onClick.RemoveListener(OnClickCard);
@@ -86,13 +86,9 @@ public class HeroInfoSetting : MonoBehaviour
             target.gameObject.SetActive(true);
     }
 
-    private async Task SetCharacter(string spriteKey)
+    private void SetCharacter()
     {
-        var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
-        await handle.Task;
-
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            characterRoot.sprite = handle.Result;
+        characterRoot.sprite = HeroSprites.Instance.GetCharacterSprite(heroID);
     }
     private void SetBadge()
     {

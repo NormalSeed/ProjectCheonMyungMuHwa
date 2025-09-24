@@ -53,14 +53,7 @@ public class CardSetting : MonoBehaviour
     }
     private void SetCharacter()
     {
-        Addressables.LoadAssetAsync<Sprite>(HeroID + "_sprite").Completed += task =>
-        {
-            if (task.Status == AsyncOperationStatus.Succeeded)
-            {
-                characterRoot.sprite = task.Result;
-            }
-        };
-
+        characterRoot.sprite = HeroSprites.Instance.GetCharacterSprite(HeroID);
     }
     private void SetBadge()
     {

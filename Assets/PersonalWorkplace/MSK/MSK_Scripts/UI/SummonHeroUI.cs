@@ -69,18 +69,28 @@ public class SummonHeroUI : UIBase
     #region Button OnClick
     private void onClickSummon()
     {
+        currency = BigCurrency.FromBaseAmount(1);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
         SummonHeros(1);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 1);
     }
     private void onClickSummon10th()
     {
+        currency = BigCurrency.FromBaseAmount(10);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
         SummonHeros(10);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 10);
     }
     private void onClickSummon50th()
     {
+        currency = BigCurrency.FromBaseAmount(50);
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+            return;
+
         SummonHeros(50);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, 50);
