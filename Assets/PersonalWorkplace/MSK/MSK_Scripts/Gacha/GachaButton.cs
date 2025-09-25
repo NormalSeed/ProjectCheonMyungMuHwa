@@ -40,13 +40,13 @@ public class GachaButton : MonoBehaviour
         // 텍스트 설정
 
         // 만약에 보유중인 뽑기권의 개수가 인풋보다 크다면
-        if (model.Get(currencyType) > ticketCost)
+        if (model.Get(currencyType) >= ticketCost)
         {
             buttonImage.sprite = ticketSprite;
             summonButton.interactable = true;
             buttonText.text = $"{ticketCost} 개";
         }// 인풋보다 보유중인 용옥이 충분하면
-        else if (model.Get(CurrencyType.SpiritStone) > spiritStoneCost)
+        else if (model.Get(CurrencyType.SpiritStone) >= spiritStoneCost)
         {
             buttonImage.sprite = spiritStoneSprite;
             summonButton.interactable = true;
