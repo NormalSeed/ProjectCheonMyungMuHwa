@@ -18,6 +18,7 @@ public class SummonResultUI : UIBase
     [Header("Panel")]
     [SerializeField] private SummonEquipUI SummonEquipUI;
     [SerializeField] private SummonHeroUI SummonHeroUI;
+
     #region Unity LifeCycle
     private void OnEnable()
     {

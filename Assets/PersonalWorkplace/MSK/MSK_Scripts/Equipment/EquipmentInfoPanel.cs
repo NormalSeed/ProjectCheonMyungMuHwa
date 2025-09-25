@@ -8,7 +8,7 @@ using VContainer;
 public class EquipmentInfoPanel : MonoBehaviour
 {
     [Inject] private EquipmentService equipmentService;
-    [Inject] private EquipmentManager equipmentManager;
+    [Inject] private  EquipmentManager equipmentManager;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI textEquipmentName;       //장비 이름
