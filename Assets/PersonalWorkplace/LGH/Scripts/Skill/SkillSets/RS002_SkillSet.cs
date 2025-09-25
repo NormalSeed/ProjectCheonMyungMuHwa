@@ -88,6 +88,8 @@ public class RS002_SkillSet : SkillSet
                 }
 
                 damagable.TakeDamage(damage);
+                controller.damageDealt += damage;
+                controller.synergyUI.UpdateDamageUI();
             }
         }
 

@@ -52,15 +52,24 @@ public class BS02_SkillSet : SkillSet
         }
 
         IDamagable damagable = target.GetComponent<IDamagable>();
+        MonsterController mController = target.GetComponent<MonsterController>();
+        float rawDamage = (float)(
+                skills[0].ExtSkillDmg * controller.model.ExtAtk +
+                skills[0].InnSkillDmg * controller.model.InnAtk -
+                mController.Model.BaseModel.finalOuterDefense -
+                mController.Model.BaseModel.finalInnerDefense);
+        float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
+        if (damagable != null && mController != null)
+        {
+            bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
+            if (isCritical)
+            {
+                damage *= controller.model.CritDamage;
+            }
 
-        if (damagable != null)
-        {
-            damagable.TakeDamage(
-            controller.model.ExtAtk * skills[0].ExtSkillDmg);
-        }
-        else
-        {
-            Debug.Log("IDamagable이 없음");
+            damagable.TakeDamage(damage);
+            controller.damageDealt += damage;
+            controller.synergyUI.UpdateDamageUI();
         }
 
         StartCoroutine(Skill1DamageLoop(target));

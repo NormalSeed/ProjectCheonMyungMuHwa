@@ -114,9 +114,8 @@ public partial class PlayerAttackAction : Action
 
                 target.TakeDamage(damage);
                 mController.isAttackedByNormalAttack = true;
-
-                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
+                controller.damageDealt += damage;
+                controller.synergyUI.UpdateDamageUI();
 
                 attackDelay = 1f / model.AttackSpeed;
                 controller.skill2Count--;

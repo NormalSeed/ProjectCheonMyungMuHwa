@@ -25,6 +25,8 @@ public class R002_Skill1 : SkillEffect
                 }
 
                 damagable.TakeDamage(damage);
+                controller.damageDealt += damage;
+                controller.synergyUI.UpdateDamageUI();
             }
             else
             {

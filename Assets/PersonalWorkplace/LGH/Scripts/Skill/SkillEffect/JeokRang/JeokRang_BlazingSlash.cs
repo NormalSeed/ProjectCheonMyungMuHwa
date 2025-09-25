@@ -30,9 +30,8 @@ public class JeokRang_BlazingSlash : SkillEffect
                 }
 
                 damagable.TakeDamage(damage);
-
-                DamageText text = DamageTextManager.Instance.Get(mController.transform.position);
-                text.SetText(BigCurrency.FromBaseAmount(damage).ToString());
+                controller.damageDealt += damage;
+                controller.synergyUI.UpdateDamageUI();
             }
             else
             {

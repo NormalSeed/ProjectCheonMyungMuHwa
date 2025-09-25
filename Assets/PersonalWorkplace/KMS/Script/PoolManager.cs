@@ -34,6 +34,7 @@ public class PoolManager : MonoBehaviour
     private MonsterController bosscon;
 
     private WaitForSeconds GetItemWfs;
+
     [Inject]
     public void VCTest(IObjectResolver container)
     {

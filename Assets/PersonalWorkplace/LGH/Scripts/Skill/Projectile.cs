@@ -65,6 +65,8 @@ public class Projectile : PooledObject
                 }
 
                 damagable.TakeDamage(damage);
+                controller.damageDealt += damage;
+                controller.synergyUI.UpdateDamageUI();
             }
             else
             {
