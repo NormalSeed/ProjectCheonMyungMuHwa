@@ -53,13 +53,15 @@ public class NS003_SkillSet : SkillSet
         float damage = Mathf.Clamp(rawDamage, 1f, float.MaxValue);
         if (damagable != null && mController != null)
         {
-            damagable.TakeDamage(damage);
-
             bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
             if (isCritical)
             {
                 damage *= controller.model.CritDamage;
             }
+
+            damagable.TakeDamage(damage);
+            controller.damageDealt += damage;
+            controller.synergyUI.UpdateDamageUI();
         }
 
         yield return new WaitForSeconds(0.4f);

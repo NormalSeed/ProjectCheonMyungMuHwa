@@ -99,6 +99,8 @@ public class US002_SkillSet : SkillSet
             }
 
             damagable.TakeDamage(damage);
+            controller.damageDealt += damage;
+            controller.synergyUI.UpdateDamageUI();
         }
 
         if (Random.value < 0.2f)

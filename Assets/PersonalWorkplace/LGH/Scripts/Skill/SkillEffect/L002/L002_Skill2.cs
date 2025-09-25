@@ -94,6 +94,8 @@ public class L002_Skill2 : SkillEffect
                     }
 
                     damagable.TakeDamage(damage);
+                    controller.damageDealt += damage;
+                    controller.synergyUI.UpdateDamageUI();
                 }
             }
         }

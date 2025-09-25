@@ -60,6 +60,8 @@ public class NS002_SkillSet : SkillSet
             }
 
             damagable.TakeDamage(damage);
+            controller.damageDealt += damage;
+            controller.synergyUI.UpdateDamageUI();
         }
 
         GameObject effect2 = skill2Effect;

@@ -31,6 +31,9 @@ public class InGameManager : MonoBehaviour
 
     public NavMeshSurface surface;
 
+    [Header("누적 데미지 UI")]
+    [SerializeField] SynergyUI synergyUI;
+
     [Header("페이드 인/아웃 이미지")]
     [SerializeField] private Image fadeImage;
 
@@ -108,6 +111,12 @@ public class InGameManager : MonoBehaviour
         PoolManager.Instance.ActiveAll(stageNum);
         alignedNum.Value = 0;
         stageProgress++;
+
+        foreach (var player in players)
+        {
+            player.damageDealt = 0;
+        }
+        synergyUI.UpdateDamageUI();
     }
 
     public void SpawnBoss()
@@ -135,6 +144,12 @@ public class InGameManager : MonoBehaviour
         }
         StartCoroutine(ResetAlignmentFlag());
         OnStageStart?.Invoke(stageNum, stageProgress);
+
+        foreach (var player in players)
+        {
+            player.damageDealt = 0;
+        }
+        synergyUI.UpdateDamageUI();
     }
     private IEnumerator ResetAlignmentFlag()
     {

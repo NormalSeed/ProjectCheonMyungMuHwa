@@ -127,6 +127,7 @@ public class PartyManager : MonoBehaviour, IStartable
                 controller.charID.Value = string.Empty;
                 controller.gameObject.SetActive(false);
             }
+            controller.synergyUI.UpdateDamageUI();
         }
         InGameManager.Instance.playerCount = MembersID.Count;
         TeamInfoUI.Instance.UpdateTeamUI();

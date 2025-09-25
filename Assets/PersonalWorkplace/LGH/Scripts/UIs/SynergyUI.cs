@@ -3,9 +3,12 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class SynergyUI : MonoBehaviour
 {
+    [Header("시너지")]
+    [SerializeField] private GameObject synergy;
     public List<SynergySlot> slots; // Inspector에서 3개 연결
     public List<SynergySkill> synergySkills;
     private SynergySkill currentSkill;
@@ -15,6 +18,20 @@ public class SynergyUI : MonoBehaviour
     public Button synergySkillButton;
     public Image synergySkillShadow;
     public TextMeshProUGUI synergySkillRemainTime;
+
+    [SerializeField] private Button synergyButton;
+
+    [Header("데미지")]
+    [SerializeField] private GameObject damageDealt;
+    [SerializeField] private List<PlayerController> heros;
+    [SerializeField] private List<GameObject> players;
+    [SerializeField] private List<TextMeshProUGUI> damages;
+    [SerializeField] private List<Image> playerIcons;
+    [SerializeField] private List<Image> damageImage;
+    [SerializeField] private List<Image> guageBackImages;
+    [SerializeField] private List<Image> guages;
+
+    [SerializeField] private Button damageDealtButton;
 
     private bool canUseSynergySkill;
     [SerializeField] private float coolTime;
@@ -40,6 +57,11 @@ public class SynergyUI : MonoBehaviour
         coolTime = 0f;
         canUseSynergySkill = true;
         synergySkillButton.onClick.AddListener(OnClickSynergySkillButton);
+
+        synergyButton.onClick.AddListener(OnClickSynergyButton);
+        damageDealtButton.onClick.AddListener(OnClickDamageDealtButton);
+
+        UpdateDamageUI();
     }
 
     private void Update()
@@ -63,6 +85,20 @@ public class SynergyUI : MonoBehaviour
             synergySkillShadow.enabled = false;
             synergySkillRemainTime.enabled = false;
         }
+    }
+
+    private void OnClickSynergyButton()
+    {
+        synergy.SetActive(true);
+        damageDealt.SetActive(false);
+        UpdateSynergyUI(PartyManager.Instance.activeSynergies);
+    }
+
+    private void OnClickDamageDealtButton()
+    {
+        damageDealt.SetActive(true);
+        synergy.SetActive(false);
+        UpdateDamageUI();
     }
 
     public void UpdateSynergyUI(List<SynergyInfo> synergyInfos)
@@ -136,5 +172,44 @@ public class SynergyUI : MonoBehaviour
 
         currentSkill.PlaySkill();
         coolTime = 60f;
+    }
+
+    public void UpdateDamageUI()
+    {
+        // 활성화된 PlayerController만 있는 리스트
+        var activeHeros = heros.Where(h => h.gameObject.activeInHierarchy).ToList();
+        // 총 가한 데미지(모든 캐릭터가 가한 데미지의 총합)
+        float totalDamage = activeHeros.Sum(h => h.damageDealt);
+
+        for (int i = 0; i < activeHeros.Count && i < playerIcons.Count; i++)
+        {
+            players[i].SetActive(true);
+
+            var hero = activeHeros[i];
+
+            // 스프라이트 갱신(스프라이트는 전용 스프라이트로 변경해야함)
+            var sprite = HeroSprites.Instance.GetCharacterSprite(hero.charID.Value);
+            playerIcons[i].color = Color.white;
+            playerIcons[i].sprite = sprite;
+
+            // 데미지 텍스트 갱신
+            damages[i].text = BigCurrency.FromBaseAmount((double)hero.damageDealt).ToString();
+
+            // 데미지 비율 이미지 갱신
+            float ratio = totalDamage > 0f ? hero.damageDealt / totalDamage : 0f;
+            damageImage[i].fillAmount = ratio;
+            guageBackImages[i].color = Color.white;
+            guages[i].color = Color.white;
+            damageImage[i].color = Color.white;
+        }
+
+        for (int i = activeHeros.Count; i < players.Count; i++)
+        {
+            playerIcons[i].color = new Color(0, 0, 0, 0);
+            guageBackImages[i].color = new Color(0, 0, 0, 0);
+            guages[i].color = new Color(0, 0, 0, 0);
+            damages[i].text = "";
+            damageImage[i].color = new Color(0, 0, 0, 0);
+        }
     }
 }

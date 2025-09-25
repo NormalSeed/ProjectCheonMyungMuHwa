@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour, IDamagable
 
     private Vector3 damageOffest = new Vector3(0, 0.8f, 0);
 
+    public SynergyUI synergyUI;
+    public float damageDealt = 0;
+
     [Header("스킬 관련 필드")]
     public bool isSkillReady = true;
     public bool isSkill1Ready = true;
@@ -106,6 +109,7 @@ public class PlayerController : MonoBehaviour, IDamagable
         GameEvents.OnHeroLevelChanged += HandleHeroLevelChanged;
         model.CurHealth.Subscribe(UpdateHealthBar);
         isDead.Subscribe(InGameManager.Instance.CheckAllPlayersDead);
+        damageDealt = 0;
     }
 
     private void OnDisable()
@@ -115,6 +119,7 @@ public class PlayerController : MonoBehaviour, IDamagable
 
         shieldAmount = 0f;
         isShieldActive = false;
+        damageDealt = 0;
 
         skillSet.SetActive(false);
         skillSet = null;

@@ -117,6 +117,8 @@ public class L003_Skill1 : SkillEffect
             }
 
             damagable.TakeDamage(damage);
+            controller.damageDealt += damage;
+            controller.synergyUI.UpdateDamageUI();
         }
 
         atkInterval = 1 / atkSpeed;
