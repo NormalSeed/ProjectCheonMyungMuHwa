@@ -223,5 +223,27 @@ public partial class PopupManager : MonoBehaviour
     {
         return _popupDict.TryGetValue(popupType, out popup);
     }
+
+    public void ShowConfirmPopup(string title, string message, Action onConfirm, Action onCancel = null)
+    {
+        Debug.Log("[PopupManager] ShowConfirmPopup 호출됨");
+        if (!_popupDict.TryGetValue(PopupType.Confirm, out var uiBase) || uiBase == null)
+        {
+            Debug.LogWarning("[PopupManager] Confirm 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        Debug.Log($"[PopupManager] Confirm popup found: {uiBase.name}, activeInHierarchy={uiBase.gameObject.activeInHierarchy}");
+        if (uiBase is ConfirmPopup confirmPopup)
+        {
+            Debug.Log("[PopupManager] ConfirmPopup.SetShow 호출 전");
+            confirmPopup.SetShow(title, message, onConfirm, onCancel);
+            Debug.Log("[PopupManager] ConfirmPopup.SetShow 호출 후");
+        }
+        else
+        {
+            Debug.LogError("[PopupManager] PopupType.Confirm 이 ConfirmPopup이 아님 (타입: " + uiBase.GetType().Name + ")");
+        }
+    }
     #endregion // public funcs
 }
