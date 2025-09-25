@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.AddressableAssets;
-using System.Threading.Tasks;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using VContainer;
+using VContainer.Unity;
 
 
 public interface IPooled<T>
@@ -25,10 +24,18 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     private bool activeOnGet;
     private bool canExceedMaxCount;
     private bool useWarmUp;
+    private IObjectResolver resolve;
     private Transform parent;
 
     private List<IPooled<T>> pooledItems;
-    public DefaultPool(GameObject obj, int maxCount, bool active = true, bool exceed = false, bool warmup = true, Transform parent = null)
+    public DefaultPool(
+        GameObject obj,
+        int maxCount,
+        bool active = true,
+        bool exceed = false,
+        bool warmup = true,
+        Transform parent = null,
+        IObjectResolver resolver = null)
     {
         targetObj = obj;
         this.maxCount = maxCount;
@@ -37,6 +44,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
         useWarmUp = warmup;
         this.parent = parent;
         pooledItems = new();
+        resolve = resolver;
         Init();
     }
 
@@ -55,7 +63,9 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
 
     private IPooled<T> Create()
     {
-        IPooled<T> obj = UnityEngine.Object.Instantiate(targetObj).GetComponent<IPooled<T>>();
+        IPooled<T> obj = (resolve == null) ?
+        UnityEngine.Object.Instantiate(targetObj).GetComponent<IPooled<T>>() :
+        resolve.Instantiate(targetObj).GetComponent<IPooled<T>>();
         (obj as MonoBehaviour).transform.parent = parent;
         obj.OnLifeEnded = null;
         obj.OnLifeEnded += ReleaseItem;

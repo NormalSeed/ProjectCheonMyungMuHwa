@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public enum SoundMode { Once, Permanent }
+public enum PlayMode { Once, Loop }
 public class AudioSourceController : MonoBehaviour, IPooled<AudioSourceController>
 {
     public Action<IPooled<AudioSourceController>> OnLifeEnded { get; set; }
@@ -11,7 +11,7 @@ public class AudioSourceController : MonoBehaviour, IPooled<AudioSourceControlle
     private float timer;
     private float soundTime;
 
-    private SoundMode currentmode;
+    private PlayMode currentmode;
 
     void Awake()
     {
@@ -23,7 +23,7 @@ public class AudioSourceController : MonoBehaviour, IPooled<AudioSourceControlle
         timer = 0;
     }
 
-    public void Init(AudioClip clip, float volume, SoundMode mode)
+    public void Init(AudioClip clip, float volume, PlayMode mode)
     {
         source.clip = clip;
         source.volume = volume;
@@ -36,7 +36,7 @@ public class AudioSourceController : MonoBehaviour, IPooled<AudioSourceControlle
     {
         if (timer >= soundTime)
         {
-            if (currentmode == SoundMode.Once)
+            if (currentmode == PlayMode.Once)
             {
                 OnLifeEnded?.Invoke(this);
             }

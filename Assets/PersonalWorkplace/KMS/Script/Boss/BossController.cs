@@ -2,9 +2,6 @@ using System.Collections;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
-using VContainer;
-using UnityEngine.UI;
-using Unity.VisualScripting;
 
 public enum MonsterAnimationState
 {
@@ -30,17 +27,9 @@ public class BossController : MonsterController
     [SerializeField] protected string attackSound;
 
     [SerializeField] protected string spawnEffect;
-
-    [Inject]
-    public void Construct(Image bossbar)
-    {
-        healthBar = bossbar;
-    }
     protected override void SetValue()
     {
         Model.CurHealth.Value = Model.BaseModel.finalMaxHealth;
-        healthBar.fillAmount = 1;
-        healthBar.transform.parent.gameObject.SetActive(true);
         treeAgent.SetVariableValue<float>("AttackDelay", Model.AttackDelay);
         treeAgent.SetVariableValue<BossController>("Controller", this);
         treeAgent.Restart();
@@ -86,7 +75,6 @@ public class BossController : MonsterController
         if (attackCo != null) StopCoroutine(attackCo);
         InGameManager.Instance?.SetNextStage();
         if (InGameManager.Instance != null) InGameManager.Instance.monsterDeathStack.Value--;
-        healthBar.transform.parent.gameObject.SetActive(false);
         AudioManager.Instance.PlaySound("Monster_Dead");
         StartCoroutine(DeathRoutine());
     }
@@ -142,6 +130,14 @@ public class BossController : MonsterController
             go.GetComponent<IDamagable>().TakeDamage((float)Model.BaseModel.finalAttackPower);
         }
         attackCo = null;
+    }
+
+    protected override void SetHealthBar()
+    {
+        double val = Model.CurHealth.Value / Model.BaseModel.finalMaxHealth;
+        float v = (float)val;
+        float res = Mathf.Max(0, v);
+        barUI.SetFill(res);
     }
 
     //private void SetAnimation(MonsterAnimationState state)
