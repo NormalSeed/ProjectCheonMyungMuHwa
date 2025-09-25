@@ -13,6 +13,7 @@ public class InGameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<HeroInfoUI>();
         builder.RegisterComponentInHierarchy<EquipmentItemList>();
         builder.RegisterComponentInHierarchy<EquipmentInfoPanel>();
+        builder.RegisterComponentInHierarchy<EquipmentChange>();
         builder.RegisterComponentInHierarchy<HeroDataManager>();
     }
 }

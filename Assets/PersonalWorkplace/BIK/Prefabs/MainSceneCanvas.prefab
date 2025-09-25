@@ -25438,6 +25438,21 @@ MonoBehaviour:
   upgradeButton: {fileID: 5453605587237114445}
   HeroInfo: {fileID: 4301342812065383193}
   itemList: {fileID: 0}
+  changePanel: {fileID: 51401041786146578}
+  instance:
+    instanceID: 
+    templateID: 
+    charID: 
+    equipmentType: 0
+    rarity: 0
+    statType: 0
+    level: 0
+    isEquipped: 0
+    baseStat: 0
+    statIncrease: 0
+    appliedStatValue: 0
+  charId: 
+  instanceID: 
 --- !u!114 &4740343530213471743 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1162174732900870194, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
@@ -25998,24 +26013,85 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3294975579274230350, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 6671345594527206486, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
       propertyPath: m_Name
       value: EquipChangePanel
       objectReference: {fileID: 0}
     - target: {fileID: 6671345594527206486, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6671345594527206486, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 51401041786146578}
   m_SourcePrefab: {fileID: 100100000, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+--- !u!1 &767253763980062194 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6671345594527206486, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+  m_PrefabInstance: {fileID: 6210662088033280420}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &51401041786146578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 767253763980062194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aca8206c4b8b8941a5d0d8791f8d75c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  equipmentImage: {fileID: 8621907252652595122}
+  infoPanel: {fileID: 8485820657296523936}
+  submitButton: {fileID: 2067424774745200461}
+  cancelButton: {fileID: 1882226225795503676}
+--- !u!114 &1882226225795503676 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5489807152568776600, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+  m_PrefabInstance: {fileID: 6210662088033280420}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2067424774745200461 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5368365120964671209, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+  m_PrefabInstance: {fileID: 6210662088033280420}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5560738229937153107 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1953156745620817399, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
   m_PrefabInstance: {fileID: 6210662088033280420}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8621907252652595122 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2420577822034458134, guid: 8e0396e0fba222e47a2ad99a377e2663, type: 3}
+  m_PrefabInstance: {fileID: 6210662088033280420}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5361b97aba734449cd253e71c1f8a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6314276768794331697
 PrefabInstance:
   m_ObjectHideFlags: 0

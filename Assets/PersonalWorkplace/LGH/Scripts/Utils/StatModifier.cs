@@ -200,12 +200,10 @@ public static class StatModifierManager
         {
             if (modifier.isPercent)
             {
-                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += baseValue * modifier.value;
             }
             else
             {
-                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += modifier.value;
             }
         }
