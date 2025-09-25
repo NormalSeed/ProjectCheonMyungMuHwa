@@ -60,6 +60,7 @@ public class TableManager : IStartable
             TableType.Level => new TLevel(),
             TableType.NormalChest => new TNormalChest(),
             TableType.RareChest => new TRareChest(),
+            TableType.BadWord => new TBadWord(),
             _ => null
         };
     }

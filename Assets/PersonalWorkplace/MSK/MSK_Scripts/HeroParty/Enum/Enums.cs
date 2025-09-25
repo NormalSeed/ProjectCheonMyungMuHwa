@@ -78,6 +78,7 @@ public enum TableType
     Level,
     NormalChest,
     RareChest,
+    BadWord,
 }
 
 public enum ItemType
