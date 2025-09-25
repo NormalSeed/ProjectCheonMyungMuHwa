@@ -20,7 +20,7 @@ public class DecompositionEquipment : MonoBehaviour
     [SerializeField] private TextMeshProUGUI equipCount;    // 장비 개수
     [SerializeField] private TextMeshProUGUI resultGrind;    // 획득 연마석
 
-    // public List<InventoryEquipButton> activeEquipButtons = new();    // 분해 선택 버튼
+    public List<DecompositionButton> activeEquipButtons = new();    // 분해 선택 버튼
 
     void Start()
     {

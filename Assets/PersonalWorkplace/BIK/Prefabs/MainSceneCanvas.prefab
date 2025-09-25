@@ -25276,7 +25276,7 @@ PrefabInstance:
       objectReference: {fileID: 6752486835966893750, guid: d2ebd98d8e7ca4f4fa7f6765075ca8d2, type: 3}
     - target: {fileID: 7745304177980789323, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7931446601873290071, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
       propertyPath: m_Type
@@ -25437,7 +25437,7 @@ MonoBehaviour:
   equipButton: {fileID: 7213322684813571727}
   upgradeButton: {fileID: 5453605587237114445}
   HeroInfo: {fileID: 4301342812065383193}
-  itemList: {fileID: 0}
+  itemListitemList: {fileID: 0}
   changePanel: {fileID: 51401041786146578}
   instance:
     instanceID: 
@@ -25473,6 +25473,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5245118905985645002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1811482011512726535, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
+  m_PrefabInstance: {fileID: 5902471508060298701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5453605587237114445 stripped
@@ -25580,7 +25591,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equipPanel: {fileID: 8485820657296523936}
   cardPoolManager: {fileID: 2240612008401629615}
-  button: {fileID: 6502603159000049158}
+  eixtButton: {fileID: 6502603159000049158}
+  decompositionButton: {fileID: 5245118905985645002}
   activeEquipButtons: []
 --- !u!114 &9101808757052064874 stripped
 MonoBehaviour:
@@ -27275,7 +27287,6 @@ MonoBehaviour:
   poolManager: {fileID: 599348318498064448}
   SummonEquipUI: {fileID: 2378921266679019605}
   SummonHeroUI: {fileID: 3254723712265329608}
-  SummonPetUI: {fileID: 0}
 --- !u!114 &599348318498064448
 MonoBehaviour:
   m_ObjectHideFlags: 0

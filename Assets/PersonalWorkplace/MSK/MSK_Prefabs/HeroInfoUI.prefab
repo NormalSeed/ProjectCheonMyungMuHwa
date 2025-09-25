@@ -7416,7 +7416,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equipPanel: {fileID: 1212068026101630764}
   cardPoolManager: {fileID: 8758758085723821756}
-  button: {fileID: 8471733285648008836}
+  eixtButton: {fileID: 8471733285648008836}
+  decompositionButton: {fileID: 3002676979651776104}
   activeEquipButtons: []
 --- !u!114 &2247823706392261576 stripped
 MonoBehaviour:
@@ -7449,6 +7450,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3002676979651776104 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1811482011512726535, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
+  m_PrefabInstance: {fileID: 3497057786953132655}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &3084588748872687989 stripped
@@ -7544,7 +7556,22 @@ MonoBehaviour:
   equipButton: {fileID: 394944390503776557}
   upgradeButton: {fileID: 3084640788274750959}
   HeroInfo: {fileID: -612307817280898805}
-  itemList: {fileID: 5588197120445112402}
+  itemListitemList: {fileID: 0}
+  changePanel: {fileID: 0}
+  instance:
+    instanceID: 
+    templateID: 
+    charID: 
+    equipmentType: 0
+    rarity: 0
+    statType: 0
+    level: 0
+    isEquipped: 0
+    baseStat: 0
+    statIncrease: 0
+    appliedStatValue: 0
+  charId: 
+  instanceID: 
 --- !u!224 &7063148836770513277 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5948503001222179602, guid: 14fc1b692648ba644a69e41d0a9ea097, type: 3}
