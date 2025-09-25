@@ -29,7 +29,12 @@ public class IntroSceneManager : MonoBehaviour
         // VContainer Scope 대기
         var scope = FindObjectOfType<GameLifetimeScope>();
         if (scope != null)
-            yield return new WaitUntil(() => scope.Container != null);
+        {
+            Debug.Log("스코프 있음");
+            yield return new WaitUntil(() => scope.Container != null);  
+            Debug.Log("컨테이너 받아옴"); 
+        }
+
 
         yield return new WaitUntil(() => BackendManager.Instance != null);
         bool loginCompleted = false;

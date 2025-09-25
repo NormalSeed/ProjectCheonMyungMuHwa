@@ -124,6 +124,7 @@ public class TrainingUI : UIBase
 
         for (int i = 0; i < levelsToUpgrade; i++)
         {
+            QuestManager.Instance.ReportEvent(QuestTargetType.ExtPow, 1);
             training.LevelUpTraining(type);
         }
 

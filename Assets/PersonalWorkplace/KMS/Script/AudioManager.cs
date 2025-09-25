@@ -10,6 +10,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private GameObject AudioSourcePrefab;
     private Dictionary<string, AudioClip> clips;
 
+    private AudioSourceController BGM;
+
     public bool IsInitialized;
 
     private void Awake()
@@ -42,7 +44,7 @@ public class AudioManager : MonoBehaviour
         Debug.Log($"<color=yellow> 사운드 로드 완료 </color>");
     }
 
-    public AudioSourceController PlaySound(string id, float volume = 1, SoundMode mode = SoundMode.Once)
+    public AudioSourceController PlaySound(string id, float volume = 1, PlayMode mode = PlayMode.Once)
     {
         AudioClip clip = clips[id];
         AudioSourceController asc = soundPool.GetItem();
@@ -56,6 +58,22 @@ public class AudioManager : MonoBehaviour
     public void StopAllSounds()
     {
         soundPool.ReleaseAllItes();
+    }
+
+    public void PlayBGM(string id, float volume = 1, PlayMode mode = PlayMode.Loop)
+    {
+        StopSound(BGM);
+        AudioClip clip = clips[id];
+        BGM = soundPool.GetItem();
+        BGM.Init(clip, volume, mode);
+    }
+    public void StopBGM()
+    {
+        if (BGM != null)
+        {
+            StopSound(BGM);
+            BGM = null;
+        }
     }
 
 }

@@ -32,7 +32,9 @@ public class MSynergySkill : SynergySkill
 
     private IEnumerator DamageRoutine()
     {
-        particleController.PlayParticle("FX_splash_portal_floor", Vector3.zero);
+        Vector3 screenCenter = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Camera.main.transform.position.z * -1));
+
+        particleController.PlayParticle("FX_splash_portal_floor", screenCenter);
 
         for (int i = 0; i < 10; i++)
         {
@@ -43,7 +45,7 @@ public class MSynergySkill : SynergySkill
                 IDamagable damagable = monster.GetComponent<IDamagable>();
                 if (damagable != null)
                 {
-                    particleController.PlayParticle("FX_splash_hit_02_air", monster.transform.position + effectPosition);
+                    particleController.PlayParticle("FX_splash_hit_02_air", monster.transform.position);
                     damagable.TakeDamage(partyCombatPower * 0.5f * 0.05f);
                 }
             }

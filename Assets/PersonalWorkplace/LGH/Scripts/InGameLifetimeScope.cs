@@ -5,6 +5,11 @@ using VContainer.Unity;
 
 public class InGameLifetimeScope : LifetimeScope
 {
+    protected override void Awake()
+    {
+        base.Awake();
+        Build();
+    }
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<EquipmentService>(Lifetime.Singleton);
@@ -13,6 +18,7 @@ public class InGameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<HeroInfoUI>();
         builder.RegisterComponentInHierarchy<EquipmentItemList>();
         builder.RegisterComponentInHierarchy<EquipmentInfoPanel>();
+        builder.RegisterComponentInHierarchy<EquipmentChange>();
         builder.RegisterComponentInHierarchy<HeroDataManager>();
     }
 }

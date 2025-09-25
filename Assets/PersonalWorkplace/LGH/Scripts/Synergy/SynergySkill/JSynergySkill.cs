@@ -13,8 +13,10 @@ public class JSynergySkill : SynergySkill
 
     public override void PlaySkill()
     {
+        Vector3 screenCenter = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Camera.main.transform.position.z * -1));
+
         // 시전 이펙트
-        particleController.PlayParticle("FX_splash_spear_floor", spearPosition);
+        particleController.PlayParticle("FX_splash_spear_floor", screenCenter);
 
         // 버프 이펙트 + StatModifier 적용
         foreach (var player in players)

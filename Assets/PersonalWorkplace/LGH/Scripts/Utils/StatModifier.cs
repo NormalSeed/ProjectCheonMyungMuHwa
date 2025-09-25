@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 public enum ModifierSource
@@ -201,12 +200,10 @@ public static class StatModifierManager
         {
             if (modifier.isPercent)
             {
-                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += baseValue * modifier.value;
             }
             else
             {
-                Debug.LogWarning($"[GetCardModifier] : {modifier.isPercent}");
                 total += modifier.value;
             }
         }

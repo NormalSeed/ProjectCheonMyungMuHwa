@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
+using VContainer;
 
 public class PlayerProfileUI : UIBase
 {
@@ -11,6 +12,8 @@ public class PlayerProfileUI : UIBase
     [SerializeField] private Button _closeButton;
     [SerializeField] private Button _editNicknameButton;
     [SerializeField] private Button _saveButton;
+    [SerializeField] private Button _quitPopupButton;
+    [SerializeField] private Button _unfittablePopup;
 
     [Header("플레이어 프로필")]
     [SerializeField] private Image _playerProfileBGImage;
@@ -23,6 +26,9 @@ public class PlayerProfileUI : UIBase
     [Header("토글 및 패널들")]
     [SerializeField] private List<Toggle> _toggles;
     [SerializeField] private List<GameObject> _panels;
+
+    [Header("부적절한 닉네임 팝업")]
+    [SerializeField] private GameObject _unfittableNicknamePopup;
 
     [Header("컨트롤러 참조")]
     [SerializeField] private MainSceneUIController _mainSceneUIController;
@@ -41,6 +47,9 @@ public class PlayerProfileUI : UIBase
 
     private bool _isEditingNickname = false;
 
+    // 닉네임 금지어 필터링을 위한 ForbiddenWordManager
+    private ForbiddenWordManager _forbiddenWordManager;
+
     // Save 버튼 눌러야 확정되는 값
     private string _tempTitle;
     private string _tempBackground;
@@ -54,6 +63,8 @@ public class PlayerProfileUI : UIBase
         _closeButton.onClick.AddListener(OnClickClose);
         _saveButton.onClick.AddListener(OnClickSave);
         _editNicknameButton.onClick.AddListener(OnClickEditNickname);
+        _quitPopupButton.onClick.AddListener(OnClickQuitPopUp);
+        _unfittablePopup.onClick.AddListener(OnClickQuitPopUp);
 
         _playerNicknameInput.onEndEdit.AddListener(OnNicknameEditEnd);
 
@@ -64,6 +75,8 @@ public class PlayerProfileUI : UIBase
 
         InitTitleUI();
         InitBackgroundUI();
+
+        _forbiddenWordManager = new();
     }
 
     private void OnEnable()
@@ -110,9 +123,33 @@ public class PlayerProfileUI : UIBase
 
     private void OnNicknameEditEnd(string newName)
     {
+        newName = newName.Trim();
+
+        if (_forbiddenWordManager == null)
+        {
+            Debug.LogWarning("금지어 매니저 없음");
+            ToggleNicknameEdit(false);
+            return;
+        }
+
+        if (_forbiddenWordManager.ContainsForbiddenWord(newName))
+        {
+            Debug.LogWarning("금지어가 포함된 닉네임은 사용할 수 없습니다.");
+            _playerNicknameInput.text = _playerNicknameText.text;
+            ToggleNicknameEdit(false);
+            // 팝업 UI 띄우기
+            _unfittableNicknamePopup.SetActive(true);
+            return;
+        }
+
         _playerNicknameText.text = newName;
         PlayerProfileManager.Instance.SetNickname(newName); // 닉네임은 즉시 저장
         ToggleNicknameEdit(false);
+    }
+
+    private void OnClickQuitPopUp()
+    {
+        _unfittableNicknamePopup.SetActive(false);
     }
     #endregion
 

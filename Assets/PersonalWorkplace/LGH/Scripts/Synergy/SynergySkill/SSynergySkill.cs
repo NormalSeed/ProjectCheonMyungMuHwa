@@ -36,6 +36,7 @@ public class SSynergySkill : SynergySkill
         Vector3 bottomRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width - 200f, 200f, z));
         Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width - 200f, Screen.height - 200f, z));
         Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(200f, 200f, z));
+        Vector3 screenCenter = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, Camera.main.transform.position.z * -1));
 
         // 순서: 좌상단 → 우하단 → 우상단 → 좌하단
         Vector3[] positions = new Vector3[] { topLeft, bottomRight, topRight, bottomLeft };
@@ -46,7 +47,7 @@ public class SSynergySkill : SynergySkill
             yield return effectInterval;
         }
 
-        particleController.PlayParticle("FX_splash_hit_01_floor", Vector3.zero);
+        particleController.PlayParticle("FX_splash_hit_01_floor", screenCenter);
 
         // Monster 태그가 붙은 모든 오브젝트에 데미지 적용
         GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -9,24 +10,27 @@ public class EquipmentItemList : MonoBehaviour
     [Inject] private EquipmentManager equipmentManager;
 
     [Header("Panel")]
-    [SerializeField] public EquipmentInfoPanel equipPanel;
+    [SerializeField] public EquipmentInfoPanel equipPanel;          // 장비 패널
 
     [Header("Pool")]
-    [SerializeField] private GachaCardPoolManager cardPoolManager;
+    [SerializeField] private GachaCardPoolManager cardPoolManager;  // 풀메니저
+
     [Header("Button")]
-    [SerializeField] private Button button;
+    [SerializeField] private Button eixtButton;                     // 나가기 버튼
+    [SerializeField] private Button decompositionButton;            // 분해 버튼
+
 
     public List<InventoryEquipButton> activeEquipButtons = new();
 
     #region Unity
     private void OnEnable()
     {
-        button.onClick.AddListener(OnClickExitButton);
+        eixtButton.onClick.AddListener(OnClickExitButton);
     }
 
     private void OnDisable()
     {
-        button.onClick.RemoveListener(OnClickExitButton);
+        eixtButton.onClick.RemoveListener(OnClickExitButton);
         equipPanel.gameObject.SetActive(false);
     }
     #endregion
@@ -35,6 +39,10 @@ public class EquipmentItemList : MonoBehaviour
     private void OnClickExitButton()
     {
         this.gameObject.SetActive(false);
+    }
+    private void OnClicKDecompositionButton()
+    {
+
     }
     #endregion
     public void ShowEquipmentListByTemplateID(string templateID)

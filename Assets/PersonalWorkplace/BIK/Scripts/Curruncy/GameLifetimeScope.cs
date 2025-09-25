@@ -69,6 +69,5 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<AttendanceManager>(Lifetime.Singleton).AsSelf();
         builder.RegisterEntryPoint<AttendanceCSVLoader>(Lifetime.Singleton).AsSelf();
         builder.RegisterEntryPoint<AttendanceUIManager>(Lifetime.Singleton).AsSelf();
-        builder.Register<TableManager>(Lifetime.Singleton).As<IStartable>().AsSelf();
     }
 }
