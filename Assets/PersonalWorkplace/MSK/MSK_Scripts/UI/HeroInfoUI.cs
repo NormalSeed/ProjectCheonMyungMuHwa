@@ -88,13 +88,9 @@ public class HeroInfoUI : UIBase
     private void SetEquipment()
     {
         SetEquipmentSettings();
-        Debug.Log("[SetEquipment] : 불러오는 중 Weapon");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Weapon);
-        Debug.Log("[SetEquipment] : 불러오는 중Armor");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Armor);
-        Debug.Log("[SetEquipment] : 불러오는 중 Gloves");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Gloves);
-        Debug.Log("[SetEquipment] : 불러오는 중Boots");
         GetEquipment(heroData.PlayerModelSO.CharID, EquipmentType.Boots);
     }
     private void SetEquipmentSettings()
@@ -177,7 +173,6 @@ public class HeroInfoUI : UIBase
     #region OnClick
     private void OnClickExit()
     {
-        Debug.Log("정보 UI 비활성화 입력됨");
         heroInfoPanel.gameObject.SetActive(false);
     }
     private void OnClickUpgrade()
@@ -204,7 +199,6 @@ public class HeroInfoUI : UIBase
         {
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-            Debug.Log($"[HeroLevelUpgrade] {heroData.heroName} 전투력 적용");
             requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             RequireLevelUpGold(heroData.PlayerModelSO.Level);
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
@@ -245,7 +239,6 @@ public class HeroInfoUI : UIBase
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
         GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-        Debug.Log($"[HeroRankUpPiece] {heroData.heroName} 전투력 적용");
         heroUI.RefreshAllCards();
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
@@ -328,7 +321,6 @@ public class HeroInfoUI : UIBase
         }
         else
         {
-            Debug.LogWarning($"[GetEquipment] 장비 없음: {charID}, {type}");
             button.EquipReset();
 
             switch (type)

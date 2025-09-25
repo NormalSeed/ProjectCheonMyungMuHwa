@@ -47,10 +47,10 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         droppedItems = new();
         bosses = new();
-        PunchPool = new DefaultPool<MonsterController>(loadedData.Objects["Punch"], 3, active: false);
-        StickPool = new DefaultPool<MonsterController>(loadedData.Objects["Stick"], 3, active: false);
-        CanePool = new DefaultPool<MonsterController>(loadedData.Objects["Cane"], 3, active: false);
-        BowPool = new DefaultPool<MonsterController>(loadedData.Objects["Bow"], 3, active: false);
+        PunchPool = new DefaultPool<MonsterController>(loadedData.Objects["Punch"], 3, active: false, resolver: container);
+        StickPool = new DefaultPool<MonsterController>(loadedData.Objects["Stick"], 3, active: false, resolver: container);
+        CanePool = new DefaultPool<MonsterController>(loadedData.Objects["Cane"], 3, active: false, resolver: container);
+        BowPool = new DefaultPool<MonsterController>(loadedData.Objects["Bow"], 3, active: false, resolver: container);
         ArrowPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["Arrow"], 8, exceed: true, warmup: false, parent: gameObject.transform);
         MagicPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["MagicBall"], 8, exceed: true, warmup: false, parent: gameObject.transform);
         ItemPool = new DefaultPool<DroppedItem>(loadedData.Objects["DroppedItem"], 60, exceed: true, warmup: false, parent: gameObject.transform);
@@ -124,6 +124,10 @@ public class PoolManager : MonoBehaviour
                 else if (currentDoor % 25 == 0)
                 {
                     str = "50Boss";
+                }
+                else
+                {
+                    str = "BigBoss";
                 }
                 break;
             case 5: str = "BigBoss"; break;

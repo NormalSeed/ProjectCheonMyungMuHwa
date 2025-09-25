@@ -9,18 +9,20 @@ public class CurrencyDungeonTimer : MonoBehaviour
 
     [SerializeField] TMP_Text timeText;
 
+    [SerializeField] StageBarFill fill;
+
     private float currentTime;
 
     private bool isStopped;
 
     public Action OnTimeOver;
 
-
-    void Start()
+    void OnEnable()
     {
         isStopped = false;
         currentTime = startTime;
-        timeText.text = GetTimeFormet();
+        fill?.SetValue(1);
+        //timeText.text = GetTimeFormet();
     }
 
     void Update()
@@ -28,13 +30,15 @@ public class CurrencyDungeonTimer : MonoBehaviour
         if (isStopped) return;
         if (currentTime <= 0)
         {
-            timeText.text = "타임 오버";
+            //timeText.text = "타임 오버";
+            fill?.SetValue(0);
             OnTimeOver?.Invoke();
             isStopped = true;
             return;
         }
         currentTime -= Time.deltaTime;
-        timeText.text = GetTimeFormet();
+        fill?.SetValue(currentTime / startTime);
+        //timeText.text = GetTimeFormet();
     }
 
     private string GetTimeFormet()
@@ -49,6 +53,14 @@ public class CurrencyDungeonTimer : MonoBehaviour
     public void Stop()
     {
         isStopped = true;
+    }
+    public void Inactivate()
+    {
+        gameObject.SetActive(false);
+    }
+    public void Activate()
+    {
+        gameObject.SetActive(true);
     }
 
 }

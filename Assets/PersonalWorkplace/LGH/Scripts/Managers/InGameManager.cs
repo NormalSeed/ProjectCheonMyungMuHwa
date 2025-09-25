@@ -3,6 +3,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using GooglePlayGames.BasicApi;
 using NavMeshPlus.Components;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,8 @@ public class InGameManager : MonoBehaviour
     private string stage => $"<color=yellow>{stageNum}관문 {(stageProgress == 3 ? "보스" : stageProgress + 1)}던전</color>";
 
     [SerializeField] TMPro.TMP_Text stagetext;
+
+    public Action<int, int> OnStageStart;
 
     private void Awake()
     {
@@ -117,7 +120,7 @@ public class InGameManager : MonoBehaviour
 
     public void ExamineAllAligned(int num)
     {
-        if (isProcessingAlignment || num < playerCount)return;
+        if (isProcessingAlignment || num < playerCount) return;
         if (stagetext != null) stagetext.text = stage;
 
         isProcessingAlignment = true;
@@ -131,6 +134,7 @@ public class InGameManager : MonoBehaviour
             stageProgress++;
         }
         StartCoroutine(ResetAlignmentFlag());
+        OnStageStart?.Invoke(stageNum, stageProgress);
     }
     private IEnumerator ResetAlignmentFlag()
     {

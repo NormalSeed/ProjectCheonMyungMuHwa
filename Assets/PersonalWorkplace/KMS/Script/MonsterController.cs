@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using VContainer;
 
 public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<MonsterController>
 {
@@ -37,6 +38,13 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     private Vector2 damagePos => transform.position + new Vector3(0, damageOffset, 0);
 
     public bool IsDead => Model.CurHealth.Value <= 0;
+
+    protected StageBarUI barUI;
+    [Inject]
+    public void Construct(StageBarUI ui)
+    {
+        barUI = ui;
+    }
     void Awake()
     {
         InitComponent();
@@ -134,6 +142,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         onDeath?.Invoke();
         InGameManager.Instance.monsterDeathStack.Value--;
+        barUI.AddFill(1f / 12);
         if (attackCo != null) StopCoroutine(attackCo);
         deathCo = StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
@@ -194,7 +203,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     }
 
-    private void SetHealthBar()
+    protected virtual void SetHealthBar()
     {
         double val = Model.CurHealth.Value / Model.BaseModel.finalMaxHealth;
         float v = (float)val;

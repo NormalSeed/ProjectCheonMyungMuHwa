@@ -7,8 +7,8 @@ using VContainer;
 
 public class EquipmentInfoPanel : MonoBehaviour
 {
-    [Inject] private readonly EquipmentService equipmentService;
-    [Inject] private readonly EquipmentManager equipmentManager;
+    [Inject] private EquipmentService equipmentService;
+    [Inject] private  EquipmentManager equipmentManager;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI textEquipmentName;       //장비 이름
@@ -35,13 +35,13 @@ public class EquipmentInfoPanel : MonoBehaviour
     [SerializeField] private Button upgradeButton;                //장비 강화 버튼
 
     [Header("Instance")]
-    [SerializeField] private HeroInfoUI HeroInfo;
-    [SerializeField] private EquipmentItemList itemList;
+    [SerializeField] public HeroInfoUI HeroInfo;                // 영웅 정보창
+    [SerializeField] public EquipmentItemList itemListitemList;         // 아이템 리스트 창
+    [SerializeField] public EquipmentChange changePanel;        // 아이템 교채창
 
-    private EquipmentInstance instance;     // 판넬의 장비
-   
-    private string charId;                  // 영웅 ID
-    private string instanceID;              // 장비 ID
+    public EquipmentInstance instance;     // 판넬의 장비
+    public string charId;                  // 영웅 ID
+    public string instanceID;              // 장비 ID
 
     #region Unity
     private void OnEnable()
@@ -77,40 +77,7 @@ public class EquipmentInfoPanel : MonoBehaviour
             _ => null
         };
     }
-    // 판넬의 텍스트 설정
-    private void SetPanelText()
-    {
-        textEquipmentName.text = instance.template.equipmentName;           // 이름
-        textEquipmentEffect.text = instance.template.description;           // 설명
-        textEffectRate.text = instance.GetStat().ToString() + "%";                // 장비 효과
-        textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
-        textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
-        // 상승 능력치
-        //textPresentEff.text = 
-        //textNextEff.text =
-        // 연마석
-        //textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
-        //textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
 
-        textEquipLevel.text = "현재 단계" + instance.level.ToString();
-        textNextLevel.text = "다음 단계" + (instance.level + 1).ToString();   
-     
-        if (instance.isEquipped)
-        {
-            if (instance.charID == HeroInfo.heroData.heroId)
-            {
-                textEquip.text = "해제하기";
-            }
-            else
-            {
-                textEquip.text = "교체하기";
-            }
-        }
-        else
-        {
-            textEquip.text = "장비하기";
-        }
-    }
 
     private void SetButtonAddListener()
     {
@@ -157,7 +124,13 @@ public class EquipmentInfoPanel : MonoBehaviour
             oldInstance = equipmentManager.allEquipments
                 .FirstOrDefault(e => e.instanceID == currentEquippedId);
         }
-
+        //  장비가 장착되어 있고, 슬롯에 다른 영웅이 있을 경우
+        if (instance.isEquipped && instance.charID != heroData.heroId)
+        {
+            // 아이템 교체 확인 패널 활성화
+            changePanel.gameObject.SetActive(true);
+            return;
+        }
         // 1. 해제: 현재 장비가 장착되어 있고, 슬롯에 자신이 들어있을 경우
         if (currentEquippedId == instance.instanceID && instance.isEquipped)
         {
@@ -221,9 +194,44 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     #endregion
 
-    #region Private
+    #region Public
+    // 판넬의 텍스트 설정
+    public void SetPanelText()
+    {
+        textEquipmentName.text = instance.template.equipmentName;           // 이름
+        textEquipmentEffect.text = instance.template.description;           // 설명
+        textEffectRate.text = instance.GetStat().ToString() + "%";                // 장비 효과
+        textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
+        textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
+        // 상승 능력치
+        //textPresentEff.text = 
+        //textNextEff.text =
+        // 연마석
+        //textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
+        //textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
+
+        textEquipLevel.text = "현재 단계" + instance.level.ToString();
+        textNextLevel.text = "다음 단계" + (instance.level + 1).ToString();
+
+        if (instance.isEquipped)
+        {
+            if (instance.charID == HeroInfo.heroData.heroId)
+            {
+                textEquip.text = "해제하기";
+            }
+            else
+            {
+                textEquip.text = "교체하기";
+            }
+        }
+        else
+        {
+            textEquip.text = "장비하기";
+        }
+    }
+
     // 아이템 ID에 받아와 장비 타입 확인
-    private void SetHeroEquipmentSlot(string itemId)
+    public void SetHeroEquipmentSlot(string itemId)
     {
         var type = instance.equipmentType;
         var heroData = HeroInfo.heroData;
@@ -236,7 +244,7 @@ public class EquipmentInfoPanel : MonoBehaviour
             case EquipmentType.Boots: heroData.boots = itemId; break;
         }
     }
-    private void RefreshEquipCardUI()
+    public void RefreshEquipCardUI()
     {
         var itemList = FindFirstObjectByType<EquipmentItemList>();
         if (itemList == null)
@@ -255,9 +263,6 @@ public class EquipmentInfoPanel : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Public
     // 장비 받아오기
     public void GetEquipmentInstance(EquipmentInstance input)
     {
