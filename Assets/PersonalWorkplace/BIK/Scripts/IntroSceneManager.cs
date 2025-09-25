@@ -31,6 +31,13 @@ public class IntroSceneManager : MonoBehaviour
         if (scope != null)
             yield return new WaitUntil(() => scope.Container != null);
 
+        yield return new WaitUntil(() => BackendManager.Instance != null);
+        bool loginCompleted = false;
+        BackendManager.Instance.OnLoginSuccess += () => loginCompleted = true;
+        yield return new WaitUntil(() => loginCompleted);
+
+        Debug.Log("[IntroScene] 로그인 & 데이터 로드 완료!");
+
         // 테이블 로딩 대기
         if (scope != null)
         {
