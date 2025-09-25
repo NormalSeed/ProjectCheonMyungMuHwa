@@ -70,4 +70,17 @@ public class PlayerDataManager : MonoBehaviour
             CurrencyManager.Instance.Get(CurrencyType.Gold)
         );
     }
+    public void InitializeDefaultData()
+    {
+        ClearedStage = 1;
+        CurrencyManager.Instance.Set(CurrencyType.Gold, new BigCurrency(0));
+        Debug.Log("[PlayerDataManager] 신규 유저 기본 데이터 초기화 완료");
+    }
+
+    public void LoadFromServer(int stage, BigCurrency gold)
+    {
+        ClearedStage = stage;
+        CurrencyManager.Instance.Set(CurrencyType.Gold, gold);
+        Debug.Log($"[PlayerDataManager] 서버 데이터 적용 완료, Stage={stage}, Gold={gold}");
+    }
 }
