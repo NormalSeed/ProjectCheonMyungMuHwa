@@ -98,7 +98,7 @@ public class MapManager : MonoBehaviour
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        int themeIndex = (stageIndex - 1) / 100;
+        int themeIndex = (stageIndex - 1) / 25;
         if (themeIndex >= mapThemes.Length)
             themeIndex = mapThemes.Length - 1;
 
