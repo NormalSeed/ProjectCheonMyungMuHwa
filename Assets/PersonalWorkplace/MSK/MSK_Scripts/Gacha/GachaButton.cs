@@ -46,7 +46,7 @@ public class GachaButton : MonoBehaviour
             summonButton.interactable = true;
             buttonText.text = $"{ticketCost} 개";
         }// 인풋보다 보유중인 용옥이 충분하면
-        else if (model.Get(CurrencyType.SpiritStone) >= spiritStoneCost)
+        else if (model.Get(CurrencyType.Jewel) >= spiritStoneCost)
         {
             buttonImage.sprite = spiritStoneSprite;
             summonButton.interactable = true;
