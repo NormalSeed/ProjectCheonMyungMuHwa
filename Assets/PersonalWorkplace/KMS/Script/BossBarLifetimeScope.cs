@@ -7,10 +7,10 @@ using NUnit.Framework.Internal;
 
 public class BossBarLifetimeScope : LifetimeScope
 {
-    [SerializeField] public Image Bossbar;
+    [SerializeField] public StageBarUI BarUI;
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponent(Bossbar);
+        builder.RegisterComponent(BarUI);
 
     }
 }
