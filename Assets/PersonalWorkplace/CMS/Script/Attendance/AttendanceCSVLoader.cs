@@ -143,3 +143,11 @@ public class AttendanceReward
     public int day;
     public List<RewardItemInfo> rewards = new();
 }
+
+public static class TItemD
+{
+    public static ItemData GetItemByImage(this TItem table, string imageKey)
+    {
+        return null;
+    }
+}
