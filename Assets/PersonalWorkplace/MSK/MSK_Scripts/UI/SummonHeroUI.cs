@@ -35,6 +35,8 @@ public class SummonHeroUI : UIBase
 
     #region Properties
     private BigCurrency currency;
+    private BigCurrency stoneCurrency;
+
     private int summonCount;
     private int requireCount;
     private int inputTimes;
@@ -76,8 +78,10 @@ public class SummonHeroUI : UIBase
     {
         inputTimes = 1;
         currency = BigCurrency.FromBaseAmount(inputTimes);
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+        stoneCurrency = currency * 100;
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
+
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
@@ -86,8 +90,10 @@ public class SummonHeroUI : UIBase
     {
         inputTimes = 10;
         currency = BigCurrency.FromBaseAmount(inputTimes);
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+        stoneCurrency = currency * 100;
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
+
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
@@ -96,7 +102,8 @@ public class SummonHeroUI : UIBase
     {
         inputTimes = 50;
         currency = BigCurrency.FromBaseAmount(inputTimes);
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency))
+        stoneCurrency = currency * 100;
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
         SummonHeros(inputTimes);
