@@ -9,6 +9,7 @@ public class SettingUI : UIBase
     [SerializeField] private Button logoutButton;
     [SerializeField] private Button deleteAccountButton;
     [SerializeField] private Button linkGoogleButton;
+    [SerializeField] private Button closeButton;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI uidText;
@@ -43,6 +44,12 @@ public class SettingUI : UIBase
         linkGoogleButton.onClick.AddListener(() =>
         {
             BackendManager.Instance?.LinkGuestToGoogle();
+        });
+
+        closeButton.onClick.AddListener(() =>
+        {
+            Debug.Log("[SettingUI] 닫기 버튼 클릭됨");
+            SetHide(); 
         });
     }
 

@@ -303,46 +303,55 @@ public class BackendManager : MonoBehaviour
         }
 
         string uid = Auth.CurrentUser.UserId;
+        Debug.Log($"[BackendManager] LoadPlayerData 시작, UID={uid}");
+
         DatabaseReference userRef = Database.RootReference.Child("players").Child(uid);
 
         userRef.GetValueAsync().ContinueWithOnMainThread((Task<DataSnapshot> task) =>
         {
+            Debug.Log("[BackendManager] DB 응답 수신");
             if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.LogError("플레이어 데이터 불러오기 실패: " + task.Exception);
                 return;
             }
 
-            DataSnapshot snapshot = task.Result;
-            if (!snapshot.Exists)
+            try
             {
-                Debug.Log("[BackendManager] 신규 유저 데이터 생성");
-                PlayerDataManager.Instance.InitializeDefaultData();
-                SafeSave();
-            }
-            else
-            {
-                int clearedStage = snapshot.Child("clearedStage").Exists
-                    ? int.Parse(snapshot.Child("clearedStage").Value.ToString())
-                    : 1;
-
-                if (snapshot.Child("gold").Exists)
+                DataSnapshot snapshot = task.Result;
+                if (!snapshot.Exists)
                 {
-                    string rawGold = snapshot.Child("gold").Value.ToString();
-                    if (!BigCurrency.TryParse(rawGold, out gold))
-                    {
-                        Debug.LogWarning($"골드 파싱 실패: {rawGold}, 기본값 0 사용");
-                        gold = new BigCurrency(0);
-                    }
+                    Debug.Log("[BackendManager] 신규 유저 데이터 생성");
+                    PlayerDataManager.Instance?.InitializeDefaultData();
+                    SafeSave();
                 }
                 else
                 {
-                    gold = new BigCurrency(0);
+                    int clearedStage = snapshot.Child("clearedStage").Exists
+                        ? int.Parse(snapshot.Child("clearedStage").Value.ToString())
+                        : 1;
+
+                    if (snapshot.Child("gold").Exists)
+                    {
+                        string rawGold = snapshot.Child("gold").Value.ToString();
+                        if (!BigCurrency.TryParse(rawGold, out gold))
+                        {
+                            Debug.LogWarning($"골드 파싱 실패: {rawGold}, 기본값 0 사용");
+                            gold = new BigCurrency(0);
+                        }
+                    }
+                    else
+                    {
+                        gold = new BigCurrency(0);
+                    }
+
+                    PlayerDataManager.Instance?.LoadFromServer(clearedStage, gold);
+                    Debug.Log($"[BackendManager] 데이터 로드 완료, Stage={clearedStage}, Gold={gold}");
                 }
-
-                PlayerDataManager.Instance.LoadFromServer(clearedStage, gold);
-
-                Debug.Log($"[BackendManager] 데이터 로드 완료 → Stage={clearedStage}, Gold={gold}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("[BackendManager] LoadPlayerData 처리 중 예외: " + ex);
             }
 
             onComplete?.Invoke();
