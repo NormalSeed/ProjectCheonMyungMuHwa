@@ -77,7 +77,7 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 1;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
         SummonHeros(inputTimes);
@@ -89,7 +89,7 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 10;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
         SummonHeros(inputTimes);
@@ -101,7 +101,7 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 50;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
         SummonHeros(inputTimes);

@@ -84,7 +84,10 @@ public class DecompositionEquipment : MonoBehaviour
     {
         // 분해 보상 연마석 지급
         Debug.LogWarning($"연마석 : {currency.ToString()} 개");
+
         CurrencyManager.Instance.Add(CurrencyType.GrindingStone, currency);
+
+
         // 1. 실제 장비 데이터에서 제거
         equipmentManager.DelectEquipmentsByList(selectedEquip);
 
