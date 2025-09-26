@@ -1,4 +1,6 @@
 using Firebase;
+using Firebase.Auth;
+using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections;
 using UnityEngine;
@@ -32,7 +34,8 @@ public class IntroSceneManager : MonoBehaviour
         {
             Debug.Log("스코프 있음");
             yield return new WaitUntil(() => scope.Container != null);  
-            Debug.Log("컨테이너 받아옴"); 
+            Debug.Log("컨테이너 받아옴");
+            BackendManager.Instance.Init(FirebaseApp.DefaultInstance, FirebaseAuth.DefaultInstance, FirebaseDatabase.DefaultInstance);
         }
 
 
