@@ -9,7 +9,7 @@ public class EquipmentCardDisplay : MonoBehaviour
     [SerializeField] private Image iconImage;
 
     private EquipmentInstance equipment;
-
+    
     #region Private
     private void LoadIcon(string key)
     {

@@ -42,6 +42,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     public EquipmentInstance instance;     // 판넬의 장비
     public string charId;                  // 영웅 ID
     public string instanceID;              // 장비 ID
+    private BigCurrency levelUpCurrency;   // 소모 연마석 
 
     #region Unity
     private void OnEnable()
@@ -51,12 +52,14 @@ public class EquipmentInfoPanel : MonoBehaviour
     private void OnDisable()
     {
         SetButtonRemoveListener();
+        this.gameObject.SetActive(false);
     }
     #endregion
 
     #region Init
     public void Init()
     {
+        levelUpCurrency = BigCurrency.FromBaseAmount(GetLevelUpGrindingStone(instance));
         imageEquipment.SetData(instance);
         GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
         SetInstanceIDFromHeroData();
@@ -101,7 +104,10 @@ public class EquipmentInfoPanel : MonoBehaviour
     // 장비 업그레이드
     private void OnClickUpgrade()
     {
-        // TODO : 연마석 소모체크 추가하기
+        // TODO : 연마석 팝업
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.GrindingStone, levelUpCurrency)) 
+            return;
+
         instance.level++;
         StatModifierManager.ApplyToCard(HeroInfo.heroData.cardInfo);
         SetPanelText();
@@ -190,7 +196,29 @@ public class EquipmentInfoPanel : MonoBehaviour
         RefreshEquipCardUI();
     }
 
+    // 소모 연마석 반환
+    private int GetLevelUpGrindingStone(EquipmentInstance equip)
+    {
+        int baseValue = 0;
 
+        switch (equip.rarity)
+        {
+            case RarityType.Normal:
+                baseValue = 10;
+                break;
+            case RarityType.Rare:
+                baseValue = 20;
+                break;
+            case RarityType.Epic:
+                baseValue = 30;
+                break;
+            case RarityType.Unique:
+                baseValue = 40;
+                break;
+        }
+
+        return baseValue * equip.level;
+    }
 
     #endregion
 
@@ -204,11 +232,11 @@ public class EquipmentInfoPanel : MonoBehaviour
         textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
         textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
         // 상승 능력치
-        //textPresentEff.text = 
-        //textNextEff.text =
+        textPresentEff.text = $"{instance.statType}";
+        textNextEff.text = $"{instance.statType}";
         // 연마석
-        //textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
-        //textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.)}";
+        textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone)}";
+        textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone) - levelUpCurrency}";
 
         textEquipLevel.text = "현재 단계" + instance.level.ToString();
         textNextLevel.text = "다음 단계" + (instance.level + 1).ToString();

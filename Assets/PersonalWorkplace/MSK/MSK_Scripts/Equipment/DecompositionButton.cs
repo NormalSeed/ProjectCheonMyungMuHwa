@@ -51,4 +51,9 @@ public class DecompositionButton : MonoBehaviour
     {
         return equipmentCardDisplay != null ? equipmentCardDisplay.GetEquipment() : null;
     }
+    public void ToggleSelect()
+    {
+        OnClickSelect();
+    }
+
 }

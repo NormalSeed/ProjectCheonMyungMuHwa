@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +30,8 @@ public class DecompositionEquipment : MonoBehaviour
     public List<DecompositionButton> selectedEquipButtons = new();  // 선택된 장비버튼 리스트
     public List<EquipmentInstance> selectedEquip = new();  // 선택된 장비 리스트
 
+    private BigCurrency currency;
+
     #region Unity
     private void OnEnable()
     {
@@ -45,6 +46,7 @@ public class DecompositionEquipment : MonoBehaviour
         epicButton.onClick.RemoveListener(OnClickEpic);
         exitButton.onClick.RemoveListener(OnClickExit);
         submitButton.onClick.RemoveListener(OnClickSubmit);
+        this.gameObject.SetActive(false);
     }
 
     #endregion
@@ -59,15 +61,30 @@ public class DecompositionEquipment : MonoBehaviour
     }
 
     #region OnClick
-    private void OnClickNormal() { }
-    private void OnClickRare() { }
-    private void OnClickEpic() { }
+    private void OnClickNormal()
+    {
+        SelectEquipmentsByRarity(RarityType.Normal);
+    }
+
+    private void OnClickRare()
+    {
+        SelectEquipmentsByRarity(RarityType.Rare);
+    }
+
+    private void OnClickEpic()
+    {
+        SelectEquipmentsByRarity(RarityType.Epic);
+    }
+
     private void OnClickExit()
     {
         this.gameObject.SetActive(false);
     }
     private void OnClickSubmit()
     {
+        //  연마석 지급
+        CurrencyManager.Instance.Add(CurrencyType.GrindingStone, currency);
+
         // 1. 실제 장비 데이터에서 제거
         equipmentManager.DelectEquipmentsByList(selectedEquip);
 
@@ -78,7 +95,8 @@ public class DecompositionEquipment : MonoBehaviour
         // 3. UI 갱신
         ShowEquipmentListByEquip();
         equipmentItemList.ShowEquipmentListByTemplateID(equipmentItemList.thisTemplateID);
-        // CurrencyManager.Instance.Add(CurrencyType.GrindingStone);
+        currency = BigCurrency.FromBaseAmount(CalculateTotalGrindingStone(selectedEquip));
+        resultGrind.text = currency.ToString();
     }
 
 
@@ -106,10 +124,63 @@ public class DecompositionEquipment : MonoBehaviour
             }
         }
         // UI 업데이트 예시
-        resultGrind.text = selectedEquipButtons.Count.ToString();
+        currency = BigCurrency.FromBaseAmount(CalculateTotalGrindingStone(selectedEquip));
+        resultGrind.text = $"분해 시 획득 연마석 : {currency.ToString()} 개"; // 선택된 장비에 따라 계산 필요
     }
     #endregion
+    private void SelectEquipmentsByRarity(RarityType maxRarity)
+    {
+        foreach (var button in activeEquipButtons)
+        {
+            var equip = button.equipmentCardDisplay.GetEquipment();
+            if (equip != null && equip.rarity <= maxRarity)
+            {
+                if (!button.IsSelected)
+                {
+                    button.ToggleSelect(); // 선택
+                }
+            }
+            else
+            {
+                if (button.IsSelected)
+                {
+                    button.ToggleSelect(); // 선택 해제
+                }
+            }
+        }
+    }
+    // 분해 시 연마석 계산
+    private int GetDecompositionGrindingStone(EquipmentInstance equip)
+    {
+        int baseValue = 0;
 
+        switch (equip.rarity)
+        {
+            case RarityType.Normal:
+                baseValue = 20;
+                break;
+            case RarityType.Rare:
+                baseValue = 40;
+                break;
+            case RarityType.Epic:
+                baseValue = 60;
+                break;
+            case RarityType.Unique:
+                baseValue = 80;
+                break;
+        }
+
+        return baseValue * equip.level;
+    }
+    public int CalculateTotalGrindingStone(List<EquipmentInstance> selectedEquip)
+    {
+        int total = 0;
+        foreach (var equip in selectedEquip)
+        {
+            total += GetDecompositionGrindingStone(equip);
+        }
+        return total;
+    }
     #endregion
 
     #region Public
@@ -141,8 +212,8 @@ public class DecompositionEquipment : MonoBehaviour
         }
 
         // UI 텍스트 업데이트
-        equipCount.text = filtered.Count.ToString();
-        resultGrind.text = "0"; // 선택된 장비에 따라 계산 필요
+        equipCount.text = $"{filtered.Count.ToString()} / 300 개";
+        resultGrind.text = $"분해 시 획득 연마석 : {currency.ToString()} 개"; // 선택된 장비에 따라 계산 필요
     }
     #endregion
 }
