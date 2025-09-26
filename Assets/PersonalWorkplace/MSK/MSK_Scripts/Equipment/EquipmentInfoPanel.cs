@@ -52,6 +52,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     private void OnDisable()
     {
         SetButtonRemoveListener();
+        this.gameObject.SetActive(false);
     }
     #endregion
 

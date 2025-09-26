@@ -46,6 +46,7 @@ public class DecompositionEquipment : MonoBehaviour
         epicButton.onClick.RemoveListener(OnClickEpic);
         exitButton.onClick.RemoveListener(OnClickExit);
         submitButton.onClick.RemoveListener(OnClickSubmit);
+        this.gameObject.SetActive(false);
     }
 
     #endregion
