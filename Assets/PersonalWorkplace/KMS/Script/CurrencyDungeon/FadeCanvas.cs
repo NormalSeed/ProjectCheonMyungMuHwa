@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 public class FadeCanvas : MonoBehaviour
 {
 
-    private static bool isInstantiated;
+    public static FadeCanvas Instance;
 
     [SerializeField] Image image;
 
     void Awake()
     {
-        if (isInstantiated)
+        if (Instance != null)
         {
             Destroy(gameObject);
         }
         else
         {
             DontDestroyOnLoad(gameObject);
-            isInstantiated = true;
+            Instance = this;
         }
     }
 
@@ -38,7 +38,7 @@ public class FadeCanvas : MonoBehaviour
 
     public void FadeOutAndLoadScene(string scene, float time)
     {
-        AudioManager.Instance.StopAllSounds();
+        //AudioManager.Instance.StopAllSounds();
         Sequence seq = DOTween.Sequence();
         seq.Append(image.DOFade(1f, time));
         seq.OnComplete(() =>

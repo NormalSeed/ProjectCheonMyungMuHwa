@@ -72,6 +72,7 @@ public class BossController : MonsterController
     public override void OnDeath()
     {
         onDeath?.Invoke();
+        barUI.Timer.Stop();
         if (attackCo != null) StopCoroutine(attackCo);
         InGameManager.Instance?.SetNextStage();
         if (InGameManager.Instance != null) InGameManager.Instance.monsterDeathStack.Value--;

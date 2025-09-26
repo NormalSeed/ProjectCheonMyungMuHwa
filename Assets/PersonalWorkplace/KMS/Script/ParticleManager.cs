@@ -54,9 +54,9 @@ public class ParticleManager : MonoBehaviour
             },
             actionOnGet: obj => obj.gameObject.SetActive(true),
             actionOnRelease: obj => obj.gameObject.SetActive(false),
-            actionOnDestroy: obj => UnityEngine.Object.Destroy(obj.gameObject),
-            defaultCapacity: 20,
-            maxSize: 20
+            actionOnDestroy: obj => { Debug.Log("particle removed"); },
+            defaultCapacity: 2,
+            maxSize: 40
             );
             ParticleSystem part = prefab.GetComponent<ParticleSystem>();
             particleDelays.Add(prefab.name, new WaitForSeconds(part.main.duration));
@@ -64,7 +64,6 @@ public class ParticleManager : MonoBehaviour
             particleName.Add(part, prefab.name);
         }
         IsInitialized = true;
-        Debug.Log($"<color=green> 파티클 로드 완료 </color>");
 
     }
     public ParticleSystem GetParticle(string name, Vector2 pos, Transform parent = null, float scale = 1)
@@ -89,7 +88,7 @@ public class ParticleManager : MonoBehaviour
     {
         pt.Play();
         yield return wfs;
-        pt.transform.SetParent(gameObject.transform);
+        if (pt != null) pt.transform.SetParent(gameObject.transform);
         poolDict[name].Release(pt);
     }
 }

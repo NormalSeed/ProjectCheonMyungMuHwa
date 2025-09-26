@@ -63,6 +63,7 @@ public class CurrencyDungeonUI : UIBase
         if (data.MainUiToOpen == UIType.Dungeon)
         {
             OpenLevelPanel(data.type);
+            data.MainUiToOpen = UIType.None;
         }
         else
         {
