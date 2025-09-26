@@ -41,5 +41,9 @@ public class EquipmentCardDisplay : MonoBehaviour
         string addressKey = $"{equipment.templateID}_{equipment.rarity}";
         LoadIcon(addressKey);
     }
+    public EquipmentInstance GetEquipment()
+    {
+        return equipment;
+    }
     #endregion
 }
