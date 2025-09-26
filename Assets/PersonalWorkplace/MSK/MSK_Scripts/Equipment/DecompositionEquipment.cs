@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,16 +21,128 @@ public class DecompositionEquipment : MonoBehaviour
     [SerializeField] private TextMeshProUGUI equipCount;    // 장비 개수
     [SerializeField] private TextMeshProUGUI resultGrind;    // 획득 연마석
 
+    [Header("Pool")]
+    [SerializeField] private GachaCardPoolManager cardPoolManager;  // 풀메니저
+
+    [Header("Panel")]
+    [SerializeField] private EquipmentItemList equipmentItemList; // 아이템 인벤토리 창
+
     public List<DecompositionButton> activeEquipButtons = new();    // 분해 선택 버튼
+    public List<DecompositionButton> selectedEquipButtons = new();  // 선택된 장비버튼 리스트
+    public List<EquipmentInstance> selectedEquip = new();  // 선택된 장비 리스트
 
-    void Start()
+    #region Unity
+    private void OnEnable()
     {
-        
+        Init();
+
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        normalButton.onClick.RemoveListener(OnClickNormal);
+        rareButton.onClick.RemoveListener(OnClickRare);
+        epicButton.onClick.RemoveListener(OnClickEpic);
+        exitButton.onClick.RemoveListener(OnClickExit);
+        submitButton.onClick.RemoveListener(OnClickSubmit);
     }
+
+    #endregion
+
+    private void Init()
+    {
+        normalButton.onClick.AddListener(OnClickNormal);
+        rareButton.onClick.AddListener(OnClickRare);
+        epicButton.onClick.AddListener(OnClickEpic);
+        exitButton.onClick.AddListener(OnClickExit);
+        submitButton.onClick.AddListener(OnClickSubmit);
+    }
+
+    #region OnClick
+    private void OnClickNormal() { }
+    private void OnClickRare() { }
+    private void OnClickEpic() { }
+    private void OnClickExit()
+    {
+        this.gameObject.SetActive(false);
+    }
+    private void OnClickSubmit()
+    {
+        // 1. 실제 장비 데이터에서 제거
+        equipmentManager.DelectEquipmentsByList(selectedEquip);
+
+        // 2. 선택 리스트 초기화
+        selectedEquipButtons.Clear();
+        selectedEquip.Clear();
+
+        // 3. UI 갱신
+        ShowEquipmentListByEquip();
+        equipmentItemList.ShowEquipmentListByTemplateID(equipmentItemList.thisTemplateID);
+        // CurrencyManager.Instance.Add(CurrencyType.GrindingStone);
+    }
+
+
+    #endregion
+
+    #region Private
+
+    #region events
+    private void HandleSelectChanged(DecompositionButton button, bool isSelected)
+    {
+        if (isSelected)
+        {
+            if (!selectedEquipButtons.Contains(button))
+            {
+                selectedEquipButtons.Add(button);
+                selectedEquip.Add(button.equipmentCardDisplay.GetEquipment());
+            }
+        }
+        else
+        {
+            if (selectedEquipButtons.Contains(button))
+            {
+                selectedEquipButtons.Remove(button);
+                selectedEquip.Remove(button.equipmentCardDisplay.GetEquipment());
+            }
+        }
+        // UI 업데이트 예시
+        resultGrind.text = selectedEquipButtons.Count.ToString();
+    }
+    #endregion
+
+    #endregion
+
+    #region Public
+    public void ShowEquipmentListByEquip()
+    {
+        cardPoolManager.ReturnAll(); // 기존 카드 초기화
+        activeEquipButtons.Clear();
+
+        // 착용되지 않은 장비만 필터링
+        var filtered = equipmentManager.allEquipments.FindAll(e => !e.isEquipped);
+
+        Debug.Log($"[ShowEquipmentListByEquip] 미착용 장비 수: {filtered.Count}");
+        foreach (var equip in filtered)
+        {
+            var card = cardPoolManager.GetCard();
+            var display = card.GetComponentInChildren<EquipmentCardDisplay>();
+            var button = card.GetComponent<DecompositionButton>();
+
+            if (display != null) display.SetData(equip);
+            if (button != null)
+            {
+                button.Init(equip);
+                button.onSelectChanged = HandleSelectChanged; // 이벤트 연결
+                activeEquipButtons.Add(button);
+            }
+
+            card.transform.SetAsLastSibling();
+            card.SetActive(true);
+        }
+
+        // UI 텍스트 업데이트
+        equipCount.text = filtered.Count.ToString();
+        resultGrind.text = "0"; // 선택된 장비에 따라 계산 필요
+    }
+    #endregion
 }

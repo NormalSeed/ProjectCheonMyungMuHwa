@@ -3,6 +3,7 @@ using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -37,7 +38,7 @@ public class EquipmentFirebaseData
 }
 
 
-public class    EquipmentManager : IStartable
+public class EquipmentManager : IStartable
 {
     public bool IsInitialized { get; private set; }
 
@@ -182,6 +183,16 @@ public class    EquipmentManager : IStartable
         // 파이어베이스에서 장비 데이터 삭제
         DeleteEquipmentsFromFirebase();
 
+    }
+
+    public void DelectEquipmentsByList(List<EquipmentInstance> input)
+    {
+        // 장비 ID를 기준으로 일치하면 삭제
+        allEquipments.RemoveAll(equip =>
+    input.Any(selected => selected.instanceID == equip.instanceID));
+
+        // JSON 파일 초기화
+        SaveToJson();
     }
 
     private void DeleteEquipmentsFromFirebase()

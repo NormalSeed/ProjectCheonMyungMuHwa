@@ -19,6 +19,7 @@ public class InGameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<EquipmentItemList>();
         builder.RegisterComponentInHierarchy<EquipmentInfoPanel>();
         builder.RegisterComponentInHierarchy<EquipmentChange>();
+        builder.RegisterComponentInHierarchy<DecompositionEquipment>();
         builder.RegisterComponentInHierarchy<HeroDataManager>();
     }
 }

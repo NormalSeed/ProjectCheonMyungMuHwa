@@ -140,6 +140,7 @@ public class CurrencyManager : IStartable, IDisposable
         _model.Set(CurrencyType.GoldChallengeTicket, new BigCurrency(0, 0));
         _model.Set(CurrencyType.SoulChallengeTicket, new BigCurrency(0, 0));
         _model.Set(CurrencyType.SpiritStoneChallengeTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyType.GrindingStone, new BigCurrency(0, 0));
     }
 
     #endregion // private funcs

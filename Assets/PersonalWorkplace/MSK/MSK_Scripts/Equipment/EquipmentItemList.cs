@@ -10,8 +10,8 @@ public class EquipmentItemList : MonoBehaviour
     [Inject] private EquipmentManager equipmentManager;
 
     [Header("Panel")]
-    [SerializeField] public EquipmentInfoPanel equipPanel;          // 장비 패널
-
+    [SerializeField] public EquipmentInfoPanel equipPanel;             // 장비 패널
+    [SerializeField] public DecompositionEquipment decompositionPanel; // 분해 패널
     [Header("Pool")]
     [SerializeField] private GachaCardPoolManager cardPoolManager;  // 풀메니저
 
@@ -21,16 +21,19 @@ public class EquipmentItemList : MonoBehaviour
 
 
     public List<InventoryEquipButton> activeEquipButtons = new();
+    public string thisTemplateID;
 
     #region Unity
     private void OnEnable()
     {
         eixtButton.onClick.AddListener(OnClickExitButton);
+        decompositionButton.onClick.AddListener(OnClicKDecompositionButton);
     }
 
     private void OnDisable()
     {
         eixtButton.onClick.RemoveListener(OnClickExitButton);
+        decompositionButton.onClick.RemoveListener(OnClicKDecompositionButton);
         equipPanel.gameObject.SetActive(false);
     }
     #endregion
@@ -42,14 +45,15 @@ public class EquipmentItemList : MonoBehaviour
     }
     private void OnClicKDecompositionButton()
     {
-
+        decompositionPanel.gameObject.SetActive(true);
+        decompositionPanel.ShowEquipmentListByEquip();
     }
     #endregion
     public void ShowEquipmentListByTemplateID(string templateID)
     {
         cardPoolManager.ReturnAll(); // 기존 카드 초기화
         activeEquipButtons.Clear();
-
+        thisTemplateID = templateID;
         var filtered = equipmentManager.allEquipments.FindAll(e => e.templateID == templateID);
 
         Debug.Log($"[ShowEquipmentListByTemplateID] templateID: {templateID}, 장비 수: {filtered.Count}");
