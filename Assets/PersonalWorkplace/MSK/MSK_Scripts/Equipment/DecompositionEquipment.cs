@@ -82,6 +82,9 @@ public class DecompositionEquipment : MonoBehaviour
     }
     private void OnClickSubmit()
     {
+        // 분해 보상 연마석 지급
+        Debug.LogWarning($"연마석 : {currency.ToString()} 개");
+        CurrencyManager.Instance.Add(CurrencyType.GrindingStone, currency);
         // 1. 실제 장비 데이터에서 제거
         equipmentManager.DelectEquipmentsByList(selectedEquip);
 
@@ -92,8 +95,8 @@ public class DecompositionEquipment : MonoBehaviour
         // 3. UI 갱신
         ShowEquipmentListByEquip();
         equipmentItemList.ShowEquipmentListByTemplateID(equipmentItemList.thisTemplateID);
-        // 분해 보상 연마석 지급
-        // CurrencyManager.Instance.Add(CurrencyType.GrindingStone);
+        currency = BigCurrency.FromBaseAmount(CalculateTotalGrindingStone(selectedEquip));
+        resultGrind.text = currency.ToString();
     }
 
 
@@ -121,7 +124,8 @@ public class DecompositionEquipment : MonoBehaviour
             }
         }
         // UI 업데이트 예시
-        resultGrind.text = selectedEquipButtons.Count.ToString();
+        currency = BigCurrency.FromBaseAmount(CalculateTotalGrindingStone(selectedEquip));
+        resultGrind.text = currency.ToString(); // 선택된 장비에 따라 계산 필요
     }
     #endregion
     private void SelectEquipmentsByRarity(RarityType maxRarity)
@@ -209,7 +213,7 @@ public class DecompositionEquipment : MonoBehaviour
 
         // UI 텍스트 업데이트
         equipCount.text = filtered.Count.ToString();
-        resultGrind.text = "0"; // 선택된 장비에 따라 계산 필요
+        resultGrind.text = currency.ToString(); // 선택된 장비에 따라 계산 필요
     }
     #endregion
 }
