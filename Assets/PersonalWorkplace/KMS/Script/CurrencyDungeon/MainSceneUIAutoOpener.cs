@@ -15,6 +15,14 @@ public class MainSceneUIAutoOpener : MonoBehaviour
     {
         yield return null;
         mainUI.ShowUI(data.MainUiToOpen);
-        
+
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            AudioManager.Instance.PlayBGM("BGM_Chapter2");
+        }
     }
 }

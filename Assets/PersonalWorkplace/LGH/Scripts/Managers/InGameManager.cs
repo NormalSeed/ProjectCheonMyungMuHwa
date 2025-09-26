@@ -46,10 +46,13 @@ public class InGameManager : MonoBehaviour
     [SerializeField] TMPro.TMP_Text stagetext;
 
     public Action<int, int> OnStageStart;
+    public MainSceneBGMPlayer bgmPlayer;
+    private bool stageLoaded;
 
     private void Awake()
     {
         Instance = this;
+        bgmPlayer = new MainSceneBGMPlayer();
     }
 
     private void Start()
@@ -97,6 +100,7 @@ public class InGameManager : MonoBehaviour
             {
                 int savedStage = int.Parse(task.Result.Value.ToString());
                 stageNum = savedStage;
+                stageLoaded = true;
                 Debug.Log($"Firebase에서 불러온 스테이지: {stageNum}");
             }
             else
@@ -104,6 +108,12 @@ public class InGameManager : MonoBehaviour
                 Debug.LogWarning("Firebase에서 스테이지 데이터를 찾을 수 없습니다. 기본값 사용.");
             }
         });
+        StartCoroutine(PlayBGM());
+    }
+    private IEnumerator PlayBGM()
+    {
+        yield return new WaitUntil(() => stageLoaded);
+        bgmPlayer.SetInitialBGM(stageNum);
     }
 
     public void RespawnMonsters()
@@ -144,6 +154,7 @@ public class InGameManager : MonoBehaviour
         }
         StartCoroutine(ResetAlignmentFlag());
         OnStageStart?.Invoke(stageNum, stageProgress);
+        bgmPlayer.SetBGM(stageNum);
 
         foreach (var player in players)
         {

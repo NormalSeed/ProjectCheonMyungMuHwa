@@ -10,6 +10,8 @@ public class StageBarUI : MonoBehaviour
     [SerializeField] StageBarFill[] monsterFills;
     [SerializeField] CurrencyDungeonTimer timer;
 
+    public CurrencyDungeonTimer Timer => timer;
+
     private StageBarFill targetMonsterFill;
 
 
@@ -60,6 +62,18 @@ public class StageBarUI : MonoBehaviour
     public void AddFill(float val)
     {
         targetMonsterFill.AddValue(val);
+    }
+
+    public void SetCurrencyDungeon(CurrencyDungeonType type)
+    {
+        BossSetting();
+        stageValueText.text = "";
+        switch (type)
+        {
+            case CurrencyDungeonType.Gold: stageText.text = "금화던전"; break;
+            case CurrencyDungeonType.Honbaeg: stageText.text = "혼백던전"; break;
+            case CurrencyDungeonType.Spirit: stageText.text = "영석던전"; break;
+        }
     }
 
 

@@ -11,9 +11,9 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
     private CurrencyDungeonClearData clearData;
 
-    [SerializeField] CurrencyDungeonTimer timer;
+    [SerializeField] CurrencyDungeonTimer timer => barUI.Timer;
 
-    [SerializeField] UIBase failUI;
+    [SerializeField] StageBarUI barUI;
 
 
     void Awake()
@@ -22,12 +22,14 @@ public class CurrencyDungeonManage : MonoBehaviour
         playerSet.InitPlayer();
 
         timer.OnTimeOver += DungeonFail;
+        playerSet.SpawnPlayer();
     }
 
     void Start()
     {
+        barUI.SetCurrencyDungeon(sceneData.type);
         bossSpawner.SpawnBoss();
-        playerSet.SpawnPlayer();
+        
     }
 
     private void DungeonClear()
@@ -64,7 +66,7 @@ public class CurrencyDungeonManage : MonoBehaviour
         yield return new WaitForSeconds(4f);
         PopupManager.Instance.ShowRewardPopup(new List<ItemData>() { rewardItem }, new List<BigCurrency>() { reward });
         yield return new WaitForSeconds(3f);
-        //fade.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
+        FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
 
 
     }

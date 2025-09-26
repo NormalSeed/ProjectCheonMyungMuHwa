@@ -2,15 +2,17 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
     private DefaultPool<AudioSourceController> soundPool;
     [SerializeField] private GameObject AudioSourcePrefab;
-    private Dictionary<string, AudioClip> clips;
 
-    private AudioSourceController BGM;
+    [SerializeField] AudioSource BGMSource;
+    private Dictionary<string, AudioClip> clips;
+    private string currentBGM;
 
     public bool IsInitialized;
 
@@ -28,7 +30,7 @@ public class AudioManager : MonoBehaviour
     }
     public void Init()
     {
-        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
+        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: true, parent: gameObject.transform);
         clips = new();
         LoadAssetAsync();
     }
@@ -60,20 +62,19 @@ public class AudioManager : MonoBehaviour
         soundPool.ReleaseAllItes();
     }
 
-    public void PlayBGM(string id, float volume = 1, PlayMode mode = PlayMode.Loop)
+    public void PlayBGM(string id, float volume = 1)
     {
-        StopSound(BGM);
+        if (id == currentBGM) return;
+        StopBGM();
         AudioClip clip = clips[id];
-        BGM = soundPool.GetItem();
-        BGM.Init(clip, volume, mode);
+        currentBGM = id;
+        BGMSource.clip = clip;
+        BGMSource.volume = volume;
+        BGMSource.Play();
     }
     public void StopBGM()
     {
-        if (BGM != null)
-        {
-            StopSound(BGM);
-            BGM = null;
-        }
+        if (BGMSource.clip != null) BGMSource.Stop();
     }
 
 }
