@@ -77,6 +77,12 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 1;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
@@ -89,6 +95,12 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 10;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
@@ -101,9 +113,14 @@ public class SummonEquipUI : MonoBehaviour
         inputTimes = 50;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
-
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
@@ -142,12 +159,6 @@ public class SummonEquipUI : MonoBehaviour
     }
     private async Task SummonHeros(int times)
     {
-        int equipCount = gachaManager.allEquipCount + times;
-        if (equipCount >= 300) 
-        {
-            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
-            return;
-        }
         summonResultUI.gameObject.SetActive(true);
         await gachaManager.Summon(times);
     }
