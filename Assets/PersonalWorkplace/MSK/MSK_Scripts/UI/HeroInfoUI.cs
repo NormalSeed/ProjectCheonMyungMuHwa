@@ -196,12 +196,20 @@ public class HeroInfoUI : UIBase
     private void HeroLevelUpgrade()
     {
         if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
-        {
+        {   //  이전 전투력 저장
+            BigCurrency prePow = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower);
+            //  레벨업
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
+            //  다음 레벨 골드 계산
             requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             RequireLevelUpGold(heroData.PlayerModelSO.Level);
+            //  DB 저장 
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
+            //  변화 팝업 띄우기
+            BigCurrency valueChange = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower) - prePow;
+            PopupManager.Instance.ShowPowerUpPanel(BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower), valueChange);
+            //  정보 새로고침
             RefreshHeroUI();
         }
     }
@@ -235,14 +243,27 @@ public class HeroInfoUI : UIBase
     {
         if (heroData.stage >= 5) return;
 
+        //  이전 전투력 저장
+        BigCurrency prePow = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower);
+
+        // 돌파 작업
         ownerPiece -= requirePiece;
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
-        GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-        heroUI.RefreshAllCards();
+        
+        // DB에 사용한 조각, 돌파 정보 저장
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
+       
+        // 다음 요구량
         requirePiece = heroData.stage + (5 - (int)heroData.cardInfo.rarity) * (heroData.stage);
+
+        //  변화 팝업 띄우기
+        BigCurrency valueChange = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower) - prePow;
+        PopupManager.Instance.ShowPowerUpPanel(BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower), valueChange);
+
+        // UI 갱신
+        heroUI.RefreshAllCards();
         RefreshHeroUI();
     }
 

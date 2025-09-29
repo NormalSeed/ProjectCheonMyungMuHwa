@@ -13,13 +13,13 @@ public class InGameLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<EquipmentService>(Lifetime.Singleton);
-        builder.RegisterComponentInHierarchy<TestEquipmentCreator>();
+        builder.Register<HeroDataManager>(Lifetime.Singleton);
         builder.RegisterComponentInHierarchy<EquipGachaManager>();
         builder.RegisterComponentInHierarchy<HeroInfoUI>();
         builder.RegisterComponentInHierarchy<EquipmentItemList>();
         builder.RegisterComponentInHierarchy<EquipmentInfoPanel>();
         builder.RegisterComponentInHierarchy<EquipmentChange>();
         builder.RegisterComponentInHierarchy<DecompositionEquipment>();
-        builder.RegisterComponentInHierarchy<HeroDataManager>();
+        builder.RegisterComponentInHierarchy<TestEquipmentCreator>();
     }
 }
