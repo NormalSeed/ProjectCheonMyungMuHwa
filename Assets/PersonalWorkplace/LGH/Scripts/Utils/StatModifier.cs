@@ -233,15 +233,34 @@ public static class StatModifierManager
 
     public static void ApplyToCard(CardInfo card)
     {
-        string charID = card.HeroID;
-
-        // 모델 정보 가져오기
-        var modelSO = HeroModels.Instance.GetModelSO(charID);
-        if (modelSO == null)
+        if (card == null)
         {
-            Debug.LogWarning($"[ApplyToCard] 모델 SO를 찾을 수 없습니다: {charID}");
+            Debug.LogError("[ApplyToCard] card가 null입니다");
             return;
         }
+
+        if (string.IsNullOrEmpty(card.HeroID))
+        {
+            Debug.LogError("[ApplyToCard] card.HeroID가 null 또는 빈 문자열입니다");
+            return;
+        }
+
+        if (HeroModels.Instance == null)
+        {
+            Debug.LogError("[ApplyToCard] HeroModels.Instance가 null입니다");
+            return;
+        }
+
+        // 모델 정보 가져오기
+        var modelSO = HeroModels.Instance.GetModelSO(card.HeroID);
+        if (modelSO == null)
+        {
+            Debug.LogWarning($"[ApplyToCard] 모델 SO를 찾을 수 없습니다: {card.HeroID}");
+            return;
+        }
+
+        string charID = card.HeroID;
+
         // 스탯 계산
         card.HealthPoint = modelSO.HealthPoint + GetCardModifier(charID, StatType.Health, modelSO.HealthPoint);
         card.ExtAtkPoint = modelSO.ExtAtkPoint + GetCardModifier(charID, StatType.ExtAtk, modelSO.ExtAtkPoint);

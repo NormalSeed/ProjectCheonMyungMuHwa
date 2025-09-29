@@ -190,10 +190,32 @@ public class HeroDataManager : IStartable
                 if (template != null)
                 {
                     hero.PlayerModelSO = template.PlayerModelSO;
-                    hero.cardInfo = template.cardInfo;
+                    hero.cardInfo = new CardInfo
+                    {
+                        HeroID = template.cardInfo.HeroID,
+                        HeroName = template.cardInfo.HeroName,
+                        // 필요한 필드 복사
+                    };
                 }
+                else
+                {
+                    Debug.LogWarning($"[LoadHeroDataFromFirebase] template이 null입니다: heroId={hero.heroId}");
+                    hero.cardInfo = new CardInfo
+                    {
+                        HeroID = hero.heroId,
+                        HeroName = "Unknown"
+                        // 기본값으로라도 생성
+                    };
+                }
+
                 foreach (EquipmentType type in Enum.GetValues(typeof(EquipmentType)))
                 {
+                    if (hero.cardInfo == null)
+                    {
+                        Debug.LogError($"[LoadHeroDataFromFirebase] hero.cardInfo가 null입니다: heroId={hero.heroId}");
+                        continue;
+                    }
+
                     var equip = equipmentManager.allEquipments
                         .FirstOrDefault(e => e.charID == hero.cardInfo.HeroID && e.equipmentType == type);
 
