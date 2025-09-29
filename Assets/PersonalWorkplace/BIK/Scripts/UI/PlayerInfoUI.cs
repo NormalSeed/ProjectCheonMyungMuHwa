@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -10,11 +12,16 @@ public class PlayerInfoUI : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private TMP_Text nicknameText;
     [SerializeField] private TMP_Text levelText;
+    [SerializeField] private TMP_Text titleText;
     [SerializeField] private Image _profileImage;
     [SerializeField] private Button _profileButton;
 
     [Header("Controller Reference")]
     [SerializeField] private MainSceneUIController _mainSceneUIController;
+
+    [Header("Data Reference")]
+    [SerializeField] private List<TitleData> _titleDataList;   // 같은 순서대로 매핑
+
 
     // 현재 로드된 핸들 캐싱 (메모리 릭 방지용)
     private AsyncOperationHandle<Sprite>? _currentHandle;
@@ -63,6 +70,9 @@ public class PlayerInfoUI : MonoBehaviour
         if (profile == null) return;
 
         nicknameText.text = profile.Nickname;
+        var titleData = _titleDataList.FirstOrDefault(t => t.Id == profile.Title);
+        titleText.text = titleData != null ? titleData.DisplayName : "";
+
         levelText.text = "-";
 
         if (!string.IsNullOrEmpty(profile.ProfileImage)) {
