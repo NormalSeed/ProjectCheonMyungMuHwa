@@ -2,9 +2,13 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
+using GooglePlayGames;
+using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
 
@@ -13,10 +17,133 @@ public class IntroSceneManager : MonoBehaviour
     [SerializeField] private string _mainSceneName = "DEMO_GameScene";
     [SerializeField] private LoadingUI loadingUI;
 
+    [Header("로그인 UI")]
+    [SerializeField] private GameObject loginPanel;
+    [SerializeField] private GameObject agreementPanel;
+    [SerializeField] private Button googleLoginButton;
+    [SerializeField] private Button guestLoginButton;
+    [SerializeField] private Image serviceAgreementCheck;
+    [SerializeField] private Button serviceAgreementButton;
+    [SerializeField] private Image personalInformationAgreementCheck;
+    [SerializeField] private Button personalInformationAgreementButton;
+    [SerializeField] private Image notificationAgreementCheck;
+    [SerializeField] private Button notificationAgreementButton;
+    [SerializeField] private Button agreeButton;
+    [SerializeField] private Button agreeAllButton;
+
     private AsyncOperation asyncOperation;
     private bool isReady = false;
 
-    private IEnumerator Start()
+    public static IntroSceneManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // 중복 방지
+            return;
+        }
+
+        Instance = this;
+    }
+
+    public void StartIntroScene()
+    {
+        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            Debug.Log("이미 로그인된 유저 있음 → 바로 게임 로딩");
+            StartCoroutine(StartLoading(true)); // 자동 로그인 → 바로 로딩
+            return;
+        }
+
+        SetupLoginUI();
+
+        BackendManager.Instance.OnLoginSuccess += () =>
+        {
+            loginPanel.SetActive(false);
+            agreementPanel.SetActive(false);
+            StartCoroutine(StartLoading(true)); // 게임 로딩 시작
+        };
+
+    }
+
+    private void SetupLoginUI()
+    {
+        loginPanel.SetActive(true);
+        agreementPanel.SetActive(false);
+
+        googleLoginButton.onClick.AddListener(() =>
+        {
+            agreementPanel.SetActive(true);
+        });
+
+        guestLoginButton.onClick.AddListener(() =>
+        {
+            BackendManager.Instance.SignInAsGuest();
+        });
+
+        serviceAgreementButton.onClick.AddListener(() =>
+        {
+            serviceAgreementCheck.enabled = !serviceAgreementCheck.enabled;
+        });
+
+        personalInformationAgreementButton.onClick.AddListener(() =>
+        {
+            personalInformationAgreementCheck.enabled = !personalInformationAgreementCheck.enabled;
+        });
+
+        notificationAgreementButton.onClick.AddListener(() =>
+        {
+            notificationAgreementCheck.enabled = !notificationAgreementCheck.enabled;
+        });
+
+        agreeAllButton.onClick.AddListener(() =>
+        {
+            serviceAgreementCheck.enabled = true;
+            personalInformationAgreementCheck.enabled = true;
+            notificationAgreementCheck.enabled = true;
+        });
+
+        agreeButton.onClick.AddListener(() =>
+        {
+            if (!AllAgreementsChecked())
+            {
+                ShowAgreementWarning();
+                return;
+            }
+
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.Result != DependencyStatus.Available)
+                {
+                    Debug.LogError($"Firebase 초기화 실패: {task.Result}");
+                    return;
+                }
+
+                // 여기서부터 안전하게 DefaultInstance 호출 가능
+                FirebaseApp firebaseApp = FirebaseApp.DefaultInstance;
+                FirebaseAuth firebaseAuth = FirebaseAuth.DefaultInstance;
+                FirebaseDatabase firebaseDatabase = FirebaseDatabase.DefaultInstance;
+
+                BackendManager.Instance.Init(firebaseApp, firebaseAuth, firebaseDatabase);
+            });
+        });
+    }
+
+    private bool AllAgreementsChecked()
+    {
+        return serviceAgreementCheck.enabled &&
+               personalInformationAgreementCheck.enabled &&
+               notificationAgreementCheck.enabled;
+    }
+
+    private void ShowAgreementWarning()
+    {
+        Debug.LogWarning("모든 약관에 동의해야 로그인할 수 있습니다.");
+        // 여기에 경고 UI 띄우는 로직 추가 가능
+    }
+
+    private IEnumerator StartLoading(bool loginAlreadyCompleted)
     {
         //// Firebase 초기화
         //var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
@@ -31,18 +158,17 @@ public class IntroSceneManager : MonoBehaviour
         // VContainer Scope 대기
         var scope = FindObjectOfType<GameLifetimeScope>();
         if (scope != null)
-        {
-            Debug.Log("스코프 있음");
-            yield return new WaitUntil(() => scope.Container != null);  
-            Debug.Log("컨테이너 받아옴");
-            BackendManager.Instance.Init(FirebaseApp.DefaultInstance, FirebaseAuth.DefaultInstance, FirebaseDatabase.DefaultInstance);
-        }
-
+            yield return new WaitUntil(() => scope.Container != null);
 
         yield return new WaitUntil(() => BackendManager.Instance != null);
-        bool loginCompleted = false;
-        BackendManager.Instance.OnLoginSuccess += () => loginCompleted = true;
-        yield return new WaitUntil(() => loginCompleted);
+
+        bool loginCompleted = loginAlreadyCompleted;
+
+        if (!loginAlreadyCompleted)
+        {
+            BackendManager.Instance.OnLoginSuccess += () => loginCompleted = true;
+            yield return new WaitUntil(() => loginCompleted);
+        }
 
         Debug.Log("[IntroScene] 로그인 & 데이터 로드 완료!");
 

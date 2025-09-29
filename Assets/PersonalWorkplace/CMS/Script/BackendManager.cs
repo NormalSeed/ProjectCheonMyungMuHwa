@@ -30,7 +30,6 @@ public class BackendManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            //InitializeFirebase();
         }
         else
         {
@@ -57,34 +56,8 @@ public class BackendManager : MonoBehaviour
         StartCoroutine(AutoSaveRoutine());
     }
 
-    #region Firebase Init
-    private void InitializeFirebase()
-    {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread((Task<DependencyStatus> task) =>
-        {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available)
-            {
-                FirebaseApp = FirebaseApp.DefaultInstance;
-                Auth = FirebaseAuth.DefaultInstance;
-                Database = FirebaseDatabase.DefaultInstance;
-
-                Debug.Log("Firebase 초기화 완료!");
-                OnFirebaseReady?.Invoke();
-
-                // Firebase 준비되면 자동 로그인 시도
-                /*InitializeGPGS()*/;
-            }
-            else
-            {
-                Debug.LogError($"Firebase 해결 실패: {dependencyStatus}");
-            }
-        });
-    }
-    #endregion
-
     #region Google Play 로그인
-    private void InitializeGPGS()
+    public void InitializeGPGS()
     {
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
@@ -175,32 +148,24 @@ public class BackendManager : MonoBehaviour
     {
         Auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
         {
-            if (task is Task<AuthResult> authTask)
+            if (task.IsCanceled || task.IsFaulted)
             {
-                if (authTask.IsCanceled || authTask.IsFaulted)
-                {
-                    Debug.LogError("Firebase 자격증명 로그인 실패: " + authTask.Exception);
-                    SignInAsGuest();
-                    return;
-                }
-
-                FirebaseUser newUser = authTask.Result.User;
-                Debug.Log($"Firebase 로그인 성공! UID: {newUser.UserId}, DisplayName: {newUser.DisplayName}, Email: {newUser.Email}");
-
-                LoadPlayerData(() =>
-                {
-                    OnLoginSuccess?.Invoke();
-                    QuestManager.Instance?.InitializeAfterLogin();
-                });
-            }
-            else
-            {
-                Debug.LogError("SignInWithCredentialAsync 결과 타입 오류: " + task.GetType());
+                Debug.LogError("Firebase 자격증명 로그인 실패: " + task.Exception);
                 SignInAsGuest();
+                return;
             }
+
+            // 성공 흐름
+            FirebaseUser newUser = task.Result;
+            Debug.Log($"Firebase 로그인 성공! UID: {newUser.UserId}, DisplayName: {newUser.DisplayName}, Email: {newUser.Email}");
+
+            LoadPlayerData(() =>
+            {
+                OnLoginSuccess?.Invoke();
+                QuestManager.Instance?.InitializeAfterLogin();
+            });
         });
     }
-
     #endregion
 
     #region 게스트 로그인
