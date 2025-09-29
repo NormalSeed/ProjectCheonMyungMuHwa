@@ -112,7 +112,7 @@ public class PoolManager : MonoBehaviour
 
     private void ActiveBoss(Vector2 pos)
     {
-        AudioManager.Instance.PlaySound("Monster_Recall_New");
+        AudioManager.Instance.PlaySound("2. 보스 등장시 사운드");
         int last = currentDoor % 10;
         string str = "";
         switch (last)
