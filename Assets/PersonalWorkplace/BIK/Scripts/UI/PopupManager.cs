@@ -245,5 +245,24 @@ public partial class PopupManager : MonoBehaviour
             Debug.LogError("[PopupManager] PopupType.Confirm 이 ConfirmPopup이 아님 (타입: " + uiBase.GetType().Name + ")");
         }
     }
+
+    public void ShowHeroGetPopup(CardInfo cardInfo)
+    {
+        Debug.Log("[PopupManager] ShowHeroGetPopup 호출됨");
+        if (!_popupDict.TryGetValue(PopupType.HeroGet, out var uiBase) || uiBase == null)
+        {
+            Debug.LogWarning("[PopupManager] HeroGet 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        if (uiBase is HeroGetPopup HeroGetPopup)
+        {
+            HeroGetPopup.SetShow(cardInfo);
+        }
+        else
+        {
+
+        }
+    }
     #endregion // public funcs
 }

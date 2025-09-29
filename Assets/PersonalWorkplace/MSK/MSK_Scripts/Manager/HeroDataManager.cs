@@ -3,11 +3,11 @@ using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using System.Linq;
 #region Serializable
 [Serializable]
 public class HeroSaveList
@@ -324,17 +324,23 @@ public class HeroDataManager : IStartable
         foreach (var card in results)
         {
             if (!ownedHeroes.ContainsKey(card.HeroID))
-                AddNewHero(card);
+            {
+                AddNewHero(card);       // 신규 획득로직
+                if (card.rarity == HeroRarity.Legend)   // 획득 시 레어도 체크
+                {
+                    PopupManager.Instance.ShowHeroGetPopup(card);
+                }
+            }
             else
                 AddHeroPiece(card.HeroID, GetPieceAmountByRarity(card.rarity));
         }
     }
     public float CalculateCombatPower(HeroData hero)
     {
-        var model = hero.PlayerModelSO; 
+        var model = hero.PlayerModelSO;
         return 2.0f * (
             (model.InnAtkPoint + model.ExtAtkPoint) *
-            (1 + model.CritRate * (model.CritDamage - 1)) + 
+            (1 + model.CritRate * (model.CritDamage - 1)) +
             1.4f * model.DefPoint + 0.1f * model.HealthPoint
        );
     }

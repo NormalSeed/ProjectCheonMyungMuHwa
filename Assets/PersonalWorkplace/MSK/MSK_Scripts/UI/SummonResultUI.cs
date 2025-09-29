@@ -39,6 +39,7 @@ public class SummonResultUI : UIBase
 
     private void OnClickResult()
     {
+        poolManager.ReturnAll();
         this.gameObject.SetActive(false);
     }
     #endregion

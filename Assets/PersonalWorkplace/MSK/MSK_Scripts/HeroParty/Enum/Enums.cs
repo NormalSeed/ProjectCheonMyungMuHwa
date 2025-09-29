@@ -71,7 +71,8 @@ public enum PopupType
     Alert,
     Roulette,
     DungeonFail,
-    Confirm
+    Confirm,
+    HeroGet,
 }
 
 public enum TableType
