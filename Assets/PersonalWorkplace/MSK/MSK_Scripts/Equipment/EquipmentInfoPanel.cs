@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -8,7 +8,7 @@ using VContainer;
 public class EquipmentInfoPanel : MonoBehaviour
 {
     [Inject] private EquipmentService equipmentService;
-    [Inject] private  EquipmentManager equipmentManager;
+    [Inject] private EquipmentManager equipmentManager;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI textEquipmentName;       //장비 이름
@@ -28,7 +28,7 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     [Header("EquipmentCardDisplay")]
     [SerializeField] private EquipmentCardDisplay imageEquipment;     // 장비 이미지
-    
+
     [Header("Button")]
     [SerializeField] private Button exitButton;                   //나가기 버튼
     [SerializeField] private Button equipButton;                  //장비하기/ 해제하기 버튼
@@ -43,6 +43,22 @@ public class EquipmentInfoPanel : MonoBehaviour
     public string charId;                  // 영웅 ID
     public string instanceID;              // 장비 ID
     private BigCurrency levelUpCurrency;   // 소모 연마석 
+
+    // 장비 능력치 한글 텍스트 변환용 딕셔너리
+    public readonly Dictionary<StatType, string> Descriptions = new()
+    {
+        { StatType.Attack, "공격력" },
+        { StatType.ExtAtk, "외공" },
+        { StatType.InnAtk, "내공" },
+        { StatType.Defense, "방어력" },
+        { StatType.CritDamage, "치명타 배율" },
+        { StatType.CritRate, "치명타 확률" },
+        { StatType.AtkSpeed, "공격 속도" },
+        { StatType.Health, "체력" },
+        { StatType.BDamage, "보스 데미지" },
+        { StatType.NDamage, "일반 데미지" },
+        { StatType.SkillDamage, "스킬 데미지" }
+    };
 
     #region Unity
     private void OnEnable()
@@ -105,7 +121,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     private void OnClickUpgrade()
     {
         // TODO : 연마석 팝업
-        if (!CurrencyManager.Instance.TrySpend(CurrencyType.GrindingStone, levelUpCurrency)) 
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.GrindingStone, levelUpCurrency))
             return;
 
         instance.level++;
@@ -143,10 +159,10 @@ public class EquipmentInfoPanel : MonoBehaviour
             SetHeroEquipmentSlot(null);
             instance.isEquipped = false;
             instance.charID = null;
-           
+
             equipmentService.UnequipFromUnactivatedCharacter(charId, instance);
             equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
-            
+
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
 
             HeroDataManager.Instance.ApplyHeorStats(instance, charId);
@@ -159,10 +175,10 @@ public class EquipmentInfoPanel : MonoBehaviour
             {
                 oldInstance.isEquipped = false;
                 oldInstance.charID = null;
-                
+
                 equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
                 equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
-                
+
                 Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
 
                 HeroDataManager.Instance.ApplyHeorStats(instance, charId);
@@ -219,7 +235,6 @@ public class EquipmentInfoPanel : MonoBehaviour
 
         return baseValue * equip.level;
     }
-
     #endregion
 
     #region Public
@@ -232,8 +247,9 @@ public class EquipmentInfoPanel : MonoBehaviour
         textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
         textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
         // 상승 능력치
-        textPresentEff.text = $"{instance.statType}";
-        textNextEff.text = $"{instance.statType}";
+        textPresentEff.text = GetDescription(instance.statType);
+        textNextEff.text = GetDescription(instance.statType);
+
         // 연마석
         textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone)}";
         textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone) - levelUpCurrency}";
@@ -322,6 +338,13 @@ public class EquipmentInfoPanel : MonoBehaviour
 
         Debug.Log($"[GetCharID] : 캐릭터 {charId} 설정됨, 기존 장비 ID: {oldInstanceID}");
     }
+
+    // 타입에 맞는 한글 텍스트 불러오기
+    public string GetDescription(StatType stat)
+    {
+        return Descriptions.TryGetValue(stat, out var desc) ? desc : stat.ToString();
+    }
+
 
     #endregion
 }

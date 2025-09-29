@@ -216,6 +216,13 @@ public class PartyManager : MonoBehaviour, IStartable
         synergyUI.UpdateSynergyUI(activeSynergies);
         explainUI.UpdateExplainUI(activeSynergies);
 
+        // 시너지가 없을 경우
+        if (activeSynergies.Count == 0)
+        {
+            synergyUI.SetSynergySkillButtonState(null); // 또는 비활성화 처리
+            return;
+        }
+
         // 1. 가장 높은 stage 찾기
         int maxStage = activeSynergies.Max(s => s.stage);
 
