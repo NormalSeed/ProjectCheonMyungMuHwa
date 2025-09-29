@@ -216,7 +216,7 @@ public class PartyManager : MonoBehaviour, IStartable
         synergyUI.UpdateSynergyUI(activeSynergies);
         explainUI.UpdateExplainUI(activeSynergies);
 
-        // 파티가 비어있을 경우
+        // 시너지가 없을 경우
         if (activeSynergies.Count == 0)
         {
             synergyUI.SetSynergySkillButtonState(null); // 또는 비활성화 처리
