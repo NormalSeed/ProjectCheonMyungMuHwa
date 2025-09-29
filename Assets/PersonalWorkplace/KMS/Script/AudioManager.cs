@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.Rendering;
 
 public class AudioManager : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public class AudioManager : MonoBehaviour
     }
     public void Init()
     {
-        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: true, parent: gameObject.transform);
+        soundPool = new DefaultPool<AudioSourceController>(obj: AudioSourcePrefab, maxCount: 30, active: true, exceed: true, warmup: false, parent: gameObject.transform);
         clips = new();
         LoadAssetAsync();
     }
