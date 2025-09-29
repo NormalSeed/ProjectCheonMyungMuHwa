@@ -49,10 +49,13 @@ public class AudioManager : MonoBehaviour
 
     public AudioSourceController PlaySound(string id, float volume = 1, PlayMode mode = PlayMode.Once)
     {
-        AudioClip clip = clips[id];
-        AudioSourceController asc = soundPool.GetItem();
-        asc.Init(clip, volume, mode);
-        return asc;
+        if (clips.TryGetValue(id, out AudioClip clip))
+        {
+            AudioSourceController asc = soundPool.GetItem();
+            asc.Init(clip, volume, mode);
+            return asc;
+        }
+        return null;
     }
     public void StopSound(AudioSourceController asc)
     {
