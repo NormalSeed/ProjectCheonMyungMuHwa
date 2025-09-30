@@ -109,7 +109,7 @@ public class HeroUI : UIBase
             if (card.chardata != null && top.Contains(card))
             {
                 Debug.LogWarning($"{card.name} 보유여부 {card.heroData.hasHero}");
-                if(!card.heroData.hasHero)
+                if (!card.heroData.hasHero)
                     continue;
                 card.OnClickCard();
                 card.HeroSettingStart();
@@ -208,7 +208,6 @@ public class HeroUI : UIBase
         }
         stageUpgrade.gameObject.SetActive(false);
     }
-
     private void SlotClear()
     {
         // 파티 멤버 리스트 복사 후 초기화
@@ -245,6 +244,7 @@ public class HeroUI : UIBase
     #endregion
 
     #region Public
+
     public void RefreshSlot(CardInfo input)
     {
         int index = PartyManager.Instance.MembersID.IndexOf(input);
@@ -254,6 +254,23 @@ public class HeroUI : UIBase
         PartyManager.Instance.PartyLoadUI();
         PartyNumChanged?.Invoke();
     }
+    public void RefreshAllPartyNum()
+    {
+        for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
+        {
+            var member = PartyManager.Instance.MembersID[i];
+            foreach (var setting in heroCard)
+            {
+                if (setting.chardata == member)
+                {
+                    setting.selectRoot.gameObject.SetActive(true);
+                    setting.PartyNum.text = (i + 1).ToString();
+                    break;
+                }
+            }
+        }
+    }
+
     public void RefreshAllCards()
     {
         foreach (var card in heroCard)
