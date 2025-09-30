@@ -49,6 +49,9 @@ public class InGameManager : MonoBehaviour
     public MainSceneBGMPlayer bgmPlayer;
     private bool stageLoaded;
 
+    [SerializeField] MainSceneUIController mainUI;
+    private UIType mainUiToOpen;
+
     private void Awake()
     {
         Instance = this;
@@ -235,7 +238,14 @@ public class InGameManager : MonoBehaviour
 
         if (allActivePlayersDead)
         {
-            StartCoroutine(HandleAllPlayersDead());
+            DungeonFailUI ui = PopupManager.Instance.ShowDungeonFailPopup();
+            ui.SetActionToButton(0, () => { mainUiToOpen = UIType.Hero; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+            ui.SetActionToButton(1, () => { mainUiToOpen = UIType.Dungeon; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+            ui.SetActionToButton(2, () => { mainUiToOpen = UIType.Upgrade; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+            ui.SetActionToButton(3, () => { mainUiToOpen = UIType.Summon; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+            ui.SetActionToScreen(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+            ui.SetActionToTimeOut(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
+                
         }
     }
 
@@ -244,7 +254,7 @@ public class InGameManager : MonoBehaviour
         Debug.Log("모든 플레이어 사망. 페이드 아웃 시작");
 
         // 페이드 아웃 효과 추가해야함
-        FadeOut();
+        FadeCanvas.Instance.FadeOut(2f);
 
         yield return new WaitForSeconds(2f); // 암전 시간
 
@@ -312,7 +322,8 @@ public class InGameManager : MonoBehaviour
             }
         }
 
-        FadeIn();
+        mainUI.ShowUI(mainUiToOpen);
+        FadeCanvas.Instance.FadeIn(1.5f);
     }
 
     private void FadeOut()

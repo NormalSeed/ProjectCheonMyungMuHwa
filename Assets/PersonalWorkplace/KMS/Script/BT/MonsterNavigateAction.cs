@@ -8,10 +8,9 @@ using Unity.Properties;
 [NodeDescription(name: "MonsterNavigate", story: "[Target] [Controller] [Movespeed]", category: "Action", id: "cbdf5b83b6e56a50dfcb67530bd4694c")]
 public partial class MonsterNavigateAction : Action
 {
-    [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<PlayerController> Target;
     [SerializeReference] public BlackboardVariable<MonsterController> Controller;
     [SerializeReference] public BlackboardVariable<float> Movespeed;
-
     protected override Status OnStart()
     {
         Controller.Value.NavAgent.speed = Movespeed.Value;
@@ -20,7 +19,7 @@ public partial class MonsterNavigateAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Target.Value == null || !Target.Value.activeSelf) return Status.Running;
+        if (Target.Value == null || !Target.Value.gameObject.activeSelf || Target.Value.isDead.Value) return Status.Running;
         Controller.Value.NavAgent.SetDestination(Target.Value.transform.position);
         return Status.Running;
     }

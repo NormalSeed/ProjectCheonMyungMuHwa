@@ -36,6 +36,7 @@ public class BossController : MonsterController
     }
     public void OnSpawn()
     {
+        barUI.SetHealthBarText(new BigCurrency(Model.CurHealth.Value), new BigCurrency(Model.BaseModel.finalMaxHealth));
         IsInvulnerable = true;
         transform.localScale = Vector3.one;
         StartCoroutine(SpawnRoutine());
@@ -139,6 +140,8 @@ public class BossController : MonsterController
         float v = (float)val;
         float res = Mathf.Max(0, v);
         barUI.SetFill(res);
+        float h = Mathf.Max((float)Model.CurHealth.Value, 0f);
+        barUI.SetHealthBarText(new BigCurrency(h), new BigCurrency(Model.BaseModel.finalMaxHealth));
     }
 
     //private void SetAnimation(MonsterAnimationState state)
