@@ -171,7 +171,7 @@ public class MapManager : MonoBehaviour
         else
         {
             PoolManager.Instance.SpawnMonster(
-                currentMap.transform.position,
+                currentMap.transform.position + new Vector3(0, 6.55f, 0),
                 MonsterType.Boss
             );
             return true;
