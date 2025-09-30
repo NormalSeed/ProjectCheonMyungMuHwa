@@ -54,12 +54,14 @@ public class GachaRateInfoUI : MonoBehaviour
     }
 
     #region Unity
-
-    private async void OnEnable()
+    private void Awake()
     {
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
+    }
 
+    private async void OnEnable()
+    {
         ShowCategoryPanels();
 
         for (int i = 0; i < levelButtons.Length; i++)
@@ -89,6 +91,7 @@ public class GachaRateInfoUI : MonoBehaviour
             button.onClick.RemoveAllListeners();
         }
         exitButton.onClick.RemoveListener(OnClickExit);
+        this.gameObject.SetActive(false);
     }
 
     #endregion
