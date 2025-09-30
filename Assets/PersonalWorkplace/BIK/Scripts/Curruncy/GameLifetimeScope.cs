@@ -1,4 +1,6 @@
 using Firebase;
+using Firebase.Auth;
+using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,16 +19,18 @@ public class GameLifetimeScope : LifetimeScope
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
             if (task.Result == DependencyStatus.Available) {
                 FirebaseApp app = FirebaseApp.DefaultInstance;
+                FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+                FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
+
                 app.Options.DatabaseUrl = new System.Uri("https://cheonmyungmuhwa-d3fc4-default-rtdb.asia-southeast1.firebasedatabase.app");
 
                 _firebaseInitialized = true;
-
                 // Firebase 초기화가 끝났으니 DI 컨테이너 빌드
 
                 Build(); // 이게 핵심!
+                IntroSceneManager.Instance.StartIntroScene();
             }
         });
-
     }
 
     protected override void Configure(IContainerBuilder builder)
@@ -39,6 +43,13 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<InventoryManager>(Lifetime.Singleton);
         // 프로필
         builder.RegisterEntryPoint<PlayerProfileManager>(Lifetime.Singleton);
+
+        // 모델
+        builder.RegisterComponentInHierarchy<HeroModels>().AsSelf();
+        // 스킬셋
+        builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
+        // 스프라이트
+        builder.RegisterComponentInHierarchy<HeroSprites>().AsSelf();
 
         builder.RegisterInstance(allHeroTemplates);
         builder.RegisterEntryPoint<HeroDataManager>(Lifetime.Singleton)
@@ -56,12 +67,6 @@ public class GameLifetimeScope : LifetimeScope
         Debug.Log("[GameLifetimeScope] EquipmentManager 등록 완료");
         // 테이블
         builder.RegisterEntryPoint<TableManager>(Lifetime.Singleton).AsSelf();
-        // 모델
-        builder.RegisterComponentInHierarchy<HeroModels>().AsSelf();
-        // 스킬셋
-        builder.RegisterComponentInHierarchy<HeroSkillSets>().AsSelf();
-        // 스프라이트
-        builder.RegisterComponentInHierarchy<HeroSprites>().AsSelf();
 
         builder.RegisterComponentInHierarchy<MonsterLoader>().AsSelf();
         builder.RegisterComponentInHierarchy<AudioManager>().AsSelf();

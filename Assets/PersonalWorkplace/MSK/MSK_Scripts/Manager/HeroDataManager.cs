@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using System;
@@ -135,6 +136,14 @@ public class HeroDataManager : IStartable
     public void Start()
     {
         Instance = this;
+
+        if (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
+        {
+            Debug.LogWarning("[HeroDataManager] FirebaseAuth가 아직 초기화되지 않았습니다. 초기화 대기 중...");
+            WaitForFirebaseAndStart();
+            return;
+        }
+
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
         Debug.Log("[HeroDataMagaer] Start 실행");
@@ -146,7 +155,7 @@ public class HeroDataManager : IStartable
         // HeroModels 초기화 대기
         while (HeroModels.Instance == null || !HeroModels.Instance.IsInitialized)
         {
-            await Task.Delay(100);
+            await Task.Delay(500);
         }
 
         Debug.Log("[HeroDataManager] HeroModels 초기화 완료 확인");
@@ -159,6 +168,20 @@ public class HeroDataManager : IStartable
 
         IsInitialized = true;
         Debug.Log("[HeroDataManager] 초기화 완료 → IsInitialized = true");
+    }
+
+    private async void WaitForFirebaseAndStart()
+    {
+        while (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
+        {
+            await Task.Delay(500);
+        }
+
+        _uid = CurrencyManager.Instance.UserID;
+        _dbRef = CurrencyManager.Instance.DbRef;
+
+        Debug.Log("[HeroDataManager] Firebase 초기화 완료 후 Start 실행");
+        WaitForHeroModelsAndInit();
     }
     #endregion
 
@@ -223,7 +246,7 @@ public class HeroDataManager : IStartable
                     {
                         ApplyHeorStats(equip, hero.cardInfo.HeroID);
                     }
-                    StatModifierManager.ApplyToCard(hero.cardInfo);
+                    //StatModifierManager.ApplyToCard(hero.cardInfo);
                 }
                 Debug.Log($"[LoadHeroDataFromFirebase] {hero.heroName} 전투력 적용");
             }
@@ -359,6 +382,18 @@ public class HeroDataManager : IStartable
     }
     public float CalculateCombatPower(HeroData hero)
     {
+        if (hero == null)
+        {
+            Debug.LogError("[CombatPower] hero가 null입니다");
+            return 0f;
+        }
+
+        if (hero.PlayerModelSO == null)
+        {
+            Debug.LogError($"[CombatPower] PlayerModelSO가 null입니다: heroId={hero.heroId}");
+            return 0f;
+        }
+
         var model = hero.PlayerModelSO;
         return 2.0f * (
             (model.InnAtkPoint + model.ExtAtkPoint) *
