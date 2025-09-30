@@ -30,7 +30,8 @@ public class SummonEquipUI : MonoBehaviour
 
     [Header("Slider")]
     [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
-
+    [Header("Layout")]
+    [SerializeField] private GridLayoutGroup gridLayout;    // 레이아웃 설정
     #endregion
 
     #region Properties
@@ -56,10 +57,10 @@ public class SummonEquipUI : MonoBehaviour
         summonInfo.onClick.RemoveListener(OnClickShowInfo);
     }
 
-    private void Init()
+    private async void Init()
     {
         ButtonInit();
-        SummonLevelChange();
+        await SummonLevelChange();
     }
 
     private void ButtonInit()
@@ -74,6 +75,7 @@ public class SummonEquipUI : MonoBehaviour
     #region Button OnClick
     private void OnClickSummon()
     {
+        Debug.Log("장비뽑기 눌림");
         inputTimes = 1;
         currency = BigCurrency.FromBaseAmount(inputTimes);
         stoneCurrency = currency * 100;
@@ -86,6 +88,8 @@ public class SummonEquipUI : MonoBehaviour
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
+        Debug.Log("장비뽑기 진행");
+        gridLayout.childAlignment = TextAnchor.MiddleCenter;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
@@ -104,6 +108,7 @@ public class SummonEquipUI : MonoBehaviour
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
@@ -121,6 +126,8 @@ public class SummonEquipUI : MonoBehaviour
         }
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
+
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
