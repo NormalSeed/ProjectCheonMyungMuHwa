@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -7,23 +8,23 @@ public class DungeonFailUI : UIBase
 {
   [SerializeField] Button[] buttons;
   [SerializeField] Button screen;
+  [SerializeField] UnityAction OnTimeOver;
+  [SerializeField] TMP_Text message;
+  private bool isStopped;
+  private float currentTime;
 
-  [SerializeField] FadeCanvas fade;
-
-  public void SetActionToButton(int index, Action act)
+  private float initTime = 5f;
+  public void SetActionToButton(int index, UnityAction act)
   {
-    UnityAction action = new UnityAction(act);
-    buttons[index].onClick.AddListener(action);
+    buttons[index].onClick.AddListener(act);
   }
-  public void SetActionToScreen(Action act)
+  public void SetActionToScreen(UnityAction act)
   {
-    UnityAction action = new UnityAction(act);
-    screen.onClick.AddListener(action);
+    screen.onClick.AddListener(act);
   }
-
-  public void LoadScene(string id)
+  public void SetActionToTimeOut(UnityAction act)
   {
-    fade.FadeOutAndLoadScene(id, 1.5f);
+    OnTimeOver += act;
   }
 
   void OnEnable()
@@ -32,7 +33,22 @@ public class DungeonFailUI : UIBase
     {
       b.onClick.RemoveAllListeners();
     }
-    screen.onClick.RemoveAllListeners(); 
+    screen.onClick.RemoveAllListeners();
+    OnTimeOver = null;
+    isStopped = false;
+    currentTime = initTime;
+  }
+  void Update()
+  {
+    if (isStopped) return;
+    if (currentTime <= 0)
+    {
+      OnTimeOver?.Invoke();
+      isStopped = true;
+      return;
+    }
+    currentTime -= Time.deltaTime;
+    message.text = $"{(int)currentTime + 1} 초 후 자동으로 다시 시작...";
   }
 }
 

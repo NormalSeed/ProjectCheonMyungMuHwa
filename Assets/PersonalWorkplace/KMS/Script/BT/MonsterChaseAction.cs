@@ -8,14 +8,12 @@ using Unity.Properties;
 [NodeDescription(name: "MonsterChaseAction", story: "check [Target] / set [IsTargetDetected] / set [CurrentDistance] based on [AttackDistance] and [Self] & [Controller]", category: "Action", id: "bcc7bc30e5e62c353ed1834ee12847c1")]
 public partial class MonsterChaseAction : Action
 {
-    [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<PlayerController> Target;
     [SerializeReference] public BlackboardVariable<bool> IsTargetDetected;
     [SerializeReference] public BlackboardVariable<float> CurrentDistance;
     [SerializeReference] public BlackboardVariable<float> AttackDistance;
-
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<MonsterController> Controller;
-
     protected override Status OnStart()
     {
         Controller.Value.OnMove();
@@ -24,7 +22,7 @@ public partial class MonsterChaseAction : Action
 
     protected override Status OnUpdate()
     {
-        if (Target.Value == null || !Target.Value.activeSelf)
+        if (Target.Value == null || !Target.Value.gameObject.activeSelf || Target.Value.isDead.Value)
         {
             Target.Value = null;
             IsTargetDetected.Value = false;
