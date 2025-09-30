@@ -31,6 +31,8 @@ public class SummonHeroUI : UIBase
     [Header("Slider")]
     [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
 
+    [Header("Layout")]
+    [SerializeField] private GridLayoutGroup gridLayout;    // 레이아웃 설정
     #endregion
 
     #region Properties
@@ -82,6 +84,7 @@ public class SummonHeroUI : UIBase
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
+        gridLayout.childAlignment = TextAnchor.MiddleCenter;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
@@ -94,6 +97,7 @@ public class SummonHeroUI : UIBase
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);
@@ -106,6 +110,7 @@ public class SummonHeroUI : UIBase
         if (!CurrencyManager.Instance.TrySpend(CurrencyType.SummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
             return;
 
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
         SummonHeros(inputTimes);
         InterActButtons(false);
         QuestManager.Instance.ReportEvent(QuestTargetType.Gacha1, inputTimes);

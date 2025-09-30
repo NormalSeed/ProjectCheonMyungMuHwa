@@ -1316,10 +1316,10 @@ RectTransform:
   - {fileID: 5811464564070800647}
   m_Father: {fileID: 1386061083293555769}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 720, y: -80}
-  m_SizeDelta: {x: 380, y: 140}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4264002851781862820
 CanvasRenderer:
@@ -1421,7 +1421,7 @@ MonoBehaviour:
   spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
   summonButton: {fileID: 605717784492883312}
   buttonText: {fileID: 7470447133500234776}
-  currencyType: 5
+  currencyType: 9
 --- !u!1 &1406989293038240323
 GameObject:
   m_ObjectHideFlags: 0
@@ -2892,10 +2892,10 @@ RectTransform:
   - {fileID: 8896223173874325099}
   m_Father: {fileID: 1386061083293555769}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 290, y: -80}
-  m_SizeDelta: {x: 380, y: 140}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7554501562748205847
 CanvasRenderer:
@@ -2997,7 +2997,7 @@ MonoBehaviour:
   spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
   summonButton: {fileID: 8259179711620855991}
   buttonText: {fileID: 2344144234415923106}
-  currencyType: 5
+  currencyType: 9
 --- !u!1 &2921647107235035158
 GameObject:
   m_ObjectHideFlags: 0
@@ -3291,8 +3291,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 5193995411839442984}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.386, y: 0}
-  m_AnchorMax: {x: 0.386, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4494,6 +4494,7 @@ MonoBehaviour:
   gachaManager: {fileID: 7245022482317455256}
   summonInfoPanel: {fileID: 4312185322264756255}
   summonSlider: {fileID: 2005534111287608164}
+  gridLayout: {fileID: 3920278052813246540}
 --- !u!114 &7245022482317455256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5673,10 +5674,10 @@ RectTransform:
   - {fileID: 7616954200466677849}
   m_Father: {fileID: 1386061083293555769}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1150, y: -80}
-  m_SizeDelta: {x: 380, y: 140}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6550844967463900022
 CanvasRenderer:
@@ -5778,7 +5779,7 @@ MonoBehaviour:
   spiritStoneSprite: {fileID: 2223405745134810199, guid: 29c74e3467f738e43848fbd68756821b, type: 3}
   summonButton: {fileID: 1491472958550764483}
   buttonText: {fileID: 893661005327987572}
-  currencyType: 5
+  currencyType: 9
 --- !u!1 &5939869459477696499
 GameObject:
   m_ObjectHideFlags: 0
@@ -7918,7 +7919,7 @@ RectTransform:
   m_Father: {fileID: 8500669569823650515}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.386, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8695,6 +8696,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fef1fb67b1a59784ca9f7430d5e1af8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3920278052813246540 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2292382169252188930, guid: 28f9c167684c8584399213f69fe9aca8, type: 3}
+  m_PrefabInstance: {fileID: 3006026795465491278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7287291631738957897 stripped
