@@ -95,7 +95,8 @@ public class HeroUI : UIBase
     //  영웅 자동 배치
     private void OnClickAutoSet()
     {
-        Debug.LogWarning("[OnClickAutoSet] 입력됨");
+        // 배치 표시 초기화
+        ResetAllPartyIndicators();
         // 기존 파티 초기화
         PartyManager.Instance.MembersID.Clear();
         var top = heroCard
@@ -108,7 +109,6 @@ public class HeroUI : UIBase
         {
             if (card.chardata != null && top.Contains(card))
             {
-                Debug.LogWarning($"{card.name} 보유여부 {card.heroData.hasHero}");
                 if (!card.heroData.hasHero)
                     continue;
                 card.OnClickCard();
@@ -286,5 +286,12 @@ public class HeroUI : UIBase
         heroSlots[index].SetCard(input, index);
     }
 
+    public void ResetAllPartyIndicators()
+    {
+        foreach (var hero in heroCard)
+        {
+            hero.selectRoot.gameObject.SetActive(false);
+        }
+    }
     #endregion
 }
