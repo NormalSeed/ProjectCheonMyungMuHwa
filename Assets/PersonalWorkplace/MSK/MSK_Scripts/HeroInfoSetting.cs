@@ -26,7 +26,7 @@ public class HeroInfoSetting : MonoBehaviour
     [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
     [SerializeField] private HeroUI heroUI;
 
-    private HeroData heroData;
+    public HeroData heroData;
     #region Unity LifeCycle
 
     private async void OnEnable()

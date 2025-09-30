@@ -98,16 +98,19 @@ public class HeroUI : UIBase
         Debug.LogWarning("[OnClickAutoSet] 입력됨");
         // 기존 파티 초기화
         PartyManager.Instance.MembersID.Clear();
-        var top5 = heroCard
+        var top = heroCard
              .OrderByDescending(hero => hero.chardata.combatPower)
-             .Take(5)
+             .Take(heroCard.Count)
              .ToList();
 
         // 파티에 추가
         foreach (var card in heroCard)
         {
-            if (card.chardata != null && top5.Contains(card))
+            if (card.chardata != null && top.Contains(card))
             {
+                Debug.LogWarning($"{card.name} 보유여부 {card.heroData.hasHero}");
+                if(!card.heroData.hasHero)
+                    continue;
                 card.OnClickCard();
                 card.HeroSettingStart();
                 if (PartyManager.Instance.MembersID.Count >= 5)
