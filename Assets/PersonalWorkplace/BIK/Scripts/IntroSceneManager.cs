@@ -84,24 +84,24 @@ public class IntroSceneManager : MonoBehaviour
 
         serviceAgreementButton.onClick.AddListener(() =>
         {
-            serviceAgreementCheck.enabled = !serviceAgreementCheck.enabled;
+            serviceAgreementCheck.gameObject.SetActive(!serviceAgreementCheck.gameObject.activeSelf);
         });
 
         personalInformationAgreementButton.onClick.AddListener(() =>
         {
-            personalInformationAgreementCheck.enabled = !personalInformationAgreementCheck.enabled;
+            personalInformationAgreementCheck.gameObject.SetActive(!personalInformationAgreementCheck.gameObject.activeSelf);
         });
 
         notificationAgreementButton.onClick.AddListener(() =>
         {
-            notificationAgreementCheck.enabled = !notificationAgreementCheck.enabled;
+            notificationAgreementCheck.gameObject.SetActive(notificationAgreementCheck.gameObject.activeSelf);
         });
 
         agreeAllButton.onClick.AddListener(() =>
         {
-            serviceAgreementCheck.enabled = true;
-            personalInformationAgreementCheck.enabled = true;
-            notificationAgreementCheck.enabled = true;
+            serviceAgreementCheck.gameObject.SetActive(true);
+            personalInformationAgreementCheck.gameObject.SetActive(true);
+            notificationAgreementCheck.gameObject.SetActive(true);
         });
 
         agreeButton.onClick.AddListener(() =>
@@ -112,21 +112,11 @@ public class IntroSceneManager : MonoBehaviour
                 return;
             }
 
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.Result != DependencyStatus.Available)
-                {
-                    Debug.LogError($"Firebase 초기화 실패: {task.Result}");
-                    return;
-                }
+            FirebaseApp app = FirebaseApp.DefaultInstance;
+            FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+            FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
 
-                // 여기서부터 안전하게 DefaultInstance 호출 가능
-                FirebaseApp firebaseApp = FirebaseApp.DefaultInstance;
-                FirebaseAuth firebaseAuth = FirebaseAuth.DefaultInstance;
-                FirebaseDatabase firebaseDatabase = FirebaseDatabase.DefaultInstance;
-
-                BackendManager.Instance.Init(firebaseApp, firebaseAuth, firebaseDatabase);
-            });
+            BackendManager.Instance.Init(app, auth, db);
         });
     }
 
