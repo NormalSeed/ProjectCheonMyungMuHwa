@@ -112,13 +112,14 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     public void TakeDamage(float amount)
     {
+        if (IsDead) return;
         if (IsInvulnerable) return;
+        if (!gameObject.activeSelf) return;
         OnTakeDamage(amount);
         SetHealthBar();
     }
     protected virtual void OnTakeDamage(double amount)
     {
-        if (IsDead) return;
         Model.CurHealth.Value -= amount;
         DamageText text = DamageTextManager.Instance.Get(damagePos);
         text.SetText(BigCurrency.FromBaseAmount(amount).ToString());
@@ -214,6 +215,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
 
     void OnDisable()
     {
+        Model.SetSpriteColor(Color.white);
         if (attackCo != null) StopCoroutine(attackCo);
         if (hurtCo != null) StopCoroutine(hurtCo);
         if (deathCo != null) StopCoroutine(deathCo);

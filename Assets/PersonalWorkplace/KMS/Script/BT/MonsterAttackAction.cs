@@ -9,25 +9,23 @@ using Unity.Properties;
 public partial class MonsterAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
-    [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<PlayerController> Target;
     [SerializeReference] public BlackboardVariable<float> AttackDelay;
     [SerializeReference] public BlackboardVariable<bool> IsTargetDetected;
     [SerializeReference] public BlackboardVariable<float> CurrentDistance;
     [SerializeReference] public BlackboardVariable<MonsterController> Controller;
-
     private IDamagable damageable;
     private float timer;
 
     protected override Status OnStart()
     {
-        damageable = Target.Value.GetComponent<IDamagable>();
         Controller.Value.OnIdle();
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if (Target.Value == null || !Target.Value.activeSelf)
+        if (Target.Value == null ||!Target.Value.gameObject.activeSelf || Target.Value.isDead.Value)
         {
             Target.Value = null;
             IsTargetDetected.Value = false;
@@ -46,7 +44,7 @@ public partial class MonsterAttackAction : Action
 
     private void Attack()
     {
-        Controller.Value.OnAttack(Self.Value, damageable);
+        Controller.Value.OnAttack(Self.Value, Target.Value);
     }
 }
 

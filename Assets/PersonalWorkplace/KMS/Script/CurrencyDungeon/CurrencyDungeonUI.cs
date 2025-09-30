@@ -4,6 +4,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using UnityEngine.UI;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public enum CurrencyDungeonType { Gold, Honbaeg, Spirit }
 
@@ -70,7 +71,21 @@ public class CurrencyDungeonUI : UIBase
             OpenDungeonPanel();
         }
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            string json;
+            string _uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+            DatabaseReference _dbRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users").Child(_uid).Child("currencyDungeon");
+            CurrencyDungeonClearData cleardat = new CurrencyDungeonClearData() { goldClearLevel = 0, HonbaegClearLevel = 0, SpiritClearLevel = 0 };
+
+            json = JsonUtility.ToJson(cleardat);
+            _dbRef.SetRawJsonValueAsync(json);
+        }
+    }
 }
+
 
 public struct CurrencyDungeonClearData
 {

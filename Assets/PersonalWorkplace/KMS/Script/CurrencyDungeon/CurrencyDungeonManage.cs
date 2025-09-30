@@ -3,6 +3,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class CurrencyDungeonManage : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDungeonTimer timer => barUI.Timer;
 
     [SerializeField] StageBarUI barUI;
+
+    [SerializeField] PlayerController[] players;
 
 
     void Awake()
@@ -29,7 +32,18 @@ public class CurrencyDungeonManage : MonoBehaviour
     {
         barUI.SetCurrencyDungeon(sceneData.type);
         bossSpawner.SpawnBoss();
-        
+        foreach (PlayerController p in players)
+        {
+            p.isDead.Subscribe(CheckAllPlayersDead);
+        }
+
+    }
+    void OnDestroy()
+    {
+        foreach (PlayerController p in players)
+        {
+            p.isDead.Unsubscribe(CheckAllPlayersDead);
+        }
     }
 
     private void DungeonClear()
@@ -73,37 +87,44 @@ public class CurrencyDungeonManage : MonoBehaviour
 
     private void DungeonFail()
     {
+        timer.Stop();
         bossSpawner.Bosscon.gameObject.SetActive(false);
         DungeonFailUI ui = PopupManager.Instance.ShowDungeonFailPopup();
         ui.SetActionToButton(0, () =>
         {
             sceneData.MainUiToOpen = UIType.Hero;
             ui.SetHide();
-            ui.LoadScene("Demo_GameScene");
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
         });
         ui.SetActionToButton(1, () =>
         {
             sceneData.MainUiToOpen = UIType.Dungeon;
             ui.SetHide();
-            ui.LoadScene("Demo_GameScene");
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
         });
         ui.SetActionToButton(2, () =>
         {
             sceneData.MainUiToOpen = UIType.Upgrade;
             ui.SetHide();
-            ui.LoadScene("Demo_GameScene");
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
         });
         ui.SetActionToButton(3, () =>
         {
             sceneData.MainUiToOpen = UIType.Summon;
             ui.SetHide();
-            ui.LoadScene("Demo_GameScene");
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
         });
         ui.SetActionToScreen(() =>
         {
             sceneData.MainUiToOpen = UIType.Dungeon;
             ui.SetHide();
-            ui.LoadScene("Demo_GameScene");
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
+        });
+        ui.SetActionToTimeOut(() =>
+        {
+            sceneData.MainUiToOpen = UIType.Dungeon;
+            ui.SetHide();
+            FadeCanvas.Instance.FadeOutAndLoadScene("DEMO_GameScene", 1.5f);
         });
     }
     void Update()
@@ -131,5 +152,20 @@ public class CurrencyDungeonManage : MonoBehaviour
 
         json = JsonUtility.ToJson(clearData);
         await _dbRef.SetRawJsonValueAsync(json);
+    }
+
+    public void CheckAllPlayersDead(bool isDead)
+    {
+        List<PlayerController> players = PartyManager.Instance.players;
+
+        // 모든 플레이어가 사망했는지 확인
+        bool allActivePlayersDead = players
+        .Where(p => p.gameObject.activeSelf)
+        .All(p => p.isDead.Value);
+
+        if (allActivePlayersDead)
+        {
+            DungeonFail();
+        }
     }
 }
