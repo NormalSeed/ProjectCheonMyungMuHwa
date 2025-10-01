@@ -62,13 +62,17 @@ public class QuestUIManager : UIBase
     private IEnumerator WaitAndBind()
     {
         while (QuestManager.Instance == null)
+        {
             yield return null;
+        }
 
-        while (!QuestManager.Instance.IsReady) // IsReady가 true가 될 때까지 확실하게 기다립니다.
+        while (!QuestManager.Instance.IsReady)
+        {
             yield return null;
+        }
 
+        Debug.Log("QuestManager 준비 완료 → 이벤트 등록");
         QuestManager.Instance.OnQuestsUpdated += RefreshQuestUI;
-
         SetActiveCategory(QuestCategory.Daily);
     }
 
