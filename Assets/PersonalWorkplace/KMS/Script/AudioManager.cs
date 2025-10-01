@@ -71,11 +71,13 @@ public class AudioManager : MonoBehaviour
     {
         if (id == currentBGM) return;
         StopBGM();
-        AudioClip clip = clips[id];
-        currentBGM = id;
-        BGMSource.clip = clip;
-        BGMSource.volume = volume;
-        BGMSource.Play();
+        if (clips.TryGetValue(id, out AudioClip c))
+        {
+            currentBGM = id;
+            BGMSource.clip = c;
+            BGMSource.volume = volume;
+            BGMSource.Play();
+        }
     }
     public void StopBGM()
     {

@@ -26,7 +26,8 @@ public partial class MonsterNavigateAction : Action
 
     protected override void OnEnd()
     {
-        Controller.Value.NavAgent.ResetPath();
+        if (Controller.Value.NavAgent.isOnNavMesh)
+            Controller.Value.NavAgent.ResetPath();
     }
 }
 

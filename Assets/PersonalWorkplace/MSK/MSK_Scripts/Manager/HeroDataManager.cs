@@ -187,52 +187,52 @@ public class HeroDataManager : IStartable
     #region Private
     // 최초 로딩함수
     private async Task LoadHeroDataFromFirebase()
-    {
-        var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
-        var snapshot = await heroRef.GetValueAsync();
+  {
+      var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
+      var snapshot = await heroRef.GetValueAsync();
 
-        foreach (var child in snapshot.Children)
-        {
-            string heroId = child.Key;
-            string json = child.GetRawJsonValue();
-            var template = heroTemplates.Find(t => t.heroId == heroId);
+      foreach (var child in snapshot.Children)
+      {
+          string heroId = child.Key;
+          string json = child.GetRawJsonValue();
+          var template = heroTemplates.Find(t => t.heroId == heroId);
 
-            HeroData hero = JsonUtility.FromJson<HeroData>(json);
-            ownedHeroes[heroId] = hero;
+          HeroData hero = JsonUtility.FromJson<HeroData>(json);
+          ownedHeroes[heroId] = hero;
 
-            // PlayerModelSO를 HeroModels에서 가져오기
-            var modelSO = HeroModels.Instance.GetModelSO(heroId);
-            if (modelSO == null)
-            {
-                Debug.LogWarning($"[PlayerModelSO] null입니다: {hero.heroName} heroId={heroId}");
-            }
+          // PlayerModelSO를 HeroModels에서 가져오기
+          var modelSO = HeroModels.Instance.GetModelSO(heroId);
+          if (modelSO == null)
+          {
+              Debug.LogWarning($"[PlayerModelSO] null입니다: {hero.heroName} heroId={heroId}");
+          }
 
-            hero.PlayerModelSO = modelSO;
+          hero.PlayerModelSO = modelSO;
 
-            // 템플릿 정보 보완
-            if (template != null)
-            {
-                hero.cardInfo = template.cardInfo;
-            }
-            else
-            {
-                Debug.LogWarning($"[LoadHeroDataFromFirebase] 템플릿 누락: {heroId}");
-            }
+          // 템플릿 정보 보완
+          if (template != null)
+          {
+              hero.cardInfo = template.cardInfo;
+          }
+          else
+          {
+              Debug.LogWarning($"[LoadHeroDataFromFirebase] 템플릿 누락: {heroId}");
+          }
 
-            Debug.LogWarning($"{hero.heroName} 전투력 설정");
+          Debug.LogWarning($"{hero.heroName} 전투력 설정");
 
-            // PlayerModelSO 설정
-            hero.PlayerModelSO = HeroModels.Instance.GetModelSO(heroId);
+          // PlayerModelSO 설정
+          hero.PlayerModelSO = HeroModels.Instance.GetModelSO(heroId);
 
-            if (hero.cardInfo != null)
-            {
-                StatModifierManager.ApplyToCard(hero.cardInfo);
-            }
-            Debug.Log($"{hero.heroName} 로딩 완료");
-        }
+          if (hero.cardInfo != null)
+          {
+              StatModifierManager.ApplyToCard(hero.cardInfo);
+          }
+          Debug.Log($"{hero.heroName} 로딩 완료");
+      }
 
-        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
-    }
+      Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
+  }
 
 
     #endregion

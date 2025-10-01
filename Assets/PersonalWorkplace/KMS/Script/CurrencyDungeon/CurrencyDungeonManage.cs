@@ -4,6 +4,7 @@ using Firebase.Database;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 
 public class CurrencyDungeonManage : MonoBehaviour
 {
@@ -21,21 +22,22 @@ public class CurrencyDungeonManage : MonoBehaviour
 
     void Awake()
     {
+        BGMPlay();
+        barUI.SetCurrencyDungeon(sceneData.type);
         bossSpawner.InitBoss(DungeonClear);
         playerSet.InitPlayer();
-
         timer.OnTimeOver += DungeonFail;
-        playerSet.SpawnPlayer();
+
     }
 
     void Start()
     {
-        barUI.SetCurrencyDungeon(sceneData.type);
-        bossSpawner.SpawnBoss();
         foreach (PlayerController p in players)
         {
             p.isDead.Subscribe(CheckAllPlayersDead);
         }
+        bossSpawner.SpawnBoss();
+        playerSet.SpawnPlayer();
 
     }
     void OnDestroy()
@@ -43,6 +45,14 @@ public class CurrencyDungeonManage : MonoBehaviour
         foreach (PlayerController p in players)
         {
             p.isDead.Unsubscribe(CheckAllPlayersDead);
+        }
+    }
+    private void BGMPlay()
+    {
+        switch (sceneData.type)
+        {
+            case CurrencyDungeonType.Gold: AudioManager.Instance.PlayBGM("BGM_GoldDungeon"); break;
+            case CurrencyDungeonType.Honbaeg: AudioManager.Instance.PlayBGM("BGM_SoulDungeon"); break;
         }
     }
 
