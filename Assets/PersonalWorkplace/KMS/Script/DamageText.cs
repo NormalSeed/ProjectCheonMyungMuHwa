@@ -25,6 +25,7 @@ public class DamageText : MonoBehaviour, IPooled<DamageText>
     public void SetText(string damage)
     {
         damageText.text = damage;
+        damageText.color = Color.red;
     }
     public void SetText(string damage, Color color)
     {

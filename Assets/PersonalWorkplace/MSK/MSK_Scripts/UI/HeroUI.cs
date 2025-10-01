@@ -95,19 +95,22 @@ public class HeroUI : UIBase
     //  영웅 자동 배치
     private void OnClickAutoSet()
     {
-        Debug.LogWarning("[OnClickAutoSet] 입력됨");
+        // 배치 표시 초기화
+        ResetAllPartyIndicators();
         // 기존 파티 초기화
         PartyManager.Instance.MembersID.Clear();
-        var top5 = heroCard
+        var top = heroCard
              .OrderByDescending(hero => hero.chardata.combatPower)
-             .Take(5)
+             .Take(heroCard.Count)
              .ToList();
 
         // 파티에 추가
         foreach (var card in heroCard)
         {
-            if (card.chardata != null && top5.Contains(card))
+            if (card.chardata != null && top.Contains(card))
             {
+                if (!card.heroData.hasHero)
+                    continue;
                 card.OnClickCard();
                 card.HeroSettingStart();
                 if (PartyManager.Instance.MembersID.Count >= 5)
@@ -205,7 +208,6 @@ public class HeroUI : UIBase
         }
         stageUpgrade.gameObject.SetActive(false);
     }
-
     private void SlotClear()
     {
         // 파티 멤버 리스트 복사 후 초기화
@@ -242,6 +244,7 @@ public class HeroUI : UIBase
     #endregion
 
     #region Public
+
     public void RefreshSlot(CardInfo input)
     {
         int index = PartyManager.Instance.MembersID.IndexOf(input);
@@ -251,6 +254,23 @@ public class HeroUI : UIBase
         PartyManager.Instance.PartyLoadUI();
         PartyNumChanged?.Invoke();
     }
+    public void RefreshAllPartyNum()
+    {
+        for (int i = 0; i < PartyManager.Instance.MembersID.Count; i++)
+        {
+            var member = PartyManager.Instance.MembersID[i];
+            foreach (var setting in heroCard)
+            {
+                if (setting.chardata == member)
+                {
+                    setting.selectRoot.gameObject.SetActive(true);
+                    setting.PartyNum.text = (i + 1).ToString();
+                    break;
+                }
+            }
+        }
+    }
+
     public void RefreshAllCards()
     {
         foreach (var card in heroCard)
@@ -266,5 +286,12 @@ public class HeroUI : UIBase
         heroSlots[index].SetCard(input, index);
     }
 
+    public void ResetAllPartyIndicators()
+    {
+        foreach (var hero in heroCard)
+        {
+            hero.selectRoot.gameObject.SetActive(false);
+        }
+    }
     #endregion
 }

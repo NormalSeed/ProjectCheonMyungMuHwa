@@ -73,5 +73,6 @@ public class BS01_SkillSet : SkillSet
         {
             Debug.LogWarning("Projectile이 null임");
         }
+        isSkillPlaying = false;
     }
 }

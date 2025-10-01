@@ -6,6 +6,7 @@ using GooglePlayGames;
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,8 +25,10 @@ public class IntroSceneManager : MonoBehaviour
     [SerializeField] private Button guestLoginButton;
     [SerializeField] private Image serviceAgreementCheck;
     [SerializeField] private Button serviceAgreementButton;
+    [SerializeField] private Button lookButton1;
     [SerializeField] private Image personalInformationAgreementCheck;
     [SerializeField] private Button personalInformationAgreementButton;
+    [SerializeField] private Button lookButton2;
     [SerializeField] private Image notificationAgreementCheck;
     [SerializeField] private Button notificationAgreementButton;
     [SerializeField] private Button agreeButton;
@@ -70,6 +73,10 @@ public class IntroSceneManager : MonoBehaviour
     private void SetupLoginUI()
     {
         loginPanel.SetActive(true);
+        serviceAgreementCheck.enabled = false;
+        personalInformationAgreementCheck.enabled = false;
+        notificationAgreementCheck.enabled = false;
+        agreeButton.interactable = false;
         agreementPanel.SetActive(false);
 
         googleLoginButton.onClick.AddListener(() =>
@@ -84,24 +91,38 @@ public class IntroSceneManager : MonoBehaviour
 
         serviceAgreementButton.onClick.AddListener(() =>
         {
-            serviceAgreementCheck.gameObject.SetActive(!serviceAgreementCheck.gameObject.activeSelf);
+            serviceAgreementCheck.enabled = !serviceAgreementButton.enabled;
+            UpdateAgreeButtonState();
+        });
+
+        lookButton1.onClick.AddListener(() =>
+        {
+            Application.OpenURL("https://cafe.naver.com/cheonmyungmuhwa/4");
         });
 
         personalInformationAgreementButton.onClick.AddListener(() =>
         {
-            personalInformationAgreementCheck.gameObject.SetActive(!personalInformationAgreementCheck.gameObject.activeSelf);
+            personalInformationAgreementCheck.enabled = !personalInformationAgreementCheck.enabled;
+            UpdateAgreeButtonState();
+        });
+
+        lookButton2.onClick.AddListener(() =>
+        {
+            Application.OpenURL("https://cafe.naver.com/cheonmyungmuhwa/3");
+            UpdateAgreeButtonState();
         });
 
         notificationAgreementButton.onClick.AddListener(() =>
         {
-            notificationAgreementCheck.gameObject.SetActive(notificationAgreementCheck.gameObject.activeSelf);
+            notificationAgreementCheck.enabled = !notificationAgreementCheck.enabled;
         });
 
         agreeAllButton.onClick.AddListener(() =>
         {
-            serviceAgreementCheck.gameObject.SetActive(true);
-            personalInformationAgreementCheck.gameObject.SetActive(true);
-            notificationAgreementCheck.gameObject.SetActive(true);
+            serviceAgreementCheck.enabled = true;
+            personalInformationAgreementCheck.enabled = true;
+            notificationAgreementCheck.enabled = true;
+            UpdateAgreeButtonState();
         });
 
         agreeButton.onClick.AddListener(() =>
@@ -131,6 +152,11 @@ public class IntroSceneManager : MonoBehaviour
     {
         Debug.LogWarning("모든 약관에 동의해야 로그인할 수 있습니다.");
         // 여기에 경고 UI 띄우는 로직 추가 가능
+    }
+
+    private void UpdateAgreeButtonState()
+    {
+        agreeButton.interactable = AllAgreementsChecked();
     }
 
     private IEnumerator StartLoading(bool loginAlreadyCompleted)

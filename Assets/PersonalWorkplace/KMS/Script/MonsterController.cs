@@ -122,7 +122,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         Model.CurHealth.Value -= amount;
         DamageText text = DamageTextManager.Instance.Get(damagePos);
-        text.SetText(BigCurrency.FromBaseAmount(amount).ToString());
+        text.SetText(BigCurrency.FromBaseAmount(amount).ToString(), Color.blue);
         if (hurtCo != null)
         {
             StopCoroutine(hurtCo);

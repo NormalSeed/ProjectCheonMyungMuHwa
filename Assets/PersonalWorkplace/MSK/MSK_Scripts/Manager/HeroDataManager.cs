@@ -213,12 +213,9 @@ public class HeroDataManager : IStartable
                 if (template != null)
                 {
                     hero.PlayerModelSO = template.PlayerModelSO;
-                    hero.cardInfo = new CardInfo
-                    {
-                        HeroID = template.cardInfo.HeroID,
-                        HeroName = template.cardInfo.HeroName,
-                        // 필요한 필드 복사
-                    };
+                    hero.cardInfo = ScriptableObject.CreateInstance<CardInfo>();
+                    hero.cardInfo.HeroID = template.cardInfo.HeroID;
+                    hero.cardInfo.HeroName = template.cardInfo.HeroName;
                 }
                 else
                 {

@@ -56,7 +56,7 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Goods Properties
-    private BigCurrency requireGold = new();              // 필요 골드
+    private BigCurrency requireSoul = new();              // 필요 혼백
     private BigCurrency prePow = new();
     private int requirePiece;                    // 필요 영웅 조각
     private int ownerPiece;                      // 보유중인 영웅 조각
@@ -107,7 +107,7 @@ public class HeroInfoUI : UIBase
         HealthPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.HealthPoint);
         ExtAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.ExtAtkPoint);
         InnAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.InnAtkPoint);
-        requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
+        requireSoul = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
         ownerPiece = heroData.heroPiece;
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
     }
@@ -125,7 +125,7 @@ public class HeroInfoUI : UIBase
         outPow.text = ExtAtkPoint.ToString();
         inPow.text = InnAtkPoint.ToString();
         power.text = CountingHeroPower();
-        exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
+        exp.text = $"{requireSoul} / {CurrencyManager.Instance.Model.Get(CurrencyType.Soul)}";
         heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
     }
     private void SetCharacter()
@@ -162,7 +162,7 @@ public class HeroInfoUI : UIBase
     // 버튼 설정여부
     private void SetUpgradeInteractable(Button btn)
     {
-        btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold;
+        btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Soul) >= requireSoul;
     }
     private void SetRankUpInteractable(Button btn)
     {
@@ -197,14 +197,14 @@ public class HeroInfoUI : UIBase
     {
         prePow = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower);
 
-        if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
+        if (CurrencyManager.Instance.TrySpend(CurrencyType.Soul, requireSoul))
         {
             //  레벨업
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
             //  다음 레벨 골드 계산
-            requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
-            RequireLevelUpGold(heroData.PlayerModelSO.Level);
+            requireSoul = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
+            RequireLevelUpSoul(heroData.PlayerModelSO.Level);
             //  DB 저장 
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
            //  정보 새로고침
@@ -225,14 +225,14 @@ public class HeroInfoUI : UIBase
     }
 
     /// <summary>
-    /// 레벨업 시 필요한 골드 계산용 코드입니다.
+    /// 레벨업 시 필요한 혼백 계산용 코드입니다.
     /// </summary>
     /// <param name="level"></param>
-    private string RequireLevelUpGold(int level)
+    private string RequireLevelUpSoul(int level)
     {
-        string myGold = CurrencyManager.Instance.Model.Get(CurrencyType.Gold).ToString();
-        string reqGold = requireGold.ToString();
-        string result = reqGold + " / " + myGold;
+        string mySoul = CurrencyManager.Instance.Model.Get(CurrencyType.Soul).ToString();
+        string reqSoul = requireSoul.ToString();
+        string result = reqSoul + " / " + mySoul;
         return result;                 // 임시 계산식 level * 500
     }
 

@@ -143,12 +143,15 @@ public class MapManager : MonoBehaviour
         }
         else // 3관문 → 보스 추가
         {
+
             foreach (var point in spawnPoints)
             {
                 PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
             }
-
-            PoolManager.Instance.SpawnMonster(currentMap.transform.position, MonsterType.Boss);
+            PoolManager.Instance.SpawnMonster(
+                currentMap.transform.position + new Vector3(0, 6.55f, 0),
+                MonsterType.Boss
+            );
             return true;
         }
     }

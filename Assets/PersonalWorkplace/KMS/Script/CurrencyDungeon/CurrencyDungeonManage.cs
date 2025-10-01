@@ -26,6 +26,8 @@ public class CurrencyDungeonManage : MonoBehaviour
 
         timer.OnTimeOver += DungeonFail;
         playerSet.SpawnPlayer();
+        BGMPlay();
+        
     }
 
     void Start()
@@ -43,6 +45,14 @@ public class CurrencyDungeonManage : MonoBehaviour
         foreach (PlayerController p in players)
         {
             p.isDead.Unsubscribe(CheckAllPlayersDead);
+        }
+    }
+    private void BGMPlay()
+    {
+        switch (sceneData.type)
+        {
+            case CurrencyDungeonType.Gold: AudioManager.Instance.PlayBGM("BGM_GoldDungeon"); break;
+            case CurrencyDungeonType.Honbaeg: AudioManager.Instance.PlayBGM("BGM_SoulDungeon"); break;
         }
     }
 
