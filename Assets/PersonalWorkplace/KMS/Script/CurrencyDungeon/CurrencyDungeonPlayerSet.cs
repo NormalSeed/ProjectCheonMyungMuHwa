@@ -29,6 +29,7 @@ public class CurrencyDungeonPlayerSet : MonoBehaviour
             if (type == point.Type)
             {
                 point.gameObject.SetActive(true);
+                Camera.main.transform.position = point.transform.position;
                 for (int i = 0; i < players.Length; i++)
                 {
                     players[i].transform.position = point.points[i].transform.position;
