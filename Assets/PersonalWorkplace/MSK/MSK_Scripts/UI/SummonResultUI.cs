@@ -80,7 +80,7 @@ public class SummonResultUI : UIBase
 
             if (skipAnimation)
                 continue;
-
+            AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -188,6 +188,7 @@ public class SummonResultUI : UIBase
                 card.SetActive(true);
             }
         }
+        AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
         Debug.Log("[ShowRemainingCardsInstantly]");
         SummonHeroUI.HandleGachaCompleted();
         skipAnimation = false;
