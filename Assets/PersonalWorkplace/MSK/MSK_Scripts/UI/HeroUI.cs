@@ -87,7 +87,7 @@ public class HeroUI : UIBase
                 }
             }
         }
-
+        AudioManager.Instance.PlaySound("0.레벨업, 전투력 상승, 미션 완료, 스테이지 클리어 사운드");
         CheckUpgradableHeroes(); // 버튼 상태 갱신
         stageUpgrade.onClick.RemoveListener(OnClickStageUpgrade);
     }
