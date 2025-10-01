@@ -79,6 +79,7 @@ public class DecompositionEquipment : MonoBehaviour
     private void OnClickExit()
     {
         this.gameObject.SetActive(false);
+        AudioManager.Instance.PlaySound("5. 팝업 닫을 때 사운드");
     }
     private void OnClickSubmit()
     {

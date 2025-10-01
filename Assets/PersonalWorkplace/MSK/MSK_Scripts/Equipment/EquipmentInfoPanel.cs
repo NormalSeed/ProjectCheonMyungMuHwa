@@ -116,6 +116,7 @@ public class EquipmentInfoPanel : MonoBehaviour
     private void OnClickExit()
     {
         this.gameObject.SetActive(false);
+        AudioManager.Instance.PlaySound("5. 팝업 닫을 때 사운드");
     }
     // 장비 업그레이드
     private void OnClickUpgrade()

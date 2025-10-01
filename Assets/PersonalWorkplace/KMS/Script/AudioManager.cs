@@ -42,6 +42,7 @@ public class AudioManager : MonoBehaviour
         foreach (AudioClip clip in loadedSound)
         {
             clips.Add(clip.name, clip);
+            Debug.LogWarning($"{clip} 로드");
         }
         IsInitialized = true;
         Debug.Log($"<color=yellow> 사운드 로드 완료 </color>");

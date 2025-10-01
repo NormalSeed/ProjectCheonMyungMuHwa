@@ -104,8 +104,7 @@ public class MainSceneUIController : MonoBehaviour
     public void ShowUI(UIType type)
     {
         if (!_uiDict.TryGetValue(type, out var ui) || ui == null) return;
-        AudioManager.Instance.PlaySound("Sound06");
-        Debug.Log("효과음 재생");
+        AudioManager.Instance.PlaySound("6. 팝업 열 때 사운드");
         // 한번 더 눌렀을 때 닫기
         if (_currentMainUI == ui)
         {

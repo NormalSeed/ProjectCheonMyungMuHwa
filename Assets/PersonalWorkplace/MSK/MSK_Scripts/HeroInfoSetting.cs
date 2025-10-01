@@ -144,6 +144,7 @@ public class HeroInfoSetting : MonoBehaviour
         {
             heroInfoUI.SetHeroData(heroData);
             heroInfoUI.gameObject.SetActive(true);
+            AudioManager.Instance.PlaySound("6. 팝업 열 때 사운드");
         }
     }
     #endregion

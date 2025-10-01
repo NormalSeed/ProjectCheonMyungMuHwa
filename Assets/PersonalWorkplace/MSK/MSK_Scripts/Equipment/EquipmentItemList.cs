@@ -42,9 +42,11 @@ public class EquipmentItemList : MonoBehaviour
     private void OnClickExitButton()
     {
         this.gameObject.SetActive(false);
+        AudioManager.Instance.PlaySound("5. 팝업 닫을 때 사운드");
     }
     private void OnClicKDecompositionButton()
     {
+        AudioManager.Instance.PlaySound("6. 팝업 열 때 사운드");
         decompositionPanel.gameObject.SetActive(true);
         decompositionPanel.ShowEquipmentListByEquip();
     }
