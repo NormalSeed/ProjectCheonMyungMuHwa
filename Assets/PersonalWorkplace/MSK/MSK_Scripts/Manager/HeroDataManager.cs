@@ -371,10 +371,6 @@ public class HeroDataManager : IStartable
             if (!ownedHeroes.ContainsKey(card.HeroID))
             {
                 AddNewHero(card);       // 신규 획득로직
-                if (card.rarity == HeroRarity.Legend)   // 획득 시 레어도 체크
-                {
-                    PopupManager.Instance.ShowHeroGetPopup(card);
-                }
             }
             else
                 AddHeroPiece(card.HeroID, GetPieceAmountByRarity(card.rarity));

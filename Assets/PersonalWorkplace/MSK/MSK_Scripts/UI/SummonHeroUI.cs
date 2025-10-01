@@ -130,7 +130,6 @@ public class SummonHeroUI : UIBase
         summon10thButton.interactable = input;
         summon50thTimesButton.interactable = input;
         summonInfo.interactable = input;
-        summonResult.interactable = input;
     }
     private async Task SummonLevelChange()
     {
