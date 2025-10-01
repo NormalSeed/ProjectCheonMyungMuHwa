@@ -201,6 +201,8 @@ public class HeroInfoUI : UIBase
             //  레벨업
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
+            // 전투력 계산
+            StatModifierManager.ApplyToCard(heroData.cardInfo);
             //  다음 레벨 골드 계산
             requireSoul = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
             RequireLevelUpSoul(heroData.PlayerModelSO.Level);
@@ -243,11 +245,17 @@ public class HeroInfoUI : UIBase
     {
         if (heroData.stage >= 5) return;
 
+
+        Debug.LogWarning($"랩업 전 {heroData.cardInfo.combatPower}");
         AudioManager.Instance.PlaySound("0.레벨업, 전투력 상승, 미션 완료, 스테이지 클리어 사운드");
         // 돌파 작업
         ownerPiece -= requirePiece;
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
+        heroData.PlayerModelSO.Grade = heroData.stage; // ← 이거 꼭 필요
+        // 전투력 계산
+        StatModifierManager.ApplyToCard(heroData.cardInfo);
+        Debug.LogWarning($"랩업 후 {heroData.cardInfo.combatPower}");
 
         // DB에 사용한 조각, 돌파 정보 저장
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);

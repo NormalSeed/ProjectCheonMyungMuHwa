@@ -426,5 +426,4 @@ public class HeroDataManager : IStartable
 
         return instance;
     }
-
 }
