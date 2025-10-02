@@ -227,21 +227,18 @@ public partial class PopupManager : MonoBehaviour
     public void ShowConfirmPopup(string title, string message, Action onConfirm, Action onCancel = null)
     {
         Debug.Log("[PopupManager] ShowConfirmPopup 호출됨");
-        if (!_popupDict.TryGetValue(PopupType.Confirm, out var uiBase) || uiBase == null)
-        {
+        if (!_popupDict.TryGetValue(PopupType.Confirm, out var uiBase) || uiBase == null) {
             Debug.LogWarning("[PopupManager] Confirm 팝업이 등록되지 않았습니다.");
             return;
         }
 
         Debug.Log($"[PopupManager] Confirm popup found: {uiBase.name}, activeInHierarchy={uiBase.gameObject.activeInHierarchy}");
-        if (uiBase is ConfirmPopup confirmPopup)
-        {
+        if (uiBase is ConfirmPopup confirmPopup) {
             Debug.Log("[PopupManager] ConfirmPopup.SetShow 호출 전");
             confirmPopup.SetShow(title, message, onConfirm, onCancel);
             Debug.Log("[PopupManager] ConfirmPopup.SetShow 호출 후");
         }
-        else
-        {
+        else {
             Debug.LogError("[PopupManager] PopupType.Confirm 이 ConfirmPopup이 아님 (타입: " + uiBase.GetType().Name + ")");
         }
     }
@@ -249,20 +246,37 @@ public partial class PopupManager : MonoBehaviour
     public void ShowHeroGetPopup(CardInfo cardInfo)
     {
         Debug.Log("[PopupManager] ShowHeroGetPopup 호출됨");
-        if (!_popupDict.TryGetValue(PopupType.HeroGet, out var uiBase) || uiBase == null)
-        {
+        if (!_popupDict.TryGetValue(PopupType.HeroGet, out var uiBase) || uiBase == null) {
             Debug.LogWarning("[PopupManager] HeroGet 팝업이 등록되지 않았습니다.");
             return;
         }
 
-        if (uiBase is HeroGetPopup HeroGetPopup)
-        {
+        if (uiBase is HeroGetPopup HeroGetPopup) {
             HeroGetPopup.SetShow(cardInfo);
         }
-        else
-        {
+        else {
 
         }
     }
+
+    public void ShowStagePopup(int stage)
+    {
+        Debug.Log("[PopupManager] ShowStagePopup 호출됨");
+        if (!_popupDict.TryGetValue(PopupType.Stage, out var uiBase) || uiBase == null) {
+            Debug.LogWarning("[PopupManager] Stage 팝업이 등록되지 않았습니다.");
+            return;
+        }
+
+        Debug.Log($"[PopupManager] Stage popup found: {uiBase.name}, activeInHierarchy={uiBase.gameObject.activeInHierarchy}");
+        if (uiBase is StagePopup stagePopup) {
+            Debug.Log("[PopupManager] StagePopup.SetShow 호출 전");
+            stagePopup.SetShow(stage);
+            Debug.Log("[PopupManager] StagePopup.SetShow 호출 후");
+        }
+        else {
+            Debug.LogError("[PopupManager] PopupType.Stage 이 StagePopup이 아님 (타입: " + uiBase.GetType().Name + ")");
+        }
+    }
+
     #endregion // public funcs
 }
