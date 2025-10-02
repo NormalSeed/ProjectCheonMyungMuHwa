@@ -60,12 +60,12 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
         {
             transform.localScale = new Vector3(13, 13, 13);
         }
-        //Vector3 middlepos = Vector3.Lerp(transform.position, pos, UnityEngine.Random.Range(0.1f, 0.9f)) + Vector3.Cross((Vector3)pos - transform.position, Vector3.up) * UnityEngine.Random.Range(-100f, 100f);
-        //Vector3[] path = { transform.position, middlepos, pos };
+        Vector3 middlepos = Vector3.Lerp(transform.position, pos, UnityEngine.Random.Range(0.15f, 0.85f)) + Vector3.Cross((Vector3)pos - transform.position, Vector3.forward) * UnityEngine.Random.Range(-0.3f, 0.3f);
+        Vector3[] path = { transform.position, middlepos, pos };
         throwing = false;
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(pos, 0.7f));
-        //seq.Append(transform.DOPath(path, 3f, PathType.CatmullRom));
+        //seq.Append(transform.DOMove(pos, 0.7f));
+        seq.Append(transform.DOPath(path, 1.2f, PathType.CatmullRom));
         seq.OnComplete(() =>
         {
             AddCurrency();
