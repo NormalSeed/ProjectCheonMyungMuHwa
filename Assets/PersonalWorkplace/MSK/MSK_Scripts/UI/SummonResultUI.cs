@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -18,6 +19,18 @@ public class SummonResultUI : UIBase
     [Header("Panel")]
     [SerializeField] private SummonEquipUI SummonEquipUI;
     [SerializeField] private SummonHeroUI SummonHeroUI;
+
+    private List<GameObject> cardsToShow = new();
+    private List<GameObject> equipCardsToShow = new();
+    private Coroutine revealRoutine;
+    private Coroutine equipRevealRoutine;
+
+    private bool skipAnimation = false;
+    private bool isShowCards = false;
+    public void SkipReveal()
+    {
+        skipAnimation = true;
+    }
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -39,74 +52,187 @@ public class SummonResultUI : UIBase
 
     private void OnClickResult()
     {
-        poolManager.ReturnAll();
-        this.gameObject.SetActive(false);
+        if (isShowCards)
+        {
+            SkipSummonAnimation();
+        }
+        else
+        {
+            poolManager.ReturnAll();
+            this.gameObject.SetActive(false);
+        }
     }
     #endregion
 
+
+
     #region Private
+    // 영웅 획득 코루틴
+    private IEnumerator ShowCardsRoutine()
+    {
+        foreach (var card in cardsToShow)
+        {
+            var setting = card.GetComponent<CardSetting>();
+            var info = setting.chardata;
+
+            if (info.rarity == HeroRarity.Legend)
+            {
+                PopupManager.Instance.ShowHeroGetPopup(info);
+            }
+
+            card.SetActive(true);
+
+            if (skipAnimation)
+                continue;
+            AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        SummonHeroUI.HandleGachaCompleted();
+        Debug.Log("[ShowCardsRoutine]");
+        skipAnimation = false;
+        isShowCards = false;
+    }
+    // 장비 획득 코루틴
+    private IEnumerator ShowEquipCardsRoutine()
+    {
+        foreach (var card in equipCardsToShow)
+        {
+            card.SetActive(true);
+
+            if (skipAnimation)
+                continue;
+
+            AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        SummonEquipUI.HandleGachaCompleted();
+        skipAnimation = false;
+        isShowCards = false;
+    }
+
+
     /// <summary>
     /// 소환 결과를 보여줍니다.
     /// </summary>
     /// <param name="times"></param>
-    public async void ShowSummonResult(List<CardInfo> results)
+    public void ShowSummonResult(List<CardInfo> results)
     {
+        isShowCards = true;
         gameObject.SetActive(true);
         poolManager.ReturnAll();
+        cardsToShow.Clear();
+        skipAnimation = false;
 
         for (int i = 0; i < results.Count; i++)
         {
             var info = results[i];
             var card = poolManager.GetCard();
             var setting = card.GetComponent<CardSetting>();
-
             setting.chardata = info;
-            card.transform.SetAsLastSibling();
-            card.SetActive(true);
 
-            // 연출 간격 조정
-            await Task.Delay(100);
+            card.transform.SetAsLastSibling();
+            card.SetActive(false); // 정보만 넣고 숨김
+            cardsToShow.Add(card);
         }
-        SummonHeroUI.HandleGachaCompleted();
+
+        // 활성화 코루틴 시작
+        revealRoutine = StartCoroutine(ShowCardsRoutine());
     }
+
 
     /// <summary>
     /// 장비 소환 결과를 보여줍니다.
     /// </summary>
     /// <param name="results">소환된 장비 리스트</param>
-    public async void ShowSummonResult(List<EquipmentInstance> results)
+    public void ShowSummonResult(List<EquipmentInstance> results)
     {
-        Debug.Log($"[ShowSummonResult] 장비 결과 표시 시작 - 총 {results.Count}개");
+        isShowCards = true;
         gameObject.SetActive(true);
         poolManager.ReturnAll();
-        Debug.Log("[ShowSummonResult] 카드 풀 초기화 완료");
+        equipCardsToShow.Clear();
+        skipAnimation = false;
 
-        for (int i = 0; i < results.Count; i++)
+        foreach (var equip in results)
         {
-            var equip = results[i];
-            Debug.Log($"[ShowSummonResult] 카드 생성 시작 - {i + 1}/{results.Count}, 장비: {equip.templateID}, 레어도: {equip.rarity}, Lv.{equip.level}");
-
             var card = poolManager.GetCard();
             var display = card.GetComponent<EquipmentCardDisplay>();
 
             if (display != null)
             {
                 display.SetData(equip);
-                Debug.Log($"[ShowSummonResult] 카드 데이터 설정 완료 - {equip.templateID}");
-            }
-            else
-            {
-                Debug.LogWarning($"[ShowSummonResult] 카드에 EquipmentCardDisplay가 없습니다 - 카드 인덱스: {i}");
             }
 
             card.transform.SetAsLastSibling();
-            card.SetActive(true);
-            Debug.Log($"[ShowSummonResult] 카드 활성화 완료 - {card.name}");
-
-            await Task.Delay(100);
+            card.SetActive(false); // 미리 숨겨두기
+            equipCardsToShow.Add(card);
         }
-        SummonEquipUI.HandleGachaCompleted();
-        Debug.Log("[ShowSummonResult] 모든 카드 표시 완료 - Gacha 처리 종료");
+
+        equipRevealRoutine = StartCoroutine(ShowEquipCardsRoutine());
     }
+
+
+    // 스킵 입력
+    public void SkipSummonAnimation()
+    {
+        skipAnimation = true;
+
+        if (revealRoutine != null)
+        {
+            StopCoroutine(revealRoutine);
+            revealRoutine = null;
+            ShowRemainingCardsInstantly();
+        }
+
+        if (equipRevealRoutine != null)
+        {
+            StopCoroutine(equipRevealRoutine);
+            equipRevealRoutine = null;
+            ShowRemainingEquipCardsInstantly();
+        }
+    }
+
+    // 장비 스킵
+    private void ShowRemainingEquipCardsInstantly()
+    {
+        foreach (var card in equipCardsToShow)
+        {
+            if (!card.activeSelf)
+            {
+                card.SetActive(true);
+            }
+        }
+
+        SummonEquipUI.HandleGachaCompleted();
+        AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
+        skipAnimation = false;
+        isShowCards = false;
+    }
+
+    // 영웅 스킵
+    private void ShowRemainingCardsInstantly()
+    {
+        foreach (var card in cardsToShow)
+        {
+            if (!card.activeSelf)
+            {
+                var setting = card.GetComponent<CardSetting>();
+                var info = setting.chardata;
+
+                if (info.rarity == HeroRarity.Legend)
+                {
+                    PopupManager.Instance.ShowHeroGetPopup(info);
+                }
+
+                card.SetActive(true);
+            }
+        }
+        AudioManager.Instance.PlaySound("1. 모든 캐릭터 획득 사운드");
+        SummonHeroUI.HandleGachaCompleted();
+        skipAnimation = false;
+        isShowCards = false;
+    }
+
     #endregion
 }

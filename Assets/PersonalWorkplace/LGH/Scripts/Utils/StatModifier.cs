@@ -233,25 +233,12 @@ public static class StatModifierManager
 
     public static void ApplyToCard(CardInfo card)
     {
-        if (card == null)
+        if (card == null || string.IsNullOrEmpty(card.HeroID))
         {
-            Debug.LogError("[ApplyToCard] card가 null입니다");
+            Debug.LogError("[ApplyToCard] card 또는 HeroID가 null입니다");
             return;
         }
 
-        if (string.IsNullOrEmpty(card.HeroID))
-        {
-            Debug.LogError("[ApplyToCard] card.HeroID가 null 또는 빈 문자열입니다");
-            return;
-        }
-
-        if (HeroModels.Instance == null)
-        {
-            Debug.LogError("[ApplyToCard] HeroModels.Instance가 null입니다");
-            return;
-        }
-
-        // 모델 정보 가져오기
         var modelSO = HeroModels.Instance.GetModelSO(card.HeroID);
         if (modelSO == null)
         {
@@ -261,13 +248,20 @@ public static class StatModifierManager
 
         string charID = card.HeroID;
 
-        // 스탯 계산
-        card.HealthPoint = modelSO.HealthPoint + GetCardModifier(charID, StatType.Health, modelSO.HealthPoint);
-        card.ExtAtkPoint = modelSO.ExtAtkPoint + GetCardModifier(charID, StatType.ExtAtk, modelSO.ExtAtkPoint);
-        card.InnAtkPoint = modelSO.InnAtkPoint + GetCardModifier(charID, StatType.InnAtk, modelSO.InnAtkPoint);
-        card.DefPoint = modelSO.DefPoint + GetCardModifier(charID, StatType.Defense, modelSO.DefPoint);
-        Debug.Log($"[ApplyToCard] 목표 모델 : {modelSO.CharName}");
+        // 기본 스탯 계산 (성장치 + 계수 기반)
+        float baseHealth = (modelSO.Vital + modelSO.Vital_Increase * modelSO.Grade) * (modelSO.HealthRatio + modelSO.HealthRatio_Increase * modelSO.Grade);
+        float baseExtAtk = (modelSO.ExtPow + modelSO.ExtPow_Increase * modelSO.Grade) * (modelSO.AttackRatio + modelSO.AttackRatio_Increase * modelSO.Grade);
+        float baseInnAtk = (modelSO.InnPow + modelSO.InnPow_Increase * modelSO.Grade) * (modelSO.AttackRatio + modelSO.AttackRatio_Increase * modelSO.Grade);
+        float baseDef = (modelSO.Vital + modelSO.Vital_Increase * modelSO.Grade) * (modelSO.DefRatio + modelSO.DefRatio_Increase * modelSO.Grade);
 
+        // Modifier 반영
+        card.HealthPoint = baseHealth + GetCardModifier(charID, StatType.Health, baseHealth);
+        card.ExtAtkPoint = baseExtAtk + GetCardModifier(charID, StatType.ExtAtk, baseExtAtk);
+        card.InnAtkPoint = baseInnAtk + GetCardModifier(charID, StatType.InnAtk, baseInnAtk);
+        card.DefPoint = baseDef + GetCardModifier(charID, StatType.Defense, baseDef);
+
+        Debug.Log($"[ApplyToCard] {card.HeroName} 전투력 적용됨: {card.HealthPoint} / {card.ExtAtkPoint} /{card.InnAtkPoint} / {card.DefPoint} ");
+        // 전투력 계산
         var hero = new HeroData
         {
             heroId = charID,
@@ -275,9 +269,7 @@ public static class StatModifierManager
             PlayerModelSO = modelSO
         };
 
-        // 전투력 계산
         card.combatPower = HeroDataManager.Instance.CalculateCombatPower(hero);
-        Debug.Log($"[ApplyToCard] : {card.HeroName}의 전투력 {card.combatPower} 적용됨");
+        Debug.Log($"[ApplyToCard] {card.HeroName} 전투력 적용됨: {card.combatPower}");
     }
-
 }

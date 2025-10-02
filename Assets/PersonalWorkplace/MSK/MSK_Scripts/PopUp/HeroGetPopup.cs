@@ -82,6 +82,7 @@ public class HeroGetPopup :  UIBase
         heroData = data;
         Init();
         heroGetPopup.gameObject.SetActive(true);
+        AudioManager.Instance.PlaySound("4. 전설 캐릭터 획득 사운드");
     }
 
     public override void SetHide()

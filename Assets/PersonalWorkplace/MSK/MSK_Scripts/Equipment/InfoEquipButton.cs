@@ -34,6 +34,7 @@ public class InfoEquipButton : MonoBehaviour
     {
         equipmentList.gameObject.SetActive(true);
         equipmentList.ShowEquipmentListByTemplateID(templateID);
+        AudioManager.Instance.PlaySound("6. 팝업 열 때 사운드");
     }
     #endregion
 

@@ -28,6 +28,7 @@ public class InventoryEquipButton : MonoBehaviour
         panel.GetEquipmentInstance(equipmentInstance);
         panel.gameObject.SetActive(true);
         panel.Init();
+        AudioManager.Instance.PlaySound("6. 팝업 열 때 사운드");
     }
     #endregion
 
@@ -48,6 +49,8 @@ public class InventoryEquipButton : MonoBehaviour
     }
     public bool IsSameInstance(EquipmentInstance target)
     {
+        if (target == null)
+            return false;
         return equipmentInstance != null && equipmentInstance.instanceID == target.instanceID;
     }
     #endregion
