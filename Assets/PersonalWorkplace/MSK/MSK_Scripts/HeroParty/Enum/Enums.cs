@@ -73,6 +73,7 @@ public enum PopupType
     DungeonFail,
     Confirm,
     HeroGet,        // 영웅 최초 획득
+    Stage,
 }
 
 public enum TableType

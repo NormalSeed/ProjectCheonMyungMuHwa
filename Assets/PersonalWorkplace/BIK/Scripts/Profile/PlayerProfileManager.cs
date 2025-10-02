@@ -204,6 +204,8 @@ public class PlayerProfileManager : IStartable, IDisposable
                 CurrentProfile.Level += 1;
                 Debug.Log($"[ProfileManager] 레벨업! → Lv.{CurrentProfile.Level}");
                 PopupManager.Instance.ShowLevelUpPopup(CurrentProfile.Level - 1, CurrentProfile.Level);
+
+                QuestManager.Instance.ReportEvent(QuestTargetType.Growth, 1);
             }
             else break;
         }
