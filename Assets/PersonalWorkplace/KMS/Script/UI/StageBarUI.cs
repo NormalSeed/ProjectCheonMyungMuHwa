@@ -21,6 +21,7 @@ public class StageBarUI : MonoBehaviour
         if (InGameManager.Instance != null)
         {
             InGameManager.Instance.OnStageStart += SetStage;
+            InGameManager.Instance.OnStageStart += SpawnStagePanel;
         }
     }
 
@@ -33,6 +34,12 @@ public class StageBarUI : MonoBehaviour
             case 0: BossSetting(); break;
             case 1: case 2: case 3: MonsterSetting(progress); break;
         }
+    }
+    private void SpawnStagePanel(int door, int progress)
+    {
+        if (progress != 1) return;
+        int last = door % 1;
+        if (last == 0) PopupManager.Instance.ShowStagePopup(door);
     }
 
     private void BossSetting()

@@ -138,6 +138,7 @@ public class DefaultPool<T> where T : MonoBehaviour, IPooled<T>
     {
         if (pool.CountActive <= 0) return;
         pooledItems.Remove(pooled);
+        (pooled as MonoBehaviour).transform.parent = parent;
         pool.Release(pooled);
     }
 }
