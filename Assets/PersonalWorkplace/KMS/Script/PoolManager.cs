@@ -48,10 +48,10 @@ public class PoolManager : MonoBehaviour
         Instance = this;
         droppedItems = new();
         bosses = new();
-        PunchPool = new DefaultPool<MonsterController>(loadedData.Objects["Punch"], 3, active: false, resolver: container);
-        StickPool = new DefaultPool<MonsterController>(loadedData.Objects["Stick"], 3, active: false, resolver: container);
-        CanePool = new DefaultPool<MonsterController>(loadedData.Objects["Cane"], 3, active: false, resolver: container);
-        BowPool = new DefaultPool<MonsterController>(loadedData.Objects["Bow"], 3, active: false, resolver: container);
+        PunchPool = new DefaultPool<MonsterController>(loadedData.Objects["Punch"], 3, active: false, resolver: container, warmup: false, exceed: true);
+        StickPool = new DefaultPool<MonsterController>(loadedData.Objects["Stick"], 3, active: false, resolver: container, warmup: false, exceed: true);
+        CanePool = new DefaultPool<MonsterController>(loadedData.Objects["Cane"], 3, active: false, resolver: container, warmup: false, exceed: true);
+        BowPool = new DefaultPool<MonsterController>(loadedData.Objects["Bow"], 3, active: false, resolver: container, warmup: false, exceed: true);
         ArrowPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["Arrow"], 8, exceed: true, warmup: false, parent: gameObject.transform);
         MagicPool = new DefaultPool<MonsterProjectile>(loadedData.Objects["MagicBall"], 8, exceed: true, warmup: false, parent: gameObject.transform);
         ItemPool = new DefaultPool<DroppedItem>(loadedData.Objects["DroppedItem"], 60, exceed: true, warmup: false, parent: gameObject.transform);
@@ -61,7 +61,9 @@ public class PoolManager : MonoBehaviour
             loadedData.Objects["StickBoss"],
             loadedData.Objects["CaneBoss"],
             loadedData.Objects["BowBoss"],
-            loadedData.Objects["BigBoss"]
+            loadedData.Objects["BigBoss"],
+            loadedData.Objects["50Boss"],
+            loadedData.Objects["100Boss"]
         };
         foreach (GameObject go in loadedbosses)
         {
@@ -112,7 +114,7 @@ public class PoolManager : MonoBehaviour
 
     private void ActiveBoss(Vector2 pos)
     {
-        AudioManager.Instance.PlaySound("Monster_Recall_New");
+        AudioManager.Instance.PlaySound("2. 보스 등장시 사운드");
         int last = currentDoor % 10;
         string str = "";
         switch (last)

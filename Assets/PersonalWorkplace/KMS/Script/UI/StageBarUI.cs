@@ -6,6 +6,7 @@ public class StageBarUI : MonoBehaviour
 {
     [SerializeField] TMP_Text stageText;
     [SerializeField] TMP_Text stageValueText;
+    [SerializeField] TMP_Text healthText;
     [SerializeField] StageBarFill bossFill;
     [SerializeField] StageBarFill[] monsterFills;
     [SerializeField] CurrencyDungeonTimer timer;
@@ -37,6 +38,7 @@ public class StageBarUI : MonoBehaviour
     private void BossSetting()
     {
         timer.Activate();
+        healthText.gameObject.SetActive(true);
         foreach (var f in monsterFills)
         {
             f.Inactivate();
@@ -48,10 +50,21 @@ public class StageBarUI : MonoBehaviour
     private void MonsterSetting(int progress)
     {
         timer.Inactivate();
+        healthText.gameObject.SetActive(false);
         bossFill.Inactivate();
         targetMonsterFill = monsterFills[progress - 1];
+        for (int i = 0; i < progress - 1; i++)
+        {
+            monsterFills[i].Activate();
+            monsterFills[i].SetValue(1);
+        }
         targetMonsterFill.Activate();
         targetMonsterFill.SetValue(0);
+        for (int i = progress; i < monsterFills.Length; i++)
+        {
+            monsterFills[i].SetValue(0);
+            monsterFills[i].Inactivate();
+        }
     }
 
     public void SetFill(float val)
@@ -74,6 +87,11 @@ public class StageBarUI : MonoBehaviour
             case CurrencyDungeonType.Honbaeg: stageText.text = "혼백던전"; break;
             case CurrencyDungeonType.Spirit: stageText.text = "영석던전"; break;
         }
+    }
+
+    public void SetHealthBarText(BigCurrency current, BigCurrency Initial)
+    {
+        healthText.text = $"{current} / {Initial}";
     }
 
 

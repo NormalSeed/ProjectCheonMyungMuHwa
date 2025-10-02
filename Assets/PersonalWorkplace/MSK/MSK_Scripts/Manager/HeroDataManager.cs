@@ -1,13 +1,14 @@
+using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using System.Linq;
 #region Serializable
 [Serializable]
 public class HeroSaveList
@@ -135,6 +136,14 @@ public class HeroDataManager : IStartable
     public void Start()
     {
         Instance = this;
+
+        if (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
+        {
+            Debug.LogWarning("[HeroDataManager] FirebaseAuth가 아직 초기화되지 않았습니다. 초기화 대기 중...");
+            WaitForFirebaseAndStart();
+            return;
+        }
+
         _uid = CurrencyManager.Instance.UserID;
         _dbRef = CurrencyManager.Instance.DbRef;
         Debug.Log("[HeroDataMagaer] Start 실행");
@@ -146,7 +155,7 @@ public class HeroDataManager : IStartable
         // HeroModels 초기화 대기
         while (HeroModels.Instance == null || !HeroModels.Instance.IsInitialized)
         {
-            await Task.Delay(100);
+            await Task.Delay(500);
         }
 
         Debug.Log("[HeroDataManager] HeroModels 초기화 완료 확인");
@@ -159,6 +168,20 @@ public class HeroDataManager : IStartable
 
         IsInitialized = true;
         Debug.Log("[HeroDataManager] 초기화 완료 → IsInitialized = true");
+    }
+
+    private async void WaitForFirebaseAndStart()
+    {
+        while (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
+        {
+            await Task.Delay(500);
+        }
+
+        _uid = CurrencyManager.Instance.UserID;
+        _dbRef = CurrencyManager.Instance.DbRef;
+
+        Debug.Log("[HeroDataManager] Firebase 초기화 완료 후 Start 실행");
+        WaitForHeroModelsAndInit();
     }
     #endregion
 
@@ -190,10 +213,29 @@ public class HeroDataManager : IStartable
                 if (template != null)
                 {
                     hero.PlayerModelSO = template.PlayerModelSO;
-                    hero.cardInfo = template.cardInfo;
+                    hero.cardInfo = ScriptableObject.CreateInstance<CardInfo>();
+                    hero.cardInfo.HeroID = template.cardInfo.HeroID;
+                    hero.cardInfo.HeroName = template.cardInfo.HeroName;
                 }
+                else
+                {
+                    Debug.LogWarning($"[LoadHeroDataFromFirebase] template이 null입니다: heroId={hero.heroId}");
+                    hero.cardInfo = new CardInfo
+                    {
+                        HeroID = hero.heroId,
+                        HeroName = "Unknown"
+                        // 기본값으로라도 생성
+                    };
+                }
+
                 foreach (EquipmentType type in Enum.GetValues(typeof(EquipmentType)))
                 {
+                    if (hero.cardInfo == null)
+                    {
+                        Debug.LogError($"[LoadHeroDataFromFirebase] hero.cardInfo가 null입니다: heroId={hero.heroId}");
+                        continue;
+                    }
+
                     var equip = equipmentManager.allEquipments
                         .FirstOrDefault(e => e.charID == hero.cardInfo.HeroID && e.equipmentType == type);
 
@@ -201,7 +243,7 @@ public class HeroDataManager : IStartable
                     {
                         ApplyHeorStats(equip, hero.cardInfo.HeroID);
                     }
-                    StatModifierManager.ApplyToCard(hero.cardInfo);
+                    //StatModifierManager.ApplyToCard(hero.cardInfo);
                 }
                 Debug.Log($"[LoadHeroDataFromFirebase] {hero.heroName} 전투력 적용");
             }
@@ -324,17 +366,35 @@ public class HeroDataManager : IStartable
         foreach (var card in results)
         {
             if (!ownedHeroes.ContainsKey(card.HeroID))
-                AddNewHero(card);
+            {
+                AddNewHero(card);       // 신규 획득로직
+                if (card.rarity == HeroRarity.Legend)   // 획득 시 레어도 체크
+                {
+                    PopupManager.Instance.ShowHeroGetPopup(card);
+                }
+            }
             else
                 AddHeroPiece(card.HeroID, GetPieceAmountByRarity(card.rarity));
         }
     }
     public float CalculateCombatPower(HeroData hero)
     {
-        var model = hero.PlayerModelSO; 
+        if (hero == null)
+        {
+            Debug.LogError("[CombatPower] hero가 null입니다");
+            return 0f;
+        }
+
+        if (hero.PlayerModelSO == null)
+        {
+            Debug.LogError($"[CombatPower] PlayerModelSO가 null입니다: heroId={hero.heroId}");
+            return 0f;
+        }
+
+        var model = hero.PlayerModelSO;
         return 2.0f * (
             (model.InnAtkPoint + model.ExtAtkPoint) *
-            (1 + model.CritRate * (model.CritDamage - 1)) + 
+            (1 + model.CritRate * (model.CritDamage - 1)) +
             1.4f * model.DefPoint + 0.1f * model.HealthPoint
        );
     }

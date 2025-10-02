@@ -56,7 +56,8 @@ public class HeroInfoUI : UIBase
     #endregion
 
     #region Goods Properties
-    private BigCurrency requireGold = new();              // 필요 골드
+    private BigCurrency requireSoul = new();              // 필요 혼백
+    private BigCurrency prePow = new();
     private int requirePiece;                    // 필요 영웅 조각
     private int ownerPiece;                      // 보유중인 영웅 조각
     #endregion
@@ -106,8 +107,7 @@ public class HeroInfoUI : UIBase
         HealthPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.HealthPoint);
         ExtAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.ExtAtkPoint);
         InnAtkPoint = BigCurrency.FromBaseAmount(heroData.cardInfo.InnAtkPoint);
-        requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
-
+        requireSoul = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
         ownerPiece = heroData.heroPiece;
         requirePiece = heroData.stage * (5 - (int)heroData.cardInfo.rarity);
     }
@@ -125,7 +125,7 @@ public class HeroInfoUI : UIBase
         outPow.text = ExtAtkPoint.ToString();
         inPow.text = InnAtkPoint.ToString();
         power.text = CountingHeroPower();
-        exp.text = $"{requireGold} / {CurrencyManager.Instance.Model.Get(CurrencyType.Gold)}";
+        exp.text = $"{requireSoul} / {CurrencyManager.Instance.Model.Get(CurrencyType.Soul)}";
         heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
     }
     private void SetCharacter()
@@ -162,7 +162,7 @@ public class HeroInfoUI : UIBase
     // 버튼 설정여부
     private void SetUpgradeInteractable(Button btn)
     {
-        btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Gold) >= requireGold;
+        btn.interactable = CurrencyManager.Instance.Model.Get(CurrencyType.Soul) >= requireSoul;
     }
     private void SetRankUpInteractable(Button btn)
     {
@@ -195,14 +195,23 @@ public class HeroInfoUI : UIBase
     /// </summary>
     private void HeroLevelUpgrade()
     {
-        if (CurrencyManager.Instance.TrySpend(CurrencyType.Gold, requireGold))
+        prePow = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower);
+
+        if (CurrencyManager.Instance.TrySpend(CurrencyType.Soul, requireSoul))
         {
+            //  레벨업
             heroData.PlayerModelSO.Level++;
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-            requireGold = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
-            RequireLevelUpGold(heroData.PlayerModelSO.Level);
+            //  다음 레벨 골드 계산
+            requireSoul = BigCurrency.FromBaseAmount(heroData.PlayerModelSO.Level * 500);
+            RequireLevelUpSoul(heroData.PlayerModelSO.Level);
+            //  DB 저장 
             CurrencyManager.Instance.SaveCharacterInfoToFireBase(heroData.cardInfo.HeroID, heroData.PlayerModelSO.Level);
+           //  정보 새로고침
             RefreshHeroUI();
+            //  변화 팝업 띄우기
+            BigCurrency valueChange = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower) - prePow;
+            PopupManager.Instance.ShowPowerUpPanel(BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower), valueChange);
         }
     }
 
@@ -216,14 +225,14 @@ public class HeroInfoUI : UIBase
     }
 
     /// <summary>
-    /// 레벨업 시 필요한 골드 계산용 코드입니다.
+    /// 레벨업 시 필요한 혼백 계산용 코드입니다.
     /// </summary>
     /// <param name="level"></param>
-    private string RequireLevelUpGold(int level)
+    private string RequireLevelUpSoul(int level)
     {
-        string myGold = CurrencyManager.Instance.Model.Get(CurrencyType.Gold).ToString();
-        string reqGold = requireGold.ToString();
-        string result = reqGold + " / " + myGold;
+        string mySoul = CurrencyManager.Instance.Model.Get(CurrencyType.Soul).ToString();
+        string reqSoul = requireSoul.ToString();
+        string result = reqSoul + " / " + mySoul;
         return result;                 // 임시 계산식 level * 500
     }
 
@@ -235,15 +244,24 @@ public class HeroInfoUI : UIBase
     {
         if (heroData.stage >= 5) return;
 
+        // 돌파 작업
         ownerPiece -= requirePiece;
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
-        GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
-        heroUI.RefreshAllCards();
+        
+        // DB에 사용한 조각, 돌파 정보 저장
         CurrencyManager.Instance.SaveHeroStageToFireBase(heroData.cardInfo.HeroID, heroData.stage);
         CurrencyManager.Instance.SavePieceToFireBase(heroData.cardInfo.HeroID, ownerPiece);
+       
+        // 다음 요구량
         requirePiece = heroData.stage + (5 - (int)heroData.cardInfo.rarity) * (heroData.stage);
+        // UI 갱신
+        heroUI.RefreshAllCards();
         RefreshHeroUI();
+
+        //  변화 팝업 띄우기
+        BigCurrency valueChange = BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower) - prePow;
+        PopupManager.Instance.ShowPowerUpPanel(BigCurrency.FromBaseAmount(heroData.cardInfo.combatPower), valueChange);
     }
 
     /// <summary>
@@ -349,10 +367,3 @@ public class HeroInfoUI : UIBase
     }
     #endregion
 }
-
-/*
-TODO : 영웅 정보 UI 작업 예정 목록
-    골드 부족 시 버튼 상호작용 불가능 추가
-    임시 작성한 영웅 레벨업, 돌파에 필요한 재화, 종합 전투력 계산식 수정하기
-    영웅 돌파 표시 수정
- */

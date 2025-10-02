@@ -7,8 +7,7 @@ using Unity.VisualScripting;
 
 public class ParticleManager : MonoBehaviour
 {
-
-    public static ParticleManager Instance;
+    public static ParticleManager Instance { get; private set; }
 
     public bool IsInitialized;
 

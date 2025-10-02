@@ -17,16 +17,16 @@ public class HeroInfoSetting : MonoBehaviour
     [SerializeField] private Image characterRoot;          // 캐릭터 이미지
     [SerializeField] private Transform stageRoot;          // 돌파상태
     [SerializeField] private Transform badgeRoot;          // 캐릭터 소속
-    [SerializeField] private Transform selectRoot;         // 배치 선택여부 
+    [SerializeField] public Transform selectRoot;         // 배치 선택여부 
 
     [Header("UI")]
     [SerializeField] private Button CardButton;             // 캐릭터 카드
-    [SerializeField] private TextMeshProUGUI PartyNum;      // 배치 순서
+    [SerializeField] public TextMeshProUGUI PartyNum;      // 배치 순서
 
     [SerializeField] private HeroInfoUI heroInfoUI;         // 캐릭터 정보 판넬
     [SerializeField] private HeroUI heroUI;
 
-    private HeroData heroData;
+    public HeroData heroData;
     #region Unity LifeCycle
 
     private async void OnEnable()
@@ -138,6 +138,7 @@ public class HeroInfoSetting : MonoBehaviour
                 PartyManager.Instance.RemoveMember(chardata);
                 selectRoot.gameObject.SetActive(false);
             }
+            heroUI.RefreshAllPartyNum();
         }
         else
         {

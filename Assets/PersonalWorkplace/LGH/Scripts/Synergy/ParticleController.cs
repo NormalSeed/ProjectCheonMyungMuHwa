@@ -6,7 +6,7 @@ public class ParticleController : MonoBehaviour
     [SerializeField] private GameObject[] particlePrefabs;
     public Dictionary<string, LGH_ObjectPool> particlePools;
 
-    public void Awake()
+    public void OnEnable()
     {
         particlePools = new Dictionary<string, LGH_ObjectPool>();
 
