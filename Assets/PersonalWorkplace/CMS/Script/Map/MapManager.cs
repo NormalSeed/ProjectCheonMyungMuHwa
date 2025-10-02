@@ -31,18 +31,18 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         SpawnStage(currentStageIndex, Vector3.zero);
-        // 생성된 맵에서 AlignPoint 찾기
+
         if (spawnedMaps.Count > 0)
         {
-            GameObject currentMap = spawnedMaps[spawnedMaps.Count - 1];
+            currentMap = spawnedMaps[spawnedMaps.Count - 1]; 
             Transform alignRoot = currentMap.transform.Find("AlignPoint");
-            InGameManager.Instance.alignPoint = alignRoot.gameObject;
+            InGameManager.Instance.alignPoint = alignRoot?.gameObject;
 
             if (alignRoot != null)
             {
                 for (int i = 0; i < PartyManager.Instance.players.Count; i++)
                 {
-                    Transform point = alignRoot.Find($"Point{i}");
+                    Transform point = alignRoot.Find($"Point{i}"); 
                     if (point != null)
                     {
                         var player = PartyManager.Instance.players[i];
@@ -98,9 +98,8 @@ public class MapManager : MonoBehaviour
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        int themeIndex = (stageIndex - 1) / 25;
-        if (themeIndex >= mapThemes.Length)
-            themeIndex = mapThemes.Length - 1;
+        // 몇 번째 테마를 쓸지 결정 (순환 반복)
+        int themeIndex = (stageIndex - 1) % mapThemes.Length;
 
         string prefabName = mapThemes[themeIndex];
         GameObject prefab = Resources.Load<GameObject>(prefabName);
@@ -121,29 +120,6 @@ public class MapManager : MonoBehaviour
             }
 
             Debug.Log($"스테이지 {stageIndex}, {prefabName} 생성 완료");
-
-            //// --- 몬스터 소환 로직 ---
-            //PoolManager.Instance.SetMonsterState(stageIndex);
-            //
-            //if (stageIndex % 3 == 0) // 보스 스테이지
-            //{
-            //    PoolManager.Instance.SpawnMonster(
-            //        newMap.transform.position,
-            //        MonsterType.Boss
-            //    );
-            //}
-            //else // 일반 스테이지
-            //{
-            //    var spawnPoints = newMap.GetComponentsInChildren<SpawnPoint>();
-            //    Debug.Log($"[MapManager] {newMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
-            //
-            //    foreach (var point in spawnPoints)
-            //    {
-            //        Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
-            //        PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
-            //    }
-            //
-            //}
         }
         else
         {
@@ -153,28 +129,48 @@ public class MapManager : MonoBehaviour
 
     public bool SpawnMonsters(int stageIndex, int stageProgress)
     {
-        // --- 몬스터 소환 로직 ---
-        // 일반 스테이지
         PoolManager.Instance.SetMonsterState(stageIndex);
-        if (stageProgress < 3)
-        {
-            var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
-            Debug.Log($"[MapManager] {currentMap.name} 안에서 SpawnPoint {spawnPoints.Length}개 발견됨");
 
+        var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
+
+        if (stageProgress < 2) // 1, 2 관문 → 일반 몬스터
+        {
             foreach (var point in spawnPoints)
             {
-                Debug.Log($"[MapManager] {point.monsterType} 몬스터 소환 at {point.transform.position}");
                 PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
             }
             return false;
         }
-        else
+        else // 3관문 → 보스 추가
         {
+
+            foreach (var point in spawnPoints)
+            {
+                PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
+            }
             PoolManager.Instance.SpawnMonster(
                 currentMap.transform.position + new Vector3(0, 6.55f, 0),
                 MonsterType.Boss
             );
             return true;
+        }
+    }
+    public void GoToNextGate(Vector3 spawnPosition)
+    {
+        int gate = InGameManager.Instance.stageProgress;
+
+        if (gate < 2)
+        {
+            SpawnStage(currentStageIndex, spawnPosition);
+        }
+        else
+        {
+            // 보스 클리어 → 다음 스테이지로 이동
+            currentStageIndex++;
+            InGameManager.Instance.stageProgress = 0; 
+            SpawnStage(currentStageIndex, spawnPosition);
+
+            Debug.Log($"스테이지 {currentStageIndex} 시작!");
         }
     }
 }

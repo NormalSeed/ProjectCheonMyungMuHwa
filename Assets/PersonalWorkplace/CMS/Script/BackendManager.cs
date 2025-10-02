@@ -30,6 +30,14 @@ public class BackendManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            //  여기서 Init 보장
+            FirebaseApp app = FirebaseApp.DefaultInstance;
+            FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+            FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
+            Init(app, auth, db);
         }
         else
         {
@@ -118,8 +126,7 @@ public class BackendManager : MonoBehaviour
 
                                 LoadPlayerData(() =>
                                 {
-                                    OnLoginSuccess?.Invoke();
-                                    QuestManager.Instance?.InitializeAfterLogin();
+                                    HandleLoginSuccess();
                                 });
                             }
                             else
@@ -161,8 +168,7 @@ public class BackendManager : MonoBehaviour
 
             LoadPlayerData(() =>
             {
-                OnLoginSuccess?.Invoke();
-                QuestManager.Instance?.InitializeAfterLogin();
+                HandleLoginSuccess();
             });
         });
     }
@@ -192,8 +198,7 @@ public class BackendManager : MonoBehaviour
 
             LoadPlayerData(() =>
             {
-                OnLoginSuccess?.Invoke();
-                QuestManager.Instance?.InitializeAfterLogin();
+                HandleLoginSuccess();
             });
         });
     }
@@ -249,8 +254,7 @@ public class BackendManager : MonoBehaviour
 
                     LoadPlayerData(() =>
                     {
-                        OnLoginSuccess?.Invoke();
-                        QuestManager.Instance?.InitializeAfterLogin();
+                        HandleLoginSuccess();
                     });
                 });
             });
@@ -426,6 +430,31 @@ public class BackendManager : MonoBehaviour
             else
                 Debug.Log($"[서버 저장 완료] Stage={clearedStage}, Gold={gold}");
         });
+    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "DEMO_GameScene")
+        {
+            Debug.Log("GameScene 로드됨 → QuestManager 초기화 대기 (OnLoginSuccess에서 처리)");
+        }
+    }
+    public void HandleLoginSuccess()
+    {
+        Debug.Log("로그인 성공!");
+
+        // 이벤트 호출
+        OnLoginSuccess?.Invoke();
+
+        // 만약 씬이 GameScene이면 QuestManager 초기화
+        if (SceneManager.GetActiveScene().name == "DEMO_GameScene")
+        {
+            QuestManager.Instance?.InitializeAfterLogin();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnApplicationQuit()

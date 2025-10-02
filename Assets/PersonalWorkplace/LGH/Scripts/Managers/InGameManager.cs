@@ -178,39 +178,38 @@ public class InGameManager : MonoBehaviour
             foreach (var player in players)
             {
                 if (player.model == null) continue;
-
-                if (player.isDead.Value == true)
-                {
-                    player.Resurrect();
-                }
-
+                if (player.isDead.Value) player.Resurrect();
                 player.model.CurHealth.Value = player.model.Health;
             }
 
-            alignedNum.Value = 0; // 전투 종료 후 초기화
+            alignedNum.Value = 0;
             isProcessingAlignment = false;
             PoolManager.Instance.GetItems();
-            // 현재 정렬 포인트 비활성화
             alignPoint.SetActive(false);
 
-            // 다음 스테이지로 이동
             Map currentMap = MapManager.Instance.currentMap.GetComponent<Map>();
             if (currentMap != null)
             {
                 Vector3 nextSpawnPos = currentMap.endPoint.position;
-                MapManager.Instance.GoToNextStage(nextSpawnPos);
-            }
-            else
-            {
-                Debug.LogWarning("현재 맵을 찾을 수 없습니다.");
+
+                if (stageProgress < 2) // 아직 보스 전
+                {
+                    stageProgress++;
+                    MapManager.Instance.GoToNextGate(nextSpawnPos);
+                }
+                else // 보스 클리어 → 다음 스테이지
+                {
+                    stageProgress = 0;
+                    stageNum++;
+                    SetNextStage();
+                    MapManager.Instance.GoToNextStage(nextSpawnPos);
+                }
             }
         }
     }
 
     public void SetNextStage()
     {
-        stageNum++;
-
         string uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.GetReference($"users/{uid}/stage");
 
@@ -269,7 +268,7 @@ public class InGameManager : MonoBehaviour
         // 페이드인 전에 플레이어 위치 재배치
         for (int i = 0; i < PartyManager.Instance.players.Count; i++)
         {
-            Transform point = alignPoint.transform.Find($"Point{i + 1}");
+            Transform point = alignPoint.transform.Find($"Point{i}");
             if (point != null)
             {
                 Vector3 offset = new Vector3(0, -0.1f, 0);
