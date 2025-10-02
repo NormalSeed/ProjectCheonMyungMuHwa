@@ -41,7 +41,7 @@ public class EquipmentInfoPanel : MonoBehaviour
 
     public EquipmentInstance instance;     // 판넬의 장비
     public string charId;                  // 영웅 ID
-    public string instanceID;              // 장비 ID
+    public string oldInstanceID;              // 장비중인 장비 ID
     private BigCurrency levelUpCurrency;   // 소모 연마석 
 
     // 장비 능력치 한글 텍스트 변환용 딕셔너리
@@ -87,7 +87,7 @@ public class EquipmentInfoPanel : MonoBehaviour
         var type = instance.equipmentType;
         var heroData = HeroInfo.heroData;
 
-        instanceID = type switch
+        oldInstanceID = type switch
         {
             EquipmentType.Weapon => heroData.weapone,
             EquipmentType.Armor => heroData.armor,
@@ -136,9 +136,9 @@ public class EquipmentInfoPanel : MonoBehaviour
         var heroData = HeroInfo.heroData;
         var type = instance.equipmentType;
 
-        // 현재 슬롯에 장착된 장비 ID 가져오기
+        // 현재 영웅에게 장착된 장비 ID 가져오기
         SetInstanceIDFromHeroData();
-        var currentEquippedId = instanceID;
+        var currentEquippedId = oldInstanceID;
 
         // 현재 슬롯에 장착된 장비 인스턴스 가져오기
         EquipmentInstance oldInstance = null;
@@ -146,6 +146,8 @@ public class EquipmentInfoPanel : MonoBehaviour
         {
             oldInstance = equipmentManager.allEquipments
                 .FirstOrDefault(e => e.instanceID == currentEquippedId);
+            Debug.Log($"기존 장착 인스턴스 : {oldInstance.instanceID}");
+            Debug.Log($"신규 장착 인스턴스 : {instance.instanceID}");
         }
         //  장비가 장착되어 있고, 슬롯에 다른 영웅이 있을 경우
         if (instance.isEquipped && instance.charID != heroData.heroId)
@@ -210,7 +212,7 @@ public class EquipmentInfoPanel : MonoBehaviour
         HeroInfo.Init();
         HeroInfo.RefreshHeroUI();
         SetPanelText();
-        RefreshEquipCardUI();
+        RefreshEquipCardUI(oldInstance);
     }
 
     // 소모 연마석 반환
@@ -289,8 +291,11 @@ public class EquipmentInfoPanel : MonoBehaviour
             case EquipmentType.Boots: heroData.boots = itemId; break;
         }
     }
-    public void RefreshEquipCardUI()
+    public void RefreshEquipCardUI(EquipmentInstance oldInstance)
     {
+        int taskCount = 0;
+        if (oldInstance == null)
+            taskCount++;
         var itemList = FindFirstObjectByType<EquipmentItemList>();
         if (itemList == null)
         {
@@ -300,11 +305,19 @@ public class EquipmentInfoPanel : MonoBehaviour
 
         foreach (var button in itemList.activeEquipButtons)
         {
+            if (button != null && button.IsSameInstance(oldInstance))
+            {
+                button.Init(this, oldInstance);
+                taskCount++;
+            }
+
             if (button != null && button.IsSameInstance(instance))
             {
                 button.Init(this, instance);
-                break;
+                taskCount++;
             }
+            if (taskCount >= 2)
+                break;
         }
     }
 

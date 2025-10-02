@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -17,6 +18,7 @@ public class EquipmentChange : MonoBehaviour
 
 
     private EquipmentInstance instance;     // 판넬의 장비
+    private EquipmentInstance oldInstance;
 
     private string thisCharId;              // 새로 장착할 대상 영웅 ID
     private string oldCharID;               // 기존 장착중인 대상 영웅 ID
@@ -24,7 +26,7 @@ public class EquipmentChange : MonoBehaviour
 
     private void OnEnable()
     {
-        Init();   
+        Init();
     }
 
     private void OnDisable()
@@ -36,7 +38,9 @@ public class EquipmentChange : MonoBehaviour
     private void Init()
     {
         instance = infoPanel.instance;
-        instanceID = infoPanel.instanceID;
+        oldInstance = equipmentManager.allEquipments
+            .FirstOrDefault(e => e.instanceID == infoPanel.oldInstanceID);
+        instanceID = infoPanel.oldInstanceID;
         thisCharId = infoPanel.charId;
         oldCharID = instance.charID;
         equipmentImage.SetData(instance);
@@ -64,7 +68,7 @@ public class EquipmentChange : MonoBehaviour
             Debug.LogWarning($"장비중 {oldCharID}, 신규 장착 대상 {thisCharId}");
             instance.isEquipped = false;
             instance.charID = null;
-            if(equipmentService == null)
+            if (equipmentService == null)
             {
                 Debug.LogWarning("equipmentService 등록안됨");
             }
@@ -89,6 +93,6 @@ public class EquipmentChange : MonoBehaviour
         infoPanel.HeroInfo.Init();
         infoPanel.HeroInfo.RefreshHeroUI();
         infoPanel.SetPanelText();
-        infoPanel.RefreshEquipCardUI();
+        infoPanel.RefreshEquipCardUI(oldInstance);
     }
 }
