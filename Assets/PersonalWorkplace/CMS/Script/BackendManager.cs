@@ -32,6 +32,12 @@ public class BackendManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
+
+            //  여기서 Init 보장
+            FirebaseApp app = FirebaseApp.DefaultInstance;
+            FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+            FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
+            Init(app, auth, db);
         }
         else
         {
