@@ -49,6 +49,8 @@ public class InventoryEquipButton : MonoBehaviour
     }
     public bool IsSameInstance(EquipmentInstance target)
     {
+        if (target == null)
+            return false;
         return equipmentInstance != null && equipmentInstance.instanceID == target.instanceID;
     }
     #endregion
