@@ -28,12 +28,16 @@ public class PoolManager : MonoBehaviour
 
     private Dictionary<string, MonsterController> bosses;
 
-    private Stack<DroppedItem> droppedItems;
+    private Queue<DroppedItem> droppedItems;
 
     private IObjectResolver container;
     private MonsterController bosscon;
 
     private WaitForSeconds GetItemWfs;
+
+    private Camera maincam;
+
+    [SerializeField] Canvas canvas;
 
     [Inject]
     public void VCTest(IObjectResolver container)
@@ -44,7 +48,8 @@ public class PoolManager : MonoBehaviour
 
     void Awake()
     {
-        GetItemWfs = new WaitForSeconds(0.03f);
+        maincam = Camera.main;
+        GetItemWfs = new WaitForSeconds(0.1f);
         Instance = this;
         droppedItems = new();
         bosses = new();
@@ -159,7 +164,7 @@ public class PoolManager : MonoBehaviour
 
     public void AddItemToList(DroppedItem item)
     {
-        droppedItems.Push(item);
+        droppedItems.Enqueue(item);
     }
 
     public void GetItems()
@@ -171,9 +176,13 @@ public class PoolManager : MonoBehaviour
         yield return GetItemWfs;
         while (droppedItems.Count > 0)
         {
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, goldRect.position);
-            Vector2 target = Camera.main.ScreenToWorldPoint(screenPos);
-            droppedItems.Pop().Release(target);
+            //Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, goldRect.position);
+            //Vector2 target = maincam.ScreenToWorldPoint(screenPos);
+            DroppedItem item = droppedItems.Dequeue();
+            Vector2 pos = maincam.WorldToScreenPoint(item.transform.position);
+            item.transform.SetParent(canvas.transform);
+            item.transform.position = pos;
+            item.Release(goldRect.position + Vector3.right * 10);
             yield return GetItemWfs;
         }
 

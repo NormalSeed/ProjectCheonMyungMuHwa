@@ -9,6 +9,8 @@ public class MainSceneBGMPlayer
     //    InGameManager.Instance.OnStageInit += SetInitialBGM;
     //}
 
+    private int currentstage;
+
     public void SetInitialBGM(int stage)
     {
         Debug.Log($"<color=yellow>{stage}");
@@ -36,6 +38,7 @@ public class MainSceneBGMPlayer
         {
             AudioManager.Instance.PlayBGM("BGM_Chapter4");
         }
+        currentstage = stage;
     }
 
     public void SetBGM(int stage)

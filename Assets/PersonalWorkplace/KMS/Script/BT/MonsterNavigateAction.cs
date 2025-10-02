@@ -20,7 +20,7 @@ public partial class MonsterNavigateAction : Action
     protected override Status OnUpdate()
     {
         if (Target.Value == null || !Target.Value.gameObject.activeSelf || Target.Value.isDead.Value) return Status.Running;
-        Controller.Value.NavAgent.SetDestination(Target.Value.transform.position);
+        if (Controller.Value.NavAgent.isOnNavMesh) Controller.Value.NavAgent.SetDestination(Target.Value.transform.position);
         return Status.Running;
     }
 

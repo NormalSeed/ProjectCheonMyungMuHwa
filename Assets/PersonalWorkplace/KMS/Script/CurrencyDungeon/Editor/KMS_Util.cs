@@ -41,13 +41,13 @@ public static class KMS_Util
 [MenuItem("Utilities/Generate Monster State Data Scriptable Object")]
   public static void GenMonsterStateDataTable()
   {
-    string[] stateAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monsterstate.csv");
-    string[] currencyAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monstercurrency.csv");
+    string[] stateAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monsterstate.psv");
+    string[] currencyAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monstercurrency.psv");
     MonsterStateDataTableSO so = ScriptableObject.CreateInstance<MonsterStateDataTableSO>();
     for (int i = 3; i < stateAllLines.Length; i++)
     {
-      string[] ss = stateAllLines[i].Split(',');
-      string[] sc = currencyAllLines[i].Split(',');
+      string[] ss = stateAllLines[i].Split('|');
+      string[] sc = currencyAllLines[i].Split('|');
       MonsterStateData monster = new MonsterStateData()
       {
         HP = double.Parse(ss[1]),
