@@ -274,6 +274,8 @@ public class InventoryUI : UIBase
             // OnItemChanged에서 갱신됨
         }
         UpdateUseButtonInteractable();
+
+        QuestManager.Instance.ReportEvent(QuestTargetType.Growth, _useCount);
     }
 
     private void OnClickCloseButton()
