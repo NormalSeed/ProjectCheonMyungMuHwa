@@ -167,8 +167,7 @@ public class EquipmentInfoPanel : MonoBehaviour
             equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
 
             Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
-
-            HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+            StatModifierManager.RemoveModifiersByOrigin(charId, oldInstance.instanceID);
             StatModifierManager.ApplyToCard(heroData.cardInfo);
         }
         else
@@ -183,7 +182,7 @@ public class EquipmentInfoPanel : MonoBehaviour
                 equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
 
                 Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
-
+                StatModifierManager.RemoveModifiersByOrigin(charId, oldInstance.instanceID);
                 HeroDataManager.Instance.ApplyHeorStats(instance, charId);
                 StatModifierManager.ApplyToCard(heroData.cardInfo);
             }

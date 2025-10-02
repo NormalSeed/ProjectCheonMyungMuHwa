@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -87,9 +88,10 @@ public class EquipmentChange : MonoBehaviour
         Debug.Log($"[ChangeHeroEquipment] 새 캐릭터 {thisCharId}에게 장비 {instanceID} 장착됨");
 
         // 5. 장비 매니저 및 UI 갱신
+        StatModifierManager.RemoveModifiersByOrigin(oldCharID, oldInstance.instanceID);
+        StatModifierManager.ApplyToCard(infoPanel.HeroInfo.heroData.cardInfo);
         HeroDataManager.Instance.ApplyHeorStats(instance, thisCharId);
         HeroDataManager.Instance.SaveHeroData(thisCharId);
-        StatModifierManager.ApplyToCard(infoPanel.HeroInfo.heroData.cardInfo);
         infoPanel.HeroInfo.Init();
         infoPanel.HeroInfo.RefreshHeroUI();
         infoPanel.SetPanelText();
