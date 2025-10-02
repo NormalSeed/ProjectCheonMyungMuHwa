@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
 {
@@ -11,6 +12,7 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     private float lerp_t;
     private float timer;
     private SpriteRenderer sprite;
+    private Image image;
 
     private DroppedItemType type;
     private float quantity;
@@ -26,13 +28,17 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     void Awake()
     {
         sprite = GetComponent<SpriteRenderer>();
+        image = GetComponent<Image>();
     }
 
     public void Init(DroppedItemType type, float quantity)
     {
+        sprite.enabled = true;
+        transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         this.type = type;
         this.quantity = quantity;
         sprite.sprite = datas.sprites[type];
+        image.sprite = datas.sprites[type];
         PoolManager.Instance.AddItemToList(this);
     }
     public void Shot()
@@ -45,9 +51,21 @@ public class DroppedItem : MonoBehaviour, IPooled<DroppedItem>
     }
     public void Release(Vector2 pos)
     {
+        sprite.enabled = false;
+        if (type == DroppedItemType.NormalChest || type == DroppedItemType.EpicChest)
+        {
+            transform.localScale = new Vector3(30, 30, 30);
+        }
+        else
+        {
+            transform.localScale = new Vector3(13, 13, 13);
+        }
+        //Vector3 middlepos = Vector3.Lerp(transform.position, pos, UnityEngine.Random.Range(0.1f, 0.9f)) + Vector3.Cross((Vector3)pos - transform.position, Vector3.up) * UnityEngine.Random.Range(-100f, 100f);
+        //Vector3[] path = { transform.position, middlepos, pos };
         throwing = false;
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(pos, 0.5f));
+        seq.Append(transform.DOMove(pos, 0.7f));
+        //seq.Append(transform.DOPath(path, 3f, PathType.CatmullRom));
         seq.OnComplete(() =>
         {
             AddCurrency();
