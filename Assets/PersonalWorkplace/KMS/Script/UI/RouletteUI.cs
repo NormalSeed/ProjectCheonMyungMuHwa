@@ -80,10 +80,10 @@ public class RouletteUI : UIBase
                     item = new ItemData(11003, "", "", "SoulImage", true, ItemType.Currency); break;
                 case CurrencyType.SpiritStone:
                     item = new ItemData(11004, "", "", "SpiritImage", true, ItemType.Currency); break;
-                case CurrencyType.InvitationTicket:
-                    item = new ItemData(11006, "", "", "GoldImage", true, ItemType.Currency); break; //TODO 해당하는 어드렛서블 이미지등록
+                case CurrencyType.SummonTicket:
+                    item = new ItemData(11006, "", "", "HeroTicketImage", true, ItemType.Currency); break; //TODO 해당하는 어드렛서블 이미지등록
                 case CurrencyType.EquipmentSummonTicket:
-                    item = new ItemData(11011, "", "", "GoldImage", true, ItemType.Currency); break; //TODO 해당하는 어드렛서블 이미지등록
+                    item = new ItemData(11011, "", "", "EquipTicketImage", true, ItemType.Currency); break; //TODO 해당하는 어드렛서블 이미지등록
             }
             datas.Add(item);
             curs.Add(c);

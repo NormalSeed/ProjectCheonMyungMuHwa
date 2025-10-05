@@ -152,6 +152,7 @@ public class MapManager : MonoBehaviour
                 currentMap.transform.position + new Vector3(0, 6.55f, 0),
                 MonsterType.Boss
             );
+            PopupManager.Instance.ShowBossStagePopup(stageIndex);
             return true;
         }
     }

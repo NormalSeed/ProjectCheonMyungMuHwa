@@ -205,6 +205,7 @@ public class InGameManager : MonoBehaviour
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
                 }
             }
+            PopupManager.Instance.ShowStageClearPopup();
         }
     }
 
