@@ -16,7 +16,7 @@ public class OfflineRewardUI : UIBase
 
     [Header("Slots")]
     public Transform rewardSlotsParent;
-    private ItemSlotUI[] slots;
+    [SerializeField] ItemSlot[] slots;
 
     [Header("Buttons")]
     public Button adButton;
@@ -33,7 +33,7 @@ public class OfflineRewardUI : UIBase
     private void Awake()
     {
         Instance = this;
-        slots = rewardSlotsParent.GetComponentsInChildren<ItemSlotUI>(true);
+        slots = rewardSlotsParent.GetComponentsInChildren<ItemSlot>(true);
         offlineRewardPanel.SetActive(false);
     }
 
@@ -77,18 +77,28 @@ public class OfflineRewardUI : UIBase
     {
         offlineRewardPanel.SetActive(true);
 
-        // 슬롯 초기화
-        foreach (var slot in slots)
-            slot.gameObject.SetActive(false);
-
         int i = 0;
         foreach (var reward in rewards)
         {
             if (i >= slots.Length) break;
 
             // BigCurrency를 문자열로 표시
-            slots[i].SetSlot(reward.Key, reward.Value.ToString());
             slots[i].gameObject.SetActive(true);
+            ItemData item = null;
+            switch (reward.Key)
+            {
+                case CurrencyType.Gold:
+                    item = new ItemData(11002, "", "", "GoldImage", true, ItemType.Currency); break;
+                case CurrencyType.Soul:
+                    item = new ItemData(11003, "", "", "SoulImage", true, ItemType.Currency); break;
+                case CurrencyType.SpiritStone:
+                    item = new ItemData(11004, "", "", "SpiritImage", true, ItemType.Currency); break;
+                case CurrencyType.SummonTicket:
+                    item = new ItemData(11006, "", "", "HeroTicketImage", true, ItemType.Currency); break;
+                case CurrencyType.EquipmentSummonTicket:
+                    item = new ItemData(11011, "", "", "EquipTicketImage", true, ItemType.Currency); break;
+            }
+            slots[i].SetItem(item, reward.Value);
             i++;
         }
 

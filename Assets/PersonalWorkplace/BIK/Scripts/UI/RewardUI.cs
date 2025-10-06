@@ -21,9 +21,9 @@ public class RewardUI : UIBase
 
     private void Start()
     {
-        for (int i = 0; i < _itemSlots.Count; i++) {
-            _itemSlots[i].SetEmpty();
-        }
+        //for (int i = 0; i < _itemSlots.Count; i++) {
+        //    _itemSlots[i].SetEmpty();
+        //}
     }
 
     /// <summary>
