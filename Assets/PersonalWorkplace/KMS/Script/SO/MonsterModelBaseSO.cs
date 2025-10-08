@@ -14,6 +14,8 @@ public class MonsterModelBaseSO : ScriptableObject
   public float GoldQuant => data.GoldRate;
   public float SpiritBackQuant => data.SpiritRate;
   public float SoulStoneQuant => data.SoulRate;
+
+  public int Exp => data.Exp;
   public int CurrentDoor;
 
 

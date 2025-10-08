@@ -149,6 +149,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
         AudioManager.Instance.PlaySound("Monster_Dead");
         QuestManager.Instance.UpdateQuest("Monster", 1);
         QuestManager.Instance.ReportEvent(QuestTargetType.Monster, 1);
+        PlayerProfileManager.Instance?.AddExp(Model.BaseModel.Exp);
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
     protected abstract IEnumerator RealAttackRoutine(IDamagable target);

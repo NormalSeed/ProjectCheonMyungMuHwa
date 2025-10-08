@@ -56,7 +56,8 @@ public static class KMS_Util
         InnPowArmor = float.Parse(ss[4]),
         GoldRate = float.Parse(sc[1]),
         SoulRate = float.Parse(sc[2]),
-        SpiritRate = float.Parse(sc[3])
+        SpiritRate = float.Parse(sc[3]),
+        Exp =int.Parse(sc[7])
       };
       MonsterStateData boss = new MonsterStateData()
       {
@@ -66,7 +67,8 @@ public static class KMS_Util
         InnPowArmor = float.Parse(ss[8]),
         GoldRate = float.Parse(sc[4]),
         SoulRate = float.Parse(sc[5]),
-        SpiritRate = float.Parse(sc[6])
+        SpiritRate = float.Parse(sc[6]),
+        Exp =int.Parse(sc[7])
       };
       so.NormalMonster.Add(monster);
       so.BossMonster.Add(boss);
