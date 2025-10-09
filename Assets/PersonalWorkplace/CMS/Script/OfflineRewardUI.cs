@@ -29,6 +29,7 @@ public class OfflineRewardUI : UIBase
     private double adMultiplier = 1.3f;
 
     private Dictionary<CurrencyType, BigCurrency> pendingRewards;
+    private int Exp;
 
     private void Awake()
     {
@@ -38,7 +39,7 @@ public class OfflineRewardUI : UIBase
     }
 
     // BackendManager에서 불러온 데이터로 UI 초기화
-    public void ShowReward(Dictionary<CurrencyType, BigCurrency> rewards, int time)
+    public void ShowReward(Dictionary<CurrencyType, BigCurrency> rewards, int time, int exp)
     {
         Debug.Log("[OfflineRewardUI] ShowReward 호출됨");
 
@@ -58,6 +59,7 @@ public class OfflineRewardUI : UIBase
         timeText.text = $"{time} 분";
 
         Debug.Log("[OfflineRewardUI] 보상 적용 시작");
+        Exp = exp;
         ApplyRewardUI(rewards);
     }
 
@@ -110,6 +112,7 @@ public class OfflineRewardUI : UIBase
             {
                 CurrencyManager.Instance.Add(reward.Key, reward.Value);
             }
+            PlayerProfileManager.Instance.AddExp(Exp);
             offlineRewardPanel.SetActive(false);
         });
 
@@ -148,6 +151,7 @@ public class OfflineRewardUI : UIBase
         yield return null;
         RouletteUI ui = PopupManager.Instance.ShowRoulettePopup();
         ui.Rewards = rewards; //리워드 룰렛 ui로 전달
+        ui.Exp = Exp;
         this.SetHide();
     }
 }

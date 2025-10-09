@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
         await LoadStage();
         await SaveCurrentTime();
         await LoadTimes();
-        CalculateOffineReward();
+        SetOffineReward();
         StartCoroutine(ExitTimeRoutine());
     }
 
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CalculateOffineReward()
+    private void SetOffineReward()
     {
         TimeSpan difference = current - exit;
         int totalMin = (int)difference.TotalMinutes;
@@ -135,8 +135,8 @@ public class GameManager : MonoBehaviour
                 if (popup is OfflineRewardUI rewardUI)
                 {
                     Debug.Log("[CheckOfflineReward] OfflineRewardUI 캐스팅 성공, ShowReward 호출");
-                    popup.SetShow();
-                    rewardUI.ShowReward(rewards, totalMin);
+                    rewardUI.ShowReward(rewards, totalMin, data.Exp);
+                    rewardUI.SetShow();
                 }
                 else
                 {
