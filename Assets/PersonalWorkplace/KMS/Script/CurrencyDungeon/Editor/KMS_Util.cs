@@ -89,7 +89,7 @@ public static class KMS_Util
         Stage = int.Parse(ss[0]),
         Gold = double.Parse(ss[4]),
         Soul = double.Parse(ss[5]),
-        Exp = double.Parse(ss[6]),
+        Exp = int.Parse(ss[6]),
         Stone = double.Parse(ss[7]),
         EquipTicket = double.Parse(ss[8]),
         HeroTicket = double.Parse(ss[9])

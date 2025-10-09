@@ -14,7 +14,7 @@ public struct OfflineRewardData
   public double Gold;
   public double Soul;
   public double Stone;
-  public double Exp;
+  public int Exp;
   public double EquipTicket;
   public double HeroTicket;
 
