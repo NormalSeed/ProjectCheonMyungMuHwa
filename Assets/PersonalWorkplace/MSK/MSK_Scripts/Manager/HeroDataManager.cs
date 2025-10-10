@@ -369,12 +369,14 @@ public class HeroDataManager : IStartable
 
         var card = hero.cardInfo;
         
-        card.CritRate = hero.PlayerModelSO.CritRate + hero.PlayerModelSO.CritRate_Increase * hero.PlayerModelSO.Level;
-        card.CritDamage  = hero.PlayerModelSO.CritDamage + hero.PlayerModelSO.CritDamage_Increase * hero.PlayerModelSO.Level;
+        card.CritRate = hero.PlayerModelSO.CritRate + hero.PlayerModelSO.CritRate_Increase * (hero.PlayerModelSO.Level-1);
+        card.CritDamage  = hero.PlayerModelSO.CritDamage + hero.PlayerModelSO.CritDamage_Increase * (hero.PlayerModelSO.Level-1);
 
         float result = 2.0f * ((card.InnAtkPoint + card.ExtAtkPoint) *
                 (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1))) +
                 1.4f * card.DefPoint + 0.1f * card.HealthPoint;
+
+
 
         Debug.LogWarning($"[전투력 계산식] : 대상 {card.name}");
         Debug.LogWarning($"[전투력 계산식] : 내공 {card.InnAtkPoint}");

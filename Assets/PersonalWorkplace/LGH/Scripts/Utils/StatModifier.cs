@@ -251,6 +251,7 @@ public static class StatModifierManager
         float baseHealth = modelSO.Vital;
         float baseInn = modelSO.InnPow;
         float baseExt = modelSO.ExtPow;
+        float baseDef = baseInn + baseExt;
 
         float levelHealth = 0f;
         float levelExt = 0f;
@@ -261,31 +262,50 @@ public static class StatModifierManager
         float finalHealth = 0f;
         float finalExt = 0f;
         float finalInn = 0f;
+        float levelDef = 0f;
+        float stageDef = 0f;
+
+        float finalDef = 0f;
 
         if (modelSO.Level != 1f)
         {
-            levelHealth = baseHealth * (modelSO.Vital_Increase * modelSO.Level);
-            levelExt = baseExt * (modelSO.ExtPow_Increase * modelSO.Level);
-            levelInn = baseInn * (modelSO.InnPow_Increase * modelSO.Level);
-
+            levelHealth = baseHealth * (1 + modelSO.Vital_Increase * (modelSO.Level - 1)) - baseHealth;
+            levelExt = baseExt * (1 + modelSO.ExtPow_Increase * (modelSO.Level - 1)) - baseExt;
+            levelInn = baseInn * (1 + modelSO.InnPow_Increase * (modelSO.Level - 1)) - baseInn;
         }
 
         if (modelSO.Grade != 1f)
         {
-            stageHealth = levelHealth * modelSO.HealthRatio_Increase * (modelSO.Grade);
-            stageExt = levelExt * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
-            stageInn = levelInn * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
+            stageHealth = baseHealth * modelSO.HealthRatio_Increase * (modelSO.Grade - 1);
+            stageExt = baseExt * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
+            stageInn = baseInn * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
         }
+
+
 
 
         finalHealth = baseHealth + levelHealth + stageHealth;
         finalExt = baseExt + levelExt + stageExt;
         finalInn = baseInn + levelInn + stageInn;
-        float finalDef = finalExt + finalInn;
+
+        if (modelSO.Level != 1f)
+        {
+            levelDef = finalExt * modelSO.DefRatio_Increase * (modelSO.Level - 1)
+                     + finalInn * modelSO.DefRatio_Increase * (modelSO.Level - 1);
+        }
+
+        if (modelSO.Grade != 1f)
+        {
+            stageDef = finalExt * modelSO.DefRatio_Increase * (modelSO.Grade - 1)
+                     + finalInn * modelSO.DefRatio_Increase * (modelSO.Grade - 1);
+        }
+
+        finalDef = finalExt + finalInn + stageDef + levelDef;
 
         Debug.LogWarning($"[전투력 계산식] : 기반 체력 {modelSO.Vital}, 레벨, {levelHealth}, 돌파 {stageHealth}, 최종{finalHealth}");
         Debug.LogWarning($"[전투력 계산식] : 기반 외공 {modelSO.ExtPow}, 레벨, {levelExt}, 돌파 {stageExt}, 최종{finalExt}");
         Debug.LogWarning($"[전투력 계산식] : 기반 내공 {modelSO.InnPow}, 레벨, {levelInn}, 돌파 {stageInn}, 최종{finalInn}");
+        Debug.LogWarning($"[전투력 계산식] : 기반 방어력 {baseDef}, 레벨, {levelDef}, 돌파, {stageDef}, 최종 {finalDef}");
 
         // Modifier 반영
         card.HealthPoint = finalHealth + GetCardModifier(charID, StatType.Health, finalHealth);
