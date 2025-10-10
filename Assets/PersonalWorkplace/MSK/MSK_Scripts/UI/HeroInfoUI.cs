@@ -200,7 +200,6 @@ public class HeroInfoUI : UIBase
             AudioManager.Instance.PlaySound("0.레벨업, 전투력 상승, 미션 완료, 스테이지 클리어 사운드");
             //  레벨업
             heroData.PlayerModelSO.Level++;
-            HeroDataManager.Instance.UpdateGrowthStats(heroData);
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
             // 전투력 계산
             StatModifierManager.ApplyToCard(heroData.cardInfo);
@@ -254,7 +253,6 @@ public class HeroInfoUI : UIBase
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
         heroData.PlayerModelSO.Grade = heroData.stage;
-        HeroDataManager.Instance.UpdateGrowthStats(heroData);
         // 전투력 계산
         StatModifierManager.ApplyToCard(heroData.cardInfo);
         Debug.LogWarning($"랩업 후 {heroData.cardInfo.combatPower}");

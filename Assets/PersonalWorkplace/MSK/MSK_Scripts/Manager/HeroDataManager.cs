@@ -368,6 +368,10 @@ public class HeroDataManager : IStartable
         }
 
         var card = hero.cardInfo;
+        
+        card.CritRate = hero.PlayerModelSO.CritRate + hero.PlayerModelSO.CritRate_Increase * hero.PlayerModelSO.Level;
+        card.CritDamage  = hero.PlayerModelSO.CritDamage + hero.PlayerModelSO.CritDamage_Increase * hero.PlayerModelSO.Level;
+
         float result = 2.0f * ((card.InnAtkPoint + card.ExtAtkPoint) *
                 (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1))) +
                 1.4f * card.DefPoint + 0.1f * card.HealthPoint;
@@ -375,8 +379,8 @@ public class HeroDataManager : IStartable
         Debug.LogWarning($"[전투력 계산식] : 대상 {card.name}");
         Debug.LogWarning($"[전투력 계산식] : 내공 {card.InnAtkPoint}");
         Debug.LogWarning($"[전투력 계산식] : 외공 {card.ExtAtkPoint}");
-        Debug.LogWarning($"[전투력 계산식] : 치명타율 {hero.PlayerModelSO.CritRate}");
-        Debug.LogWarning($"[전투력 계산식] : 치명타데미지{hero.PlayerModelSO.CritDamage}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타율 {card.CritRate}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타데미지{card.CritDamage}");
         Debug.LogWarning($"[전투력 계산식] : 방어력 {card.DefPoint}");
         Debug.LogWarning($"[전투력 계산식] : 체력 {card.HealthPoint}");
         Debug.LogWarning($"[전투력 계산식] : 최종 {result}");
@@ -454,31 +458,6 @@ public class HeroDataManager : IStartable
         return instance;
     }
 
-    public void UpdateGrowthStats(HeroData hero)
-    {
-        if (hero == null || hero.PlayerModelSO == null)
-        {
-            Debug.LogError("[UpdateGrowthStats] HeroData 또는 PlayerModelSO가 null입니다");
-            return;
-        }
-
-        var model = hero.PlayerModelSO;
-
-        // Grade(stage) 반영
-        model.Grade = hero.stage;
-
-        model.Vital = model.Vital_Increase * model.Level;
-        model.ExtPow = model.ExtPow_Increase * model.Level;
-        model.InnPow = model.InnPow_Increase * model.Level;
-        model.CritRate = model.CritRate_Increase * model.Level;
-        model.CritDamage = model.CritDamage_Increase * model.Level;
-
-        model.HealthRatio = model.HealthRatio_Increase * model.Grade;
-        model.AttackRatio = model.AttackRatio_Increase * model.Grade;
-        model.DefRatio = model.DefRatio_Increase * model.Grade;
-
-        Debug.Log($"[UpdateGrowthStats] {hero.heroName} 성장치 계산 완료 (Level={model.Level}, Grade={model.Grade})");
-    }
     public HeroData GetHeroData(string charID)
     {
         if (string.IsNullOrEmpty(charID))
