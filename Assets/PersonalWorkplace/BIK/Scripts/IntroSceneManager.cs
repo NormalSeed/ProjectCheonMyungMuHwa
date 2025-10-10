@@ -17,6 +17,7 @@ public class IntroSceneManager : MonoBehaviour
 {
     [SerializeField] private string _mainSceneName = "DEMO_GameScene";
     [SerializeField] private LoadingUI loadingUI;
+    [SerializeField] private LoadingImageLoader loadingImageLoader;
 
     [Header("로그인 UI")]
     [SerializeField] private GameObject loginPanel;
@@ -161,6 +162,7 @@ public class IntroSceneManager : MonoBehaviour
 
     private IEnumerator StartLoading(bool loginAlreadyCompleted)
     {
+        loadingImageLoader.ShowRandomLoadingImage();
         //// Firebase 초기화
         //var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
         //yield return new WaitUntil(() => dependencyTask.IsCompleted);
