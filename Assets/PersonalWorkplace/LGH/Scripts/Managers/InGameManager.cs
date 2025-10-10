@@ -90,6 +90,20 @@ public class InGameManager : MonoBehaviour
                 isQuitUIActive = true;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            KillAllPlayers();
+        }
+    }
+
+    private void KillAllPlayers()
+    {
+        foreach (PlayerController player in players)
+        {
+            if (player.isDead.Value == true) continue;
+            player.Dead();
+        }
     }
 
     private void LoadStageFromFirebase()
@@ -266,10 +280,16 @@ public class InGameManager : MonoBehaviour
         monsterDeathStack.Value = 0;
         stageProgress = 0;
 
+        if (alignPoint.activeInHierarchy == false)
+        {
+            Debug.LogError("정렬 포인트가 활성화되지 않음");
+            alignPoint.SetActive(true);
+        }
+
         // 페이드인 전에 플레이어 위치 재배치
         for (int i = 0; i < PartyManager.Instance.players.Count; i++)
         {
-            Transform point = alignPoint.transform.Find($"Point{i}");
+            Transform point = alignPoint.transform.Find($"Point{i + 1}");
             if (point != null)
             {
                 Vector3 offset = new Vector3(0, -0.1f, 0);
