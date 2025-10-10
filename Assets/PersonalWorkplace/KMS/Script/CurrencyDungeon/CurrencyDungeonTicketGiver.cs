@@ -6,6 +6,8 @@ using UnityEngine;
 using System;
 using System.Collections;
 
+// current : 현재 접속 시각 기록용
+// last : 마지막 접속 시각
 public class CurrencyDungeonTicketGiver : MonoBehaviour
 {
     string _uid;
@@ -43,7 +45,6 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
             { "current", ServerValue.Timestamp }
         };
         await _dbRef.UpdateChildrenAsync(data);
-
     }
     private async Task LoadTimes()
     {
@@ -107,13 +108,9 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
 
     private IEnumerator AddTicket()
     {
-        CurrencyManager manager = CurrencyManager.Instance;
         int amount = 3;
-        while (manager == null)
-        {
-            yield return null;
-            manager = CurrencyManager.Instance;
-        }
+        yield return new WaitUntil(() => CurrencyManager.Instance != null);
+        CurrencyManager manager = CurrencyManager.Instance;
         BigCurrency gold = manager.Get(CurrencyType.GoldChallengeTicket);
         if (gold.Value < amount)
         {

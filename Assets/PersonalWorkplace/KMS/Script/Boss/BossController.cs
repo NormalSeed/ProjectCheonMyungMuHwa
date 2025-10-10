@@ -78,6 +78,7 @@ public class BossController : MonsterController
         InGameManager.Instance?.SetNextStage();
         if (InGameManager.Instance != null) InGameManager.Instance.monsterDeathStack.Value--;
         AudioManager.Instance.PlaySound("Monster_Dead");
+        PlayerProfileManager.Instance?.AddExp(Model.BaseModel.Exp);
         StartCoroutine(DeathRoutine());
     }
 

@@ -19,5 +19,6 @@ public struct MonsterStateData
   public float GoldRate;
   public float SoulRate;
   public float SpiritRate;
+  public int Exp;
 
 }

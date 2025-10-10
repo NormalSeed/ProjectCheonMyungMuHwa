@@ -138,7 +138,6 @@ public class HeroDataManager : IStartable
     public void Start()
     {
         Instance = this;
-
         if (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
         {
             Debug.LogWarning("[HeroDataManager] FirebaseAuth가 아직 초기화되지 않았습니다. 초기화 대기 중...");
@@ -162,6 +161,7 @@ public class HeroDataManager : IStartable
         Debug.Log("[HeroDataManager] HeroModels 초기화 완료 확인");
 
         LoadHeroDataFromCache();
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
         await LoadHeroDataFromFirebase();
 
         RefreshAllCombatPower();
@@ -192,9 +192,12 @@ public class HeroDataManager : IStartable
     {
         var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
         var snapshot = await heroRef.GetValueAsync();
+        Debug.Log(_uid);
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
 
         foreach (var child in snapshot.Children)
         {
+            Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
             string heroId = child.Key;
             string json = child.GetRawJsonValue();
             var template = heroTemplates.Find(t => t.heroId == heroId);
@@ -245,6 +248,11 @@ public class HeroDataManager : IStartable
         if (!File.Exists(savePath))
         {
             Debug.LogWarning("영웅 캐시 파일이 존재하지 않습니다.");
+            return;
+        }
+        else
+        {
+            File.Delete(savePath);
             return;
         }
 

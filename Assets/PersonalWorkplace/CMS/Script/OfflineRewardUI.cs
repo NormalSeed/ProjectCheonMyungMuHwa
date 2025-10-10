@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,7 +16,7 @@ public class OfflineRewardUI : UIBase
 
     [Header("Slots")]
     public Transform rewardSlotsParent;
-    private ItemSlotUI[] slots;
+    [SerializeField] ItemSlot[] slots;
 
     [Header("Buttons")]
     public Button adButton;
@@ -28,16 +29,17 @@ public class OfflineRewardUI : UIBase
     private double adMultiplier = 1.3f;
 
     private Dictionary<CurrencyType, BigCurrency> pendingRewards;
+    private int Exp;
 
     private void Awake()
     {
         Instance = this;
-        slots = rewardSlotsParent.GetComponentsInChildren<ItemSlotUI>(true);
+        slots = rewardSlotsParent.GetComponentsInChildren<ItemSlot>(true);
         offlineRewardPanel.SetActive(false);
     }
 
     // BackendManager에서 불러온 데이터로 UI 초기화
-    public void ShowReward(Dictionary<CurrencyType, BigCurrency> rewards)
+    public void ShowReward(Dictionary<CurrencyType, BigCurrency> rewards, int time, int exp)
     {
         Debug.Log("[OfflineRewardUI] ShowReward 호출됨");
 
@@ -54,8 +56,10 @@ public class OfflineRewardUI : UIBase
             CurrencyManager.OnInitialized += OnCurrencyManagerInitialized;
             return;
         }
+        timeText.text = $"{time} 분";
 
         Debug.Log("[OfflineRewardUI] 보상 적용 시작");
+        Exp = exp;
         ApplyRewardUI(rewards);
     }
 
@@ -75,18 +79,28 @@ public class OfflineRewardUI : UIBase
     {
         offlineRewardPanel.SetActive(true);
 
-        // 슬롯 초기화
-        foreach (var slot in slots)
-            slot.gameObject.SetActive(false);
-
         int i = 0;
         foreach (var reward in rewards)
         {
             if (i >= slots.Length) break;
 
             // BigCurrency를 문자열로 표시
-            slots[i].SetSlot(reward.Key.ToString(), reward.Value.ToString());
             slots[i].gameObject.SetActive(true);
+            ItemData item = null;
+            switch (reward.Key)
+            {
+                case CurrencyType.Gold:
+                    item = new ItemData(11002, "", "", "GoldImage", true, ItemType.Currency); break;
+                case CurrencyType.Soul:
+                    item = new ItemData(11003, "", "", "SoulImage", true, ItemType.Currency); break;
+                case CurrencyType.SpiritStone:
+                    item = new ItemData(11004, "", "", "SpiritImage", true, ItemType.Currency); break;
+                case CurrencyType.SummonTicket:
+                    item = new ItemData(11006, "", "", "HeroTicketImage", true, ItemType.Currency); break;
+                case CurrencyType.EquipmentSummonTicket:
+                    item = new ItemData(11011, "", "", "EquipTicketImage", true, ItemType.Currency); break;
+            }
+            slots[i].SetItem(item, reward.Value);
             i++;
         }
 
@@ -98,6 +112,7 @@ public class OfflineRewardUI : UIBase
             {
                 CurrencyManager.Instance.Add(reward.Key, reward.Value);
             }
+            PlayerProfileManager.Instance.AddExp(Exp);
             offlineRewardPanel.SetActive(false);
         });
 
@@ -115,9 +130,7 @@ public class OfflineRewardUI : UIBase
         {
             adData.ShowRewardAD(() =>
             {
-                RouletteUI ui = PopupManager.Instance.ShowRoulettePopup();
-                ui.Rewards = rewards; //리워드 룰렛 ui로 전달
-                this.SetHide();
+                StartCoroutine(AdRoutine(rewards));
             });
 
         });
@@ -131,5 +144,14 @@ public class OfflineRewardUI : UIBase
     public override void SetHide()
     {
         offlineRewardPanel.SetActive(false);
+    }
+
+    private IEnumerator AdRoutine(Dictionary<CurrencyType, BigCurrency> rewards)
+    {
+        yield return null;
+        RouletteUI ui = PopupManager.Instance.ShowRoulettePopup();
+        ui.Rewards = rewards; //리워드 룰렛 ui로 전달
+        ui.Exp = Exp;
+        this.SetHide();
     }
 }

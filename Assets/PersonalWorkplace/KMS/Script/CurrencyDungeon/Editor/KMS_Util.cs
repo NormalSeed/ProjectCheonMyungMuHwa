@@ -38,7 +38,7 @@ public static class KMS_Util
 
     AssetDatabase.SaveAssets();
   }
-[MenuItem("Utilities/Generate Monster State Data Scriptable Object")]
+  [MenuItem("Utilities/Generate Monster State Data Scriptable Object")]
   public static void GenMonsterStateDataTable()
   {
     string[] stateAllLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/monsterstate.psv");
@@ -56,7 +56,8 @@ public static class KMS_Util
         InnPowArmor = float.Parse(ss[4]),
         GoldRate = float.Parse(sc[1]),
         SoulRate = float.Parse(sc[2]),
-        SpiritRate = float.Parse(sc[3])
+        SpiritRate = float.Parse(sc[3]),
+        Exp =int.Parse(sc[7])
       };
       MonsterStateData boss = new MonsterStateData()
       {
@@ -66,17 +67,38 @@ public static class KMS_Util
         InnPowArmor = float.Parse(ss[8]),
         GoldRate = float.Parse(sc[4]),
         SoulRate = float.Parse(sc[5]),
-        SpiritRate = float.Parse(sc[6])
+        SpiritRate = float.Parse(sc[6]),
+        Exp =int.Parse(sc[7])
       };
       so.NormalMonster.Add(monster);
       so.BossMonster.Add(boss);
     }
     AssetDatabase.CreateAsset(so, $"Assets/PersonalWorkplace/KMS/Script/SO/monsterStateTable.asset");
     AssetDatabase.SaveAssets();
-
-
   }
-
+  [MenuItem("Utilities/Generate Offline Reward Data Scriptable Object")]
+  public static void GenOfflineRewardDataTable()
+  {
+    string[] allLines = File.ReadAllLines(Application.dataPath + "/PersonalWorkplace/KMS/CSV/offlinereward.psv");
+    OfflineRewardDataTableSO so = ScriptableObject.CreateInstance<OfflineRewardDataTableSO>();
+    for (int i = 1; i < allLines.Length; i++)
+    {
+      string[] ss = allLines[i].Split('|');
+      OfflineRewardData data = new OfflineRewardData()
+      {
+        Stage = int.Parse(ss[0]),
+        Gold = double.Parse(ss[4]),
+        Soul = double.Parse(ss[5]),
+        Exp = int.Parse(ss[6]),
+        Stone = double.Parse(ss[7]),
+        EquipTicket = double.Parse(ss[8]),
+        HeroTicket = double.Parse(ss[9])
+      };
+      so.Table.Add(data);
+    }
+    AssetDatabase.CreateAsset(so, $"Assets/PersonalWorkplace/KMS/Script/SO/offlineRewardTable.asset");
+    AssetDatabase.SaveAssets();
+  }
   public static Dictionary<CurrencyDungeonType, string> DungeonTypeToName = new Dictionary<CurrencyDungeonType, string>()
   {
     {CurrencyDungeonType.Gold, "금화"},
