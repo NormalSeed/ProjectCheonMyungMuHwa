@@ -136,7 +136,7 @@ public partial class PlayerAttackAction : Action
                 if (Target.Value == null)
                     BGagent?.SetVariableValue<bool>("isTargetDetected", false);
 
-                return Status.Success;
+                return Status.Failure;
             }
 
             // 아직 대기 중이면 계속 Running
