@@ -1,0 +1,68 @@
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
+
+public class DungeonLevelCard : MonoBehaviour
+{
+    [SerializeField] GameObject locker;
+    [SerializeField] TMP_Text levelText;
+    [SerializeField] TMP_Text quantityText;
+    [SerializeField] TMP_Text attackText;
+    [SerializeField] TMP_Text ButtonText;
+    [SerializeField] Button startButton;
+    [SerializeField] Image currencyImage;
+
+    private CurrencyDungeonData data;
+
+    private CurrencyDungeonType type;
+
+
+    public void SetValues(CurrencyDungeonData data)
+    {
+        this.data = data;
+        levelText.text = data.Name;
+        BigCurrency reward = new BigCurrency(data.Reward);
+        BigCurrency battle = new BigCurrency(data.BattlePower);
+        quantityText.text = reward.ToString();
+        attackText.text = battle.ToString();
+    }
+    public void SetType(CurrencyDungeonType type)
+    {
+        this.type = type;
+    }
+    public void SetSprite(Sprite spr)
+    {
+        currencyImage.sprite = spr;
+    }
+    public void SetStageCleared(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
+    {
+        ButtonText.text = "소탕하기";
+        locker.SetActive(false);
+        startButton.onClick.AddListener(() =>
+        {
+            act.Invoke(data, type);
+        }); //{KMS_Util.DungeonTypeToName[type]}
+
+    }
+    public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
+    {
+        ButtonText.text = "도전하기";
+        locker.SetActive(false);
+        startButton.onClick.AddListener(() =>
+        {
+            act.Invoke(data, type);
+            //AudioManager.Instance.StopAllSounds();
+        });
+
+    }
+    public void SetStageLocked()
+    {
+        ButtonText.text = "입장불가";
+        locker.SetActive(true);
+    }
+    void OnDisable()
+    {
+        startButton.onClick.RemoveAllListeners();
+    }
+}

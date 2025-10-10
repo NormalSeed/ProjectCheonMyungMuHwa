@@ -1,0 +1,190 @@
+using TMPro;
+using UnityEngine;
+using System.Threading.Tasks;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+public class SummonEquipUI : MonoBehaviour
+{
+    #region SerializeField
+    [Header("Buttons")]
+    [SerializeField] private Button summonButton;           // 단챠
+    [SerializeField] private Button summon10thButton;       // 10챠
+    [SerializeField] private Button summon50thTimesButton;  // 50챠
+    [SerializeField] private Button summonInfo;             // 확률정보
+    [SerializeField] private Button summonResult;
+
+    [Header("ButtonSet")]
+    [SerializeField] private List<GachaButton> summonButtons;      // 버튼 스크립트   
+
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI summonLevelText;   // 소환레벨 텍스트
+    [SerializeField] private TextMeshProUGUI button1Text;       // 단챠 버튼 텍스트
+    [SerializeField] private TextMeshProUGUI button10Text;      // 10챠 버튼 텍스트
+    [SerializeField] private TextMeshProUGUI button50Text;      // 50챠 버튼 텍스트
+
+    [Header("Panel")]
+    [SerializeField] private SummonResultUI summonResultUI;    // 소환 결과창
+    [SerializeField] private EquipGachaManager gachaManager;     // 가챠 메니저
+    [SerializeField] private GachaRateInfoUI summonInfoPanel;    // 소환확률 정보창
+
+    [Header("Slider")]
+    [SerializeField] private Slider summonSlider;           // 소환래벨 슬라이더
+    [Header("Layout")]
+    [SerializeField] private GridLayoutGroup gridLayout;    // 레이아웃 설정
+    #endregion
+
+    #region Properties
+    private BigCurrency currency;
+    private BigCurrency stoneCurrency;
+    private int summonCount;
+    private int requireCount;
+    private int inputTimes;
+    private SummonLevel userSummonLevel;
+    #endregion
+
+    #region Unity LifeCycle
+    private void OnEnable()
+    {
+        Init();
+    }
+
+    private void OnDisable()
+    {
+        summonButton.onClick.RemoveListener(OnClickSummon);
+        summon10thButton.onClick.RemoveListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.RemoveListener(OnClickSummon50th);
+        summonInfo.onClick.RemoveListener(OnClickShowInfo);
+    }
+
+    private async void Init()
+    {
+        ButtonInit();
+        await SummonLevelChange();
+    }
+
+    private void ButtonInit()
+    {
+        summonInfo.onClick.AddListener(OnClickShowInfo);
+        summonButton.onClick.AddListener(OnClickSummon);
+        summon10thButton.onClick.AddListener(OnClickSummon10th);
+        summon50thTimesButton.onClick.AddListener(OnClickSummon50th);
+    }
+    #endregion
+
+    #region Button OnClick
+    private void OnClickSummon()
+    {
+        Debug.Log("장비뽑기 눌림");
+        inputTimes = 1;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+            return;
+
+        Debug.Log("장비뽑기 진행");
+        gridLayout.childAlignment = TextAnchor.MiddleCenter;
+        SummonHeros(inputTimes);
+        InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
+    }
+    private void OnClickSummon10th()
+    {
+        inputTimes = 10;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+            return;
+
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
+        SummonHeros(inputTimes);
+        InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
+    }
+    private void OnClickSummon50th()
+    {
+        inputTimes = 50;
+        currency = BigCurrency.FromBaseAmount(inputTimes);
+        stoneCurrency = currency * 100;
+        int equipCount = gachaManager.allEquipCount + inputTimes;
+        if (equipCount >= 300)
+        {
+            Debug.Log("장비 인벤토리가 부족하여 뽑기 진행을 차단합니다.");
+            return;
+        }
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.EquipmentSummonTicket, currency) && !CurrencyManager.Instance.TrySpend(CurrencyType.Jewel, stoneCurrency))
+            return;
+
+        gridLayout.childAlignment = TextAnchor.UpperLeft;
+        SummonHeros(inputTimes);
+        InterActButtons(false);
+        QuestManager.Instance.ReportEvent(QuestTargetType.Gacha2, inputTimes);
+    }
+    private void OnClickShowInfo()
+    {
+        summonInfoPanel.gameObject.SetActive(true);
+        summonInfoPanel.SetupCategory(2);
+    }
+    #endregion
+
+    #region private
+
+    private void InterActButtons(bool input)
+    {
+        summonButton.interactable = input;
+        summon10thButton.interactable = input;
+        summon50thTimesButton.interactable = input;
+        summonInfo.interactable = input;
+    }
+    private async Task SummonLevelChange()
+    {
+        var profile = await CurrencyManager.Instance.LoadUserProfileAsync();
+        summonCount = profile.EquipSummonCount;
+        userSummonLevel = profile.EquipSummonLevel;
+        requireCount = await CurrencyManager.Instance.LoadRequireCountFromFireBase(userSummonLevel.ToString());
+
+        summonLevelText.text = "장비 뽑기 레벨 " + ((int)userSummonLevel).ToString();
+        UpdateSummonSlider();
+    }
+    private void UpdateSummonSlider()
+    {
+        summonSlider.maxValue = requireCount;
+        summonSlider.value = summonCount;
+    }
+    private async Task SummonHeros(int times)
+    {
+        summonResultUI.gameObject.SetActive(true);
+        await gachaManager.Summon(times);
+    }
+
+    #endregion
+
+    #region Public
+
+    public void HandleGachaCompleted()
+    {
+        SummonLevelChange();
+        InterActButtons(true);
+        foreach (var gachaButton in summonButtons)
+        {
+            if (gachaButton != null)
+            {
+                gachaButton.ButtonImageSetting(gachaButton.inputTimes);
+            }
+        }
+    }
+    #endregion
+}
+

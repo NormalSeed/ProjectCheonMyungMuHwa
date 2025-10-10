@@ -1,0 +1,48 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SkillSet : MonoBehaviour
+{
+    [SerializeField] public string SkillSetID;
+    [SerializeField] public List<PlayerSkillSO> skills;
+
+    protected ProjectileController pController;
+    protected InstantAttatchmentController aController;
+
+    public PlayerController controller;
+    protected Transform parentTransform;
+    protected SPUM_Prefabs spumC;
+
+    public bool isSkillPlaying = false;
+
+    protected Vector3 offset = new Vector3(0, 0.4f, 0);
+
+    public void Init(PlayerController controller)
+    {
+        pController = GetComponent<ProjectileController>();
+        if (pController != null)
+        {
+            pController.Init();
+        }
+
+        aController = GetComponent<InstantAttatchmentController>();
+        if (aController != null)
+        {
+            aController.Init();
+        }
+        
+        this.controller = controller;
+        parentTransform = this.controller.gameObject.transform;
+        spumC = controller.spumController;
+    }
+
+    public virtual void Skill1(Transform target)
+    {
+
+    }
+
+    public virtual void Skill2(Transform target)
+    {
+
+    }
+}

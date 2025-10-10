@@ -1,0 +1,155 @@
+using System;
+using Unity.Behavior;
+using Unity.Properties;
+using UnityEngine;
+using UnityEngine.AI;
+using Action = Unity.Behavior.Action;
+
+[Serializable, GeneratePropertyBag]
+[NodeDescription(name: "PlayerUseSkill", story: "[Self] Use Skill to [Target] if [isSkillReady] and [isInSkillRange]", category: "Action", id: "e6f708863bb84ccd760ad1f7e1b6bf1f")]
+public partial class PlayerUseSkillAction : Action
+{
+    [SerializeReference] public BlackboardVariable<GameObject> Self;
+    [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<bool> IsSkillReady;
+    [SerializeReference] public BlackboardVariable<bool> IsInSkillRange;
+    private PlayerController controller;
+    private BehaviorGraphAgent BGagent;
+    private NavMeshAgent NMagent;
+    private SkillSet skillSet;
+
+    private bool skillExecuted = false;
+
+    protected override Status OnStart()
+    {
+        controller = Self.Value.GetComponent<PlayerController>();
+        BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
+        NMagent = Self.Value.GetComponent<NavMeshAgent>();
+        skillSet = controller.skillSet.GetComponent<SkillSet>();
+
+        Target.Value = GetTarget();
+
+        // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
+        return Status.Running;
+    }
+
+    /// <summary>
+    /// Monster 태그를 가진 오브젝트 중 거리가 가장 가까운 오브젝트를 반환하는 메서드
+    /// </summary>
+    /// <returns></returns>
+    private GameObject GetTarget()
+    {
+        GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");
+        GameObject closest = null;
+        float minDistance = Mathf.Infinity;
+        Vector3 selfPosition = Self.Value.transform.position;
+
+        foreach (GameObject monster in monsters)
+        {
+            float distance = Vector3.Distance(selfPosition, monster.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closest = monster;
+            }
+        }
+
+        return closest;
+    }
+
+    private void FlipTowardsTarget()
+    {
+        if (Target.Value == null) return;
+
+        Vector3 scale = Self.Value.transform.localScale;
+
+        if (controller.movedRight)
+        {
+            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? -1 : 1;
+        }
+        else
+        {
+            scale.x = Target.Value.transform.position.x < Self.Value.transform.position.x ? 1 : -1;
+        }
+
+        Debug.Log($"방향전환 전: {Self.Value.transform.localScale}");
+        Self.Value.transform.localScale = scale;
+        Debug.Log($"방향전환 후: {Self.Value.transform.localScale}");
+    }
+
+    protected override Status OnUpdate()
+    {
+        if (skillSet == null)
+        {
+            skillSet = controller.skillSet.GetComponent<SkillSet>();
+        }
+
+        if (!skillExecuted)
+        {
+            if (IsSkillReady.Value == false || IsInSkillRange.Value == false)
+            {
+                return Status.Failure;
+            }
+
+            if (Target.Value != null && IsSkillReady.Value == true)
+            {
+                Debug.Log("스킬 공격 실행");
+                IDamagable target = Target.Value.GetComponent<IDamagable>();
+                if (target != null)
+                {
+                    if (skillSet == null)
+                    {
+                        Debug.Log("스킬셋 로드 안됨");
+                        return Status.Success;
+                    }
+
+                    // 스킬 실행(데미지는 스킬 내부에서 가함)
+                    if (controller.isSkill1Ready)
+                    {
+                        NMagent.ResetPath();
+                        FlipTowardsTarget();
+                        skillSet.Skill1(Target.Value.transform);
+                        // 스킬 쿨타임 초기화(SkillSet의 스킬 쿨타임으로 재설정 해야함)
+                        controller.curCool = skillSet.skills[0].CoolTime;
+                        skillExecuted = true;
+                        return Status.Running;
+                    }
+                    else if (controller.isSkill2Ready)
+                    {
+                        NMagent.ResetPath();
+                        FlipTowardsTarget();
+                        skillSet.Skill2(Target.Value.transform);
+                        // 스킬 카운트 초기화
+                        controller.skill2Count = 5;
+                        skillExecuted = true;
+                        return Status.Running;
+                    }
+                }
+                else
+                {
+                    Debug.Log("데미지를 입힐 수 없는 상대입니다.");
+                }
+            }
+        }
+
+        if (!skillSet.isSkillPlaying)
+        {
+            return Status.Success;
+        }
+
+        return Status.Running;
+    }
+
+    protected override void OnEnd()
+    {
+        skillExecuted = false;
+
+        // 타겟 재탐지
+        Target.Value = GetTarget();
+        if (Target.Value == null)
+        {
+            BGagent.SetVariableValue<bool>("isTargetDetected", false);
+        }
+    }
+}
+

@@ -1,0 +1,24 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// 카드 표기에만 사용할 정보를 저장합니다.
+/// </summary>
+[CreateAssetMenu(fileName = "CharCardBase", menuName = "Scriptable Objects/CharCardBase")]
+public class CardInfo : ScriptableObject
+{   
+    public string HeroID;                   // 캐릭터의 고유 ID
+    public string HeroName;                 // 영웅 이름
+    //  돌파정보는 파이어베이스 서버에서 가져와야 한다.
+    public int HeroStage;                   // 돌파 정보
+    public HeroRarity rarity;               // 레어도
+    public HeroFaction faction;             // 소속
+    public float combatPower;               // 최종 전투력
+    public float HealthPoint;               // 표기 Hp 
+    public float ExtAtkPoint;               // 표기 외공
+    public float InnAtkPoint;               // 표기 내공
+    public float DefPoint;                  // 표기 방어
+    public float CritRate;                  // 표기 치명타율
+    public float CritDamage;                // 표기 치명타 배율
+    public List<SkillDisplayDataSO> skillDisplayList; // 스킬 표기
+}

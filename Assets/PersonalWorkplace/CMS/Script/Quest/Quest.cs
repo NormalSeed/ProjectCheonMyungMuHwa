@@ -1,0 +1,191 @@
+using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
+
+[System.Serializable]
+public class Quest
+{
+    //기본 정보
+    public string questID; // 퀘스트 ID
+    public string questName; // 퀘스트 제목
+    public QuestCategory questType; //퀘스트 유형 (일일/주간/반복)
+    public QuestTargetType questTarget; //목표 유형 (처치/수집/탐험 등)
+
+    //진행 정보
+    public int valueProgress; //현재 진행 수치
+    public int valueGoal; //목표 수치
+    public bool isComplete; //완료 여부
+    public bool isClaimed; //보상 수령 여부
+
+    //보상 정보
+    public List<Reward> rewards = new List<Reward>();
+
+    //리셋 관리
+    public DateTime lastUpdated; //마지막 갱신
+    public int lastWeek; //마지막 갱신 주차 
+
+    public QuestState state = QuestState.Locked; // 기본 상태 = 잠금
+
+    // 해금 조건
+    public int requiredStage = 0;
+    public int requiredLevel = 0;
+    public string nextQuestID;
+    public string unlockCondition; // CSV 관리용 (예: "Stage:2", "Level:5")
+    public bool IsUnlocked => state != QuestState.Locked && state != QuestState.Disabled;
+
+    public Quest() { }
+
+    public Quest(string id, string name, QuestCategory type, QuestTargetType target, int goal,
+             string rewardId, CurrencyType currencyType, int rewardCount)
+    {
+        questID = id;
+        questName = name;
+        questType = type;
+        questTarget = target;
+        valueProgress = 0;
+        valueGoal = goal;
+        isComplete = false;
+        isClaimed = false;
+
+        this.lastUpdated = DateTime.UtcNow;
+        this.lastWeek = GetCurrentWeek(DateTime.UtcNow);
+
+        rewards.Add(new Reward
+        {
+            rewardID = rewardId,
+            currencyType = currencyType, 
+            rewardCount = rewardCount
+        });
+    }
+    public string GetRemainingTimeString()
+    {
+        DateTime now = QuestManager.Instance != null ? QuestManager.Instance.NowUtc() : DateTime.UtcNow;
+        TimeSpan remain = TimeSpan.Zero;
+
+        switch (questType)
+        {
+            case QuestCategory.Daily:
+                // 마지막 갱신일 기준 자정까지 남은 시간
+                DateTime nextReset = lastUpdated.Date.AddDays(1);
+                remain = nextReset - now;
+                break;
+
+            case QuestCategory.Weekly:
+                // 마지막 갱신일 기준 다음 주 월요일 0시까지 남은 시간
+                int daysUntilMonday = ((int)DayOfWeek.Monday - (int)now.DayOfWeek + 7) % 7;
+                DateTime nextWeekReset = now.Date.AddDays(daysUntilMonday).Date;
+                remain = nextWeekReset - now;
+                break;
+
+            default:
+                return ""; // 반복/목표 퀘스트는 제한 시간 없음
+        }
+
+        if (remain.TotalSeconds < 0) remain = TimeSpan.Zero;
+        return $"남은 시간: {remain:hh\\:mm\\:ss}";
+    }
+
+    //진행도 추가
+    public void AddProgress(int amount)
+    {
+        if (state != QuestState.InProgress) return;
+
+        valueProgress += amount;
+        if (valueProgress >= valueGoal)
+        {
+            valueProgress = valueGoal;
+            state = QuestState.RewardReady; // 바로 보상 대기 상태
+        }
+        lastUpdated = QuestManager.Instance?.NowUtc() ?? DateTime.UtcNow;
+    }
+
+
+    public void ClaimReward()
+    {
+        if (state != QuestState.RewardReady) return;
+
+        foreach (var reward in rewards)
+            QuestManager.Instance.GrantReward(reward);
+
+        state = QuestState.Disabled; // 다시는 활성화되지 않음
+    }
+
+
+    //퀘스트 리셋
+    public void ResetProgress()
+    {
+        valueProgress = 0;
+        state = QuestState.InProgress;
+        lastUpdated = QuestManager.Instance?.NowUtc() ?? DateTime.UtcNow;
+    }
+
+    // 주차 계산 (주간 퀘스트 체크용)
+    private int GetCurrentWeek(DateTime time)
+    {
+        var cal = System.Globalization.CultureInfo.InvariantCulture.Calendar;
+        return cal.GetWeekOfYear(time, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+    }
+}
+public enum QuestCategory
+{
+    Daily = 1,
+    Weekly = 2,
+    Repeat = 3,
+    Mission = 4
+}
+
+public enum QuestTargetType
+{
+    None,
+    OnLogin,       // 게임 접속 여부 확인
+    Monster,       // 몬스터 사냥 개수
+    Gacha1,        // 캐릭터 뽑기 횟수
+    Gacha2,        // 장비 뽑기 횟수
+    Growth,        // 캐릭터 레벨업 횟수
+    Training,      // 수련(외공/내공/체력) 전체
+    Enhance,       // 장비 강화 횟수
+    Organization,  // 캐릭터 편성 캐릭터 수
+    Vital,         // 체력 수련
+    ExtPow,        // 외공 수련
+    InnPow,        // 내공 수련
+    Box,           // 상자 아이템 사용
+    Stage,         // 스테이지 클리어
+    Playtime       // 세션 접속 시간
+}
+
+public enum RewardType
+{ 
+    Currency = 1, // 재화
+    Equipment = 2, // 장비
+    Item = 3 // 아이템 (확장용)
+}
+public enum QuestState
+{
+    Locked,      // 잠금 (조건 미충족)
+    InProgress,  // 진행중
+    Completed,   // 완료됨
+    RewardReady, // 보상 대기 (완료 후 수령 대기)
+    Disabled     // 비활성화 (보상 수령 이후 or 조건 미충족 재진입 불가)
+}
+
+[System.Serializable]
+public class Reward
+{
+    public string rewardID;          // 아이템/재화 식별자 (ex "H0001", "S0001" 등)
+    public RewardType rewardType;    // CSV에서 넘어오는 보상 타입 (Currency, Equipment, Item 등)
+    public CurrencyType? currencyType; // 재화형 보상일 경우 구분(선택적, 프로젝트에 따라 사용)
+    public int rewardCount;          // 수량
+
+    public string GetDisplayName()
+    {
+        if (rewardType == RewardType.Currency)
+        {
+            return $"{currencyType} x{rewardCount}";
+        }
+        else
+        {
+            return $"{rewardType} {rewardID} x{rewardCount}";
+        }
+    }
+}

@@ -1,0 +1,363 @@
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using VContainer;
+
+public class EquipmentInfoPanel : MonoBehaviour
+{
+    [Inject] private EquipmentService equipmentService;
+    [Inject] private EquipmentManager equipmentManager;
+
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI textEquipmentName;       //장비 이름
+    [SerializeField] private TextMeshProUGUI textEquipmentEffect;     //장비 효과
+
+    [SerializeField] private TextMeshProUGUI textEffectRate;          //효과 수치;
+    [SerializeField] private TextMeshProUGUI textUserStone;           //보유중인 연마석
+    [SerializeField] private TextMeshProUGUI textNeedStone;           //소모 예상 연마석
+    [SerializeField] private TextMeshProUGUI textEquipLevel;          //장비 레벨
+    [SerializeField] private TextMeshProUGUI textNextLevel;           //다음 장비 레벨
+
+    [SerializeField] private TextMeshProUGUI textPresentEff;          //현재 장비 효과
+    [SerializeField] private TextMeshProUGUI textNextEff;             //다음 레벨 효과
+    [SerializeField] private TextMeshProUGUI textPresentEffectRate;   //현재 장비 효과 수치
+    [SerializeField] private TextMeshProUGUI textNextEffectRate;      //다음 레벨 효과 수치
+    [SerializeField] private TextMeshProUGUI textEquip;               //장비/ 해제 텍스트
+
+    [Header("EquipmentCardDisplay")]
+    [SerializeField] private EquipmentCardDisplay imageEquipment;     // 장비 이미지
+
+    [Header("Button")]
+    [SerializeField] private Button exitButton;                   //나가기 버튼
+    [SerializeField] private Button equipButton;                  //장비하기/ 해제하기 버튼
+    [SerializeField] private Button upgradeButton;                //장비 강화 버튼
+
+    [Header("Instance")]
+    [SerializeField] public HeroInfoUI HeroInfo;                // 영웅 정보창
+    [SerializeField] public EquipmentItemList itemListitemList;         // 아이템 리스트 창
+    [SerializeField] public EquipmentChange changePanel;        // 아이템 교채창
+
+    public EquipmentInstance instance;     // 판넬의 장비
+    public string charId;                  // 영웅 ID
+    public string oldInstanceID;              // 장비중인 장비 ID
+    private BigCurrency levelUpCurrency;   // 소모 연마석 
+
+    // 장비 능력치 한글 텍스트 변환용 딕셔너리
+    public readonly Dictionary<StatType, string> Descriptions = new()
+    {
+        { StatType.Attack, "공격력" },
+        { StatType.ExtAtk, "외공" },
+        { StatType.InnAtk, "내공" },
+        { StatType.Defense, "방어력" },
+        { StatType.CritDamage, "치명타 배율" },
+        { StatType.CritRate, "치명타 확률" },
+        { StatType.AtkSpeed, "공격 속도" },
+        { StatType.Health, "체력" },
+        { StatType.BDamage, "보스 데미지" },
+        { StatType.NDamage, "일반 데미지" },
+        { StatType.SkillDamage, "스킬 데미지" }
+    };
+
+    #region Unity
+    private void OnEnable()
+    {
+        SetButtonAddListener();
+    }
+    private void OnDisable()
+    {
+        SetButtonRemoveListener();
+        this.gameObject.SetActive(false);
+    }
+    #endregion
+
+    #region Init
+    public void Init()
+    {
+        levelUpCurrency = BigCurrency.FromBaseAmount(GetLevelUpGrindingStone(instance));
+        imageEquipment.SetData(instance);
+        GetCharID(HeroInfo.heroData.PlayerModelSO.CharID);
+        SetInstanceIDFromHeroData();
+
+        SetPanelText();
+    }
+    private void SetInstanceIDFromHeroData()
+    {
+        var type = instance.equipmentType;
+        var heroData = HeroInfo.heroData;
+
+        oldInstanceID = type switch
+        {
+            EquipmentType.Weapon => heroData.weapone,
+            EquipmentType.Armor => heroData.armor,
+            EquipmentType.Gloves => heroData.gloves,
+            EquipmentType.Boots => heroData.boots,
+            _ => null
+        };
+    }
+
+
+    private void SetButtonAddListener()
+    {
+        exitButton.onClick.AddListener(OnClickExit);
+        equipButton.onClick.AddListener(OnClickEquip);
+        upgradeButton.onClick.AddListener(OnClickUpgrade);
+    }
+    private void SetButtonRemoveListener()
+    {
+        exitButton.onClick.RemoveListener(OnClickExit);
+        equipButton.onClick.RemoveListener(OnClickEquip);
+        upgradeButton.onClick.RemoveListener(OnClickUpgrade);
+    }
+    #endregion
+    // 판넬 종료
+    #region OnClick Mathood
+    private void OnClickExit()
+    {
+        this.gameObject.SetActive(false);
+        AudioManager.Instance.PlaySound("5. 팝업 닫을 때 사운드");
+    }
+    // 장비 업그레이드
+    private void OnClickUpgrade()
+    {
+        // TODO : 연마석 팝업
+        if (!CurrencyManager.Instance.TrySpend(CurrencyType.GrindingStone, levelUpCurrency))
+            return;
+
+        instance.level++;
+        StatModifierManager.ApplyToCard(HeroInfo.heroData.cardInfo);
+        SetPanelText();
+        HeroInfo.RefreshUI();
+    }
+    // 장비를 장착
+    private void OnClickEquip()
+    {
+        var heroData = HeroInfo.heroData;
+        var type = instance.equipmentType;
+
+        // 현재 영웅에게 장착된 장비 ID 가져오기
+        SetInstanceIDFromHeroData();
+        var currentEquippedId = oldInstanceID;
+
+        // 현재 슬롯에 장착된 장비 인스턴스 가져오기
+        EquipmentInstance oldInstance = null;
+        if (!string.IsNullOrEmpty(currentEquippedId))
+        {
+            oldInstance = equipmentManager.allEquipments
+                .FirstOrDefault(e => e.instanceID == currentEquippedId);
+            Debug.Log($"기존 장착 인스턴스 : {oldInstance.instanceID}");
+            Debug.Log($"신규 장착 인스턴스 : {instance.instanceID}");
+        }
+        //  장비가 장착되어 있고, 슬롯에 다른 영웅이 있을 경우
+        if (instance.isEquipped && instance.charID != heroData.heroId)
+        {
+            // 아이템 교체 확인 패널 활성화
+            changePanel.gameObject.SetActive(true);
+            return;
+        }
+        // 1. 해제: 현재 장비가 장착되어 있고, 슬롯에 자신이 들어있을 경우
+        if (currentEquippedId == instance.instanceID && instance.isEquipped)
+        {
+            SetHeroEquipmentSlot(null);
+            instance.isEquipped = false;
+            instance.charID = null;
+
+            equipmentService.UnequipFromUnactivatedCharacter(charId, instance);
+            equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
+
+            Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 해제됨");
+            StatModifierManager.RemoveModifiersByOrigin(charId, oldInstance.instanceID);
+            StatModifierManager.ApplyToCard(heroData.cardInfo);
+        }
+        else
+        {
+            // 2. 교체: 슬롯에 다른 장비가 이미 장착되어 있을 경우
+            if (oldInstance != null && oldInstance != instance)
+            {
+                oldInstance.isEquipped = false;
+                oldInstance.charID = null;
+
+                equipmentService.UnequipFromUnactivatedCharacter(charId, oldInstance);
+                equipmentService.UnequipFromCharacter(charId, instance.equipmentType);
+
+                Debug.Log($"[OnClickEquip] 기존 장비 {oldInstance.instanceID} 해제됨");
+                StatModifierManager.RemoveModifiersByOrigin(charId, oldInstance.instanceID);
+                HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+                StatModifierManager.ApplyToCard(heroData.cardInfo);
+            }
+
+            // 3. 장착: 새 장비를 슬롯에 등록
+            SetHeroEquipmentSlot(instance.instanceID);
+            instance.isEquipped = true;
+            instance.charID = heroData.heroId;
+            equipmentService.EquipToUnactivatedCharacter(charId, instance);
+            equipmentService.EquipToCharacter(charId, instance);
+            Debug.Log($"[OnClickEquip] 장비 {instance.instanceID} 장착됨");
+
+            HeroDataManager.Instance.ApplyHeorStats(instance, charId);
+        }
+
+        // 저장 및 UI 갱신
+        if (!string.IsNullOrEmpty(heroData.heroId))
+        {
+            HeroDataManager.Instance.SaveHeroData(heroData.heroId);
+        }
+        else
+        {
+            Debug.LogError("[OnClickEquip] heroData.heroId가 null입니다. 저장 실패");
+        }
+        StatModifierManager.ApplyToCard(heroData.cardInfo);
+        HeroInfo.Init();
+        HeroInfo.RefreshHeroUI();
+        SetPanelText();
+        RefreshEquipCardUI(oldInstance);
+    }
+
+    // 소모 연마석 반환
+    private int GetLevelUpGrindingStone(EquipmentInstance equip)
+    {
+        int baseValue = 0;
+
+        switch (equip.rarity)
+        {
+            case RarityType.Normal:
+                baseValue = 10;
+                break;
+            case RarityType.Rare:
+                baseValue = 20;
+                break;
+            case RarityType.Epic:
+                baseValue = 30;
+                break;
+            case RarityType.Unique:
+                baseValue = 40;
+                break;
+        }
+
+        return baseValue * equip.level;
+    }
+    #endregion
+
+    #region Public
+    // 판넬의 텍스트 설정
+    public void SetPanelText()
+    {
+        textEquipmentName.text = instance.template.equipmentName;           // 이름
+        textEquipmentEffect.text = instance.template.description;           // 설명
+        textEffectRate.text = instance.GetStat().ToString() + "%";                // 장비 효과
+        textPresentEffectRate.text = instance.GetStat().ToString() + "%";         // 장비 효과
+        textNextEffectRate.text = instance.GetNextLevelStat().ToString() + "%";   // 다음 레벨 효과
+        // 상승 능력치
+        textPresentEff.text = GetDescription(instance.statType);
+        textNextEff.text = GetDescription(instance.statType);
+
+        // 연마석
+        textUserStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone)}";
+        textNeedStone.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.GrindingStone) - levelUpCurrency}";
+
+        textEquipLevel.text = "현재 단계" + instance.level.ToString();
+        textNextLevel.text = "다음 단계" + (instance.level + 1).ToString();
+
+        if (instance.isEquipped)
+        {
+            if (instance.charID == HeroInfo.heroData.heroId)
+            {
+                textEquip.text = "해제하기";
+            }
+            else
+            {
+                textEquip.text = "교체하기";
+            }
+        }
+        else
+        {
+            textEquip.text = "장비하기";
+        }
+    }
+
+    // 아이템 ID에 받아와 장비 타입 확인
+    public void SetHeroEquipmentSlot(string itemId)
+    {
+        var type = instance.equipmentType;
+        var heroData = HeroInfo.heroData;
+
+        switch (type)
+        {
+            case EquipmentType.Weapon: heroData.weapone = itemId; break;
+            case EquipmentType.Armor: heroData.armor = itemId; break;
+            case EquipmentType.Gloves: heroData.gloves = itemId; break;
+            case EquipmentType.Boots: heroData.boots = itemId; break;
+        }
+    }
+    public void RefreshEquipCardUI(EquipmentInstance oldInstance)
+    {
+        int taskCount = 0;
+        if (oldInstance == null)
+            taskCount++;
+        var itemList = FindFirstObjectByType<EquipmentItemList>();
+        if (itemList == null)
+        {
+            Debug.LogWarning("[RefreshEquipCardUI] EquipmentItemList를 찾을 수 없습니다.");
+            return;
+        }
+
+        foreach (var button in itemList.activeEquipButtons)
+        {
+            if (button != null && button.IsSameInstance(oldInstance))
+            {
+                button.Init(this, oldInstance);
+                taskCount++;
+            }
+
+            if (button != null && button.IsSameInstance(instance))
+            {
+                button.Init(this, instance);
+                taskCount++;
+            }
+            if (taskCount >= 2)
+                break;
+        }
+    }
+
+    // 장비 받아오기
+    public void GetEquipmentInstance(EquipmentInstance input)
+    {
+        instance = input;
+    }
+    // 장착한 캐릭터 ID 받아오기
+    public void GetCharID(string input)
+    {
+        charId = input;
+        var type = instance.equipmentType;
+
+        string oldInstanceID = null;
+
+        switch (type)
+        {
+            case EquipmentType.Weapon:
+                oldInstanceID = HeroInfo.weaponID;
+                break;
+            case EquipmentType.Armor:
+                oldInstanceID = HeroInfo.armorID;
+                break;
+            case EquipmentType.Boots:
+                oldInstanceID = HeroInfo.bootsID;
+                break;
+            case EquipmentType.Gloves:
+                oldInstanceID = HeroInfo.glovesID;
+                break;
+        }
+
+        Debug.Log($"[GetCharID] : 캐릭터 {charId} 설정됨, 기존 장비 ID: {oldInstanceID}");
+    }
+
+    // 타입에 맞는 한글 텍스트 불러오기
+    public string GetDescription(StatType stat)
+    {
+        return Descriptions.TryGetValue(stat, out var desc) ? desc : stat.ToString();
+    }
+
+
+    #endregion
+}
