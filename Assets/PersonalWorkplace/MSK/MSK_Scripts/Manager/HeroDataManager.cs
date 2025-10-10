@@ -376,6 +376,12 @@ public class HeroDataManager : IStartable
 
         var card = hero.cardInfo;
 
+        if (hero.PlayerModelSO == null)
+        {
+            Debug.LogError("[CombatPower] modelSO가 null임.");
+            return 0f;
+        }
+
         return 2.0f * (
             (card.InnAtkPoint + card.ExtAtkPoint) *
             (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1)) +
