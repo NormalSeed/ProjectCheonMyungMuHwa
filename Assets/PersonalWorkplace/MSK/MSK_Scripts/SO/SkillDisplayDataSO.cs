@@ -9,9 +9,9 @@ public class SkillDisplayDataSO : ScriptableObject
     public Sprite icon;                   // 아이콘 이미지
 
     public string triggerText;            // 발동 조건 설명
-    public string damageText;             // 피해 설명
-    public string effectText;             // 추가 효과 설명
+    //public string damageText;             // 피해 설명
+    //public string effectText;             // 추가 효과 설명
 
     public SkillTag tag;                  // 범위, 단일, 투사체, 소환 등
-    public Color tagColor;                // 태그 색상
+    //public Color tagColor;                // 태그 색상
 }

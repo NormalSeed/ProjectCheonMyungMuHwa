@@ -26,11 +26,11 @@ public class SkillDisplayUI : MonoBehaviour
         nameText.text = data.skillName;
         iconImage.sprite = data.icon;
         triggerText.text = data.triggerText;
-        damageText.text = data.damageText;
-        effectText.text = data.effectText;
+        //damageText.text = data.damageText;
+        //effectText.text = data.effectText;
 
         tagText.text = GetTagLabel(data.tag);
-        tagBackground.color = data.tagColor;
+        //tagBackground.color = data.tagColor;
     }
 
     private string GetTagLabel(SkillTag tag)
