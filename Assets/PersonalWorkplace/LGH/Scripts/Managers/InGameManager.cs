@@ -90,6 +90,20 @@ public class InGameManager : MonoBehaviour
                 isQuitUIActive = true;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            KilAllPlayers();
+        }
+    }
+
+    private void KilAllPlayers()
+    {
+        foreach (PlayerController player in players)
+        {
+            if (player.isDead.Value == true) continue;
+            player.Dead();
+        }
     }
 
     private void LoadStageFromFirebase()
@@ -188,7 +202,7 @@ public class InGameManager : MonoBehaviour
                 if (stageProgress < 2) // 아직 보스 전
                 {
                     stageProgress++;
-                    MapManager.Instance.GoToNextGate(nextSpawnPos);
+                    MapManager.Instance.GoToNextStage(nextSpawnPos);
                 }
                 else // 보스 클리어 → 다음 스테이지
                 {
@@ -239,7 +253,6 @@ public class InGameManager : MonoBehaviour
             ui.SetActionToButton(3, () => { mainUiToOpen = UIType.Summon; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToScreen(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToTimeOut(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
-
         }
     }
 
