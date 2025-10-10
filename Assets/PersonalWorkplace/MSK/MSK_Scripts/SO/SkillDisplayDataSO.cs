@@ -1,8 +1,8 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "SkillDisplay", menuName = "Scriptable Objects/SkillDisplay")]
-public class SkillDisplayDataSO : MonoBehaviour
+[CreateAssetMenu(fileName = "SkillDisplay", menuName = "ScriptableObjects/SkillDisplay")]
+public class SkillDisplayDataSO : ScriptableObject
 {
     public string skillName;              // 스킬 이름
     [TextArea] public string description; // 설명 텍스트

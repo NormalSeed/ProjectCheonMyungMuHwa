@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using VContainer;
 using VContainer.Unity;
 #region Serializable
@@ -367,12 +368,20 @@ public class HeroDataManager : IStartable
         }
 
         var card = hero.cardInfo;
-
-        return 2.0f * (
+        float result = 2.0f * (
             (card.InnAtkPoint + card.ExtAtkPoint) *
             (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1)) +
             1.4f * card.DefPoint + 0.1f * card.HealthPoint
         );
+        Debug.LogWarning($"[전투력 계산식] : 대상 {card.name}");
+        Debug.LogWarning($"[전투력 계산식] : 내공 {card.InnAtkPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 외공 {card.ExtAtkPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타율 {hero.PlayerModelSO.CritRate}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타데미지{hero.PlayerModelSO.CritDamage}");
+        Debug.LogWarning($"[전투력 계산식] : 방어력 {card.DefPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 체력 {card.HealthPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 최종 {result}");
+        return result;
     }
 
     private void RefreshAllCombatPower()
