@@ -112,7 +112,7 @@ public class OfflineRewardUI : UIBase
             {
                 CurrencyManager.Instance.Add(reward.Key, reward.Value);
             }
-            PlayerProfileManager.Instance.AddExp(Exp);
+            //PlayerProfileManager.Instance.AddExp(Exp);
             offlineRewardPanel.SetActive(false);
         });
 
