@@ -140,7 +140,7 @@ public class BossController : MonsterController
         double val = Model.CurHealth.Value / Model.BaseModel.finalMaxHealth;
         float v = (float)val;
         float res = Mathf.Max(0, v);
-        barUI.SetFill(res);
+        barUI.TargetBossFill.SetValue(res);
         float h = Mathf.Max((float)Model.CurHealth.Value, 0f);
         barUI.SetHealthBarText(new BigCurrency(h), new BigCurrency(Model.BaseModel.finalMaxHealth));
     }

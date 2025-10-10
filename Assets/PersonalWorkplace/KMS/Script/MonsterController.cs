@@ -143,7 +143,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         onDeath?.Invoke();
         InGameManager.Instance.monsterDeathStack.Value--;
-        barUI.AddFill(1f / 12);
+        barUI.TargetMonsterFill?.AddValue(1f / 12);
         if (attackCo != null) StopCoroutine(attackCo);
         deathCo = StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");

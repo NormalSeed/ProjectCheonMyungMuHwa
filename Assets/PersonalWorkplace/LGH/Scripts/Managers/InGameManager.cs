@@ -196,10 +196,10 @@ public class InGameManager : MonoBehaviour
                     stageNum++;
                     SetNextStage();
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
+                    PopupManager.Instance.ShowStageClearPopup();
                 }
             }
             Debug.Log($"<color=yellow>[igm]{stageProgress}");
-            PopupManager.Instance.ShowStageClearPopup();
         }
     }
 
@@ -239,7 +239,7 @@ public class InGameManager : MonoBehaviour
             ui.SetActionToButton(3, () => { mainUiToOpen = UIType.Summon; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToScreen(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToTimeOut(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
-                
+
         }
     }
 
@@ -261,9 +261,14 @@ public class InGameManager : MonoBehaviour
         stageProgress = 0;
 
         // 페이드인 전에 플레이어 위치 재배치
+        if (alignPoint.activeInHierarchy == false)
+        {
+            Debug.LogError("정렬 포인트가 활성화되지 않음");
+            alignPoint.SetActive(true);
+        }
         for (int i = 0; i < PartyManager.Instance.players.Count; i++)
         {
-            Transform point = alignPoint.transform.Find($"Point{i}");
+            Transform point = alignPoint.transform.Find($"Point{i + 1}");
             if (point != null)
             {
                 Vector3 offset = new Vector3(0, -0.1f, 0);
@@ -290,7 +295,7 @@ public class InGameManager : MonoBehaviour
         }
 
         // 페이드 인 효과 추가해야함
-        
+
 
         Debug.Log("스테이지 초기화 완료. 재시작 준비됨");
 
