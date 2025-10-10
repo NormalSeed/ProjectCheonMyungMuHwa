@@ -12,6 +12,7 @@ public class SkillDisplayDataSO : ScriptableObject
     //public string damageText;             // 피해 설명
     //public string effectText;             // 추가 효과 설명
 
-    public SkillTag tag;                  // 범위, 단일, 투사체, 소환 등
+    public SkillTag tag1;                  // 범위, 단일, 투사체, 소환 등
+    public SkillTag tag2;
     //public Color tagColor;                // 태그 색상
 }

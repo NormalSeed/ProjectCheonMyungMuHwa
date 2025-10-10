@@ -10,6 +10,7 @@ public class SkillDisplayUI : MonoBehaviour
     public Text damageText;
     public Text effectText;
     public Text tagText;
+    public Text tag2Text;
     public Image tagBackground;
 
     [Header("Skill Data")]
@@ -29,7 +30,8 @@ public class SkillDisplayUI : MonoBehaviour
         //damageText.text = data.damageText;
         //effectText.text = data.effectText;
 
-        tagText.text = GetTagLabel(data.tag);
+        tagText.text = GetTagLabel(data.tag1);
+        tag2Text.text = GetTagLabel(data.tag2);
         //tagBackground.color = data.tagColor;
     }
 
