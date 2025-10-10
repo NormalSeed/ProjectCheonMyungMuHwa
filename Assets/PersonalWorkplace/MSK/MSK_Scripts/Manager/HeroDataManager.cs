@@ -379,10 +379,17 @@ public class HeroDataManager : IStartable
     {
         foreach (var hero in ownedHeroes.Values)
         {
+            if (hero == null || hero.cardInfo == null)
+            {
+                Debug.LogWarning($"[CombatPower] 계산 생략: hero 또는 cardInfo가 null입니다. heroId: {hero?.heroId}");
+                continue;
+            }
+
             float power = CalculateCombatPower(hero);
             hero.cardInfo.combatPower = power;
         }
     }
+
 
     public void ApplyHeorStats(EquipmentInstance instance, string charId)
     {
