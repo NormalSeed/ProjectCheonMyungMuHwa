@@ -56,6 +56,7 @@ public class InGameManager : MonoBehaviour
     {
         Instance = this;
         bgmPlayer = new MainSceneBGMPlayer();
+        LoadStageFromFirebase();
     }
 
     private void Start()
@@ -69,8 +70,6 @@ public class InGameManager : MonoBehaviour
 
         alignedNum.Subscribe(ExamineAllAligned);
         monsterDeathStack.Subscribe(CheckMonsterClear);
-
-        LoadStageFromFirebase();
     }
 
     private void Update()
@@ -117,6 +116,7 @@ public class InGameManager : MonoBehaviour
             {
                 int savedStage = int.Parse(task.Result.Value.ToString());
                 stageNum = savedStage;
+                MapManager.Instance.currentStageIndex = savedStage;
                 stageLoaded = true;
                 Debug.Log($"Firebase에서 불러온 스테이지: {stageNum}");
             }
@@ -208,6 +208,7 @@ public class InGameManager : MonoBehaviour
                 {
                     stageProgress = 0;
                     stageNum++;
+                    MapManager.Instance.currentStageIndex = stageNum;
                     SetNextStage();
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
                     PopupManager.Instance.ShowStageClearPopup();
