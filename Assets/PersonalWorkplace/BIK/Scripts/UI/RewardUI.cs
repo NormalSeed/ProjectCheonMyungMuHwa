@@ -71,7 +71,7 @@ public class RewardUI : UIBase
                 InventoryManager.Instance.Add(key, baseUnits);
             }
         }
-        if ( exp > 0 ) PlayerProfileManager.Instance.AddExp(exp);
+        //if ( exp > 0 ) PlayerProfileManager.Instance.AddExp(exp);
         
 
         // 3) 보너스 표기

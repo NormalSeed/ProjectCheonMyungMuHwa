@@ -25,7 +25,7 @@ public class StageBarUI : MonoBehaviour
         }
     }
 
-    private void SetStage(int door, int progress) // 첫번째 몬스터 나왔을때 1부터 3까지, 보스 나왔을때 0
+    private void SetStage(int door, int progress) // 첫번째 몬스터 나왔을때 1부터 3까지, 보스 나왔을때 0 (수정된다면 0, 1 일때 몬스터, 2일때 보스)
     {
         stageValueText.text = door.ToString();
 

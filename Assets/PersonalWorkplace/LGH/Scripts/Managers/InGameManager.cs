@@ -147,14 +147,6 @@ public class InGameManager : MonoBehaviour
 
         isProcessingAlignment = true;
         bool isBossSpawned = MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
-        if (isBossSpawned)
-        {
-            stageProgress = 0;
-        }
-        else
-        {
-            stageProgress++;
-        }
         StartCoroutine(ResetAlignmentFlag());
         OnStageStart?.Invoke(stageNum, stageProgress);
         bgmPlayer.SetBGM(stageNum);
@@ -164,6 +156,7 @@ public class InGameManager : MonoBehaviour
             player.damageDealt = 0;
         }
         synergyUI.UpdateDamageUI();
+        Debug.Log($"<color=yellow>[igm]{stageProgress}");
     }
     private IEnumerator ResetAlignmentFlag()
     {
@@ -205,6 +198,7 @@ public class InGameManager : MonoBehaviour
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
                 }
             }
+            Debug.Log($"<color=yellow>[igm]{stageProgress}");
             PopupManager.Instance.ShowStageClearPopup();
         }
     }

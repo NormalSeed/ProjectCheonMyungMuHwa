@@ -168,7 +168,7 @@ public class MapManager : MonoBehaviour
         {
             // 보스 클리어 → 다음 스테이지로 이동
             currentStageIndex++;
-            InGameManager.Instance.stageProgress = 0; 
+            //InGameManager.Instance.stageProgress = 0; 
             SpawnStage(currentStageIndex, spawnPosition);
 
             Debug.Log($"스테이지 {currentStageIndex} 시작!");
