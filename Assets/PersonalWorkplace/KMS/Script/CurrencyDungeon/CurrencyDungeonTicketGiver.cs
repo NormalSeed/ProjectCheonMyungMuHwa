@@ -77,12 +77,12 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
     }
 
     // 매 시각 상 02:00:00 마다 보상 지급 초기화 (24시간)
-    private bool Compare2()
+    private bool Compare()
     {
         while (last <= current)
         {
             last += new TimeSpan(1, 0, 0);
-            if (last.Hour == 2)
+            if (last.Hour == 0)
             {
                 //조건 성립
                 return true;
@@ -92,7 +92,7 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
     }
 
     // 매 시각 상 5분 마다 보상 지급 초기화
-    private bool Compare()
+    private bool Compare2()
     {
         while (last <= current)
         {

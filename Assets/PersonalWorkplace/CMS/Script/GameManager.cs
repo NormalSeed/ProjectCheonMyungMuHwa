@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            exitEPO = currentEPO - 100000;
+            exitEPO = currentEPO;
         }
         exit = Epoch2Time(exitEPO);
         current = Epoch2Time(currentEPO);
