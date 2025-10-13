@@ -23,11 +23,16 @@ public partial class PlayerMoveAction : Action
     private PartyManager partyManager;
     private InGameManager inGameManager;
 
+    private BehaviorGraphAgent BGagent;
+    private float detectInterval = 0.15f; // 탐색 간격(튜닝 가능)
+    private float detectTimer = 0f;
+
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
         spumC = controller.spumController;
+        BGagent = Self.Value.GetComponent<BehaviorGraphAgent>(); // 추가
 
         partyManager = PartyManager.Instance;
         inGameManager = InGameManager.Instance;
@@ -65,8 +70,48 @@ public partial class PlayerMoveAction : Action
         return point;
     }
 
+    private GameObject GetClosestAliveMonsterWithinSearchRange()
+    {
+        // 필요하면 searchRange를 필드로 빼서 조절 가능
+        float searchRange = 20f;
+        GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");
+        if (monsters == null || monsters.Length == 0) return null;
+
+        Vector3 pos = Self.Value.transform.position;
+        float minSqr = float.MaxValue;
+        GameObject closest = null;
+        foreach (var m in monsters)
+        {
+            if (m == null || !m.activeInHierarchy) continue;
+            var mc = m.GetComponent<MonsterController>();
+            if (mc == null || mc.IsDead) continue;
+            float dSqr = (m.transform.position - pos).sqrMagnitude;
+            if (dSqr < minSqr && dSqr <= searchRange * searchRange)
+            {
+                minSqr = dSqr;
+                closest = m;
+            }
+        }
+        return closest;
+    }
+
     protected override Status OnUpdate()
     {
+        detectTimer -= Time.deltaTime;
+        if (detectTimer <= 0f)
+        {
+            detectTimer = detectInterval;
+            // 간단한 근접 몬스터 탐색
+            GameObject found = GetClosestAliveMonsterWithinSearchRange();
+            if (found != null)
+            {
+                // Behavior Graph 변수로 타겟 존재 알림 또는 직접 상태 변경
+                BGagent?.SetVariableValue<bool>("isTargetDetected", true);
+                BGagent?.SetVariableValue<string>("CurState", "Attack"); // CurState 타입이 string일 때
+                return Status.Failure; // 또는 Success: 트리 구조에 맞게 선택
+            }
+        }
+
         if (!NMagent.pathPending && NMagent.remainingDistance <= NMagent.stoppingDistance)
         {
             if (!NMagent.hasPath || NMagent.velocity.sqrMagnitude == 0f)

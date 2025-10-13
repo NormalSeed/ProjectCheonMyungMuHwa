@@ -25,6 +25,10 @@ public partial class PlayerUseSkillAction : Action
     // 선택: 스킬 탐색 비용이 크면 외부에서 관리하는 Monster 리스트 사용 권장
     private static GameObject[] cachedMonsters;
 
+    private float deadTargetDelay = 0.1f;
+    private float deadTargetTimer = 0f;
+    private bool isWaitingForDeadTarget = false;
+
     protected override Status OnStart()
     {
         if (Self?.Value == null) return Status.Failure;
@@ -49,6 +53,9 @@ public partial class PlayerUseSkillAction : Action
             mController = Target.Value.GetComponent<MonsterController>();
         else
             mController = null;
+
+        deadTargetTimer = 0f;
+        isWaitingForDeadTarget = false;
 
         return Status.Running;
     }
@@ -132,13 +139,27 @@ public partial class PlayerUseSkillAction : Action
         // 만약 타겟이 죽어있다면 공격하지 않음 -> 재탐색하거나 Failure 처리
         if (mController != null && mController.IsDead)
         {
-            // 타겟이 죽었으므로 즉시 타겟 재탐지하고 행동 종료(Success로 다음 노드 진행)
-            Target.Value = GetTargetSafe();
-            if (Target.Value == null)
-                BGagent?.SetVariableValue<bool>("isTargetDetected", false);
+            if (!isWaitingForDeadTarget)
+            {
+                isWaitingForDeadTarget = true;
+                deadTargetTimer = deadTargetDelay;
+            }
 
-            skillExecuted = false;
-            return Status.Success;
+            deadTargetTimer -= Time.deltaTime;
+            if (deadTargetTimer <= 0f)
+            {
+                Target.Value = GetTargetSafe();
+                mController = Target.Value?.GetComponent<MonsterController>();
+                isWaitingForDeadTarget = false;
+                deadTargetTimer = 0f;
+
+                if (Target.Value == null)
+                    BGagent?.SetVariableValue<bool>("isTargetDetected", false);
+
+                return Status.Failure;
+            }
+
+            return Status.Running;
         }
 
         // 이미 스킬을 실행했으면 스킬 재생 완료를 기다리기
