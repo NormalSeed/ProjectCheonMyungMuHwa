@@ -110,8 +110,4 @@ public enum SkillTag
     Area,           // 범위
     Projectile,     // 투사체
     Summon,         // 소환형
-    Heal,           // 회복형
-    Buff,           // 버프
-    Debuff,         // 디버프
-    Shield,         // 보호막
 }

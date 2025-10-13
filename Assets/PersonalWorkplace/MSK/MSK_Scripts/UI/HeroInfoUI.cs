@@ -42,6 +42,10 @@ public class HeroInfoUI : UIBase
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     [SerializeField] private GameObject equipPanel;
     [SerializeField] private HeroUI heroUI;
+
+    [Header("SkillBox")]
+    [SerializeField] private SkillDisplayUI skillBox1;     // 메인 스킬 정보
+    [SerializeField] private SkillDisplayUI skillBox2;     // 서브 스킬 정보
     #endregion
 
     #region SO Properties
@@ -81,7 +85,15 @@ public class HeroInfoUI : UIBase
     {
         ButtonAddListener();
         RefreshHeroUI();
+        SetSkillInfo();
     }
+
+    private void SetSkillInfo()
+    {
+        skillBox1.InitSkill(heroData.cardInfo.skillDisplayList[0]);
+        skillBox2.InitSkill(heroData.cardInfo.skillDisplayList[1]);
+    }
+
     private void SetEquipment()
     {
         SetEquipmentSettings();
