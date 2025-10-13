@@ -36,16 +36,24 @@ public class QuestManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("QuestManager의 Awake()가 호출되었습니다!"); 
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        Debug.Log("[QuestManager] Awake 호출됨");
+        if (Instance == null)
+        {
+            Instance = this;
+            Debug.Log("[QuestManager] Instance 등록 완료");
+        }
+        else
+        {
+            Debug.LogWarning("[QuestManager] 중복 인스턴스 발견 → 파괴됨");
+            Destroy(gameObject);
+        }
     }
     private void Update()
     {
         // 아직 초기화 전이면 아무것도 하지 않음
         if (!IsReady)
         {
-            Debug.Log("[QuestManager.Update] 아직 준비 안됨");
+            Debug.Log("[QuestManager.Update] 아직 준비 안됨 (IsReady=false)");
             return;
         }
 
@@ -72,60 +80,62 @@ public class QuestManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        //  Auth가 null이 아닐 때까지 대기
+        Debug.Log("[QuestManager] Start() 실행 대기 중...");
         yield return new WaitUntil(() => BackendManager.Auth != null);
-        Debug.Log("[QuestManager] Auth 준비됨 → InitializeAfterLogin 대기");
+        Debug.Log("[QuestManager] Auth 준비됨");
 
         if (BackendManager.Auth.CurrentUser != null)
         {
+            Debug.Log("[QuestManager] 이미 로그인된 유저 존재 → OnBackendLoginSuccess()");
             OnBackendLoginSuccess();
         }
         else
         {
+            Debug.Log("[QuestManager] 로그인 대기 → OnLoginSuccess 이벤트 등록");
             BackendManager.Instance.OnLoginSuccess += OnBackendLoginSuccess;
         }
     }
 
-
     private void OnBackendLoginSuccess()
     {
-        Debug.Log("[QuestManager] OnBackendLoginSuccess fired -> InitializeAfterLogin()");
+        Debug.Log("[QuestManager] OnBackendLoginSuccess fired → InitializeAfterLogin()");
         InitializeAfterLogin();
     }
     public void InitializeAfterLogin()
     {
-        Debug.Log("QuestManager InitializeAfterLogin() 실행");
+        Debug.Log("[QuestManager] InitializeAfterLogin() 실행 시작");
         IsReady = false;
 
-        //  Firebase Database 레퍼런스 초기화
-        dbRef = BackendManager.Database?.RootReference;
-        if (dbRef == null)
+        if (BackendManager.Database == null)
         {
-            Debug.LogError("[QuestManager] Firebase Database 초기화 실패");
+            Debug.LogError("[QuestManager] BackendManager.Database == null");
             return;
         }
 
-        //  서버 시간 오프셋 가져온 후 퀘스트 불러오기
+        dbRef = BackendManager.Database.RootReference;
+        Debug.Log("[QuestManager] Firebase Database 레퍼런스 연결 성공");
+
         FetchServerTimeOffset(() =>
         {
-            Debug.Log("[QuestManager] 서버 시간 오프셋 적용 완료");
+            Debug.Log("[QuestManager] 서버 시간 오프셋 적용 완료 → LoadQuests 실행");
             LoadQuests();
 
-            //  로그인 퀘스트 처리
+            // 로그인 퀘스트
             HandleLoginQuest();
         });
     }
 
     private void HandleLoginQuest()
     {
-        DateTime now = NowUtc().Date; // 날짜만 기준
+        Debug.Log("[QuestManager] HandleLoginQuest() 실행");
+        DateTime now = NowUtc().Date;
         foreach (var quest in activeQuests.Values)
         {
             if (quest.questTarget == QuestTargetType.OnLogin && quest.questType == QuestCategory.Daily)
             {
-                if (quest.lastUpdated.Date < now) // 어제거나 더 이전이면 리셋
+                if (quest.lastUpdated.Date < now)
                 {
-                    Debug.Log($"[HandleLoginQuest] {quest.questName} - 오늘 첫 로그인 처리");
+                    Debug.Log($"[QuestManager] 오늘 첫 로그인 퀘스트 처리: {quest.questName}");
                     quest.ResetProgress();
                     quest.lastUpdated = now;
                     ReportEvent(QuestTargetType.OnLogin, 1);
@@ -133,30 +143,36 @@ public class QuestManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log($"[HandleLoginQuest] {quest.questName} - 오늘 이미 처리됨");
+                    Debug.Log($"[QuestManager] 오늘 이미 로그인 처리됨: {quest.questName}");
                 }
             }
         }
     }
     private void FetchServerTimeOffset(Action onDone)
     {
+        Debug.Log("[QuestManager] FetchServerTimeOffset 시작");
         BackendManager.Database.GetReference(".info/serverTimeOffset")
             .GetValueAsync()
             .ContinueWithOnMainThread(task =>
             {
-                if (task.IsCompleted && task.Result != null && task.Result.Value != null)
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.LogWarning("⚠[QuestManager] 서버 시간 오프셋 불러오기 실패");
+                }
+                else
                 {
                     try
                     {
                         serverTimeOffsetMs = Convert.ToInt64(task.Result.Value);
-                        Debug.Log($"[QuestManager] 서버 시간 offset={serverTimeOffsetMs}ms");
+                        Debug.Log($"[QuestManager] 서버 오프셋: {serverTimeOffsetMs}ms");
                     }
                     catch
                     {
+                        Debug.LogWarning("⚠️ [QuestManager] 서버 오프셋 파싱 실패");
                         serverTimeOffsetMs = 0;
-                        Debug.LogWarning("[QuestManager] 서버 시간 오프셋 파싱 실패, 0으로 설정");
                     }
                 }
+                Debug.Log("[QuestManager] FetchServerTimeOffset 완료 → onDone 호출");
                 onDone?.Invoke();
             });
     }
@@ -166,11 +182,16 @@ public class QuestManager : MonoBehaviour
 
     private void LoadQuests()
     {
-        Debug.Log("LoadQuests() 진입 - CSV 퀘스트 불러오기 시작");
+        Debug.Log("[QuestManager] LoadQuests() 시작");
+
+        if (BackendManager.Auth?.CurrentUser == null)
+        {
+            Debug.LogError("[QuestManager] Auth.CurrentUser가 null → LoadQuests 중단");
+            return;
+        }
 
         QuestDatabase.LoadAll();
-
-        Debug.Log("QuestDatabase.LoadAll() 호출 후");
+        Debug.Log("[QuestManager] QuestDatabase.LoadAll() 완료");
 
         activeQuests.Clear();
         foreach (var quest in QuestDatabase.DailyQuests
@@ -180,18 +201,17 @@ public class QuestManager : MonoBehaviour
         {
             activeQuests[quest.questID] = quest;
         }
-
-        Debug.Log($"[로드 직후] activeQuests = {activeQuests.Count}개");
+        Debug.Log($"[QuestManager] 총 퀘스트 로드 완료: {activeQuests.Count}개");
 
         string userId = BackendManager.Auth.CurrentUser.UserId;
         dbRef.Child("players").Child(userId).Child("quests")
         .GetValueAsync().ContinueWithOnMainThread(task =>
         {
-            Debug.Log("Firebase 응답 도착");
+            Debug.Log("[QuestManager] Firebase 퀘스트 데이터 요청 완료");
 
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.LogWarning("서버 진행상황 불러오기 실패, CSV 기준으로 사용");
+                Debug.LogWarning("[QuestManager] 서버 진행상황 불러오기 실패, CSV 기준 사용");
                 IsReady = true;
                 OnQuestsUpdated?.Invoke();
                 return;
@@ -199,16 +219,16 @@ public class QuestManager : MonoBehaviour
 
             if (!task.Result.Exists)
             {
-                Debug.Log("서버 진행상황 없음, CSV 기준 초기 저장");
+                Debug.Log("[QuestManager] 서버 데이터 없음 → CSV 기준 초기 저장");
                 SaveQuests();
                 IsReady = true;
                 OnQuestsUpdated?.Invoke();
                 return;
             }
 
-            // 서버 진행상황 반영
             var wrapper = JsonUtility.FromJson<SerializationWrapper<QuestProgressData>>(task.Result.GetRawJsonValue());
             var dict = wrapper.ToDictionary();
+            Debug.Log($"[QuestManager] 서버에서 받은 진행 데이터 {dict.Count}개 반영 시작");
 
             foreach (var kvp in dict)
             {
@@ -223,20 +243,8 @@ public class QuestManager : MonoBehaviour
                 }
             }
 
-            foreach (var quest in activeQuests.Values)
-            {
-                if (quest.questType != QuestCategory.Mission && quest.state == QuestState.Locked)
-                {
-                    quest.state = QuestState.InProgress;
-                    Debug.Log($"[QuestManager] 상태 보정: {quest.questName} → InProgress");
-                }
-            }
-
-            TryUnlockQuests();
-            CheckAndResetQuests();
-
             IsReady = true;
-            Debug.Log("[QuestManager] IsReady = true (퀘스트 로드 완료)");
+            Debug.Log("[QuestManager] 퀘스트 로드 완료 → IsReady = true");
             OnQuestsUpdated?.Invoke();
         });
     }
@@ -407,12 +415,11 @@ public class QuestManager : MonoBehaviour
     {
         if (BackendManager.Auth?.CurrentUser == null || dbRef == null)
         {
-            Debug.LogWarning("[QuestManager] SaveQuests 호출 시점에 Auth/DB 준비 안 됨");
+            Debug.LogWarning("[QuestManager.SaveQuests] Auth/DB 준비 안됨");
             return;
         }
 
         string userId = BackendManager.Auth.CurrentUser.UserId;
-
         Dictionary<string, QuestProgressData> saveData = new Dictionary<string, QuestProgressData>();
         foreach (var quest in activeQuests.Values)
             saveData[quest.questID] = new QuestProgressData(quest);
@@ -421,7 +428,7 @@ public class QuestManager : MonoBehaviour
         dbRef.Child("players").Child(userId).Child("quests")
             .SetRawJsonValueAsync(json);
 
-        Debug.Log($"[QuestManager] 퀘스트 저장 완료: {saveData.Count}개");
+        Debug.Log($"[QuestManager] 퀘스트 저장 완료 ({saveData.Count}개)");
     }
 
     // JSON 직렬화를 위한 래퍼
@@ -585,17 +592,6 @@ public class QuestManager : MonoBehaviour
         return new List<Quest>();
     }
 
-    private int GetQuestPriority(QuestCategory category)
-    {
-        return category switch
-        {
-            QuestCategory.Mission => 0,  // 최우선
-            QuestCategory.Daily => 1,
-            QuestCategory.Weekly => 2,
-            QuestCategory.Repeat => 3,
-            _ => 99
-        };
-    }
     public bool CheckUnlockCondition(Quest quest)
     {
         if (quest.questType != QuestCategory.Mission) return true;
