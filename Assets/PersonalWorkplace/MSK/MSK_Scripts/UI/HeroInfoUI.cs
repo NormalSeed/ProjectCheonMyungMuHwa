@@ -149,8 +149,8 @@ public class HeroInfoUI : UIBase
         outPow.text = ExtAtkPoint.ToString();
         inPow.text = InnAtkPoint.ToString();
         power.text = CountingHeroPower();
-        exp.text = $"{requireSoul} / {CurrencyManager.Instance.Model.Get(CurrencyType.Soul)}";
-        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
+        exp.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.Soul)} / {requireSoul}";
+        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $" {ownerPiece} / {requirePiece}";
     }
     private void SetCharacter()
     {
