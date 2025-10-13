@@ -484,4 +484,34 @@ public class HeroDataManager : IStartable
         Debug.LogWarning($"[GetHeroData] 해당 charID({charID})에 대한 HeroData를 찾을 수 없습니다.");
         return null;
     }
+
+    //  영웅 지급 코드
+    public void GrantHeroById(string heroId)
+    {
+        var template = heroTemplates.Find(t => t.heroId == heroId);
+        if (template == null)
+        {
+            Debug.LogWarning($"[GrantHeroById] 해당 heroId({heroId})에 대한 템플릿을 찾을 수 없습니다.");
+            return;
+        }
+
+        var card = template.cardInfo;
+
+        if (ownedHeroes.ContainsKey(heroId))
+        {
+            // 중복
+            int pieceAmount = HeroDataManager.Instance.GetPieceAmountByRarity(card.rarity);
+            HeroDataManager.Instance.AddHeroPiece(heroId, pieceAmount);
+            HeroDataManager.Instance.SaveHeroData(heroId);
+            Debug.Log($"[GrantHeroById] 중복 영웅 → 조각 {pieceAmount}개 지급: {card.name} (ID: {heroId})");
+        }
+        else
+        {
+            // 신규 영웅
+            AddNewHero(card);
+            SaveHeroData(heroId);
+            Debug.Log($"[GrantHeroById] 신규 영웅 지급 완료: {card.name} (ID: {heroId})");
+        }
+    }
+
 }
