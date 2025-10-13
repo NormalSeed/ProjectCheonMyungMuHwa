@@ -11,9 +11,9 @@ public class MapManager : MonoBehaviour
     [SerializeField] private Transform mapParent;
 
     [Header("테마별 맵 프리팹 이름")]
-    [SerializeField] private string[] mapThemes = { "Map_Stage01", "Map_Stage02", "Map_Stage03" };
+    [SerializeField] private string[] mapThemes = { "Map_Stage01", "Map_Stage02", "Map_Stage03", "Map_Stage04" };
 
-    private int currentStageIndex = 1; // 1스테이지부터 시작
+    public int currentStageIndex = 1; // 1스테이지부터 시작
     private List<GameObject> spawnedMaps = new List<GameObject>(); // 생성된 맵 기록
 
     [SerializeField] private GameObject[] monsterPrefabs; // 몬스터 프리팹
@@ -87,7 +87,7 @@ public class MapManager : MonoBehaviour
     {
         isSpawning = true;
 
-        currentStageIndex++;
+        //currentStageIndex++;
         SpawnStage(currentStageIndex, spawnPosition);
 
         // 한 프레임 기다렸다가 풀어줌
@@ -98,8 +98,8 @@ public class MapManager : MonoBehaviour
 
     private void SpawnStage(int stageIndex, Vector3 spawnPosition)
     {
-        // 몇 번째 테마를 쓸지 결정 (순환 반복)
-        int themeIndex = (stageIndex - 1) % mapThemes.Length;
+        // 몇 번째 테마를 쓸지 결정 (순환 반복, 25스테이지마다)
+        int themeIndex = ((stageIndex - 1) / 25) % mapThemes.Length;
 
         string prefabName = mapThemes[themeIndex];
         GameObject prefab = Resources.Load<GameObject>(prefabName);
@@ -152,6 +152,7 @@ public class MapManager : MonoBehaviour
                 currentMap.transform.position + new Vector3(0, 6.55f, 0),
                 MonsterType.Boss
             );
+            PopupManager.Instance.ShowBossStagePopup(stageIndex);
             return true;
         }
     }
@@ -167,7 +168,7 @@ public class MapManager : MonoBehaviour
         {
             // 보스 클리어 → 다음 스테이지로 이동
             currentStageIndex++;
-            InGameManager.Instance.stageProgress = 0; 
+            //InGameManager.Instance.stageProgress = 0; 
             SpawnStage(currentStageIndex, spawnPosition);
 
             Debug.Log($"스테이지 {currentStageIndex} 시작!");

@@ -21,9 +21,9 @@ public class AdDataSO : ScriptableObject
   }
   public void LoadReward()
   {
-    if (loadedRewardAd != null) loadedInterstitialAd.Destroy();
+    if (loadedRewardAd != null) loadedRewardAd.Destroy();
     AdRequest request = new AdRequest();
-    RewardedAd.Load(interstitial_id, request, (RewardedAd ad, LoadAdError error) =>
+    RewardedAd.Load(reward_id, request, (RewardedAd ad, LoadAdError error) =>
     {
       if (error != null) return;
       loadedRewardAd = ad;
@@ -45,8 +45,11 @@ public class AdDataSO : ScriptableObject
   {
     if (loadedRewardAd == null || !loadedRewardAd.CanShowAd())
     {
-      LoadInterstitial();
+      LoadReward();
     }
-    loadedRewardAd?.Show(r => onAdFinished?.Invoke());
+    if (loadedRewardAd != null)
+      loadedRewardAd.OnAdFullScreenContentClosed += onAdFinished;
+    //loadedRewardAd?.Show(r => onAdFinished?.Invoke());
+    loadedRewardAd?.Show(r => { });
   }
 }

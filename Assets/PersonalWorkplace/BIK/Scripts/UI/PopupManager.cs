@@ -196,14 +196,14 @@ public partial class PopupManager : MonoBehaviour
         }
     }
 
-    public void ShowRewardPopup(List<ItemData> rewards, List<BigCurrency> rewardCount, bool bonus = false, float bonusRate = 0f)
+    public void ShowRewardPopup(List<ItemData> rewards, List<BigCurrency> rewardCount, bool bonus = false, float bonusRate = 0f, int exp = 0)
     {
         if (!_popupDict.TryGetValue(PopupType.RewardPopup, out var uiBase) || uiBase == null) {
             Debug.LogWarning("[PopupManager] Reward 팝업이 등록되지 않았습니다.");
             return;
         }
         if (uiBase is RewardUI rewardUI) {
-            rewardUI.SetShow(rewards, rewardCount, bonus, bonusRate);
+            rewardUI.SetShow(rewards, rewardCount, bonus, bonusRate, exp);
             Debug.Log($"[PopupManager] ShowRewardPopup: {rewards.Count}개 보상");
         }
         else {

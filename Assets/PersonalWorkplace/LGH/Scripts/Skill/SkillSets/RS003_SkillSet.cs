@@ -25,17 +25,21 @@ public class RS003_SkillSet : SkillSet
     private IEnumerator Skill1Routine()
     {
         Transform origin = controller.transform;
+        Transform skillSetTransform = gameObject.transform;
         skill1Effect_1.transform.position = origin.position + offset;
         skill1Effect_1.SetActive(true);
         yield return skill1Interval;
         skill1Effect_1.SetActive(false);
+        skill1Effect_2.transform.SetParent(origin);
         skill1Effect_2.transform.position = origin.position + offset;
         skill1Effect_2.SetActive(true);
         spumC.gameObject.SetActive(false);
+        isSkillPlaying = false;
         yield return skill1Duration;
         spumC.gameObject.SetActive(true);
+        spumC.PlayAnimation(PlayerState.MOVE, 0);
+        skill1Effect_2.transform.SetParent(skillSetTransform);
         skill1Effect_2.SetActive(false);
-        isSkillPlaying = false;
     }
 
     public override void Skill2(Transform target)

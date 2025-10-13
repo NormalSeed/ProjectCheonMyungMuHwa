@@ -6,6 +6,8 @@ using UnityEngine;
 using System;
 using System.Collections;
 
+// current : 현재 접속 시각 기록용
+// last : 마지막 접속 시각
 public class CurrencyDungeonTicketGiver : MonoBehaviour
 {
     string _uid;
@@ -43,7 +45,6 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
             { "current", ServerValue.Timestamp }
         };
         await _dbRef.UpdateChildrenAsync(data);
-
     }
     private async Task LoadTimes()
     {
@@ -76,12 +77,12 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
     }
 
     // 매 시각 상 02:00:00 마다 보상 지급 초기화 (24시간)
-    private bool Compare2()
+    private bool Compare()
     {
         while (last <= current)
         {
             last += new TimeSpan(1, 0, 0);
-            if (last.Hour == 2)
+            if (last.Hour == 0)
             {
                 //조건 성립
                 return true;
@@ -91,7 +92,7 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
     }
 
     // 매 시각 상 5분 마다 보상 지급 초기화
-    private bool Compare()
+    private bool Compare2()
     {
         while (last <= current)
         {
@@ -107,13 +108,9 @@ public class CurrencyDungeonTicketGiver : MonoBehaviour
 
     private IEnumerator AddTicket()
     {
-        CurrencyManager manager = CurrencyManager.Instance;
         int amount = 3;
-        while (manager == null)
-        {
-            yield return null;
-            manager = CurrencyManager.Instance;
-        }
+        yield return new WaitUntil(() => CurrencyManager.Instance != null);
+        CurrencyManager manager = CurrencyManager.Instance;
         BigCurrency gold = manager.Get(CurrencyType.GoldChallengeTicket);
         if (gold.Value < amount)
         {

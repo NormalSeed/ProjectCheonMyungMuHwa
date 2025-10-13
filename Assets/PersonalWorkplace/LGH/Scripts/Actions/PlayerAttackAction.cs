@@ -17,17 +17,28 @@ public partial class PlayerAttackAction : Action
     private PlayerModel model;
     private BehaviorGraphAgent BGagent;
     private SPUM_Prefabs spumC;
+    MonsterController mController;
 
     private float attackDelay;
 
+    private float deadTargetDelay = 0.01f;
+    private float deadTargetTimer = 0f;
+    private bool isWaitingForDeadTarget = false;
+
     protected override Status OnStart()
     {
+        if (Self?.Value == null) return Status.Failure;
         controller = Self.Value.GetComponent<PlayerController>();
+        if (controller == null) return Status.Failure;
         model = Self.Value.GetComponent<PlayerModel>();
         BGagent = Self.Value.GetComponent<BehaviorGraphAgent>();
         spumC = controller.spumController;
 
+        deadTargetTimer = 0f;
+        isWaitingForDeadTarget = false;
+
         Target.Value = GetTarget();
+        mController = Target.Value.GetComponent<MonsterController>();
         // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
 
         return Status.Running;
@@ -87,42 +98,84 @@ public partial class PlayerAttackAction : Action
         if (attackDelay > 0f)
         {
             attackDelay -= Time.deltaTime;
-            return Status.Success;
+            return Status.Running;
         }
 
+        // 타겟 유효성 재확인
+        if (Target?.Value == null)
+        {
+            Target.Value = GetTarget();
+            if (Target.Value == null)
+            {
+                BGagent?.SetVariableValue<bool>("isTargetDetected", false);
+                return Status.Failure;
+            }
+            mController = Target.Value.GetComponent<MonsterController>();
+        }
+
+        // 타겟이 몬스터 컨트롤러를 가지고 있고 죽어있다면 0.1초 대기 후 다음 행동으로
+        if (mController != null && mController.IsDead)
+        {
+            if (!isWaitingForDeadTarget)
+            {
+                // 대기 시작
+                isWaitingForDeadTarget = true;
+                deadTargetTimer = deadTargetDelay;
+            }
+
+            // 대기 중 타이머 감소
+            deadTargetTimer -= Time.deltaTime;
+            if (deadTargetTimer <= 0f)
+            {
+                // 대기 완료 -> 타겟 재탐지 후 행동 종료(성공으로 처리하여 다음 노드로 진행)
+                Target.Value = GetTarget();
+                isWaitingForDeadTarget = false;
+                deadTargetTimer = 0f;
+
+                // 새 타겟이 없으면 targetDetected=false
+                if (Target.Value == null)
+                    BGagent?.SetVariableValue<bool>("isTargetDetected", false);
+
+                return Status.Failure;
+            }
+
+            // 아직 대기 중이면 계속 Running
+            return Status.Running;
+        }
+
+        // 타겟이 유효하고 살아있다면 공격 시도
         if (Target.Value != null && attackDelay <= 0f)
         {
-            Debug.Log("기본 공격 실행");
-
-            controller.target = Target.Value.transform;
-
-            IDamagable target = Target.Value.GetComponent<IDamagable>();
-            MonsterController mController = Target.Value.GetComponent<MonsterController>();
-            if (target != null && mController != null && attackDelay <= 0f)
+            IDamagable dam = Target.Value.GetComponent<IDamagable>();
+            mController = Target.Value.GetComponent<MonsterController>();
+            if (dam != null && mController != null && !mController.IsDead)
             {
+                // 공격 실행
                 FlipTowardsTarget();
                 spumC.PlayAnimation(PlayerState.ATTACK, 0);
-                // 데미지 주기 - 기본공격 데미지 공식 넣어야 함
-                float rawDamage = (float)(model.ExtAtk + model.InnAtk - (mController.Model.BaseModel.finalInnerDefense + mController.Model.BaseModel.finalOuterDefense));
+
+                float rawDamage = (float)(model.ExtAtk + model.InnAtk
+                                 - (mController.Model.BaseModel.finalInnerDefense + mController.Model.BaseModel.finalOuterDefense));
                 float damage = Math.Clamp(rawDamage, 1f, float.MaxValue);
 
                 bool isCritical = UnityEngine.Random.value < controller.model.CritRate;
-                if (isCritical)
-                {
-                    damage *= controller.model.CritDamage;
-                }
+                if (isCritical) damage *= controller.model.CritDamage;
 
-                target.TakeDamage(damage);
+                dam.TakeDamage(damage);
                 mController.isAttackedByNormalAttack = true;
                 controller.damageDealt += damage;
-                controller.synergyUI.UpdateDamageUI();
+                controller.synergyUI?.UpdateDamageUI();
 
-                attackDelay = 1f / model.AttackSpeed;
-                controller.skill2Count--;
+                attackDelay = 1f / Mathf.Max(0.0001f, model.AttackSpeed);
+                controller.skill2Count = Math.Max(0, controller.skill2Count - 1);
+
+                return Status.Success;
             }
             else
             {
-                Debug.Log("데미지를 입힐 수 없는 상대입니다.");
+                // 공격 불가대상인 경우 재탐색 또는 대기
+                Target.Value = GetTarget();
+                return Status.Running;
             }
         }
 
