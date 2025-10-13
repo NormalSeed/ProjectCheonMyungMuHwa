@@ -133,7 +133,7 @@ public class MapManager : MonoBehaviour
 
         var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
 
-        if (stageProgress < 2) // 1, 2 관문 → 일반 몬스터
+        if (stageProgress < InGameManager.MAX_PROGRESS) // 0, 1, 2에서 몬스터만 소환
         {
             foreach (var point in spawnPoints)
             {
@@ -143,11 +143,6 @@ public class MapManager : MonoBehaviour
         }
         else // 3관문 → 보스 추가
         {
-
-            foreach (var point in spawnPoints)
-            {
-                PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
-            }
             PoolManager.Instance.SpawnMonster(
                 currentMap.transform.position + new Vector3(0, 6.55f, 0),
                 MonsterType.Boss
