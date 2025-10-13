@@ -13,6 +13,7 @@ using UnityEngine.UI;
 public class InGameManager : MonoBehaviour
 {
     public static InGameManager Instance;
+    public const int MAX_PROGRESS = 3; 
 
     private List<PlayerController> players;
 
@@ -56,6 +57,7 @@ public class InGameManager : MonoBehaviour
     {
         Instance = this;
         bgmPlayer = new MainSceneBGMPlayer();
+        LoadStageFromFirebase();
     }
 
     private void Start()
@@ -69,8 +71,6 @@ public class InGameManager : MonoBehaviour
 
         alignedNum.Subscribe(ExamineAllAligned);
         monsterDeathStack.Subscribe(CheckMonsterClear);
-
-        LoadStageFromFirebase();
     }
 
     private void Update()
@@ -90,6 +90,20 @@ public class InGameManager : MonoBehaviour
                 isQuitUIActive = true;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            KilAllPlayers();
+        }
+    }
+
+    private void KilAllPlayers()
+    {
+        foreach (PlayerController player in players)
+        {
+            if (player.isDead.Value == true) continue;
+            player.Dead();
+        }
     }
 
     private void LoadStageFromFirebase()
@@ -103,6 +117,7 @@ public class InGameManager : MonoBehaviour
             {
                 int savedStage = int.Parse(task.Result.Value.ToString());
                 stageNum = savedStage;
+                MapManager.Instance.currentStageIndex = savedStage;
                 stageLoaded = true;
                 Debug.Log($"Firebase에서 불러온 스테이지: {stageNum}");
             }
@@ -146,15 +161,7 @@ public class InGameManager : MonoBehaviour
         if (stagetext != null) stagetext.text = stage;
 
         isProcessingAlignment = true;
-        bool isBossSpawned = MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
-        if (isBossSpawned)
-        {
-            stageProgress = 0;
-        }
-        else
-        {
-            stageProgress++;
-        }
+        MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
         StartCoroutine(ResetAlignmentFlag());
         OnStageStart?.Invoke(stageNum, stageProgress);
         bgmPlayer.SetBGM(stageNum);
@@ -164,6 +171,7 @@ public class InGameManager : MonoBehaviour
             player.damageDealt = 0;
         }
         synergyUI.UpdateDamageUI();
+        Debug.Log($"<color=yellow>[igm]{stageProgress}");
     }
     private IEnumerator ResetAlignmentFlag()
     {
@@ -184,7 +192,6 @@ public class InGameManager : MonoBehaviour
 
             alignedNum.Value = 0;
             isProcessingAlignment = false;
-            PoolManager.Instance.GetItems();
             alignPoint.SetActive(false);
 
             Map currentMap = MapManager.Instance.currentMap.GetComponent<Map>();
@@ -192,19 +199,30 @@ public class InGameManager : MonoBehaviour
             {
                 Vector3 nextSpawnPos = currentMap.endPoint.position;
 
-                if (stageProgress < 2) // 아직 보스 전
+                if (stageProgress < MAX_PROGRESS - 1) // 아직 보스 전
+                {
+                    PoolManager.Instance.GetItems();
+                    stageProgress++;
+                    MapManager.Instance.GoToNextStage(nextSpawnPos);
+                }
+                else if (stageProgress == MAX_PROGRESS - 1)
                 {
                     stageProgress++;
-                    MapManager.Instance.GoToNextGate(nextSpawnPos);
+                    MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
+                    OnStageStart?.Invoke(stageNum, stageProgress);
                 }
                 else // 보스 클리어 → 다음 스테이지
                 {
+                    PoolManager.Instance.GetItems();
                     stageProgress = 0;
                     stageNum++;
+                    MapManager.Instance.currentStageIndex = stageNum;
                     SetNextStage();
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
+                    PopupManager.Instance.ShowStageClearPopup();
                 }
             }
+            Debug.Log($"<color=yellow>[igm]{stageProgress}");
         }
     }
 
@@ -244,7 +262,6 @@ public class InGameManager : MonoBehaviour
             ui.SetActionToButton(3, () => { mainUiToOpen = UIType.Summon; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToScreen(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
             ui.SetActionToTimeOut(() => { mainUiToOpen = UIType.None; StartCoroutine(HandleAllPlayersDead()); ui.SetHide(); });
-                
         }
     }
 
@@ -266,9 +283,14 @@ public class InGameManager : MonoBehaviour
         stageProgress = 0;
 
         // 페이드인 전에 플레이어 위치 재배치
+        if (alignPoint.activeInHierarchy == false)
+        {
+            Debug.LogError("정렬 포인트가 활성화되지 않음");
+            alignPoint.SetActive(true);
+        }
         for (int i = 0; i < PartyManager.Instance.players.Count; i++)
         {
-            Transform point = alignPoint.transform.Find($"Point{i}");
+            Transform point = alignPoint.transform.Find($"Point{i + 1}");
             if (point != null)
             {
                 Vector3 offset = new Vector3(0, -0.1f, 0);
@@ -295,7 +317,7 @@ public class InGameManager : MonoBehaviour
         }
 
         // 페이드 인 효과 추가해야함
-        
+
 
         Debug.Log("스테이지 초기화 완료. 재시작 준비됨");
 

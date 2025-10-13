@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using VContainer;
 using VContainer.Unity;
 #region Serializable
@@ -138,7 +139,6 @@ public class HeroDataManager : IStartable
     public void Start()
     {
         Instance = this;
-
         if (FirebaseAuth.DefaultInstance == null || FirebaseAuth.DefaultInstance.CurrentUser == null)
         {
             Debug.LogWarning("[HeroDataManager] FirebaseAuth가 아직 초기화되지 않았습니다. 초기화 대기 중...");
@@ -162,6 +162,7 @@ public class HeroDataManager : IStartable
         Debug.Log("[HeroDataManager] HeroModels 초기화 완료 확인");
 
         LoadHeroDataFromCache();
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
         await LoadHeroDataFromFirebase();
 
         RefreshAllCombatPower();
@@ -192,9 +193,12 @@ public class HeroDataManager : IStartable
     {
         var heroRef = _dbRef.Child("users").Child(_uid).Child("character").Child("charInfo");
         var snapshot = await heroRef.GetValueAsync();
+        Debug.Log(_uid);
+        Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
 
         foreach (var child in snapshot.Children)
         {
+            Debug.Log($"[HeroDataManager] 서버에서 영웅 {ownedHeroes.Count}명 로딩 완료");
             string heroId = child.Key;
             string json = child.GetRawJsonValue();
             var template = heroTemplates.Find(t => t.heroId == heroId);
@@ -245,6 +249,11 @@ public class HeroDataManager : IStartable
         if (!File.Exists(savePath))
         {
             Debug.LogWarning("영웅 캐시 파일이 존재하지 않습니다.");
+            return;
+        }
+        else
+        {
+            File.Delete(savePath);
             return;
         }
 
@@ -367,22 +376,42 @@ public class HeroDataManager : IStartable
         }
 
         var card = hero.cardInfo;
+        
+        card.CritRate = hero.PlayerModelSO.CritRate + hero.PlayerModelSO.CritRate_Increase * (hero.PlayerModelSO.Level-1);
+        card.CritDamage  = hero.PlayerModelSO.CritDamage + hero.PlayerModelSO.CritDamage_Increase * (hero.PlayerModelSO.Level-1);
 
-        return 2.0f * (
-            (card.InnAtkPoint + card.ExtAtkPoint) *
-            (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1)) +
-            1.4f * card.DefPoint + 0.1f * card.HealthPoint
-        );
+        float result = 2.0f * ((card.InnAtkPoint + card.ExtAtkPoint) *
+                (1 + hero.PlayerModelSO.CritRate * (hero.PlayerModelSO.CritDamage - 1))) +
+                1.4f * card.DefPoint + 0.1f * card.HealthPoint;
+
+
+
+        Debug.LogWarning($"[전투력 계산식] : 대상 {card.name}");
+        Debug.LogWarning($"[전투력 계산식] : 내공 {card.InnAtkPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 외공 {card.ExtAtkPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타율 {card.CritRate}");
+        Debug.LogWarning($"[전투력 계산식] : 치명타데미지{card.CritDamage}");
+        Debug.LogWarning($"[전투력 계산식] : 방어력 {card.DefPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 체력 {card.HealthPoint}");
+        Debug.LogWarning($"[전투력 계산식] : 최종 {result}");
+        return result;
     }
 
     private void RefreshAllCombatPower()
     {
         foreach (var hero in ownedHeroes.Values)
         {
+            if (hero == null || hero.cardInfo == null)
+            {
+                Debug.LogWarning($"[CombatPower] 계산 생략: hero 또는 cardInfo가 null입니다. heroId: {hero?.heroId}");
+                continue;
+            }
+
             float power = CalculateCombatPower(hero);
             hero.cardInfo.combatPower = power;
         }
     }
+
 
     public void ApplyHeorStats(EquipmentInstance instance, string charId)
     {
@@ -439,31 +468,6 @@ public class HeroDataManager : IStartable
         return instance;
     }
 
-    public void UpdateGrowthStats(HeroData hero)
-    {
-        if (hero == null || hero.PlayerModelSO == null)
-        {
-            Debug.LogError("[UpdateGrowthStats] HeroData 또는 PlayerModelSO가 null입니다");
-            return;
-        }
-
-        var model = hero.PlayerModelSO;
-
-        // Grade(stage) 반영
-        model.Grade = hero.stage;
-
-        model.Vital = model.Vital_Increase * model.Level;
-        model.ExtPow = model.ExtPow_Increase * model.Level;
-        model.InnPow = model.InnPow_Increase * model.Level;
-        model.CritRate = model.CritRate_Increase * model.Level;
-        model.CritDamage = model.CritDamage_Increase * model.Level;
-
-        model.HealthRatio = model.HealthRatio_Increase * model.Grade;
-        model.AttackRatio = model.AttackRatio_Increase * model.Grade;
-        model.DefRatio = model.DefRatio_Increase * model.Grade;
-
-        Debug.Log($"[UpdateGrowthStats] {hero.heroName} 성장치 계산 완료 (Level={model.Level}, Grade={model.Grade})");
-    }
     public HeroData GetHeroData(string charID)
     {
         if (string.IsNullOrEmpty(charID))
@@ -480,4 +484,34 @@ public class HeroDataManager : IStartable
         Debug.LogWarning($"[GetHeroData] 해당 charID({charID})에 대한 HeroData를 찾을 수 없습니다.");
         return null;
     }
+
+    //  영웅 지급 코드
+    public void GrantHeroById(string heroId)
+    {
+        var template = heroTemplates.Find(t => t.heroId == heroId);
+        if (template == null)
+        {
+            Debug.LogWarning($"[GrantHeroById] 해당 heroId({heroId})에 대한 템플릿을 찾을 수 없습니다.");
+            return;
+        }
+
+        var card = template.cardInfo;
+
+        if (ownedHeroes.ContainsKey(heroId))
+        {
+            // 중복
+            int pieceAmount = HeroDataManager.Instance.GetPieceAmountByRarity(card.rarity);
+            HeroDataManager.Instance.AddHeroPiece(heroId, pieceAmount);
+            HeroDataManager.Instance.SaveHeroData(heroId);
+            Debug.Log($"[GrantHeroById] 중복 영웅 → 조각 {pieceAmount}개 지급: {card.name} (ID: {heroId})");
+        }
+        else
+        {
+            // 신규 영웅
+            AddNewHero(card);
+            SaveHeroData(heroId);
+            Debug.Log($"[GrantHeroById] 신규 영웅 지급 완료: {card.name} (ID: {heroId})");
+        }
+    }
+
 }

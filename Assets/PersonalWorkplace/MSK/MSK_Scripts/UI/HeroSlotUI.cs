@@ -27,15 +27,35 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
         if (info != null)
         {
-            icon.enabled = false; // 로딩 중 잠시 숨김
-            LoadAddressableSprite(info.HeroID + "_face");
+            icon.enabled = false;
+
+            // HeroSprites에서 얼굴 이미지 가져오기
+            if (HeroSprites.Instance != null && HeroSprites.Instance.IsInitialized)
+            {
+                var faceSprite = HeroSprites.Instance.GetCharaterFaceSprite(info.HeroID);
+                if (faceSprite != null)
+                {
+                    icon.sprite = faceSprite;
+                    icon.enabled = true;
+                }
+                else
+                {
+                    Debug.LogWarning($"[HeroSlotUI] 얼굴 이미지 없음: {info.HeroID}");
+                    icon.enabled = false;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[HeroSlotUI] HeroSprites 초기화 안됨 → 얼굴 이미지 로딩 실패");
+                icon.enabled = false;
+            }
         }
         else
         {
-            LoadAddressableSprite("Exception_Sprite");
             icon.enabled = false;
         }
     }
+
 
 
     public void OnBeginDrag(PointerEventData eventData)

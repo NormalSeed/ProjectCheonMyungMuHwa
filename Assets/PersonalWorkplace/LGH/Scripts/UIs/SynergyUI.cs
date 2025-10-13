@@ -188,7 +188,7 @@ public class SynergyUI : MonoBehaviour
             var hero = activeHeros[i];
 
             // 스프라이트 갱신(스프라이트는 전용 스프라이트로 변경해야함)
-            var sprite = HeroSprites.Instance.GetCharacterSprite(hero.charID.Value);
+            var sprite = HeroSprites.Instance.GetCharaterFaceSprite(hero.charID.Value);
             playerIcons[i].color = Color.white;
             playerIcons[i].sprite = sprite;
 

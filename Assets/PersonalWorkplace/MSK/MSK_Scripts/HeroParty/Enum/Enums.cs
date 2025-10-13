@@ -103,3 +103,11 @@ public enum AlertType
     MissionClear,
     ClearStage,
 }
+public enum SkillTag
+{
+    None,           // 태그 없음
+    Single,         // 단일 대상
+    Area,           // 범위
+    Projectile,     // 투사체
+    Summon,         // 소환형
+}

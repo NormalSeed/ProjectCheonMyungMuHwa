@@ -16,10 +16,13 @@ public class NS003_SkillSet : SkillSet
         isSkillPlaying = true;
         spumC.PlayAnimation(PlayerState.OTHER, 0);
         StartCoroutine(Skill1ShieldRoutine());
+        isSkillPlaying = false;
     }
 
     private IEnumerator Skill1ShieldRoutine()
     {
+        Transform origin = gameObject.transform;
+        skill1Effect.transform.SetParent(controller.transform);
         skill1Effect.transform.position = controller.transform.position + offset;
         skill1Effect.SetActive(true);
         controller.ApplyShield(
@@ -27,8 +30,8 @@ public class NS003_SkillSet : SkillSet
             controller.model.InnAtk * skills[0].InnSkillDmg,
             5f);
         yield return new WaitUntil(() => controller.isShieldActive == false);
+        skill1Effect.transform.SetParent(origin);
         skill1Effect.SetActive(false);
-        isSkillPlaying = false;
     }
 
     public override void Skill2(Transform target)

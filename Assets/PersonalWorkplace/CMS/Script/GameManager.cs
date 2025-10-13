@@ -1,10 +1,26 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Firebase.Auth;
+using Firebase.Database;
 using UnityEngine;
 using System;
-using System.Collections.Generic;
+using System.Collections;
+
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    [SerializeField] OfflineRewardDataTableSO table;
+
+    string _uid;
+    DatabaseReference _dbRef;
+    long exitEPO;
+    long currentEPO;
+    int stage;
+
+    DateTime exit;
+    DateTime current;
 
     private void Awake()
     {
@@ -18,7 +34,127 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        CheckOfflineReward();
+        Give();
+    }
+    private async void Give()
+    {
+        _uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        _dbRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users").Child(_uid).Child("rewardTime");
+        await LoadStage();
+        await SaveCurrentTime();
+        await LoadTimes();
+        SetOffineReward();
+        StartCoroutine(ExitTimeRoutine());
+    }
+
+    private async Task SaveCurrentTime()
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>()
+        {
+            { "current", ServerValue.Timestamp }
+        };
+        await _dbRef.UpdateChildrenAsync(data);
+    }
+    private async Task LoadTimes()
+    {
+        DataSnapshot snapshot = await _dbRef.GetValueAsync();
+
+        object obj = snapshot.GetValue(true);
+        Dictionary<string, object> timeDict = obj as Dictionary<string, object>;
+        currentEPO = long.Parse(timeDict["current"].ToString());
+        if (timeDict.ContainsKey("exit"))
+        {
+            exitEPO = long.Parse(timeDict["exit"].ToString());
+        }
+        else
+        {
+            exitEPO = currentEPO;
+        }
+        exit = Epoch2Time(exitEPO);
+        current = Epoch2Time(currentEPO);
+        Debug.Log($"<color=green>마지막 종료시각 : {exit.ToString("yyyy-MM-dd-HH-mm-ss")}</color>");
+        Debug.Log($"<color=green>현재 접속시각 : {current.ToString("yyyy-MM-dd-HH-mm-ss")}</color>");
+    }
+    private async Task LoadStage()
+    {
+        DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.GetReference($"users/{_uid}/stage");
+        DataSnapshot snapshot = await dbRef.GetValueAsync();
+        object saved = snapshot.GetValue(true);
+        if (saved == null)
+        {
+            stage = 1;
+        }
+        else
+        {
+            int savedStage = int.Parse(saved.ToString());
+            stage = savedStage == 0 ? 1 : savedStage;
+        }
+    }
+    private DateTime Epoch2Time(long epo)
+    {
+        DateTime UTC = DateTimeOffset.FromUnixTimeMilliseconds(epo).UtcDateTime;
+        DateTime UTC9 = UTC + new TimeSpan(9, 0, 0);
+        return UTC9;
+        //return UTC_Plus_Nine.ToString("yyyy-MM-dd-HH-mm-ss");
+    }
+
+    private IEnumerator ExitTimeRoutine()
+    {
+        while (true)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "exit", ServerValue.Timestamp }
+            };
+            _dbRef.UpdateChildrenAsync(data);
+            yield return new WaitForSeconds(60f);
+        }
+    }
+
+    private void SetOffineReward()
+    {
+        TimeSpan difference = current - exit;
+        int totalMin = (int)difference.TotalMinutes;
+        if (totalMin < 1) return;
+        OfflineRewardData data = table.Table[stage - 1];
+        data.Multiply(totalMin);
+        Dictionary<CurrencyType, BigCurrency> rewards = new Dictionary<CurrencyType, BigCurrency>();
+        if (data.Gold > 0) rewards.Add(CurrencyType.Gold, new BigCurrency(data.Gold));
+        if (data.Soul > 0) rewards.Add(CurrencyType.Soul, new BigCurrency(data.Soul));
+        if (data.Stone > 0) rewards.Add(CurrencyType.SpiritStone, new BigCurrency(data.Stone));
+        if (data.EquipTicket > 0) rewards.Add(CurrencyType.EquipmentSummonTicket, new BigCurrency(data.EquipTicket));
+        if (data.HeroTicket > 0) rewards.Add(CurrencyType.SummonTicket, new BigCurrency(data.HeroTicket));
+        if (PopupManager.Instance != null)
+        {
+            Debug.Log("[CheckOfflineReward] PopupManager.Instance 발견됨");
+
+            if (PopupManager.Instance.TryGetPopup(PopupType.OfflineRewardPopup, out var popup))
+            {
+                Debug.Log("[CheckOfflineReward] OfflineRewardPopup 찾음");
+
+                if (popup is OfflineRewardUI rewardUI)
+                {
+                    Debug.Log("[CheckOfflineReward] OfflineRewardUI 캐스팅 성공, ShowReward 호출");
+                    rewardUI.ShowReward(rewards, totalMin, data.Exp);
+                    rewardUI.SetShow();
+                }
+                else
+                {
+                    Debug.LogError("[CheckOfflineReward] OfflineRewardPopup이 OfflineRewardUI 타입이 아님");
+                }
+            }
+            else
+            {
+                Debug.LogError("[CheckOfflineReward] PopupManager에서 OfflineRewardPopup 찾기 실패");
+            }
+        }
+        else
+        {
+            Debug.LogError("[CheckOfflineReward] PopupManager.Instance가 없음");
+        }
+
+
+
     }
 
     private void OnApplicationQuit()
@@ -70,7 +206,7 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("[CheckOfflineReward] OfflineRewardUI 캐스팅 성공, ShowReward 호출");
                     popup.SetShow();
-                    rewardUI.ShowReward(rewards);
+                    //rewardUI.ShowReward(rewards);
                 }
                 else
                 {

@@ -13,6 +13,10 @@ public class DungeonLevelCard : MonoBehaviour
     [SerializeField] Button startButton;
     [SerializeField] Image currencyImage;
 
+    [SerializeField] Image buttonSprite;
+    [SerializeField] Sprite disableButtonSprite;
+    [SerializeField] Sprite enableButtonSprite;
+
     private CurrencyDungeonData data;
 
     private CurrencyDungeonType type;
@@ -38,6 +42,7 @@ public class DungeonLevelCard : MonoBehaviour
     public void SetStageCleared(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
         ButtonText.text = "소탕하기";
+        buttonSprite.sprite = enableButtonSprite;
         locker.SetActive(false);
         startButton.onClick.AddListener(() =>
         {
@@ -48,6 +53,7 @@ public class DungeonLevelCard : MonoBehaviour
     public void SetStageAvailable(UnityAction<CurrencyDungeonData, CurrencyDungeonType> act)
     {
         ButtonText.text = "도전하기";
+        buttonSprite.sprite = enableButtonSprite;
         locker.SetActive(false);
         startButton.onClick.AddListener(() =>
         {
@@ -58,8 +64,10 @@ public class DungeonLevelCard : MonoBehaviour
     }
     public void SetStageLocked()
     {
-        ButtonText.text = "입장불가";
+        ButtonText.text = "도전불가";
+        buttonSprite.sprite = disableButtonSprite;
         locker.SetActive(true);
+        startButton.onClick.RemoveAllListeners();
     }
     void OnDisable()
     {

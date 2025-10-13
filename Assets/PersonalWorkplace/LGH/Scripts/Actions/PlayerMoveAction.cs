@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -21,11 +20,17 @@ public partial class PlayerMoveAction : Action
     private AlignPoint alignPoint;
     private Transform targetPoint;
 
+    private PartyManager partyManager;
+    private InGameManager inGameManager;
+
     protected override Status OnStart()
     {
         controller = Self.Value.GetComponent<PlayerController>();
         NMagent = Self.Value.GetComponent<NavMeshAgent>();
         spumC = controller.spumController;
+
+        partyManager = PartyManager.Instance;
+        inGameManager = InGameManager.Instance;
 
         Self.Value.transform.localScale = Vector3.one;
 
@@ -72,7 +77,12 @@ public partial class PlayerMoveAction : Action
                     controller.hasAligned = true;
                 }
 
-                int activeMemberCount = PartyManager.Instance.MembersID.Count(member => member != null);
+                int activeMemberCount = 0;
+                var members = partyManager.MembersID;
+                for (int i = 0; i < members.Count; i++)
+                {
+                    if (members[i] != null) activeMemberCount++;
+                }
 
                 // 모든 캐릭터가 정렬됐는지 확인
                 if (InGameManager.Instance.alignedNum.Value >= activeMemberCount)//PartyManager.Instance.partyMembers.Count
@@ -90,7 +100,7 @@ public partial class PlayerMoveAction : Action
 
     protected override void OnEnd()
     {
-        Debug.Log($"현재 정렬된 플레이어 수 : {InGameManager.Instance.alignedNum.Value}");
+        Debug.Log($"현재 정렬된 플레이어 수 : {inGameManager.alignedNum.Value}");
     }
 }
 

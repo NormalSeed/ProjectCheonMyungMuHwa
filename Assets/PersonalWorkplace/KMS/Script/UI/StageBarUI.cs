@@ -13,7 +13,8 @@ public class StageBarUI : MonoBehaviour
 
     public CurrencyDungeonTimer Timer => timer;
 
-    private StageBarFill targetMonsterFill;
+    public StageBarFill TargetMonsterFill;
+    public StageBarFill TargetBossFill;
 
 
     void Start()
@@ -23,23 +24,24 @@ public class StageBarUI : MonoBehaviour
             InGameManager.Instance.OnStageStart += SetStage;
             InGameManager.Instance.OnStageStart += SpawnStagePanel;
         }
+        timer.OnTimeOver += KillAllPlayer;
     }
 
-    private void SetStage(int door, int progress) // 첫번째 몬스터 나왔을때 1부터 3까지, 보스 나왔을때 0
+    private void SetStage(int door, int progress) // 수정 : 0 1 2에서 몬스터 3에서 보스
     {
         stageValueText.text = door.ToString();
-
-        switch (progress)
+        if (progress < InGameManager.MAX_PROGRESS)
         {
-            case 0: BossSetting(); break;
-            case 1: case 2: case 3: MonsterSetting(progress); break;
+            MonsterSetting(progress);
+        }
+        else
+        {
+            BossSetting();
         }
     }
     private void SpawnStagePanel(int door, int progress)
     {
-        if (progress != 1) return;
-        int last = door % 1;
-        if (last == 0) PopupManager.Instance.ShowStagePopup(door);
+        if (progress == 0) PopupManager.Instance.ShowStagePopup(door);
     }
 
     private void BossSetting()
@@ -50,38 +52,38 @@ public class StageBarUI : MonoBehaviour
         {
             f.Inactivate();
         }
-        targetMonsterFill = bossFill;
-        targetMonsterFill.Activate();
-        targetMonsterFill.SetValue(1);
+        TargetBossFill = bossFill;
+        TargetBossFill.Activate();
+        TargetBossFill.SetValue(1);
+        TargetMonsterFill = null;
     }
-    private void MonsterSetting(int progress)
+    private void MonsterSetting(int progress) //0 1 2
     {
         timer.Inactivate();
         healthText.gameObject.SetActive(false);
         bossFill.Inactivate();
-        targetMonsterFill = monsterFills[progress - 1];
-        for (int i = 0; i < progress - 1; i++)
+        TargetMonsterFill = monsterFills[progress];
+        TargetBossFill = null;
+        for (int i = 0; i < monsterFills.Length; i++)
         {
-            monsterFills[i].Activate();
-            monsterFills[i].SetValue(1);
-        }
-        targetMonsterFill.Activate();
-        targetMonsterFill.SetValue(0);
-        for (int i = progress; i < monsterFills.Length; i++)
-        {
-            monsterFills[i].SetValue(0);
-            monsterFills[i].Inactivate();
-        }
-    }
+            if (i < progress)
+            {
+                monsterFills[i].Activate();
+                monsterFills[i].SetValue(1);
 
-    public void SetFill(float val)
-    {
-        targetMonsterFill.SetValue(val);
+            }
+            else if (i == progress)
+            {
+                monsterFills[i].Activate();
+                monsterFills[i].SetValue(0);
+            }
+            else
+            {
+                monsterFills[i].SetValue(0);
+                monsterFills[i].Inactivate();
+            }
 
-    }
-    public void AddFill(float val)
-    {
-        targetMonsterFill.AddValue(val);
+        }
     }
 
     public void SetCurrencyDungeon(CurrencyDungeonType type)
@@ -99,6 +101,14 @@ public class StageBarUI : MonoBehaviour
     public void SetHealthBarText(BigCurrency current, BigCurrency Initial)
     {
         healthText.text = $"{current} / {Initial}";
+    }
+
+    private void KillAllPlayer()
+    {
+        foreach (PlayerController p in PartyManager.Instance.players)
+        {
+            if (!p.isDead.Value) p.TakeDamage(float.MaxValue);
+        }
     }
 
 

@@ -143,12 +143,13 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     {
         onDeath?.Invoke();
         InGameManager.Instance.monsterDeathStack.Value--;
-        barUI.AddFill(1f / 12);
+        barUI.TargetMonsterFill?.AddValue(1f / 12);
         if (attackCo != null) StopCoroutine(attackCo);
         deathCo = StartCoroutine(DeathRoutine());
         AudioManager.Instance.PlaySound("Monster_Dead");
         QuestManager.Instance.UpdateQuest("Monster", 1);
         QuestManager.Instance.ReportEvent(QuestTargetType.Monster, 1);
+        PlayerProfileManager.Instance?.AddExp(Model.BaseModel.Exp);
     }
     public abstract void OnAttack(GameObject me, IDamagable target);
     protected abstract IEnumerator RealAttackRoutine(IDamagable target);
