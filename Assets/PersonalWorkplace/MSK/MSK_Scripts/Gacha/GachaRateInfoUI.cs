@@ -1,11 +1,10 @@
+using Firebase.Database;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Firebase.Database;
-using System.Collections.Generic;
-using Mono.Cecil;
 
 public class GachaRateInfoUI : MonoBehaviour
 {
@@ -101,6 +100,14 @@ public class GachaRateInfoUI : MonoBehaviour
             var legendPanel = GetLegendPanel();
             if (legendPanel != null)
                 legendPanel.SetActive(summonLevel != SummonLevel.level01);
+
+            if (summonCategory == SummonCategory.heroList)
+            {
+                foreach (var card in heroRateCards)
+                {
+                    card.SetHeroText();
+                }
+            }
         }
     }
 
@@ -284,7 +291,7 @@ public class GachaRateInfoUI : MonoBehaviour
 
 
         rateTexts[0].text = $"총합 {rate.Normal * 100f:F2}%";
-        rateTexts[1].text = $"총합 {rate.Rare * 100f:F2}%"; 
+        rateTexts[1].text = $"총합 {rate.Rare * 100f:F2}%";
         rateTexts[2].text = $"총합 {rate.Unique * 100f:F2}%";
         rateTexts[3].text = $"총합 {rate.Epic * 100f:F2}%";
     }
