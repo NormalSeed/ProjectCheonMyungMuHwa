@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -17,4 +18,7 @@ public class CardInfo : ScriptableObject
     public float ExtAtkPoint;               // 표기 외공
     public float InnAtkPoint;               // 표기 내공
     public float DefPoint;                  // 표기 방어
+    public float CritRate;                  // 표기 치명타율
+    public float CritDamage;                // 표기 치명타 배율
+    public List<SkillDisplayDataSO> skillDisplayList; // 스킬 표기
 }

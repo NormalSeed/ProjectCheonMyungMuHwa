@@ -42,6 +42,10 @@ public class HeroInfoUI : UIBase
     [SerializeField] private GameObject heroInfoPanel;     // 자신의 오브젝트 정보
     [SerializeField] private GameObject equipPanel;
     [SerializeField] private HeroUI heroUI;
+
+    [Header("SkillBox")]
+    [SerializeField] private SkillDisplayUI skillBox1;     // 메인 스킬 정보
+    [SerializeField] private SkillDisplayUI skillBox2;     // 서브 스킬 정보
     #endregion
 
     #region SO Properties
@@ -81,7 +85,31 @@ public class HeroInfoUI : UIBase
     {
         ButtonAddListener();
         RefreshHeroUI();
+        SetSkillInfo();
     }
+
+    private void SetSkillInfo()
+    {
+        if (heroData == null || heroData.cardInfo == null || heroData.cardInfo.skillDisplayList == null)
+        {
+            Debug.LogWarning("HeroData 또는 CardInfo 또는 SkillDisplayList가 null입니다.");
+            return;
+        }
+
+        var skillList = heroData.cardInfo.skillDisplayList;
+
+        if (skillList.Count > 0 && skillList[0] != null)
+            skillBox1.InitSkill(skillList[0]);
+        else
+            Debug.LogWarning("SkillDisplayList[0]이 null이거나 존재하지 않습니다.");
+
+        if (skillList.Count > 1 && skillList[1] != null)
+            skillBox2.InitSkill(skillList[1]);
+        else
+            Debug.LogWarning("SkillDisplayList[1]이 null이거나 존재하지 않습니다.");
+    }
+
+
     private void SetEquipment()
     {
         SetEquipmentSettings();
@@ -121,8 +149,8 @@ public class HeroInfoUI : UIBase
         outPow.text = ExtAtkPoint.ToString();
         inPow.text = InnAtkPoint.ToString();
         power.text = CountingHeroPower();
-        exp.text = $"{requireSoul} / {CurrencyManager.Instance.Model.Get(CurrencyType.Soul)}";
-        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $"{requirePiece} / {ownerPiece}";
+        exp.text = $"{CurrencyManager.Instance.Model.Get(CurrencyType.Soul)} / {requireSoul}";
+        heroPiece.text = heroData.stage >= 5 ? "돌파 불가능" : $" {ownerPiece} / {requirePiece}";
     }
     private void SetCharacter()
     {
@@ -200,7 +228,6 @@ public class HeroInfoUI : UIBase
             AudioManager.Instance.PlaySound("0.레벨업, 전투력 상승, 미션 완료, 스테이지 클리어 사운드");
             //  레벨업
             heroData.PlayerModelSO.Level++;
-            HeroDataManager.Instance.UpdateGrowthStats(heroData);
             GameEvents.HeroLevelChanged(heroData.PlayerModelSO.Level);
             // 전투력 계산
             StatModifierManager.ApplyToCard(heroData.cardInfo);
@@ -254,7 +281,6 @@ public class HeroInfoUI : UIBase
         heroData.stage++;
         heroData.heroPiece = ownerPiece;
         heroData.PlayerModelSO.Grade = heroData.stage;
-        HeroDataManager.Instance.UpdateGrowthStats(heroData);
         // 전투력 계산
         StatModifierManager.ApplyToCard(heroData.cardInfo);
         Debug.LogWarning($"랩업 후 {heroData.cardInfo.combatPower}");
