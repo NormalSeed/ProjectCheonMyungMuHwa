@@ -90,9 +90,25 @@ public class HeroInfoUI : UIBase
 
     private void SetSkillInfo()
     {
-        skillBox1.InitSkill(heroData.cardInfo.skillDisplayList[0]);
-        skillBox2.InitSkill(heroData.cardInfo.skillDisplayList[1]);
+        if (heroData == null || heroData.cardInfo == null || heroData.cardInfo.skillDisplayList == null)
+        {
+            Debug.LogWarning("HeroData 또는 CardInfo 또는 SkillDisplayList가 null입니다.");
+            return;
+        }
+
+        var skillList = heroData.cardInfo.skillDisplayList;
+
+        if (skillList.Count > 0 && skillList[0] != null)
+            skillBox1.InitSkill(skillList[0]);
+        else
+            Debug.LogWarning("SkillDisplayList[0]이 null이거나 존재하지 않습니다.");
+
+        if (skillList.Count > 1 && skillList[1] != null)
+            skillBox2.InitSkill(skillList[1]);
+        else
+            Debug.LogWarning("SkillDisplayList[1]이 null이거나 존재하지 않습니다.");
     }
+
 
     private void SetEquipment()
     {
