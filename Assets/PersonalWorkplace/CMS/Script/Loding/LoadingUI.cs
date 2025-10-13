@@ -9,6 +9,8 @@ public class LoadingUI : MonoBehaviour
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private GameObject tapToStartText;
 
+    public string Text {get => progressText.text; set => progressText.text = value; }
+
     private CanvasGroup tapToStartCanvasGroup;
     private bool isBlinking = false;
 

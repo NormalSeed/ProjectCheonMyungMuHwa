@@ -27,14 +27,16 @@ public class StageBarUI : MonoBehaviour
         timer.OnTimeOver += KillAllPlayer;
     }
 
-    private void SetStage(int door, int progress) // 수정 : 0 1에서 몬스터 2에서 보스+몬스터
+    private void SetStage(int door, int progress) // 수정 : 0 1 2에서 몬스터 3에서 보스
     {
         stageValueText.text = door.ToString();
-
-        switch (progress)
+        if (progress < InGameManager.MAX_PROGRESS)
         {
-            case 0: case 1: MonsterSetting(progress); break;
-            case 2: BossSetting(); break;
+            MonsterSetting(progress);
+        }
+        else
+        {
+            BossSetting();
         }
     }
     private void SpawnStagePanel(int door, int progress)
@@ -55,7 +57,7 @@ public class StageBarUI : MonoBehaviour
         TargetBossFill.SetValue(1);
         TargetMonsterFill = null;
     }
-    private void MonsterSetting(int progress) //0 1
+    private void MonsterSetting(int progress) //0 1 2
     {
         timer.Inactivate();
         healthText.gameObject.SetActive(false);

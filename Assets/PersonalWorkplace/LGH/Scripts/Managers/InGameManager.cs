@@ -13,6 +13,7 @@ using UnityEngine.UI;
 public class InGameManager : MonoBehaviour
 {
     public static InGameManager Instance;
+    public const int MAX_PROGRESS = 3; 
 
     private List<PlayerController> players;
 
@@ -160,7 +161,7 @@ public class InGameManager : MonoBehaviour
         if (stagetext != null) stagetext.text = stage;
 
         isProcessingAlignment = true;
-        bool isBossSpawned = MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
+        MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
         StartCoroutine(ResetAlignmentFlag());
         OnStageStart?.Invoke(stageNum, stageProgress);
         bgmPlayer.SetBGM(stageNum);
@@ -191,7 +192,6 @@ public class InGameManager : MonoBehaviour
 
             alignedNum.Value = 0;
             isProcessingAlignment = false;
-            PoolManager.Instance.GetItems();
             alignPoint.SetActive(false);
 
             Map currentMap = MapManager.Instance.currentMap.GetComponent<Map>();
@@ -199,13 +199,21 @@ public class InGameManager : MonoBehaviour
             {
                 Vector3 nextSpawnPos = currentMap.endPoint.position;
 
-                if (stageProgress < 2) // 아직 보스 전
+                if (stageProgress < MAX_PROGRESS - 1) // 아직 보스 전
                 {
+                    PoolManager.Instance.GetItems();
                     stageProgress++;
                     MapManager.Instance.GoToNextStage(nextSpawnPos);
                 }
+                else if (stageProgress == MAX_PROGRESS - 1)
+                {
+                    stageProgress++;
+                    MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
+                    OnStageStart?.Invoke(stageNum, stageProgress);
+                }
                 else // 보스 클리어 → 다음 스테이지
                 {
+                    PoolManager.Instance.GetItems();
                     stageProgress = 0;
                     stageNum++;
                     MapManager.Instance.currentStageIndex = stageNum;
