@@ -87,12 +87,12 @@ public class IntroSceneManager : MonoBehaviour
 
         guestLoginButton.onClick.AddListener(() =>
         {
-            BackendManager.Instance.SignInAsGuestAsync();
+            BackendManager.Instance.SignInAsGuest();
         });
 
         serviceAgreementButton.onClick.AddListener(() =>
         {
-            serviceAgreementCheck.enabled = !serviceAgreementButton.enabled;
+            serviceAgreementCheck.enabled = !serviceAgreementCheck.enabled;
             UpdateAgreeButtonState();
         });
 

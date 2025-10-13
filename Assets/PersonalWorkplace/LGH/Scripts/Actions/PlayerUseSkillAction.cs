@@ -66,6 +66,7 @@ public partial class PlayerUseSkillAction : Action
 
         for (int i = 0; i < monsters.Length; i++)
         {
+            MonsterController monsterController = monsters[i].GetComponent<MonsterController>();
             var m = monsters[i];
             if (m == null) continue;
             var mc = m.GetComponent<MonsterController>();

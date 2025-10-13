@@ -58,6 +58,10 @@ public partial class PlayerAttackAction : Action
         foreach (GameObject monster in monsters)
         {
             float distance = Vector3.Distance(selfPosition, monster.transform.position);
+            MonsterController monsterController = monster.GetComponent<MonsterController>();
+
+            if (monsterController.IsDead) continue;
+            
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -136,7 +140,7 @@ public partial class PlayerAttackAction : Action
                 if (Target.Value == null)
                     BGagent?.SetVariableValue<bool>("isTargetDetected", false);
 
-                return Status.Failure;
+                return Status.Success;
             }
 
             // 아직 대기 중이면 계속 Running
