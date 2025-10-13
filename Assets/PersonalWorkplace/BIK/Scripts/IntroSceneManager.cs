@@ -188,14 +188,14 @@ public class IntroSceneManager : MonoBehaviour
             yield return new WaitUntil(() => loginCompleted);
         }
 
-        Debug.Log("[IntroScene] 로그인 & 데이터 로드 완료!");
+        SetText("[IntroScene] 로그인 & 데이터 로드 완료!");
 
         // 테이블 로딩 대기
         if (scope != null)
         {
             var tableManager = scope.Container.Resolve<TableManager>();
             yield return new WaitUntil(() => tableManager.AllInitialized);
-            Debug.Log("[IntroScene] 모든 테이블 로딩 완료!");
+            SetText("[IntroScene] 모든 테이블 로딩 완료!");
         }
 
         // 장비 매니저 초기화 대기
@@ -203,7 +203,8 @@ public class IntroSceneManager : MonoBehaviour
         {
             var equipmentManager = scope.Container.Resolve<EquipmentManager>();
             yield return new WaitUntil(() => equipmentManager.IsInitialized);
-            Debug.Log("[IntroScene] 장비 매니저 초기화 완료!");
+            SetText("[IntroScene] 장비 매니저 초기화 완료!");
+
         }
 
         if (scope != null)
@@ -211,15 +212,15 @@ public class IntroSceneManager : MonoBehaviour
             var heroModels = scope.Container.Resolve<HeroModels>();
             heroModels.Init();
             yield return new WaitUntil(() => heroModels.IsInitialized);
-            Debug.Log("[IntroScene] 영웅 Model SO 로딩 완료!");
+            SetText("[IntroScene] 영웅 Model SO 로딩 완료!");
         }
 
         if (scope != null)
         {
             var heroDataManager = scope.Container.Resolve<HeroDataManager>();
-            Debug.Log("[IntroScene] 영웅 데이터 매니저 초기화 대기 시작");
+            SetText("[IntroScene] 영웅 데이터 매니저 초기화 대기 시작");
             yield return new WaitUntil(() => heroDataManager.IsInitialized);
-            Debug.Log("[IntroScene] 영웅 데이터 매니저 초기화 완료!");
+            SetText("[IntroScene] 영웅 데이터 매니저 초기화 완료!");
         }
 
         if (scope != null)
@@ -227,7 +228,7 @@ public class IntroSceneManager : MonoBehaviour
             var heroSkillSets = scope.Container.Resolve<HeroSkillSets>();
             heroSkillSets.Init();
             yield return new WaitUntil(() => heroSkillSets.IsInitialized);
-            Debug.Log("[IntroScene] 영웅 스킬셋 로딩 완료!");
+            SetText("[IntroScene] 영웅 스킬셋 로딩 완료!");
         }
 
         if (scope != null)
@@ -235,7 +236,7 @@ public class IntroSceneManager : MonoBehaviour
             var heroSprites = scope.Container.Resolve<HeroSprites>();
             heroSprites.Init();
             yield return new WaitUntil(() => heroSprites.IsInitialized);
-            Debug.Log("[IntroScene] 영웅 스프라이트 로딩 완료!");
+            SetText("[IntroScene] 영웅 스프라이트 로딩 완료!");
         }
 
         if (scope != null)
@@ -244,7 +245,7 @@ public class IntroSceneManager : MonoBehaviour
             {
                 monsterLoader.Init();
                 yield return new WaitUntil(() => monsterLoader.IsInitialized);
-                Debug.Log("[IntroScene] 몬스터 로딩 완료!");
+                SetText("[IntroScene] 몬스터 로딩 완료!");
             }
         }
         if (scope != null)
@@ -253,7 +254,7 @@ public class IntroSceneManager : MonoBehaviour
             {
                 audioManager.Init();
                 yield return new WaitUntil(() => audioManager.IsInitialized);
-                Debug.Log("[IntroScene] 사운드 로딩 완료!");
+                SetText("[IntroScene] 사운드 로딩 완료!");
             }
         }
         if (scope != null)
@@ -262,7 +263,7 @@ public class IntroSceneManager : MonoBehaviour
             {
                 particleManager.Init();
                 yield return new WaitUntil(() => particleManager.IsInitialized);
-                Debug.Log("[IntroScene] 파티클 로딩 완료!");
+                SetText("[IntroScene] 파티클 로딩 완료!");
             }
         }
 
@@ -307,5 +308,11 @@ public class IntroSceneManager : MonoBehaviour
         loadingUI.gameObject.SetActive(false);
 
         asyncOperation.allowSceneActivation = true;
+    }
+    private void SetText(string text)
+    {
+        Debug.Log(text);
+        loadingUI.Text = text;
+
     }
 }
