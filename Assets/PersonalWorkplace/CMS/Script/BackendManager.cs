@@ -39,10 +39,10 @@ public class BackendManager : MonoBehaviour
             SceneManager.sceneLoaded += OnSceneLoaded;
 
             //  여기서 Init 보장
-            FirebaseApp app = FirebaseApp.DefaultInstance;
-            FirebaseAuth auth = FirebaseAuth.DefaultInstance;
-            FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
-            Init(app, auth, db);
+            //FirebaseApp app = FirebaseApp.DefaultInstance;
+            //FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+            //FirebaseDatabase db = FirebaseDatabase.DefaultInstance;
+            //Init(app, auth, db);
         }
         else
         {
@@ -111,11 +111,16 @@ public class BackendManager : MonoBehaviour
         PlayGamesPlatform.Activate();
 
         Debug.Log("GPGS 초기화 완료, 자동 로그인 시도...");
-        _ = SignInWithGPGSAsync().ContinueWith(t =>
-        {
-            if (t.IsFaulted)
-                Debug.LogError("SignInWithGPGSAsync 실패: " + t.Exception);
-        }, TaskScheduler.FromCurrentSynchronizationContext());
+        //try
+        //{
+        //    await SignInWithGPGSAsync();
+        //    Debug.Log("GPGS 로그인 성공");
+        //}
+        //catch (Exception ex)
+        //{
+        //    Debug.LogError("SignInWithGPGSAsync 실패: " + ex);
+        //}
+        SignInWithGPGS();
     }
 
     public void SignInWithGPGS()
