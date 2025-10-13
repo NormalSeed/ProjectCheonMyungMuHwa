@@ -14,15 +14,16 @@ public class SkillDisplayUI : MonoBehaviour
 
     [Header("Skill Data")]
     public SkillDisplayDataSO skillData;
-
-    private void OnEnable()
+    private string GetKoreanTagText(SkillTag tag)
     {
-        
-    }
-
-    private void OnDisable()
-    {
-        
+        return tag switch
+        {
+            SkillTag.Single => "단일",
+            SkillTag.Area => "범위",
+            SkillTag.Projectile => "투사체",
+            SkillTag.Summon => "소환",
+            _ => string.Empty
+        };
     }
 
     public void InitSkill(SkillDisplayDataSO data)
@@ -62,7 +63,7 @@ public class SkillDisplayUI : MonoBehaviour
         else
         {
             tagObject.SetActive(true);
-            tagText.text = tag.ToString();
+            tagText.text = GetKoreanTagText(tag);
         }
     }
 }
