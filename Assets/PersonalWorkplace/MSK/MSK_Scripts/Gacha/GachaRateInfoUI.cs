@@ -1,10 +1,10 @@
+using Firebase.Database;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Firebase.Database;
-using System.Collections.Generic;
 
 public class GachaRateInfoUI : MonoBehaviour
 {
@@ -25,10 +25,19 @@ public class GachaRateInfoUI : MonoBehaviour
     [SerializeField] private GameObject heroContents;
     [SerializeField] private GameObject equipContents;
 
+    [SerializeField] private List<HeroRateInfoSetting> heroRateCards;
+
     private SummonCategory summonCategory;
 
     private DatabaseReference _dbRef;
     private string _uid;
+
+
+    public string normalRate;           // 노말 확률
+    public string rareRate;             // 레어 확률
+    public string uniqueRate;           // 유니크 확률
+    public string LegendaryRate;        // 전설 확률
+
 
     private class RateData
     {
@@ -50,7 +59,6 @@ public class GachaRateInfoUI : MonoBehaviour
     {
         heroList = 1,
         equipmentList = 2,
-        PetList = 3,
     }
 
     #region Unity
@@ -70,8 +78,19 @@ public class GachaRateInfoUI : MonoBehaviour
             levelButtons[i].onClick.AddListener(() => OnLevelButtonClicked(index));
         }
         exitButton.onClick.AddListener(OnClickExit);
+        int userLevel = 0;
 
-        int userLevel = await GetUserSummonLevelAsync();
+        if ((int)summonCategory == 1)
+            userLevel = await GetUserSummonLevelAsync("summonCount");
+        else
+            userLevel = await GetUserSummonLevelAsync("equipsummonLevel");
+
+        if (userLevel == 0)
+        {
+            Debug.Log("소환레벨 설정 안됨");
+            return;
+        }
+
         if (Enum.IsDefined(typeof(SummonLevel), userLevel))
         {
             SummonLevel summonLevel = (SummonLevel)userLevel;
@@ -81,6 +100,14 @@ public class GachaRateInfoUI : MonoBehaviour
             var legendPanel = GetLegendPanel();
             if (legendPanel != null)
                 legendPanel.SetActive(summonLevel != SummonLevel.level01);
+
+            if (summonCategory == SummonCategory.heroList)
+            {
+                foreach (var card in heroRateCards)
+                {
+                    card.SetHeroText();
+                }
+            }
         }
     }
 
@@ -123,7 +150,16 @@ public class GachaRateInfoUI : MonoBehaviour
         var legendPanel = GetLegendPanel();
         if (legendPanel != null)
             legendPanel.SetActive(summonLevel != SummonLevel.level01);
+
+        if ((int)summonCategory != 1)
+            return;
+
+        foreach (var card in heroRateCards)
+        {
+            card.SetHeroText();
+        }
     }
+
 
     private void OnClickExit()
     {
@@ -163,9 +199,9 @@ public class GachaRateInfoUI : MonoBehaviour
         };
     }
 
-    private async Task<int> GetUserSummonLevelAsync()
+    private async Task<int> GetUserSummonLevelAsync(string type)
     {
-        var snap = await _dbRef.Child("users").Child(_uid).Child("profile").Child("summonLevel").GetValueAsync();
+        var snap = await _dbRef.Child("users").Child(_uid).Child("profile").Child($"{type}").GetValueAsync();
         if (snap == null || !snap.Exists)
         {
             Debug.LogWarning($"[GachaRateInfoUI] summonLevel 정보 없음: {_uid}");
@@ -201,7 +237,6 @@ public class GachaRateInfoUI : MonoBehaviour
         {
             SummonCategory.heroList => "heroList",
             SummonCategory.equipmentList => "equipmentList",
-            SummonCategory.PetList => "petList",
             _ => "heroList"
         };
 
@@ -249,10 +284,16 @@ public class GachaRateInfoUI : MonoBehaviour
             epic = count.Epic > 0 ? rate.Epic / count.Epic : 0f;
         }
 
-        rateTexts[0].text = $"각각 {normal * 100f:F3}%";
-        rateTexts[1].text = $"각각 {rare * 100f:F3}%";
-        rateTexts[2].text = $"각각 {unique * 100f:F3}%";
-        rateTexts[3].text = $"각각 {epic * 100f:F3}%";
+        normalRate = $"{normal * 100f:F2}%";
+        rareRate = $"{rare * 100f:F2}%";
+        uniqueRate = $"{epic * 100f:F2}%";
+        LegendaryRate = $"{unique * 100f:F2}%";
+
+
+        rateTexts[0].text = $"총합 {rate.Normal * 100f:F2}%";
+        rateTexts[1].text = $"총합 {rate.Rare * 100f:F2}%";
+        rateTexts[2].text = $"총합 {rate.Unique * 100f:F2}%";
+        rateTexts[3].text = $"총합 {rate.Epic * 100f:F2}%";
     }
 
     private async Task LoadRateDataAsync(SummonLevel summonLevel)
@@ -265,6 +306,5 @@ public class GachaRateInfoUI : MonoBehaviour
 
         UpdateRateUI(rate, count);
     }
-
     #endregion
 }

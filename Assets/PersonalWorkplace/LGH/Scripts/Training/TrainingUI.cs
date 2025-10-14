@@ -189,6 +189,15 @@ public class TrainingUI : UIBase
         int innLevel = training.trainingLevels.GetValueOrDefault(TrainingType.InnAtk, 0) - 200 * (training.trainingTier - 1);
         int hpLevel = training.trainingLevels.GetValueOrDefault(TrainingType.HP, 0) - 200 * (training.trainingTier - 1);
 
+        if (extLevel >= 200 && innLevel >= 200 && hpLevel >= 200 && training.CanUpgradeTrainingTier())
+        {
+            training.UpgradeTrainingTier();
+            Debug.Log("모든 훈련 레벨이 200에 도달하여 자동으로 티어가 업그레이드되었습니다.");
+            extLevel = training.trainingLevels.GetValueOrDefault(TrainingType.ExtAtk, 0);
+            innLevel = training.trainingLevels.GetValueOrDefault(TrainingType.InnAtk, 0);
+            hpLevel = training.trainingLevels.GetValueOrDefault(TrainingType.HP, 0);
+        }
+
         extLevelText.text = $"Lv. {extLevel}";
         innLevelText.text = $"Lv. {innLevel}";
         HPLevelText.text = $"Lv. {hpLevel}";

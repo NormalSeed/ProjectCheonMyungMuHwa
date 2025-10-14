@@ -13,6 +13,7 @@ public class HeroSprites : MonoBehaviour
 
     private Dictionary<string, Sprite> spriteLookup = new();
     private Dictionary<string, Sprite> standingLookup = new();
+    private Dictionary<string, Sprite> faceSpriteLookup = new();
 
     private List<string> charIDs = new List<string>
     {
@@ -54,9 +55,12 @@ public class HeroSprites : MonoBehaviour
         foreach (var id in ids)
         {
             string spriteId = id + "_sprite";
+            string faceId = id + "_face";
+            var faceHandle = Addressables.LoadAssetAsync<Sprite>(faceId);
             var handle = Addressables.LoadAssetAsync<Sprite>(spriteId);
             
             yield return handle;
+            yield return faceHandle;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
@@ -79,6 +83,17 @@ public class HeroSprites : MonoBehaviour
             {
                 Debug.LogError($"스프라이트 로딩 실패: {id}");
             }
+
+            if (faceHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                var faceSprite = faceHandle.Result;
+                faceSpriteLookup[id] = faceSprite;
+                Debug.Log($"[HeroSprites] 얼굴 이미지 로드 완료: {id}");
+            }
+            else
+            {
+                Debug.LogError($"얼굴 이미지 로딩 실패: {id}");
+            }
         }
 
         IsInitialized = true;
@@ -93,6 +108,10 @@ public class HeroSprites : MonoBehaviour
     public Sprite GetCharacterStanding(string charID)
     {
         standingLookup.TryGetValue(charID, out var sprite);
+
+    public Sprite GetCharaterFaceSprite(string charID)
+    {
+        faceSpriteLookup.TryGetValue(charID, out var sprite);
         return sprite;
     }
 }

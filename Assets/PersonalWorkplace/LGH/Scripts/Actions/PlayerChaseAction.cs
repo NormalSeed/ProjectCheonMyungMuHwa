@@ -72,6 +72,8 @@ public partial class PlayerChaseAction : Action
 
         foreach (GameObject monster in monsters)
         {
+            MonsterController monsterController = monster.GetComponent<MonsterController>();
+
             if (monster == null || !monster.activeInHierarchy) continue;
             var mCtrl = monster.GetComponent<MonsterController>();
             if (mCtrl != null && mCtrl.IsDead) continue;

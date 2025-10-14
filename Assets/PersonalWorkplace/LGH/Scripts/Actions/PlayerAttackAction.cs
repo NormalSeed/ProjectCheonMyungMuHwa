@@ -38,8 +38,10 @@ public partial class PlayerAttackAction : Action
         isWaitingForDeadTarget = false;
 
         Target.Value = GetTarget();
-        mController = Target.Value.GetComponent<MonsterController>();
-        // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
+        if (Target.Value != null)
+        {
+            mController = Target.Value.GetComponent<MonsterController>();
+        }
 
         return Status.Running;
     }
@@ -58,6 +60,10 @@ public partial class PlayerAttackAction : Action
         foreach (GameObject monster in monsters)
         {
             float distance = Vector3.Distance(selfPosition, monster.transform.position);
+            MonsterController monsterController = monster.GetComponent<MonsterController>();
+
+            if (monsterController.IsDead) continue;
+
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -179,6 +185,7 @@ public partial class PlayerAttackAction : Action
             }
         }
 
+        Target.Value = GetTarget();
         return Status.Success;
     }
 

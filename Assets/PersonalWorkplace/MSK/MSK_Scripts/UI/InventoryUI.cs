@@ -107,13 +107,18 @@ public class InventoryUI : UIBase
 
         // 이벤트 연결
         if (!_eventsHooked && InventoryManager.Instance != null) {
+            // 인벤토리 초기화/테이블 준비 완료 상태면 즉시 풀 리프레시
             if (InventoryManager.Instance.IsInitialized && _itemTableReady) {
                 RefreshAllSlots();
             }
             else {
                 InventoryManager.OnInitialized += RefreshAllSlots;
             }
-            InventoryManager.Instance.OnItemChanged += OnItemChanged; // (string, int)
+
+            // 개별 변경 + 스냅샷 동기화 모두 구독
+            InventoryManager.Instance.OnItemChanged += OnItemChanged;     // (string, int)
+            InventoryManager.Instance.OnBulkSynced += RefreshAllSlots;    // 전체 리프레시
+
             _eventsHooked = true;
         }
     }
@@ -126,6 +131,7 @@ public class InventoryUI : UIBase
         if (_eventsHooked && InventoryManager.Instance != null) {
             InventoryManager.OnInitialized -= RefreshAllSlots;
             InventoryManager.Instance.OnItemChanged -= OnItemChanged;
+            InventoryManager.Instance.OnBulkSynced -= RefreshAllSlots;
         }
         _eventsHooked = false;
     }
@@ -180,53 +186,48 @@ public class InventoryUI : UIBase
     {
         if (!_itemTableReady) return;
 
-        if (!int.TryParse(itemIdKey, out int itemIdInt)) {
-            // 문자열 키는 슬롯에서 제거 시도
+        bool updated = false;
+
+        // 숫자형 키만 처리 (문자열 키는 전체 리프레시로 커버)
+        if (int.TryParse(itemIdKey, out int itemIdInt)) {
+            // 기존 슬롯 갱신
             for (int i = 0; i < _itemSlots.Count; i++) {
                 var slot = _itemSlots[i];
-                if (slot.Data != null && slot.Data.Id.ToString() == itemIdKey) {
-                    slot.SetEmpty();
-                    if (_selectedSlot == slot) {
-                        _selectedSlot = null;
-                        _itemUseScrollbar.value = 0;
-                        _useCount = 1;
+                if (slot.Data != null && slot.Data.Id == itemIdInt) {
+                    if (count > 0) {
+                        slot.SetItem(slot.Data, BigCurrency.FromBaseAmount(count));
                     }
-                    UpdateUseButtonInteractable();
-                    return;
-                }
-            }
-            return;
-        }
-
-        for (int i = 0; i < _itemSlots.Count; i++) {
-            var slot = _itemSlots[i];
-            if (slot.Data != null && slot.Data.Id == itemIdInt) {
-                if (count > 0) {
-                    slot.SetItem(slot.Data, BigCurrency.FromBaseAmount(count));
-                }
-                else {
-                    slot.SetEmpty();
-                    if (_selectedSlot == slot) {
-                        _selectedSlot = null;
-                        _itemUseScrollbar.value = 0;
-                        _useCount = 1;
+                    else {
+                        slot.SetEmpty();
+                        if (_selectedSlot == slot) {
+                            _selectedSlot = null;
+                            _itemUseScrollbar.value = 0;
+                            _useCount = 1;
+                        }
                     }
-                }
-                UpdateUseButtonInteractable();
-                return;
-            }
-        }
-
-        if (count > 0) {
-            var data = _itemTable.GetItem(itemIdInt);
-            if (data == null) return;
-
-            foreach (var slot in _itemSlots) {
-                if (slot.Data == null) {
-                    slot.SetItem(data, BigCurrency.FromBaseAmount(count));
+                    updated = true;
                     break;
                 }
             }
+
+            // 새 아이템 추가 시도
+            if (!updated && count > 0) {
+                var data = _itemTable.GetItem(itemIdInt);
+                if (data != null) {
+                    foreach (var slot in _itemSlots) {
+                        if (slot.Data == null) {
+                            slot.SetItem(data, BigCurrency.FromBaseAmount(count));
+                            updated = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 안전망: 구조가 바뀌었거나 슬롯을 못 찾은 경우 전체 리프레시
+        if (!updated) {
+            RefreshAllSlots();
         }
 
         UpdateUseButtonInteractable();
@@ -271,7 +272,7 @@ public class InventoryUI : UIBase
 
         // 일반 아이템 사용
         if (InventoryManager.Instance.TryUse(invKey, _useCount)) {
-            // OnItemChanged에서 갱신됨
+            // OnItemChanged/OnBulkSynced에서 갱신됨
         }
         UpdateUseButtonInteractable();
 

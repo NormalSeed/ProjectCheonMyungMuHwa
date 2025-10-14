@@ -14,7 +14,7 @@ public enum ModifierSource
 }
 
 public class StatModifier
-{   
+{
     public StatType statType;       //어떤 능력치에 영향을 주는지 결정하는 필드
     public float value;             // 증감값
     public ModifierSource source;   //Modifier의 출처(장비, 시너지 등)
@@ -110,7 +110,7 @@ public static class StatModifierManager
         Debug.Log($"[코루틴 끝] modifierCache.Keys: {string.Join(", ", modifierCache.Keys)}");
         RemoveModifiersByOrigin(charID, originID);
         Debug.Log("버프 제거됨.");
-        
+
         ApplyToModel(model);
     }
 
@@ -122,7 +122,7 @@ public static class StatModifierManager
     public static void RemoveModifiersByOrigin(string charID, string originID)
     {
         if (!modifierCache.ContainsKey(charID))
-        { 
+        {
             Debug.Log("charID가 없는디요?");
             return;
         }
@@ -248,17 +248,70 @@ public static class StatModifierManager
 
         string charID = card.HeroID;
 
-        // 기본 스탯 계산 (성장치 + 계수 기반)
-        float baseHealth = (modelSO.Vital + modelSO.Vital_Increase * modelSO.Grade) * (modelSO.HealthRatio + modelSO.HealthRatio_Increase * modelSO.Grade);
-        float baseExtAtk = (modelSO.ExtPow + modelSO.ExtPow_Increase * modelSO.Grade) * (modelSO.AttackRatio + modelSO.AttackRatio_Increase * modelSO.Grade);
-        float baseInnAtk = (modelSO.InnPow + modelSO.InnPow_Increase * modelSO.Grade) * (modelSO.AttackRatio + modelSO.AttackRatio_Increase * modelSO.Grade);
-        float baseDef = (modelSO.Vital + modelSO.Vital_Increase * modelSO.Grade) * (modelSO.DefRatio + modelSO.DefRatio_Increase * modelSO.Grade);
+        float baseHealth = modelSO.Vital;
+        float baseInn = modelSO.InnPow;
+        float baseExt = modelSO.ExtPow;
+        float baseDef = baseInn + baseExt;
+
+        float levelHealth = 0f;
+        float levelExt = 0f;
+        float levelInn = 0f;
+        float stageHealth = 0f;
+        float stageExt = 0f;
+        float stageInn = 0f;
+        float finalHealth = 0f;
+        float finalExt = 0f;
+        float finalInn = 0f;
+        float levelDef = 0f;
+        float stageDef = 0f;
+
+        float finalDef = 0f;
+
+        if (modelSO.Level != 1f)
+        {
+            levelHealth = baseHealth * (1 + modelSO.Vital_Increase * (modelSO.Level - 1)) - baseHealth;
+            levelExt = baseExt * (1 + modelSO.ExtPow_Increase * (modelSO.Level - 1)) - baseExt;
+            levelInn = baseInn * (1 + modelSO.InnPow_Increase * (modelSO.Level - 1)) - baseInn;
+        }
+
+        if (modelSO.Grade != 1f)
+        {
+            stageHealth = baseHealth * modelSO.HealthRatio_Increase * (modelSO.Grade - 1);
+            stageExt = baseExt * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
+            stageInn = baseInn * modelSO.AttackRatio_Increase * (modelSO.Grade - 1);
+        }
+
+
+
+
+        finalHealth = baseHealth + levelHealth + stageHealth;
+        finalExt = baseExt + levelExt + stageExt;
+        finalInn = baseInn + levelInn + stageInn;
+
+        if (modelSO.Level != 1f)
+        {
+            levelDef = finalExt * modelSO.DefRatio_Increase * (modelSO.Level - 1)
+                     + finalInn * modelSO.DefRatio_Increase * (modelSO.Level - 1);
+        }
+
+        if (modelSO.Grade != 1f)
+        {
+            stageDef = finalExt * modelSO.DefRatio_Increase * (modelSO.Grade - 1)
+                     + finalInn * modelSO.DefRatio_Increase * (modelSO.Grade - 1);
+        }
+
+        finalDef = finalExt + finalInn + stageDef + levelDef;
+
+        Debug.LogWarning($"[전투력 계산식] : 기반 체력 {modelSO.Vital}, 레벨, {levelHealth}, 돌파 {stageHealth}, 최종{finalHealth}");
+        Debug.LogWarning($"[전투력 계산식] : 기반 외공 {modelSO.ExtPow}, 레벨, {levelExt}, 돌파 {stageExt}, 최종{finalExt}");
+        Debug.LogWarning($"[전투력 계산식] : 기반 내공 {modelSO.InnPow}, 레벨, {levelInn}, 돌파 {stageInn}, 최종{finalInn}");
+        Debug.LogWarning($"[전투력 계산식] : 기반 방어력 {baseDef}, 레벨, {levelDef}, 돌파, {stageDef}, 최종 {finalDef}");
 
         // Modifier 반영
-        card.HealthPoint = baseHealth + GetCardModifier(charID, StatType.Health, baseHealth);
-        card.ExtAtkPoint = baseExtAtk + GetCardModifier(charID, StatType.ExtAtk, baseExtAtk);
-        card.InnAtkPoint = baseInnAtk + GetCardModifier(charID, StatType.InnAtk, baseInnAtk);
-        card.DefPoint = baseDef + GetCardModifier(charID, StatType.Defense, baseDef);
+        card.HealthPoint = finalHealth + GetCardModifier(charID, StatType.Health, finalHealth);
+        card.ExtAtkPoint = finalExt + GetCardModifier(charID, StatType.ExtAtk, finalExt);
+        card.InnAtkPoint = finalInn + GetCardModifier(charID, StatType.InnAtk, finalInn);
+        card.DefPoint = finalDef + GetCardModifier(charID, StatType.Defense, finalDef);
 
         Debug.Log($"[ApplyToCard] {card.HeroName} 전투력 적용됨: {card.HealthPoint} / {card.ExtAtkPoint} /{card.InnAtkPoint} / {card.DefPoint} ");
         // 전투력 계산
