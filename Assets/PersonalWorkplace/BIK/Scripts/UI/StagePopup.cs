@@ -6,6 +6,7 @@ public class StagePopup : UIBase
 {
     [SerializeField] private GameObject _alertObject;
     [SerializeField] private TMP_Text _stageText;
+    [SerializeField] private GameObject _warning;
 
     [Header("AnimSettings")]
     [SerializeField] private float _slideTime = 1.5f;
@@ -50,6 +51,9 @@ public class StagePopup : UIBase
     {
         KillTween();
         base.SetShow();
+
+        if (stage % 25 == 0) _warning.gameObject.SetActive(true);
+        else _warning.gameObject.SetActive(false);
 
         _stageText.text = $"스테이지 {stage}";
 
