@@ -33,6 +33,13 @@ public class SynergyUI : MonoBehaviour
 
     [SerializeField] private Button damageDealtButton;
 
+    [Header("합격스킬 설명")]
+    [SerializeField] private Button synergySkillExplainButton;
+    [SerializeField] private Button synergySkillExplainCloseButton;
+    [SerializeField] private GameObject synergySkillExplain;
+    [SerializeField] private List<GameObject> synergySkillTexts;
+    private int currentExplainIndex = -1;
+
     private bool canUseSynergySkill;
     [SerializeField] private float coolTime;
 
@@ -60,6 +67,9 @@ public class SynergyUI : MonoBehaviour
 
         synergyButton.onClick.AddListener(OnClickSynergyButton);
         damageDealtButton.onClick.AddListener(OnClickDamageDealtButton);
+
+        synergySkillExplainButton.onClick.AddListener(OnClickSynergySkillExplainButton);
+        synergySkillExplainCloseButton.onClick.AddListener(OnClickSynergySkillExplainCloseButton);
 
         UpdateDamageUI();
     }
@@ -101,6 +111,34 @@ public class SynergyUI : MonoBehaviour
         UpdateDamageUI();
     }
 
+    private void OnClickSynergySkillExplainButton()
+    {
+        if (!synergySkillExplain.activeInHierarchy)
+        {
+            synergySkillExplain.SetActive(true);
+
+            // 모든 텍스트 끄고 현재 진영 텍스트만 켜기
+            for (int i = 0; i < synergySkillTexts.Count; i++)
+            {
+                synergySkillTexts[i].SetActive(i == currentExplainIndex);
+            }
+        }
+
+        synergySkillExplainButton.gameObject.SetActive(false);
+    }
+
+    private void OnClickSynergySkillExplainCloseButton()
+    {
+        synergySkillExplain.SetActive(false);
+        synergySkillExplainButton.gameObject.SetActive(true);
+
+        // 모든 설명 텍스트 끄기
+        foreach (var text in synergySkillTexts)
+        {
+            text.SetActive(false);
+        }
+    }
+
     public void UpdateSynergyUI(List<SynergyInfo> synergyInfos)
     {
         foreach (var slot in slots)
@@ -131,22 +169,39 @@ public class SynergyUI : MonoBehaviour
         }
 
         Dictionary<HeroFaction, int> iconIndexMap = new()
-    {
-        { HeroFaction.J, 0 },
-        { HeroFaction.S, 1 },
-        { HeroFaction.M, 2 }
-    };
+        {
+            { HeroFaction.J, 0 },
+            { HeroFaction.S, 1 },
+            { HeroFaction.M, 2 }
+        };
 
         if (!iconIndexMap.TryGetValue(selected.faction, out int iconIndex) || iconIndex >= synergySkillIcons.Count)
         {
             synergySkillButton.interactable = false;
             buttonImage.enabled = false;
+            synergySkillExplainButton.gameObject.SetActive(false);
             return;
         }
 
         buttonImage.sprite = synergySkillIcons[iconIndex];
         buttonImage.enabled = true;
         synergySkillButton.interactable = true;
+        synergySkillExplainButton.gameObject.SetActive(true);
+
+        currentExplainIndex = -1; // 초기화
+
+        switch (selected.faction)
+        {
+            case HeroFaction.J:
+                currentExplainIndex = 0;
+                break;
+            case HeroFaction.S:
+                currentExplainIndex = 1;
+                break;
+            case HeroFaction.M:
+                currentExplainIndex = 2;
+                break;
+        }
 
         // 버튼 클릭 이벤트 연결
         var skill = synergySkills.FirstOrDefault(s => s.faction == selected.faction);
