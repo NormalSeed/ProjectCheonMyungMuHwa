@@ -98,19 +98,6 @@ public partial class PlayerMoveAction : Action
     protected override Status OnUpdate()
     {
         detectTimer -= Time.deltaTime;
-        if (detectTimer <= 0f)
-        {
-            detectTimer = detectInterval;
-            // 간단한 근접 몬스터 탐색
-            GameObject found = GetClosestAliveMonsterWithinSearchRange();
-            if (found != null)
-            {
-                // Behavior Graph 변수로 타겟 존재 알림 또는 직접 상태 변경
-                BGagent?.SetVariableValue<bool>("isTargetDetected", true);
-                BGagent?.SetVariableValue<string>("CurState", "Attack"); // CurState 타입이 string일 때
-                return Status.Failure; // 또는 Success: 트리 구조에 맞게 선택
-            }
-        }
 
         if (!NMagent.pathPending && NMagent.remainingDistance <= NMagent.stoppingDistance)
         {
@@ -137,6 +124,20 @@ public partial class PlayerMoveAction : Action
                 }
 
                 return Status.Running; // 나만 도착했음 -> 대기
+            }
+        }
+
+        if (detectTimer <= 0f)
+        {
+            detectTimer = detectInterval;
+            // 간단한 근접 몬스터 탐색
+            GameObject found = GetClosestAliveMonsterWithinSearchRange();
+            if (found != null)
+            {
+                // Behavior Graph 변수로 타겟 존재 알림 또는 직접 상태 변경
+                BGagent?.SetVariableValue<bool>("isTargetDetected", true);
+                BGagent?.SetVariableValue<string>("CurState", "Attack"); // CurState 타입이 string일 때
+                return Status.Failure; // 또는 Success: 트리 구조에 맞게 선택
             }
         }
 
