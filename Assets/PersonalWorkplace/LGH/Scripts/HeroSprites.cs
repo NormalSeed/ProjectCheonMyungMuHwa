@@ -11,6 +11,7 @@ public class HeroSprites : MonoBehaviour
     public List<Sprite> Sprites = new();
 
     private Dictionary<string, Sprite> spriteLookup = new();
+    private Dictionary<string, Sprite> standingSpriteLookup = new();
     private Dictionary<string, Sprite> faceSpriteLookup = new();
 
     private List<string> charIDs = new List<string>
@@ -54,10 +55,15 @@ public class HeroSprites : MonoBehaviour
         {
             string spriteId = id + "_sprite";
             string faceId = id + "_face";
+            string standingId = id + "_standing";
+
             var faceHandle = Addressables.LoadAssetAsync<Sprite>(faceId);
             var handle = Addressables.LoadAssetAsync<Sprite>(spriteId);
+            var Standnghandle = Addressables.LoadAssetAsync<Sprite>(standingId);
+            
             yield return handle;
             yield return faceHandle;
+            yield return Standnghandle;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
@@ -66,9 +72,16 @@ public class HeroSprites : MonoBehaviour
                 spriteLookup[id] = sprite;
                 Debug.Log($"[HeroSprites] 스프라이트 로드 완료: {id}");
             }
+
+            if (Standnghandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                var sprite = Standnghandle.Result;
+                standingSpriteLookup[id] = sprite;
+                Debug.Log($"[HeroSprites] 전신 스프라이트 로드 완료: {id}");
+            }
             else
             {
-                Debug.LogError($"스프라이트 로딩 실패: {id}");
+                Debug.LogError($"전신 스프라이트 로딩 실패: {id}");
             }
 
             if (faceHandle.Status == AsyncOperationStatus.Succeeded)
@@ -90,6 +103,12 @@ public class HeroSprites : MonoBehaviour
     public Sprite GetCharacterSprite(string charID)
     {
         spriteLookup.TryGetValue(charID, out var sprite);
+        return sprite;
+    }
+
+    public Sprite GetCharacterStandingSprite(string charID)
+    {
+        standingSpriteLookup.TryGetValue(charID, out var sprite);
         return sprite;
     }
 
