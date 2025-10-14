@@ -154,7 +154,7 @@ public class HeroInfoUI : UIBase
     }
     private void SetCharacter()
     {
-        characterRoot.sprite = HeroSprites.Instance.GetCharacterSprite(heroData.heroId);
+        characterRoot.sprite = HeroSprites.Instance.GetCharacterStandingSprite(heroData.heroId);
     }
     private void SetBadge()
     {

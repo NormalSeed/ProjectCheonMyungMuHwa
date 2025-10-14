@@ -9,7 +9,6 @@ public class HeroSprites : MonoBehaviour
     public static HeroSprites Instance { get; private set; }
 
     public List<Sprite> Sprites = new();
-    public List<Sprite> Standing = new();
 
     private Dictionary<string, Sprite> spriteLookup = new();
     private Dictionary<string, Sprite> standingSpriteLookup = new();
