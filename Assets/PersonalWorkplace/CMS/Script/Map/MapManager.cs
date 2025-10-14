@@ -116,7 +116,7 @@ public class MapManager : MonoBehaviour
             currentMap = newMap;
             GetAlignPoint();
 
-            if (spawnedMaps.Count > 10)
+            if (spawnedMaps.Count > 5)
             {
                 GameObject oldMap = spawnedMaps[0];
                 spawnedMaps.RemoveAt(0);
