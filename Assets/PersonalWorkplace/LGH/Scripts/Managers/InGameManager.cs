@@ -157,8 +157,19 @@ public class InGameManager : MonoBehaviour
 
     public void ExamineAllAligned(int num)
     {
+        playerCount = 0;
+        foreach (var player in players)
+        {
+            if (player.gameObject.activeInHierarchy)
+            {
+                playerCount++;
+            }
+        }
+
         if (isProcessingAlignment || num < playerCount) return;
         if (stagetext != null) stagetext.text = stage;
+
+        Debug.LogError("aligned 검사 통과");
 
         isProcessingAlignment = true;
         MapManager.Instance.SpawnMonsters(stageNum, stageProgress);
