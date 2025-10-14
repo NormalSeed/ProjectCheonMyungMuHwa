@@ -30,11 +30,15 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
+
+    }
+    public void InitStage()
+  {
         SpawnStage(currentStageIndex, Vector3.zero);
 
         if (spawnedMaps.Count > 0)
         {
-            currentMap = spawnedMaps[spawnedMaps.Count - 1]; 
+            currentMap = spawnedMaps[spawnedMaps.Count - 1];
             Transform alignRoot = currentMap.transform.Find("AlignPoint");
             InGameManager.Instance.alignPoint = alignRoot?.gameObject;
 
@@ -42,7 +46,7 @@ public class MapManager : MonoBehaviour
             {
                 for (int i = 0; i < PartyManager.Instance.players.Count; i++)
                 {
-                    Transform point = alignRoot.Find($"Point{i}"); 
+                    Transform point = alignRoot.Find($"Point{i}");
                     if (point != null)
                     {
                         var player = PartyManager.Instance.players[i];
@@ -66,7 +70,7 @@ public class MapManager : MonoBehaviour
                 Debug.LogWarning("AlignPoint를 찾을 수 없습니다.");
             }
         }
-    }
+  }
 
     public void GetAlignPoint()
     {
@@ -129,6 +133,7 @@ public class MapManager : MonoBehaviour
 
     public bool SpawnMonsters(int stageIndex, int stageProgress)
     {
+        
         PoolManager.Instance.SetMonsterState(stageIndex);
 
         var spawnPoints = currentMap.GetComponentsInChildren<SpawnPoint>();
@@ -139,6 +144,7 @@ public class MapManager : MonoBehaviour
             {
                 PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
             }
+            Debug.Log("[MapManager] Monster Spawn");
             return false;
         }
         else // 3관문 → 보스 추가

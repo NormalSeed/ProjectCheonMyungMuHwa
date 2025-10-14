@@ -7,13 +7,12 @@ using UnityEngine.UI;
 public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private HeroSlotUI heroSlotPrefab; // 슬롯 프리팹
-
+    [SerializeField] private Sprite circles;
     private GameObject dragVisual;
     private Canvas canvas;
     public int slotIndex; // MembersID 리스트의 인덱스
     public Image icon;
     public CardInfo cardInfo;
-
 
     private void Start()
     {
@@ -52,7 +51,7 @@ public class HeroSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         }
         else
         {
-            icon.enabled = false;
+            icon.sprite = circles;
         }
     }
 
