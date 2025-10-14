@@ -38,8 +38,10 @@ public partial class PlayerAttackAction : Action
         isWaitingForDeadTarget = false;
 
         Target.Value = GetTarget();
-        mController = Target.Value.GetComponent<MonsterController>();
-        // Target으로부터 IDamagable을 받아와 데미지를 줄 수 있는지 체크
+        if (Target.Value != null)
+        {
+            mController = Target.Value.GetComponent<MonsterController>();
+        }
 
         return Status.Running;
     }
@@ -61,7 +63,7 @@ public partial class PlayerAttackAction : Action
             MonsterController monsterController = monster.GetComponent<MonsterController>();
 
             if (monsterController.IsDead) continue;
-            
+
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -140,7 +142,7 @@ public partial class PlayerAttackAction : Action
                 if (Target.Value == null)
                     BGagent?.SetVariableValue<bool>("isTargetDetected", false);
 
-                return Status.Success;
+                return Status.Failure;
             }
 
             // 아직 대기 중이면 계속 Running
@@ -183,6 +185,7 @@ public partial class PlayerAttackAction : Action
             }
         }
 
+        Target.Value = GetTarget();
         return Status.Success;
     }
 
