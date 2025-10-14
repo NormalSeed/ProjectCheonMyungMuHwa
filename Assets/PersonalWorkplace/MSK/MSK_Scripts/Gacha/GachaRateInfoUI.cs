@@ -26,6 +26,7 @@ public class GachaRateInfoUI : MonoBehaviour
     [SerializeField] private GameObject equipContents;
 
     [SerializeField] private List<HeroRateInfoSetting> heroRateCards;
+    [SerializeField] private List<EquipRateSetting> equipRateSettings;
 
     private SummonCategory summonCategory;
 
@@ -108,6 +109,13 @@ public class GachaRateInfoUI : MonoBehaviour
                     card.SetHeroText();
                 }
             }
+            else if (summonCategory == SummonCategory.equipmentList)
+            {
+                foreach (var equip in equipRateSettings)
+                {
+                    equip.Init();
+                }
+            }
         }
     }
 
@@ -151,12 +159,19 @@ public class GachaRateInfoUI : MonoBehaviour
         if (legendPanel != null)
             legendPanel.SetActive(summonLevel != SummonLevel.level01);
 
-        if ((int)summonCategory != 1)
-            return;
-
-        foreach (var card in heroRateCards)
+        if (summonCategory == SummonCategory.heroList)
         {
-            card.SetHeroText();
+            foreach (var card in heroRateCards)
+            {
+                card.SetHeroText();
+            }
+        }
+        else if (summonCategory == SummonCategory.equipmentList)
+        {
+            foreach (var equip in equipRateSettings)
+            {
+                equip.Init();
+            }
         }
     }
 
@@ -284,16 +299,16 @@ public class GachaRateInfoUI : MonoBehaviour
             epic = count.Epic > 0 ? rate.Epic / count.Epic : 0f;
         }
 
-        normalRate = $"{normal * 100f:F2}%";
-        rareRate = $"{rare * 100f:F2}%";
-        uniqueRate = $"{epic * 100f:F2}%";
-        LegendaryRate = $"{unique * 100f:F2}%";
+        normalRate = $"{normal * 100f:F3}%";
+        rareRate = $"{rare * 100f:F3}%";
+        uniqueRate = $"{epic * 100f:F3}%";
+        LegendaryRate = $"{unique * 100f:F3}%";
 
 
-        rateTexts[0].text = $"총합 {rate.Normal * 100f:F2}%";
-        rateTexts[1].text = $"총합 {rate.Rare * 100f:F2}%";
-        rateTexts[2].text = $"총합 {rate.Unique * 100f:F2}%";
-        rateTexts[3].text = $"총합 {rate.Epic * 100f:F2}%";
+        rateTexts[0].text = $"총합 {rate.Normal * 100f:F3}%";
+        rateTexts[1].text = $"총합 {rate.Rare * 100f:F3}%";
+        rateTexts[2].text = $"총합 {rate.Unique * 100f:F3}%";
+        rateTexts[3].text = $"총합 {rate.Epic * 100f:F3}%";
     }
 
     private async Task LoadRateDataAsync(SummonLevel summonLevel)
