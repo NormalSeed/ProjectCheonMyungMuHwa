@@ -1,179 +1,150 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-/// <summary>
-/// 퀘스트 진행 상태에 따라 튜토리얼 인디케이터(손가락 애니메이션)를 제어하는 매니저
-/// </summary>
 public class TutorialManager : MonoBehaviour
 {
-    public static TutorialManager Instance { get; private set; }
+    public static TutorialManager Instance;
 
-    [Header("인디케이터 프리팹 (손가락 애니메이션)")]
-    [SerializeField] private GameObject fingerIndicatorPrefab;
-
-    [Header("인디케이터 부모 오브젝트 (씬 내 고정)")]
+    [SerializeField] private GameObject fingerPrefab;
     [SerializeField] private Transform indicatorRoot;
+    [SerializeField] private List<TutorialScenario> tutorialScenarios;
 
-    private Dictionary<string, GameObject> indicatorMap = new Dictionary<string, GameObject>();
-    private GameObject currentIndicator;
+    private List<TutorialStep> steps;
+    private int currentStepIndex;
+    private GameObject fingerInstance;
+    private CanvasGroup previousHighlight;
 
-    private readonly List<string> tutorialPriorityOrder = new List<string>
+    private void Awake() => Instance = this;
+
+    public void StartTutorial(string questID)
+    {
+        Debug.Log($"[튜토리얼] StartTutorial 호출됨: {questID}");
+
+        var scenario = tutorialScenarios.Find(s => s.QuestID == questID);
+        if (scenario == null)
+        {
+            Debug.LogWarning($"[튜토리얼] {questID} 시나리오 없음");
+            return;
+        }
+
+        Debug.Log($"[튜토리얼] {questID} 시나리오 찾음, 단계 수: {scenario.Steps.Count}");
+
+        foreach (var step in scenario.Steps)
+        {
+            var obj = GameObject.Find(step.FingerPosName);
+            if (obj != null)
+            {
+                step.Target = obj.transform;
+                Debug.Log($"[튜토리얼] {step.FingerPosName} 연결 완료");
+            }
+            else
+            {
+                Debug.LogWarning($"[튜토리얼] {step.FingerPosName} 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+
+        steps = scenario.Steps;
+        currentStepIndex = 0;
+        Debug.Log("[튜토리얼] ShowStep 호출 시작");
+        ShowStep();
+    }
+
+    private void ShowStep()
+    {
+        if (currentStepIndex >= steps.Count)
+        {
+            EndTutorial();
+            return;
+        }
+
+        var step = steps[currentStepIndex];
+
+        if (fingerInstance == null)
+            fingerInstance = Instantiate(fingerPrefab, indicatorRoot);
+
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, step.Target.position);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            indicatorRoot as RectTransform,
+            screenPos,
+            null,
+            out Vector2 localPos
+        );
+        fingerInstance.GetComponent<RectTransform>().anchoredPosition = localPos + (Vector2)step.Offset;
+
+        if (previousHighlight != null)
+            previousHighlight.interactable = false;
+
+        CanvasGroup cg = step.Target.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.interactable = true;
+            previousHighlight = cg;
+        }
+
+        if (step.WaitForClick)
+            StartCoroutine(WaitForClick(step.Target));
+        else if (step.Condition != null)
+            StartCoroutine(WaitForCondition(step.Condition));
+    }
+
+    private IEnumerator WaitForClick(Transform target)
+    {
+        Button btn = target.GetComponent<Button>();
+        if (btn != null)
+        {
+            bool clicked = false;
+            btn.onClick.AddListener(() => clicked = true);
+            yield return new WaitUntil(() => clicked);
+            btn.onClick.RemoveAllListeners();
+        }
+        else
+        {
+            yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+        }
+        NextStep();
+    }
+
+    private IEnumerator WaitForCondition(System.Func<bool> condition)
+    {
+        yield return new WaitUntil(() => condition());
+        NextStep();
+    }
+
+    private void NextStep()
+    {
+        currentStepIndex++;
+        ShowStep();
+    }
+
+    private void EndTutorial()
+    {
+        if (fingerInstance != null)
+            fingerInstance.SetActive(false);
+        if (previousHighlight != null)
+            previousHighlight.interactable = false;
+
+        Debug.Log("튜토리얼 완료!");
+    }
+}
+
+public enum TutorialWaitType { Click, Condition }
+[System.Serializable]
+public class TutorialStep
 {
-    "QT001",
-    "QT002",
-    "QT003",
-    "QT004",
-    "QT005",
-    "QT006",
-    "QT007",
-    "QT008",
-    "QT009",
-    "QT010",
-    "QT011"
-};
+    public string Id;
+    public string FingerPosName; // 예: "FingerPos_Training_Open"
+    public Vector3 Offset;
+    public bool WaitForClick;
+    public System.Func<bool> Condition;
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+    [HideInInspector] public Transform Target; // 런타임에 자동 할당됨
+}
 
-        DontDestroyOnLoad(gameObject);
-    }
-
-    private void Start()
-    {
-        // QuestManager 이벤트 구독
-        QuestManager.Instance.OnQuestsUpdated += OnQuestsUpdated;
-        QuestManager.Instance.OnQuestProgressChanged += OnQuestProgressChanged;
-    }
-
-    private void OnDestroy()
-    {
-        if (QuestManager.Instance != null)
-        {
-            QuestManager.Instance.OnQuestsUpdated -= OnQuestsUpdated;
-            QuestManager.Instance.OnQuestProgressChanged -= OnQuestProgressChanged;
-        }
-    }
-
-    private void OnQuestsUpdated()
-    {
-        var activeQuests = QuestManager.Instance.activeQuests.Values
-            .Where(q => q.state == QuestState.InProgress && q.questType == QuestCategory.Mission)
-            .ToList();
-
-        if (activeQuests.Count == 0)
-        {
-            HideAllIndicators();
-            return;
-        }
-
-        // 튜토리얼 우선순위 기반 정렬
-        Quest nextQuest = null;
-        foreach (var questId in tutorialPriorityOrder)
-        {
-            nextQuest = activeQuests.FirstOrDefault(q => q.questID == questId);
-            if (nextQuest != null)
-                break;
-        }
-
-        if (nextQuest != null)
-            ShowIndicatorForQuest(nextQuest);
-        else
-            HideAllIndicators();
-    }
-
-
-    private void OnQuestProgressChanged(Quest quest)
-    {
-        if (quest.isComplete)
-        {
-            HideIndicator(quest.questID);
-        }
-    }
-
-    private void ShowIndicatorForQuest(Quest quest)
-    {
-        HideAllIndicators(); // 중복 방지
-
-        if (quest == null || string.IsNullOrEmpty(quest.questID))
-            return;
-
-        Transform target = FindTargetTransformByQuestTarget(quest.questTarget);
-        if (target == null)
-        {
-            Debug.LogWarning($"[TutorialManager] '{quest.questTarget}' 대상 UI를 찾을 수 없습니다.");
-            return;
-        }
-
-        if (!indicatorMap.TryGetValue(quest.questID, out var indicator))
-        {
-            indicator = Instantiate(fingerIndicatorPrefab, indicatorRoot);
-            indicator.name = $"Indicator_{quest.questID}";
-            indicatorMap[quest.questID] = indicator;
-        }
-
-        indicator.transform.SetParent(target, false);
-        indicator.transform.localPosition = Vector3.zero;
-        indicator.SetActive(true);
-        currentIndicator = indicator;
-
-        Debug.Log($"[TutorialManager] 인디케이터 표시: {quest.questName} ({quest.questTarget})");
-    }
-
-    /// <summary>
-    /// QuestTargetType 값에 따라 실제 UI 오브젝트 위치를 찾음
-    /// </summary>
-    private Transform FindTargetTransformByQuestTarget(QuestTargetType targetType)
-    {
-        // 실제 UI 구조에 맞게 연결해야 하는 부분
-        switch (targetType)
-        {
-            case QuestTargetType.Training:
-            case QuestTargetType.ExtPow:
-                return GameObject.Find("UI/GrowthTab/ExtPowerButton")?.transform;
-
-            case QuestTargetType.InnPow:
-                return GameObject.Find("UI/GrowthTab/InnPowerButton")?.transform;
-
-            case QuestTargetType.Vital:
-                return GameObject.Find("UI/GrowthTab/VitalTrainingButton")?.transform;
-
-            case QuestTargetType.Enhance:
-                return GameObject.Find("UI/EquipTab/EnhanceButton")?.transform;
-
-            case QuestTargetType.Growth:
-                return GameObject.Find("UI/CharacterTab/GrowthButton")?.transform;
-
-            case QuestTargetType.Stage:
-                return GameObject.Find("UI/StageTab/EnterStageButton")?.transform;
-
-            default:
-                return null;
-        }
-    }
-
-    private void HideIndicator(string questID)
-    {
-        if (indicatorMap.TryGetValue(questID, out var indicator))
-        {
-            indicator.SetActive(false);
-            Debug.Log($"[TutorialManager] 인디케이터 숨김: {questID}");
-        }
-    }
-
-    private void HideAllIndicators()
-    {
-        foreach (var indicator in indicatorMap.Values)
-            indicator.SetActive(false);
-
-        currentIndicator = null;
-    }
+[System.Serializable]
+public class TutorialScenario
+{
+    public string QuestID;                   // ex) QT001
+    public List<TutorialStep> Steps;         // 단계별 손가락 / 설명
 }
