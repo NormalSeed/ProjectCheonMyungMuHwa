@@ -90,24 +90,6 @@ public class InGameManager : MonoBehaviour
                 isQuitUIActive = true;
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            KilAllPlayers();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            surface.BuildNavMesh();
-        }
-    }
-
-    private void KilAllPlayers()
-    {
-        foreach (PlayerController player in players)
-        {
-            if (player.isDead.Value == true) continue;
-            player.Dead();
-        }
     }
 
     private void LoadStageFromFirebase()
@@ -175,7 +157,7 @@ public class InGameManager : MonoBehaviour
         if (isProcessingAlignment || num < playerCount) return;
         if (stagetext != null) stagetext.text = stage;
 
-        Debug.LogError("aligned 검사 통과");
+        Debug.LogError("[InGame] aligned 검사 통과");
         
         isProcessingAlignment = true;
         MapManager.Instance.SpawnMonsters(stageNum, stageProgress);

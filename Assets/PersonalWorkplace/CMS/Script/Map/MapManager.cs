@@ -144,6 +144,7 @@ public class MapManager : MonoBehaviour
             {
                 PoolManager.Instance.SpawnMonster(point.transform.position, point.monsterType);
             }
+            Debug.Log("[MapManager] Monster Spawn");
             return false;
         }
         else // 3관문 → 보스 추가
