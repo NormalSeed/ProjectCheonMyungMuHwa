@@ -9,8 +9,10 @@ public class HeroSprites : MonoBehaviour
     public static HeroSprites Instance { get; private set; }
 
     public List<Sprite> Sprites = new();
+    public List<Sprite> Standing = new();
 
     private Dictionary<string, Sprite> spriteLookup = new();
+    private Dictionary<string, Sprite> standingLookup = new();
 
     private List<string> charIDs = new List<string>
     {
@@ -53,6 +55,7 @@ public class HeroSprites : MonoBehaviour
         {
             string spriteId = id + "_sprite";
             var handle = Addressables.LoadAssetAsync<Sprite>(spriteId);
+            
             yield return handle;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
@@ -61,6 +64,16 @@ public class HeroSprites : MonoBehaviour
                 Sprites.Add(sprite);
                 spriteLookup[id] = sprite;
                 Debug.Log($"[HeroSprites] 스프라이트 로드 완료: {id}");
+            }
+
+            string standingId = id + "_standing";
+            var handle2 = Addressables.LoadAssetAsync<Sprite>(standingId);
+            yield return handle2;
+            if (handle2.Status == AsyncOperationStatus.Succeeded)
+            {
+                var sprite = handle2.Result;
+                Standing.Add(sprite);
+                standingLookup[id] = sprite;
             }
             else
             {
@@ -75,6 +88,11 @@ public class HeroSprites : MonoBehaviour
     public Sprite GetCharacterSprite(string charID)
     {
         spriteLookup.TryGetValue(charID, out var sprite);
+        return sprite;
+    }
+    public Sprite GetCharacterStanding(string charID)
+    {
+        standingLookup.TryGetValue(charID, out var sprite);
         return sprite;
     }
 }
