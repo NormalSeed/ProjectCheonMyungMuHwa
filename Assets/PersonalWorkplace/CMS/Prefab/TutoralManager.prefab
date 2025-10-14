@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6693181932632271264
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8424200604968811140}
+  - component: {fileID: 6110903116783189969}
+  m_Layer: 0
+  m_Name: TutoralManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8424200604968811140
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6693181932632271264}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 157.52174, y: 2009.545, z: -0.16382086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6110903116783189969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6693181932632271264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fb62a213fea2c14e80ab6c87a2a9736, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fingerPrefab: {fileID: 8091255897304988262, guid: 0e726a9fceb60064985182cdfa4b95f4, type: 3}
+  indicatorRoot: {fileID: 0}
+  tutorialScenarios:
+  - QuestID: QT001
+    Steps:
+    - Id: Step1
+      FingerPosName: FingerPos_Training_Open
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Step2
+      FingerPosName: FingerPos_Training_10x
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+  - QuestID: QT002
+    Steps:
+    - Id: Step1
+      FingerPosName: FingerPos_Gacha1_Open
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Step2
+      FingerPosName: FingerPos_Gacha1_Do
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+  - QuestID: QT003
+    Steps:
+    - Id: Stpe1
+      FingerPosName: FingerPos_Growth_Open
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe2
+      FingerPosName: FingerPos_Growth_Open2
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe2
+      FingerPosName: FingerPos_Growth_Do
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+  - QuestID: QT004
+    Steps:
+    - Id: Stpe1
+      FingerPosName: FingerPos_Dungeon1_Open
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe2
+      FingerPosName: FingerPos_Dungeon1_Open2
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe3
+      FingerPosName: FingerPos_Dungeon1_Do
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+  - QuestID: QT005
+    Steps:
+    - Id: Stpe1
+      FingerPosName: FingerPos_Dungeon2_Open
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe2
+      FingerPosName: FingerPos_Dungeon2_Open2
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
+    - Id: Stpe3
+      FingerPosName: FingerPos_Dungeon2_Go
+      Offset: {x: 0, y: 0, z: 0}
+      WaitForClick: 1
+      Target: {fileID: 0}
