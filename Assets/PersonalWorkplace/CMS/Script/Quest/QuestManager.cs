@@ -1,4 +1,3 @@
-using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using System;
@@ -7,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 public class QuestManager : MonoBehaviour
 {
@@ -502,38 +500,44 @@ public class QuestManager : MonoBehaviour
     }
     public void ReportEvent(QuestTargetType type, int amount = 1, bool saveImmediately = true)
     {
+        #if UNITY_EDITOR
         Debug.Log($"[ReportEvent 호출] type={type}, amount={amount}");
+        #endif
 
         var matchedQuests = activeQuests.Values
-            .Where(q => q.questTarget == type && q.state == QuestState.InProgress);
+            .Where(q => q.questTarget == type && q.state == QuestState.InProgress)
+            .ToList();
 
-        if (!matchedQuests.Any())
-        {
-            Debug.LogWarning($"[ReportEvent] type={type} 매칭 퀘스트 없음! activeQuests 상태를 확인하세요.");
-            foreach (var q in activeQuests.Values)
-            {
-                Debug.Log($" → {q.questName}, Target={q.questTarget}, State={q.state}, Progress={q.valueProgress}/{q.valueGoal}");
-            }
-        }
+        // 매칭 퀘스트가 없으면 조용히 리턴
+        if (matchedQuests.Count == 0)
+            return;
 
         foreach (var quest in matchedQuests)
         {
+            int prevProgress = quest.valueProgress; // 이전 값 저장
+
             quest.valueProgress += amount;
 
+            // 목표 초과 방지
             if (quest.valueProgress >= quest.valueGoal)
             {
                 quest.valueProgress = quest.valueGoal;
-                CompleteQuest(quest); // 여기서 OnQuestsUpdated 호출
+                CompleteQuest(quest);
+
+                #if UNITY_EDITOR
+                Debug.Log($"[ReportEvent] {quest.questName} 완료! ({quest.valueProgress}/{quest.valueGoal})");
+                #endif
             }
-            else
+            else if (quest.valueProgress != prevProgress) // 실제 진행도 변했을 때만 로그
             {
                 quest.lastUpdated = NowUtc();
                 if (saveImmediately) SaveQuests();
 
-                // 진행도 이벤트 호출
                 OnQuestProgressChanged?.Invoke(quest);
 
-                Debug.Log($"[ReportEvent] {type} → {quest.questName}: {quest.valueProgress}/{quest.valueGoal}");
+                #if UNITY_EDITOR
+                Debug.Log($"[ReportEvent] {quest.questName} 진행도 업데이트: {prevProgress} → {quest.valueProgress}/{quest.valueGoal}");
+                #endif
             }
         }
     }
@@ -609,21 +613,35 @@ public class QuestManager : MonoBehaviour
     public void TryUnlockQuests()
     {
         bool needsUpdate = false;
+
         foreach (var quest in activeQuests.Values)
         {
-            if (quest.questType != QuestCategory.Mission) continue;
+            if (quest.questType != QuestCategory.Mission)
+                continue;
 
+            // 해금 조건 통과 + 잠금 상태일 때만 처리
             if (quest.state == QuestState.Locked && CheckUnlockCondition(quest))
             {
                 quest.state = QuestState.InProgress;
                 Debug.Log($"[TryUnlockQuests] Mission 해금: {quest.questName}");
                 needsUpdate = true;
-            }
 
-            if (needsUpdate)
-            {
-                OnQuestsUpdated?.Invoke();
+                // 튜토리얼 실행 연결
+                if (TutorialManager.Instance != null)
+                {
+                    TutorialManager.Instance.StartTutorial(quest.questID);
+                    Debug.Log($"[튜토리얼 시작 호출] {quest.questID}");
+                }
+                else
+                {
+                    Debug.LogWarning("[튜토리얼] TutorialManager 인스턴스가 존재하지 않습니다.");
+                }
             }
+        }
+
+        if (needsUpdate)
+        {
+            OnQuestsUpdated?.Invoke();
         }
     }
     public Quest GetQuestToDisplayOnHUD()
