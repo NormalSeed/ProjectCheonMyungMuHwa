@@ -110,6 +110,8 @@ public class InGameManager : MonoBehaviour
             else
             {
                 Debug.LogWarning("Firebase에서 스테이지 데이터를 찾을 수 없습니다. 기본값 사용.");
+                stageNum = 1;
+                stageLoaded = true;
             }
         });
         StartCoroutine(InitStage());
@@ -345,17 +347,4 @@ public class InGameManager : MonoBehaviour
         mainUI.ShowUI(mainUiToOpen);
         FadeCanvas.Instance.FadeIn(1.5f);
     }
-
-    private void FadeOut()
-    {
-        fadeImage.color = new Color(0, 0, 0, 0);
-        fadeImage.DOFade(1f, 2f);
-    }
-
-    private void FadeIn()
-    {
-        fadeImage.color = new Color(0, 0, 0, 1);
-        fadeImage.DOFade(0f, 1.5f);
-    }
-
 }
