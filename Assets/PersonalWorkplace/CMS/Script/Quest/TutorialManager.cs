@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TutorialManager : MonoBehaviour
@@ -62,13 +63,20 @@ public class TutorialManager : MonoBehaviour
         var step = steps[currentStepIndex];
 
         if (fingerInstance == null)
+        {
             fingerInstance = Instantiate(fingerPrefab, indicatorRoot);
+        }
+        else
+        {
+            // 이미 손가락이 있다면 다시 활성화시켜줍니다.
+            fingerInstance.SetActive(true);
+        }
 
-        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, step.Target.position);
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, step.Target.position);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             indicatorRoot as RectTransform,
             screenPos,
-            null,
+            Camera.main,
             out Vector2 localPos
         );
         fingerInstance.GetComponent<RectTransform>().anchoredPosition = localPos + (Vector2)step.Offset;
@@ -91,18 +99,84 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator WaitForClick(Transform target)
     {
-        Button btn = target.GetComponent<Button>();
-        if (btn != null)
+        bool clicked = false;
+
+        // 손가락 RectTransform
+        RectTransform fingerRect = target.GetComponent<RectTransform>();
+        if (fingerRect == null)
         {
-            bool clicked = false;
-            btn.onClick.AddListener(() => clicked = true);
-            yield return new WaitUntil(() => clicked);
-            btn.onClick.RemoveAllListeners();
+            Debug.LogError("[튜토리얼] Target에 RectTransform이 없습니다!");
+            yield break;
         }
-        else
+
+        Canvas rootCanvas = indicatorRoot.GetComponentInParent<Canvas>();
+        if (rootCanvas == null)
         {
-            yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+            Debug.LogError("[튜토리얼] indicatorRoot의 Canvas를 찾을 수 없습니다!");
+            yield break;
         }
+
+        Debug.Log("[튜토리얼] 손가락 클릭 감지 대기 시작");
+
+        while (!clicked)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (EventSystem.current == null)
+                {
+                    Debug.LogWarning("[튜토리얼] EventSystem이 없습니다!");
+                    yield break;
+                }
+
+                Vector2 inputPos = Input.mousePosition;
+                PointerEventData eventData = new PointerEventData(EventSystem.current)
+                {
+                    position = inputPos
+                };
+
+                List<RaycastResult> results = new List<RaycastResult>();
+                EventSystem.current.RaycastAll(eventData, results);
+
+                foreach (var r in results)
+                {
+                    Button btn = r.gameObject.GetComponent<Button>();
+                    if (btn == null) continue;
+
+                    // 클릭된 버튼의 Canvas 기준 좌표 계산
+                    RectTransform btnRect = btn.GetComponent<RectTransform>();
+                    Vector2 btnLocalPos, fingerLocalPos;
+
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        rootCanvas.GetComponent<RectTransform>(),
+                        RectTransformUtility.WorldToScreenPoint(null, btnRect.position),
+                        null,
+                        out btnLocalPos
+                    );
+
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        rootCanvas.GetComponent<RectTransform>(),
+                        RectTransformUtility.WorldToScreenPoint(null, fingerRect.position),
+                        null,
+                        out fingerLocalPos
+                    );
+
+                    float dist = Vector2.Distance(btnLocalPos, fingerLocalPos);
+                    Debug.Log($"[튜토리얼] 클릭된 버튼: {btn.name}, 손가락과 거리: {dist:F1}px");
+
+                    // 반경 내라면 클릭 인정
+                    if (dist <= 200f)
+                    {
+                        Debug.Log($"[튜토리얼] 클릭 인정 → {btn.name}");
+                        clicked = true;
+                        break;
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        Debug.Log("[튜토리얼] 클릭 감지 완료 → 다음 단계로 이동");
         NextStep();
     }
 
