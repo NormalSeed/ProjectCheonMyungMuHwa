@@ -13,9 +13,9 @@ public class CurrencyUI : MonoBehaviour
     [SerializeField] private CurrencyType _targetCurrency;
     [SerializeField] private TMP_Text _currencyText;
     [SerializeField] private Image _currencyImage;
-    [SerializeField] private CurrencyConfig _config; // CurrencyType ↔ Item_ID 매핑 SO
+    [SerializeField] private CurrencyConfig _config;
 
-    #endregion // serialize field
+    #endregion
 
 
 
@@ -25,10 +25,9 @@ public class CurrencyUI : MonoBehaviour
 
     private ICurrencyModel _model;
     private AsyncOperationHandle<Sprite>? _loadedHandle;
-    [Inject]
-    private TableManager _tableManager; // VContainer 주입
+    [Inject] private TableManager _tableManager;
 
-    #endregion // private field
+    #endregion
 
 
 
@@ -38,11 +37,7 @@ public class CurrencyUI : MonoBehaviour
 
     public Action<CurrencyType> OnCurrencyClicked;
 
-    #endregion // public events
-
-
-
-
+    #endregion
 
     #region DI
 
@@ -52,7 +47,7 @@ public class CurrencyUI : MonoBehaviour
         _tableManager = tableManager;
     }
 
-    #endregion // DI
+    #endregion
 
 
 
@@ -97,14 +92,13 @@ public class CurrencyUI : MonoBehaviour
         ReleaseImageHandle();
     }
 
-    #endregion // mono funcs
+    #endregion
 
 
 
 
 
     #region public funcs
-
     public void SetCurrencyType(CurrencyType type)
     {
         _targetCurrency = type;
@@ -142,7 +136,6 @@ public class CurrencyUI : MonoBehaviour
             return;
         }
 
-        // Tooltip 표시
         PopupManager.Instance.ShowTooltip(itemData);
     }
 
@@ -151,7 +144,7 @@ public class CurrencyUI : MonoBehaviour
         OnCurrencyClicked?.Invoke(_targetCurrency);
     }
 
-    #endregion // public funcs
+    #endregion
 
 
 
@@ -168,7 +161,8 @@ public class CurrencyUI : MonoBehaviour
 
     private string FormatCurrency(BigCurrency currency)
     {
-        return currency.ToString();
+        // BigCurrency.ToString()이 Tier 0에서 정수(버림) 출력하도록 변경됨
+        return currency?.ToString() ?? "0";
     }
 
     private void LoadCurrencyImage(CurrencyType type)
@@ -186,7 +180,7 @@ public class CurrencyUI : MonoBehaviour
 
         string key = itemData.ImageKey;
 
-        _loadedHandle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<Sprite>(key);
+        _loadedHandle = Addressables.LoadAssetAsync<Sprite>(key);
         _loadedHandle.Value.Completed += handle => {
             if (handle.Status == AsyncOperationStatus.Succeeded) {
                 _currencyImage.sprite = handle.Result;
@@ -200,10 +194,10 @@ public class CurrencyUI : MonoBehaviour
     private void ReleaseImageHandle()
     {
         if (_loadedHandle.HasValue) {
-            UnityEngine.AddressableAssets.Addressables.Release(_loadedHandle.Value);
+            Addressables.Release(_loadedHandle.Value);
             _loadedHandle = null;
         }
     }
 
-    #endregion // private funcs
+    #endregion
 }
