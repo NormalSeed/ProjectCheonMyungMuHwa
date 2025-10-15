@@ -150,8 +150,15 @@ public sealed class BigCurrency : IComparable<BigCurrency>, IEquatable<BigCurren
     public override string ToString()
     {
         if (Value == 0) return "0";
+
+        // 1A(=Tier 0) 이하면 소수점 없이 정수(버림)
+        if (Tier == 0) {
+            var floored = Math.Floor(Value);
+            return ((long)floored).ToString();
+        }
+
         var unit = GetUnit(Tier);
-        return string.IsNullOrEmpty(unit) ? $"{Value:F2}" : $"{Value:F2}{unit}";
+        return $"{Value:F2}{unit}";
     }
 
     // 문자열 파싱(옵션): "12.3AB" -> Value=12.3, Tier=27
