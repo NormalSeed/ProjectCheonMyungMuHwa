@@ -175,8 +175,7 @@ public abstract class MonsterController : MonoBehaviour, IDamagable, IPooled<Mon
     protected virtual void DropItem()
     {
         if (DoNotDropItem) return;
-        int stage = Model.BaseModel.CurrentDoor;
-        int door = (stage + 2) / 3;
+        int door = Model.BaseModel.CurrentDoor;
         if (door >= 2)
         {
             DroppedItem i1 = PoolManager.Instance.ItemPool.GetItem(transform.position);
