@@ -129,7 +129,13 @@ public class PoolManager : MonoBehaviour
                 {
                     str = "100Boss";
                 }
-                else if (currentDoor % 25 == 0)
+                else
+                {
+                    str = "BigBoss";
+                }
+                break;
+            case 5:                 
+                if (currentDoor % 25 == 0)
                 {
                     str = "50Boss";
                 }
@@ -138,7 +144,6 @@ public class PoolManager : MonoBehaviour
                     str = "BigBoss";
                 }
                 break;
-            case 5: str = "BigBoss"; break;
             case 1: case 6: str = "PunchBoss"; break;
             case 2: case 7: str = "StickBoss"; break;
             case 3: case 8: str = "CaneBoss"; break;
