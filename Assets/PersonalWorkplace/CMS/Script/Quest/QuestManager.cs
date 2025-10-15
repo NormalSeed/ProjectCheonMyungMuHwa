@@ -366,7 +366,6 @@ public class QuestManager : MonoBehaviour
 
         SaveQuests();
         OnQuestsUpdated?.Invoke();
-        PopupManager.Instance.ShowMissionClearPanel(quest.questName);
     }
 
     // 보상 지급 로직
