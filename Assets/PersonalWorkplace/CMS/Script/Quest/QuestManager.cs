@@ -366,7 +366,6 @@ public class QuestManager : MonoBehaviour
 
         SaveQuests();
         OnQuestsUpdated?.Invoke();
-        PopupManager.Instance.ShowMissionClearPanel(quest.questName);
     }
 
     // 보상 지급 로직
@@ -505,30 +504,31 @@ public class QuestManager : MonoBehaviour
         #endif
 
         var matchedQuests = activeQuests.Values
-            .Where(q => q.questTarget == type && q.state == QuestState.InProgress)
-            .ToList();
+        .Where(q => q.questTarget == type && q.state == QuestState.InProgress)
+        .ToList();
 
-        // 매칭 퀘스트가 없으면 조용히 리턴
         if (matchedQuests.Count == 0)
             return;
 
+        bool needsUIRefresh = false; // UI 갱신이 필요한지 확인하는 플래그
+
         foreach (var quest in matchedQuests)
         {
-            int prevProgress = quest.valueProgress; // 이전 값 저장
+            int prevProgress = quest.valueProgress;
 
             quest.valueProgress += amount;
 
-            // 목표 초과 방지
             if (quest.valueProgress >= quest.valueGoal)
             {
                 quest.valueProgress = quest.valueGoal;
-                CompleteQuest(quest);
+                CompleteQuest(quest); // 이 메소드는 quest.state를 RewardReady로 바꿀 것입니다.
+                needsUIRefresh = true; // 퀘스트가 완료되었으니 UI 갱신 필요!
 
                 #if UNITY_EDITOR
                 Debug.Log($"[ReportEvent] {quest.questName} 완료! ({quest.valueProgress}/{quest.valueGoal})");
                 #endif
             }
-            else if (quest.valueProgress != prevProgress) // 실제 진행도 변했을 때만 로그
+            else if (quest.valueProgress != prevProgress)
             {
                 quest.lastUpdated = NowUtc();
                 if (saveImmediately) SaveQuests();
@@ -539,6 +539,12 @@ public class QuestManager : MonoBehaviour
                 Debug.Log($"[ReportEvent] {quest.questName} 진행도 업데이트: {prevProgress} → {quest.valueProgress}/{quest.valueGoal}");
                 #endif
             }
+        }
+
+        // foreach 루프가 끝난 후, 갱신이 필요하면 이벤트를 한 번만 호출합니다.
+        if (needsUIRefresh)
+        {
+            OnQuestsUpdated?.Invoke();
         }
     }
 
