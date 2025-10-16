@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1507264807021628243
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3336453167415990085}
+  - component: {fileID: 4480309320367847251}
+  m_Layer: 0
+  m_Name: STutorialManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3336453167415990085
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507264807021628243}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 720, y: 1480, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4480309320367847251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507264807021628243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f42abd14a99cf54984c7a191a852bf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fingerPrefab: {fileID: 8091255897304988262, guid: 0e726a9fceb60064985182cdfa4b95f4, type: 3}
+  indicatorRoot: {fileID: 0}
+  steps:
+  - FingerPosName: Gacha
+    Target: {fileID: 0}
+    Offset: {x: 869.1352, y: 247, z: 0}
+  - FingerPosName: Gacha 10
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 92, z: 0}
+  - FingerPosName: Gacha Result
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 115, z: 0}
+  - FingerPosName: Gacha X
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 97, z: 0}
+  - FingerPosName: Hero
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 97, z: 0}
+  - FingerPosName: HeroSetting
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 84, z: 0}
+  - FingerPosName: HeroAutoSetting
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 84, z: 0}
+  - FingerPosName: HeroSetSave
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 79, z: 0}
+  - FingerPosName: Hero X
+    Target: {fileID: 0}
+    Offset: {x: 0, y: 97, z: 0}
+  replayButton: {fileID: 0}
