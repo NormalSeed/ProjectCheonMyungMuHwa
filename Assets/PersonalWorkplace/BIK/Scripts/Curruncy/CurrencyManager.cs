@@ -135,7 +135,7 @@ public class CurrencyManager : IStartable, IDisposable
         _model.Set(CurrencyType.Gold, new BigCurrency(0, 0));
         _model.Set(CurrencyType.Soul, new BigCurrency(0, 0));
         _model.Set(CurrencyType.SpiritStone, new BigCurrency(0, 0));
-        _model.Set(CurrencyType.SummonTicket, new BigCurrency(0, 0));
+        _model.Set(CurrencyType.SummonTicket, new BigCurrency(100, 0));
         _model.Set(CurrencyType.InvitationTicket, new BigCurrency(0, 0));
         _model.Set(CurrencyType.GoldChallengeTicket, new BigCurrency(0, 0));
         _model.Set(CurrencyType.SoulChallengeTicket, new BigCurrency(0, 0));
@@ -191,8 +191,7 @@ public class CurrencyManager : IStartable, IDisposable
         var partyInfoRef = _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo");
 
         List<string> heroIdList = new();
-        foreach (var card in party)
-        {
+        foreach (var card in party) {
             heroIdList.Add(card.HeroID);
         }
         partyInfoRef.SetValueAsync(heroIdList);
@@ -211,25 +210,20 @@ public class CurrencyManager : IStartable, IDisposable
         var snapshot = await _dbRef.Child("users").Child(_uid).Child("character").Child("partyInfo").GetValueAsync();
         resultList.Clear();
 
-        if (snapshot.Exists)
-        {
+        if (snapshot.Exists) {
             var rawList = snapshot.Value as List<object>;
-            if (rawList != null)
-            {
-                foreach (var obj in rawList)
-                {
+            if (rawList != null) {
+                foreach (var obj in rawList) {
                     string heroId = obj.ToString();
 
                     // Addressables에서 해당 HeroID로 CardInfo 로드
-                    var handle = Addressables.LoadAssetAsync<CardInfo>(heroId+"CardInfo");
+                    var handle = Addressables.LoadAssetAsync<CardInfo>(heroId + "CardInfo");
                     await handle.Task;
 
-                    if (handle.Status == AsyncOperationStatus.Succeeded)
-                    {
+                    if (handle.Status == AsyncOperationStatus.Succeeded) {
                         resultList.Add(handle.Result);
                     }
-                    else
-                    {
+                    else {
                         Debug.LogWarning($"Addressables에서 HeroID '{heroId}' 로드 실패");
                     }
                 }
