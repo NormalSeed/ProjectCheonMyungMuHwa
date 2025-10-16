@@ -141,7 +141,7 @@ public class CurrencyUI : MonoBehaviour
 
     public void OnClick_Text()
     {
-        OnCurrencyClicked?.Invoke(_targetCurrency);
+        //OnCurrencyClicked?.Invoke(_targetCurrency);
     }
 
     #endregion
