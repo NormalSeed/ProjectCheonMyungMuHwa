@@ -19,7 +19,7 @@ public class ForbiddenWordManager
         TextAsset csvFile = Resources.Load<TextAsset>(resourcePath);
         if (csvFile == null)
         {
-            Debug.LogError($"[SimpleForbiddenWordManager] CSV 파일을 찾을 수 없습니다: {resourcePath}");
+            Debug.LogError($"[ForbiddenWordManager] CSV 파일을 찾을 수 없습니다: {resourcePath}");
             return;
         }
 
