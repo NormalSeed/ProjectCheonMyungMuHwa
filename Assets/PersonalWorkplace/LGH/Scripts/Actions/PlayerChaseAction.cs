@@ -47,6 +47,7 @@ public partial class PlayerChaseAction : Action
 
         // 타겟 지정(가장 가까운 상대)
         Target.Value = GetTarget();
+        if (Target.Value == null) return Status.Failure;
         mController = Target.Value.GetComponent<MonsterController>();
         // agent 속도 설정
         agent.speed = model.modelSO != null ? model.modelSO.MoveSpeed : agent.speed;

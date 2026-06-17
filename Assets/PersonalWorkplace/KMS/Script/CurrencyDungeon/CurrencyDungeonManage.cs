@@ -13,7 +13,7 @@ public class CurrencyDungeonManage : MonoBehaviour
     [SerializeField] CurrencyDungeonSceneLoadDataSO sceneData;
     private CurrencyDungeonClearData clearData;
 
-    [SerializeField] CurrencyDungeonTimer timer => barUI.Timer;
+    CurrencyDungeonTimer timer => barUI.Timer;
 
     [SerializeField] StageBarUI barUI;
 

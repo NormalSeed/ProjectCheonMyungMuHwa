@@ -23,6 +23,8 @@ public class QuestManager : MonoBehaviour
     private float saveInterval = 30f;     // 30초마다 Firebase 저장
     private float saveTimer = 0f;
 
+    private Coroutine _saveCoroutine = null;
+
     //UI 갱신용 이벤트
     public event Action OnQuestsUpdated;
     public event Action<Quest> OnQuestProgressChanged;
@@ -407,8 +409,21 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // Firebase 저장
+    // Firebase 저장 (BehaviorGraph 틱 블로킹 방지를 위해 1프레임 지연 처리)
     private void SaveQuests()
+    {
+        if (_saveCoroutine == null)
+            _saveCoroutine = StartCoroutine(DeferredSaveCoroutine());
+    }
+
+    private IEnumerator DeferredSaveCoroutine()
+    {
+        yield return null; // BehaviorGraph 틱 밖에서 실행되도록 1프레임 대기
+        _saveCoroutine = null;
+        ExecuteSave();
+    }
+
+    private void ExecuteSave()
     {
         if (BackendManager.Auth?.CurrentUser == null || dbRef == null)
         {

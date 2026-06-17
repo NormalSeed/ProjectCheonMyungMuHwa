@@ -27,7 +27,7 @@ public class QuestHUD : MonoBehaviour
     {
         switch (type)
         {
-            case CurrencyType.Gold: return "Icon_Gold";
+            case CurrencyType.Gold: return "GoldImage";
             default: return null;
         }
     }

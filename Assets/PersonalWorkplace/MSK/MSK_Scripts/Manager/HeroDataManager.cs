@@ -375,8 +375,14 @@ public class HeroDataManager : IStartable
             return 0f;
         }
 
+        if (hero.PlayerModelSO == null)
+        {
+            Debug.LogWarning($"[CombatPower] {hero.heroId}의 PlayerModelSO가 null입니다 (모델 로드 실패)");
+            return 0f;
+        }
+
         var card = hero.cardInfo;
-        
+
         card.CritRate = hero.PlayerModelSO.CritRate + hero.PlayerModelSO.CritRate_Increase * (hero.PlayerModelSO.Level-1);
         card.CritDamage  = hero.PlayerModelSO.CritDamage + hero.PlayerModelSO.CritDamage_Increase * (hero.PlayerModelSO.Level-1);
 

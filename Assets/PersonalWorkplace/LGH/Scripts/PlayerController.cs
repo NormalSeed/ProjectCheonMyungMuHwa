@@ -121,7 +121,8 @@ public class PlayerController : MonoBehaviour, IDamagable
         isShieldActive = false;
         damageDealt = 0;
 
-        skillSet.SetActive(false);
+        if (skillSet != null)
+            skillSet.SetActive(false);
         skillSet = null;
         GameEvents.OnHeroLevelChanged -= HandleHeroLevelChanged;
         model.CurHealth.UnsubscribeAll();
